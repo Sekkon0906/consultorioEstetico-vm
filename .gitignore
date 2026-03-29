@@ -1,0 +1,50 @@
+# ==========================
+# Node / Monorepo
+# ==========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+*.log
+
+server/config/*.json
+firebase-service-account.json
+server/config/consultorioesteticova-firebase-adminsdk-*.json
+
+# ==========================
+# Next.js (frontend)
+# ==========================
+.next/
+out/
+.vercel/
+.turbo/
+
+# Env files (NUNCA subir claves)
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# ==========================
+# Server (backend)
+# ==========================
+#server/node_modules/
+#server/.env
+#server/.env.local
+
+# PM2 / procesos
+pids
+*.pid
+*.seed
+
+# ==========================
+# SO / Editor
+# ==========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
