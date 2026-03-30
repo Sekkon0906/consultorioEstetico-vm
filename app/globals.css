@@ -35,7 +35,7 @@
 /* Layout general del héroe de inicio */
 .hero-home {
   display: flex;
-  flex-direction: column; /* móvil: imagen arriba, texto abajo */
+  flex-direction: column;
   min-height: 100vh;
   background: linear-gradient(180deg, #f7eee6 0%, #fff7f0 60%, #ffffff 100%);
 }
@@ -45,7 +45,7 @@
 .hero-left {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9; /* da altura para el <Image fill /> en móvil */
+  height: 400px;
   overflow: hidden;
   isolation: isolate;
 }
@@ -53,6 +53,8 @@
 .hero-slide {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   opacity: 0;
   transform: scale(1.04);
   object-fit: cover;
@@ -79,6 +81,22 @@
 .hero-content {
   max-width: 540px;
   padding: 2.5rem 1.6rem 3rem;
+  opacity: 0;
+  transform: translateY(25px);
+  transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+}
+
+.hero-content-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero-separator {
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(90deg, #B08968, #C9AD8D);
+  border-radius: 2px;
+  margin: 0 0 1.2rem;
 }
 
 .hero-title {
@@ -174,8 +192,9 @@
 
   .hero-left {
     flex: 1 1 50%;
-    aspect-ratio: auto;
-    min-height: 520px;
+    height: auto;
+    min-height: 600px;
+    max-height: calc(100vh - 80px);
   }
 
   .hero-right {

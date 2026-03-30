@@ -1,281 +1,157 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Collapse } from "react-collapse";
-import { motion } from "framer-motion";
-import { Fade } from "react-awesome-reveal";
-import {
-  FaChevronDown,
-  FaChevronUp,
-  FaCalendarCheck,
-  FaEye,
-} from "react-icons/fa";
-
-import FondoAnimado from "./FondoAnimado";
-import SiluetasAnimadas from "./SiluetasAnimadas";
-
-//  Tipos de dominio (ya no usamos localDB)
+import { motion, AnimatePresence } from "framer-motion";
+import { FaChevronDown, FaCalendarCheck, FaEye } from "react-icons/fa";
 import type { Procedimiento } from "../types/domain";
-//  Servicio que habla con el backend
 import { getProcedimientosApi } from "../services/procedimientosApi";
+import dynamic from "next/dynamic";
 
-// =======================================================
-// Formateador universal de precios
-// Aplica puntos de miles a cualquier número en el texto
-// =======================================================
-function formatPrecioUniversal(precio: string | number): string {
-  if (typeof precio === "number") {
-    return precio.toLocaleString("es-CO", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
-  }
+const FondoAnimado = dynamic(() => import("./FondoAnimado"), { ssr: false });
+const SiluetasAnimadas = dynamic(() => import("./SiluetasAnimadas"), { ssr: false });
 
-  // Buscar todos los números y aplicar formato
-  return precio.replace(/\d{1,3}(?:\d{3})*(?:\.\d+)?/g, (match) => {
-    const num = parseFloat(match.replace(/\./g, "").replace(/,/g, "."));
-    if (isNaN(num)) return match;
-    return num.toLocaleString("es-CO", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
+function formatPrecio(precio: string | number): string {
+  if (typeof precio === "number") return precio.toLocaleString("es-CO");
+  return precio.replace(/\d{1,3}(?:\d{3})*(?:\.\d+)?/g, (m) => {
+    const n = parseFloat(m.replace(/\./g, "").replace(/,/g, "."));
+    return isNaN(n) ? m : n.toLocaleString("es-CO");
   });
 }
 
+const CATEGORIAS = [
+  { key: "Facial", titulo: "Procedimientos Faciales", icon: "fas fa-smile", desc: "Tratamientos para rejuvenecer, hidratar y perfeccionar tu rostro" },
+  { key: "Corporal", titulo: "Procedimientos Corporales", icon: "fas fa-child", desc: "Soluciones esteticas para el cuidado integral de tu cuerpo" },
+  { key: "Capilar", titulo: "Procedimientos Capilares", icon: "fas fa-cut", desc: "Tecnologias avanzadas para la salud y vitalidad de tu cabello" },
+];
+
 export default function ProcedimientosPage() {
   const [openSection, setOpenSection] = useState<string | null>(null);
-
   const [procedimientos, setProcedimientos] = useState<Procedimiento[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const toggleSection = (key: string) => {
-    setOpenSection(openSection === key ? null : key);
-  };
-
-  //  Cargar procedimientos desde el backend al montar
   useEffect(() => {
-    let mounted = true;
-
-    const fetchProcedimientos = async () => {
-      try {
-        setLoading(true);
-        const data = await getProcedimientosApi();
-        if (mounted) {
-          setProcedimientos(data);
-        }
-      } catch (err) {
-        console.error("Error cargando procedimientos:", err);
-        if (mounted) {
-          setError("No se pudieron cargar los procedimientos. Intenta de nuevo más tarde.");
-        }
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    fetchProcedimientos();
-    return () => {
-      mounted = false;
-    };
+    getProcedimientosApi().then(d => { setProcedimientos(d); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
-  // Agrupamos por categoría (si vienen vacíos, simplemente no muestra tarjetas)
-  const procedimientosPorCategoria: Record<string, Procedimiento[]> = {
-    "Explora los procedimientos faciales": procedimientos.filter(
-      (p) => p.categoria === "Facial"
-    ),
-    "Explora los procedimientos corporales": procedimientos.filter(
-      (p) => p.categoria === "Corporal"
-    ),
-    "Explora los procedimientos capilares": procedimientos.filter(
-      (p) => p.categoria === "Capilar"
-    ),
-  };
-
-  const fadeCard = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { delay: i * 0.1, duration: 0.4 },
-    }),
-  };
+  const toggle = (key: string) => setOpenSection(openSection === key ? null : key);
 
   return (
-    <main className="relative min-h-screen py-10 px-4 sm:px-8 overflow-hidden transition-colors duration-700">
-      {/* === Fondos animados === */}
-      <div className="absolute inset-0 -z-20">
+    <main style={{ position: "relative", minHeight: "100vh", padding: "3rem 1rem 5rem", overflow: "hidden" }}>
+      {/* Backgrounds */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
         <FondoAnimado tipo={openSection} />
       </div>
-
-      <div className="absolute inset-0 -z-10 opacity-80">
+      <div style={{ position: "absolute", inset: 0, zIndex: 0, opacity: 0.8 }}>
         <SiluetasAnimadas tipo={openSection} />
       </div>
 
-      {/* === Contenido principal === */}
-      <div className="max-w-6xl mx-auto relative z-10">
-        {/* Encabezado */}
-        <div className="text-center mb-12">
-          <h1
-            className="text-4xl font-bold mb-4"
-            style={{ color: "#4E3B2B", fontFamily: "'Playfair Display', serif" }}
-          >
-            Procedimientos Médicos y Estéticos
-          </h1>
-          <p
-            className="text-[#6C584C] max-w-3xl mx-auto text-lg"
-            style={{ lineHeight: 1.6 }}
-          >
-            Descubre tratamientos faciales, corporales y capilares realizados
-            con técnicas seguras y personalizadas.
-          </p>
+      <div style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} style={{ textAlign: "center", marginBottom: "3rem" }}>
+          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B08968", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>Nuestros servicios</span>
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.8rem, 4vw, 2.6rem)", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.8rem" }}>Procedimientos Medicos y Esteticos</h1>
+          <div style={{ width: 50, height: 3, background: "linear-gradient(90deg, #C9AD8D, #B08968)", borderRadius: 2, margin: "0 auto 0.8rem" }} />
+          <p style={{ fontSize: "1.05rem", color: "#7A6554", maxWidth: 600, margin: "0 auto" }}>Tratamientos faciales, corporales y capilares con tecnicas seguras y personalizadas</p>
+        </motion.div>
 
-          {/* Mensajes de estado */}
-          {loading && (
-            <p className="mt-4 text-sm text-[#6C584C]">
-              Cargando procedimientos...
-            </p>
-          )}
-          {error && !loading && (
-            <p className="mt-4 text-sm text-red-700">
-              {error}
-            </p>
-          )}
-        </div>
+        {loading && <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border" style={{ color: "#B08968" }} /></div>}
 
-        {/* Acordeón principal */}
-        {!loading &&
-          Object.entries(procedimientosPorCategoria).map(([titulo, items]) => (
-            <motion.div
-              key={titulo}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="mb-8 rounded-3xl shadow-md overflow-hidden border border-[#E9DED2] bg-white/80 backdrop-blur-md"
+        {/* Accordion sections */}
+        {!loading && CATEGORIAS.map((cat, catIdx) => {
+          const items = procedimientos.filter(p => p.categoria === cat.key);
+          const isOpen = openSection === cat.key;
+
+          return (
+            <motion.div key={cat.key}
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: catIdx * 0.1 }}
+              style={{ marginBottom: "1rem", borderRadius: 18, overflow: "hidden", border: "1px solid rgba(176,137,104,0.15)", boxShadow: "0 4px 16px rgba(78,59,43,0.06)", background: "rgba(255,253,250,0.85)", backdropFilter: "blur(8px)" }}
             >
-              {/* Cabecera */}
-              <button
-                onClick={() => toggleSection(titulo)}
-                className="w-full flex justify-between items-center px-6 py-5 bg-[#B08968] text-white text-lg font-semibold hover:bg-[#9A7458] transition-colors"
-              >
-                <span>{titulo}</span>
-                {openSection === titulo ? <FaChevronUp /> : <FaChevronDown />}
+              {/* Accordion header */}
+              <button onClick={() => toggle(cat.key)}
+                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.2rem 1.5rem", background: isOpen ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "transparent", border: "none", cursor: "pointer", transition: "all 0.3s" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: isOpen ? "rgba(255,255,255,0.2)" : "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "1rem" }}>
+                    <i className={cat.icon} />
+                  </div>
+                  <div style={{ textAlign: "left" }}>
+                    <div style={{ fontSize: "1.05rem", fontWeight: 700, color: isOpen ? "white" : "#3A2A1A" }}>{cat.titulo}</div>
+                    <div style={{ fontSize: "0.78rem", color: isOpen ? "rgba(255,255,255,0.8)" : "#8A7565", marginTop: 2 }}>{cat.desc}</div>
+                  </div>
+                </div>
+                <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
+                  <FaChevronDown style={{ color: isOpen ? "white" : "#B08968", fontSize: "0.9rem" }} />
+                </motion.div>
               </button>
 
-              {/* Contenido desplegable */}
-              <Collapse isOpened={openSection === titulo}>
-                <Fade cascade damping={0.1} triggerOnce>
-                  <div className="p-6 bg-[#FAF9F7]/70 backdrop-blur-md transition-all duration-700">
-                    {items.length === 0 ? (
-                      <p className="text-center text-[#6C584C] py-4">
-                        No hay procedimientos registrados en esta categoría por el momento.
-                      </p>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {items.map((p, i) => (
-                          <motion.div
-                            key={p.id}
-                            variants={fadeCard}
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true }}
-                            custom={i}
-                            className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-md border border-[#E9DED2] overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col"
-                          >
-                            {/* Imagen */}
-                            <div className="relative overflow-hidden rounded-t-3xl">
-                              <Image
-                                src={p.imagen}
-                                alt={p.nombre}
-                                width={900}
-                                height={900}
-                                className="w-full h-[60%] min-h-[20rem] object-cover transition-transform duration-700 hover:scale-110"
-                                style={{ objectPosition: "center" }}
-                              />
-                            </div>
-
-                            {/* Contenido */}
-                            <div className="p-6 flex flex-col justify-between h-[40%]">
-                              <div>
-                                <h3
-                                  className="text-xl font-semibold mb-2"
-                                  style={{
-                                    color: "#4E3B2B",
-                                    fontFamily: "'Playfair Display', serif",
-                                  }}
-                                >
-                                  {p.nombre}
-                                </h3>
-                                <p className="text-[#6C584C] mb-3 leading-relaxed text-[0.95rem]">
-                                  {p.desc}
-                                </p>
-                                <p className="text-[#B08968] font-semibold">
-                                  Precio estándar: {formatPrecioUniversal(p.precio)}
-                                </p>
-                                <small className="text-[#6C584C]/70 block mb-4">
-                                  *Los precios están en pesos colombianos, y el costo puede
-                                  cambiar según la valoración médica.*
-                                </small>
+              {/* Accordion content */}
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ overflow: "hidden" }}
+                  >
+                    <div style={{ padding: "1.5rem", background: "rgba(250,249,247,0.5)" }}>
+                      {items.length === 0 ? (
+                        <p style={{ textAlign: "center", color: "#9B8575", padding: "2rem 0" }}>No hay procedimientos en esta categoria por el momento.</p>
+                      ) : (
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "1.2rem" }}>
+                          {items.map((p, i) => (
+                            <motion.div key={p.id}
+                              initial={{ opacity: 0, y: 20, scale: 0.96 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              transition={{ duration: 0.4, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                              style={{ background: "rgba(255,253,250,0.95)", borderRadius: 16, border: "1px solid rgba(176,137,104,0.1)", overflow: "hidden", boxShadow: "0 4px 14px rgba(78,59,43,0.05)", transition: "box-shadow 0.3s, transform 0.3s", display: "flex", flexDirection: "column" }}
+                              onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 12px 30px rgba(78,59,43,0.12)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+                              onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 14px rgba(78,59,43,0.05)"; e.currentTarget.style.transform = ""; }}
+                            >
+                              {/* Image */}
+                              <div style={{ position: "relative", overflow: "hidden", height: 220 }}>
+                                {p.imagen ? (
+                                  <img src={p.imagen} alt={p.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s" }}
+                                    onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.06)"; }}
+                                    onMouseLeave={e => { e.currentTarget.style.transform = ""; }} />
+                                ) : (
+                                  <div style={{ width: "100%", height: "100%", background: "#E9DED2", display: "flex", alignItems: "center", justifyContent: "center", color: "#B08968" }}>Sin imagen</div>
+                                )}
                               </div>
 
-                              {/* Botones */}
-                              <div className="flex justify-center gap-4 mt-auto pt-4 border-t border-[#E9DED2] pb-6">
-                                {/* Agendar cita */}
-                                <Link
-                                  href={`/agendar?proc=${encodeURIComponent(p.nombre)}`}
-                                  className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-medium shadow-sm transition-all duration-300"
-                                  style={{
-                                    backgroundColor: "#B08968",
-                                    color: "#FAF9F7",
-                                    fontSize: "0.95rem",
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = "#9A7458";
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = "#B08968";
-                                  }}
-                                >
-                                  <FaCalendarCheck className="text-base" />
-                                  Agendar cita
-                                </Link>
+                              {/* Content */}
+                              <div style={{ padding: "1.2rem 1.3rem 1.4rem", flex: 1, display: "flex", flexDirection: "column" }}>
+                                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.4rem" }}>{p.nombre}</h3>
+                                <p style={{ fontSize: "0.83rem", color: "#6C584C", lineHeight: 1.55, marginBottom: "0.7rem", flex: 1 }}>
+                                  {p.desc.length > 100 ? p.desc.slice(0, 100) + "..." : p.desc}
+                                </p>
+                                <p style={{ fontSize: "0.9rem", fontWeight: 600, color: "#B08968", marginBottom: "0.2rem" }}>Precio: ${formatPrecio(p.precio)}</p>
+                                <small style={{ fontSize: "0.7rem", color: "#9B8575", display: "block", marginBottom: "1rem" }}>*Puede variar segun valoracion medica</small>
 
-                                {/* Ver más */}
-                                <Link
-                                  href={`/procedimientos/${p.id}`}
-                                  className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full border font-medium shadow-sm transition-all duration-300"
-                                  style={{
-                                    borderColor: "#B08968",
-                                    color: "#6C584C",
-                                    fontSize: "0.95rem",
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = "#B08968";
-                                    e.currentTarget.style.color = "#FAF9F7";
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = "transparent";
-                                    e.currentTarget.style.color = "#6C584C";
-                                  }}
-                                >
-                                  <FaEye className="text-base" />
-                                  Ver resultados
-                                </Link>
+                                <div style={{ display: "flex", gap: "0.5rem" }}>
+                                  <Link href={`/agendar?proc=${encodeURIComponent(p.nombre)}`}
+                                    style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "0.6rem 0", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", fontSize: "0.8rem", fontWeight: 600, textDecoration: "none", transition: "all 0.3s" }}>
+                                    <FaCalendarCheck style={{ fontSize: "0.75rem" }} /> Agendar
+                                  </Link>
+                                  <Link href={`/procedimientos/${p.id}`}
+                                    style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: "0.6rem 0", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", color: "#6C584C", fontSize: "0.8rem", fontWeight: 600, textDecoration: "none", transition: "all 0.3s", background: "transparent" }}>
+                                    <FaEye style={{ fontSize: "0.75rem" }} /> Ver detalle
+                                  </Link>
+                                </div>
                               </div>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </Fade>
-              </Collapse>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
-          ))}
+          );
+        })}
       </div>
     </main>
   );

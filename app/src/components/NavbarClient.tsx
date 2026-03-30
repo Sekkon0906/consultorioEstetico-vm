@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { IMG } from "@/lib/imagenes";
 
 export default function Navbar() {
   const pathname = usePathname() || "/";
@@ -97,13 +98,12 @@ export default function Navbar() {
       >
         {/* LOGO */}
         <Link href="/" className="navbar-logo d-flex align-items-center">
-          <Image
-            src="/imagenes/logo/LogoJM.jpg"
+          <img
+            src={IMG.logo}
             alt="Logo JM"
             width={75}
             height={55}
             className="me-2"
-            priority
           />
         </Link>
 

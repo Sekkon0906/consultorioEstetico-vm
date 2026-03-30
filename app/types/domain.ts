@@ -117,6 +117,7 @@ export interface Procedimiento {
   id: number;
   nombre: string;
   desc: string;
+  descCompleta?: string;
   // VARCHAR en BD, puede ser "180000", "350.000 – 450.000" o "Según valoración médica"
   precio: string;
   imagen: string;

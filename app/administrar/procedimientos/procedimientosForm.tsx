@@ -17,6 +17,7 @@ interface Props {
 export default function ProcedimientosForm({ procedimiento, onGuardar }: Props) {
   const [nombre, setNombre] = useState(procedimiento?.nombre || "");
   const [desc, setDesc] = useState(procedimiento?.desc || "");
+  const [descCompleta, setDescCompleta] = useState(procedimiento?.descCompleta || "");
   const [precio, setPrecio] = useState(
     procedimiento?.precio != null ? procedimiento.precio.toString() : ""
   );
@@ -33,7 +34,8 @@ export default function ProcedimientosForm({ procedimiento, onGuardar }: Props) 
 const payload = {
   nombre,
   desc,
-  precio: precioString,               //  SE ENVÍA COMO STRING
+  descCompleta,
+  precio: precioString,
   imagen: procedimiento?.imagen || "",
   categoria,
   duracionMin: procedimiento?.duracionMin ?? null,
@@ -85,10 +87,19 @@ const payload = {
         />
 
         <textarea
-          placeholder="Descripción"
+          placeholder="Descripcion breve (se muestra en la lista)"
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
           className="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[--main]"
+          rows={2}
+        />
+
+        <textarea
+          placeholder="Descripcion completa (se muestra al ver detalle del procedimiento)"
+          value={descCompleta}
+          onChange={(e) => setDescCompleta(e.target.value)}
+          className="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[--main]"
+          rows={5}
         />
 
         <input

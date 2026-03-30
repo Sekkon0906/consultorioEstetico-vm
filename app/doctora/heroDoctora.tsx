@@ -3,14 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { IMG } from "@/lib/imagenes";
 
 export default function HeroDoctora() {
   const imagenes = [
-    "/imagenes/carrucel/carrucel_dr/carrucel_dr1.jpg",
-    "/imagenes/carrucel/carrucel_dr/carrucel_dr2.jpg",
-    "/imagenes/carrucel/carrucel_dr/carrucel_dr3.jpg",
-    "/imagenes/carrucel/carrucel_dr/carrucel_dr4.jpg",
-    "/imagenes/carrucel/carrucel_dr/carrucel_dr5.jpg",
+    IMG.drCarrusel[0],
+    IMG.drCarrusel[1],
+    IMG.drCarrusel[2],
+    IMG.drCarrusel[3],
+    IMG.drCarrusel[4],
   ];
   const [imagenActual, setImagenActual] = useState(0);
 

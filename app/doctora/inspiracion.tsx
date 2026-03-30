@@ -1,5 +1,7 @@
 "use client";
 
+import { IMG } from "@/lib/imagenes";
+
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { TypeAnimation } from "react-type-animation";
@@ -31,7 +33,7 @@ export default function Inspiracion() {
               transition={{ duration: 1 }}
             >
               <Image
-                src="/imagenes/inspiracion_dr.jpg"
+                src={IMG.inspiracion}
                 alt="Inspiración"
                 width={500}
                 height={500}
