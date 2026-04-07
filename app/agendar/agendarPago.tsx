@@ -2,306 +2,152 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Wallet, Globe, ArrowLeft, AlertTriangle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { PALETTE } from "./page";
-
-//  Tipos de dominio reales
-import type {
-  Cita,
-  MetodoPago,
-  TipoPagoConsultorio,
-  TipoPagoOnline,
-} from "../types/domain";
-
-//  Servicio que habla con el backend
+import type { Cita, MetodoPago, TipoPagoConsultorio, TipoPagoOnline } from "../types/domain";
 import { createCitaApi } from "../services/citasApi";
 
-// -----------------------------
-// Tipos auxiliares
-// -----------------------------
-
-//  Tipo que espera createCitaApi (coincide con Omit<Cita, "id" | "fechaCreacion">)
 export type CrearCitaPayload = Omit<Cita, "id" | "fechaCreacion">;
-
-//  En pasos anteriores todavía NO tenemos pagos ni estado
-export type CitaSinPagos = Omit<
-  CrearCitaPayload,
-  "metodoPago" | "tipoPagoConsultorio" | "tipoPagoOnline" | "estado"
->;
+export type CitaSinPagos = Omit<CrearCitaPayload, "metodoPago" | "tipoPagoConsultorio" | "tipoPagoOnline" | "estado">;
 
 interface AgendarPagoProps {
   metodoPago: MetodoPago | null;
-  setMetodoPago: (metodo: MetodoPago | null) => void;
-
+  setMetodoPago: (m: MetodoPago | null) => void;
   tipoPagoConsultorio: TipoPagoConsultorio | undefined;
-  setTipoPagoConsultorio: (tipo: TipoPagoConsultorio | undefined) => void;
-
+  setTipoPagoConsultorio: (t: TipoPagoConsultorio | undefined) => void;
   tipoPagoOnline: TipoPagoOnline | undefined;
-  setTipoPagoOnline: (tipo: TipoPagoOnline | undefined) => void;
-
-  // datos ya capturados en pasos anteriores (sin info de pago)
+  setTipoPagoOnline: (t: TipoPagoOnline | undefined) => void;
   citaData: CitaSinPagos;
-
-  // callback cuando la cita se crea correctamente
   onConfirmar: (citaCreada: Cita) => void;
-
   goBack: () => void;
 }
 
-export default function AgendarPago({
-  metodoPago,
-  setMetodoPago,
-  tipoPagoConsultorio,
-  setTipoPagoConsultorio,
-  tipoPagoOnline,
-  setTipoPagoOnline,
-  citaData,
-  onConfirmar,
-  goBack,
-}: AgendarPagoProps) {
-  const [brilloActivo, setBrilloActivo] = useState(false);
-  const [error, setError] = useState(false);
+export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPago, setTipoPagoConsultorio }: AgendarPagoProps) {
+  const [tipoPago, setTipoPago] = useState<"Efectivo" | "Tarjeta">("Efectivo");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-const opciones: {
-  tipo: MetodoPago;
-  icono: React.ReactNode;
-  titulo: string;
-  descripcion: string;
-}[] = [
-  {
-    tipo: "Consultorio",
-    icono: <Wallet size={26} />,
-    titulo: "Pagar en consultorio",
-    descripcion: "Podrás pagar tu cita en efectivo o tarjeta al asistir.",
-  },
-  {
-    tipo: "Online",
-    icono: <Globe size={26} />,
-    titulo: "Pago en línea",
-    descripcion: "Realiza tu pago seguro vía PayU o PSE antes de asistir.",
-  },
-];
+  const isEfectivo = tipoPago === "Efectivo";
 
+  const handleConfirmar = async () => {
+    setLoading(true);
+    setError(null);
+    setMetodoPago("Consultorio");
+    setTipoPagoConsultorio(tipoPago);
 
-  const pagoValido: boolean =
-    (metodoPago === "Consultorio" &&
-      (tipoPagoConsultorio === "Efectivo" ||
-        tipoPagoConsultorio === "Tarjeta")) ||
-    (metodoPago === "Online" &&
-      (tipoPagoOnline === "PayU" || tipoPagoOnline === "PSE"));
+    try {
+      const payload: CrearCitaPayload = {
+        ...citaData,
+        metodoPago: "Consultorio",
+        tipoPagoConsultorio: tipoPago,
+        tipoPagoOnline: null,
+        estado: "pendiente",
+      };
+      const nuevaCita = await createCitaApi(payload);
 
-  // === CONFIRMAR ===
-  const handleConfirmar = async (): Promise<void> => {
-    if (!pagoValido) {
-      setError(true);
-      setTimeout(() => setError(false), 2500);
-      return;
-    }
+      const fechaH = new Date(citaData.fecha + "T12:00:00").toLocaleDateString("es-CO", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      const texto = `*Nueva cita agendada*\n\n*Paciente:* ${citaData.nombres} ${citaData.apellidos || ""}\n*Telefono:* ${citaData.telefono || "No especificado"}\n*Correo:* ${citaData.correo || "No especificado"}\n*Procedimiento:* ${citaData.procedimiento}\n*Fecha:* ${fechaH}\n*Hora:* ${citaData.hora}\n*Pago:* En consultorio (${tipoPago})\n${citaData.nota ? `*Nota:* ${citaData.nota}` : ""}\n*Cita #${nuevaCita.id}*`;
+      window.open(`https://wa.me/573155445748?text=${encodeURIComponent(texto)}`, "_blank");
 
-    setBrilloActivo(true);
-
-    setTimeout(async () => {
-      try {
-        const payload: CrearCitaPayload = {
-          ...citaData,
-          //  aquí agregamos la info de pago
-          metodoPago: metodoPago ?? "Consultorio",
-          tipoPagoConsultorio:
-            metodoPago === "Consultorio" ? tipoPagoConsultorio ?? "Efectivo" : null,
-          tipoPagoOnline:
-            metodoPago === "Online" ? tipoPagoOnline ?? "PayU" : null,
-          //  estado requerido por el tipo Cita
-          estado: "pendiente",
-        };
-
-        const nuevaCita = await createCitaApi(payload);
-
-        //  Notificar a AgendarPage
-        onConfirmar(nuevaCita);
-
-        //  Dispara evento global para actualizar calendario
-        window.dispatchEvent(
-          new CustomEvent("horarioCambiado", {
-            detail: { tipo: "nuevaCita", cita: nuevaCita },
-          })
-        );
-      } catch (err: unknown) {
-        console.error("Error creando cita:", err);
-        // eslint-disable-next-line no-alert
-        alert("Error al confirmar la cita. Intenta nuevamente.");
-      } finally {
-        setBrilloActivo(false);
-      }
-    }, 1000);
+      onConfirmar(nuevaCita);
+    } catch (err: any) { setError(err.message || "Error al crear la cita"); }
+    finally { setLoading(false); }
   };
 
-  // === UI ===
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="rounded-3xl shadow-2xl p-8 relative overflow-hidden"
-      style={{
-        background: "linear-gradient(180deg,#F2E7DA 0%,#E6D5C3 100%)",
-        border: `1px solid ${PALETTE.border}`,
-      }}
-    >
-      {/* === BOTÓN VOLVER === */}
-      <motion.button
-        onClick={goBack}
-        className="absolute top-6 left-6 flex items-center gap-1 text-[#3A2413] hover:text-[#5A3A23] transition"
-        animate={{ y: [0, -2, 0] }}
-        transition={{
-          repeat: Infinity,
-          repeatType: "mirror",
-          duration: 3,
-          ease: "easeInOut",
-        }}
-      >
-        <ArrowLeft size={20} />
-        <span className="text-sm font-medium">Volver</span>
-      </motion.button>
+    <motion.div key="pago" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.5 }} style={{ maxWidth: 600, margin: "0 auto" }}>
+      <div style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", padding: "2.5rem 2rem", textAlign: "center" }}>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.5rem" }}>Confirmar cita</h2>
+        <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, margin: "0 auto 1.5rem" }} />
 
-      {/* === ENCABEZADO === */}
-      <div className="text-center mb-8">
-        <h2
-          className="text-3xl font-serif mb-2"
-          style={{ color: "#3A2413" }}
-        >
-          Método de pago
-        </h2>
-        <p className="text-[#4E3B2B]">
-          Valor de la consulta de valoración:{" "}
-          <b className="text-[#B08968]">$120.000 COP</b>
-        </p>
-      </div>
+        {/* Resumen */}
+        <div style={{ textAlign: "left", background: "linear-gradient(145deg, #FFFBF7, #F0E5D8)", borderRadius: 16, padding: "1.5rem", border: "1px solid rgba(176,137,104,0.12)", marginBottom: "1.5rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "0.5rem 1rem", fontSize: "0.9rem", color: "#5A4A3A" }}>
+            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>Paciente:</span><span>{citaData.nombres} {citaData.apellidos || ""}</span>
+            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>Procedimiento:</span><span>{citaData.procedimiento}</span>
+            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>Fecha:</span><span>{new Date(citaData.fecha + "T12:00:00").toLocaleDateString("es-CO", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
+            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>Hora:</span><span>{citaData.hora}</span>
+            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>Telefono:</span><span>{citaData.telefono || "No especificado"}</span>
+          </div>
+          {citaData.nota && <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "1px solid rgba(176,137,104,0.15)" }}><span style={{ fontWeight: 600, color: "#3A2A1A", fontSize: "0.9rem" }}>Nota: </span><span style={{ fontSize: "0.9rem", color: "#5A4A3A" }}>{citaData.nota}</span></div>}
+        </div>
 
-      {/* === OPCIONES === */}
-      <motion.div
-        className="grid md:grid-cols-2 gap-6"
-        animate={error ? { x: [-8, 8, -6, 6, 0] } : { x: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {opciones.map((o) => (
-          <motion.div
-            key={o.tipo}
-            onClick={() => setMetodoPago(o.tipo)}
-            whileHover={{
-              scale: 1.02,
-              boxShadow: "0 6px 18px rgba(0,0,0,0.15)",
+        {/* Toggle Efectivo / Tarjeta */}
+        <div style={{ marginBottom: "1.5rem" }}>
+          <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "#3A2A1A", marginBottom: "0.8rem" }}>Forma de pago en consultorio</p>
+          <div
+            onClick={() => setTipoPago(isEfectivo ? "Tarjeta" : "Efectivo")}
+            style={{
+              display: "inline-flex", alignItems: "center", cursor: "pointer", userSelect: "none",
+              background: isEfectivo
+                ? "linear-gradient(135deg, #B08968, #C9AD8D)"
+                : "linear-gradient(135deg, #6C8B6A, #8DB08A)",
+              borderRadius: 50, padding: "5px", width: 240, height: 48, position: "relative",
+              boxShadow: "inset 0 2px 6px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)",
+              transition: "background 0.4s ease",
             }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className={`cursor-pointer p-6 rounded-2xl border-2 backdrop-blur-sm transition-all flex flex-col items-start gap-2 ${
-              metodoPago === o.tipo
-                ? "border-[#B08968] bg-white shadow-lg"
-                : "border-transparent bg-[#F9F4EE]"
-            }`}
           >
-            <div className="flex items-center gap-3 text-[#3E2A1A]">
-              {o.icono}
-              <h3 className="font-semibold text-lg">{o.titulo}</h3>
-            </div>
-            <p className="text-sm text-[#5E4A3A]">{o.descripcion}</p>
+            {/* Track labels */}
+            <span style={{
+              position: "absolute", left: 20, fontSize: "0.78rem", fontWeight: 700, color: "rgba(255,255,255,0.9)",
+              opacity: isEfectivo ? 0 : 1, transition: "opacity 0.3s",
+              display: "flex", alignItems: "center", gap: 5,
+            }}>
+              <i className="fas fa-money-bill-wave" style={{ fontSize: "0.7rem" }} /> Efectivo
+            </span>
+            <span style={{
+              position: "absolute", right: 20, fontSize: "0.78rem", fontWeight: 700, color: "rgba(255,255,255,0.9)",
+              opacity: isEfectivo ? 1 : 0, transition: "opacity 0.3s",
+              display: "flex", alignItems: "center", gap: 5,
+            }}>
+              Tarjeta <i className="fas fa-credit-card" style={{ fontSize: "0.7rem" }} />
+            </span>
 
-            {/* SUBOPCIONES CONSULTORIO */}
-            {metodoPago === o.tipo && o.tipo === "Consultorio" && (
+            {/* Knob */}
+            <motion.div
+              animate={{ x: isEfectivo ? 0 : 192 }}
+              transition={{ type: "spring", stiffness: 500, damping: 35 }}
+              style={{
+                width: 42, height: 38, borderRadius: 50,
+                background: "white",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.18), 0 1px 3px rgba(0,0,0,0.1)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                position: "relative", zIndex: 2,
+              }}
+            >
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4 flex gap-4 w-full"
+                animate={{ rotate: isEfectivo ? 0 : 180 }}
+                transition={{ duration: 0.4 }}
               >
-                {(["Efectivo", "Tarjeta"] as TipoPagoConsultorio[]).map((m) => (
-                  <button
-                    key={m}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setTipoPagoConsultorio(m);
-                      setTipoPagoOnline(undefined);
-                    }}
-                    className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-all hover:shadow-md ${
-                      tipoPagoConsultorio === m
-                        ? "bg-[#B08968] text-white border-[#B08968]"
-                        : "bg-[#FFFDF9] text-[#4B3726] border-[#E9DED2]"
-                    }`}
-                  >
-                    {m}
-                  </button>
-                ))}
+                {isEfectivo ? (
+                  <i className="fas fa-money-bill-wave" style={{ color: "#B08968", fontSize: "0.9rem" }} />
+                ) : (
+                  <i className="fas fa-credit-card" style={{ color: "#6C8B6A", fontSize: "0.9rem" }} />
+                )}
               </motion.div>
-            )}
+            </motion.div>
+          </div>
 
-            {/* SUBOPCIONES ONLINE */}
-            {metodoPago === o.tipo && o.tipo === "Online" && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4 flex gap-4 w-full"
-              >
-                {(["PayU", "PSE"] as TipoPagoOnline[]).map((m) => (
-                  <button
-                    key={m}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setTipoPagoOnline(m);
-                      setTipoPagoConsultorio(undefined);
-                    }}
-                    className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-all hover:shadow-md ${
-                      tipoPagoOnline === m
-                        ? "bg-[#B08968] text-white border-[#B08968]"
-                        : "bg-[#FFFDF9] text-[#4B3726] border-[#E9DED2]"
-                    }`}
-                  >
-                    {m}
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </motion.div>
-        ))}
-      </motion.div>
+          <p style={{ fontSize: "0.82rem", color: "#8A7565", marginTop: "0.6rem" }}>
+            {isEfectivo ? "Pagaras en efectivo al llegar al consultorio" : "Pagaras con tarjeta al llegar al consultorio"}
+          </p>
+        </div>
 
-      {/* MENSAJE DE ERROR */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={error ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
-        transition={{ duration: 0.4 }}
-        className={`mt-6 flex items-center justify-center gap-2 text-[#7A4A2E] bg-[#FDF2E6] border border-[#E9C9A0] p-3 rounded-lg text-sm font-medium shadow-sm ${
-          error ? "visible" : "invisible"
-        }`}
-      >
-        <AlertTriangle size={18} />
-        Debes seleccionar un método y tipo de pago antes de continuar.
-      </motion.div>
+        <p style={{ fontSize: "0.78rem", color: "#8A7565", marginBottom: "1.5rem", fontStyle: "italic" }}>
+          Al confirmar, se enviara la informacion de tu cita por WhatsApp a la doctora
+        </p>
 
-      {/* BOTÓN CONFIRMAR */}
-      <div className="mt-12 text-center relative">
-        <motion.button
-          whileHover={{ scale: pagoValido ? 1.05 : 1 }}
-          whileTap={{ scale: pagoValido ? 0.97 : 1 }}
-          disabled={!pagoValido}
-          onClick={handleConfirmar}
-          className={`relative px-10 py-3 rounded-full font-semibold text-white shadow-lg transition-all overflow-hidden ${
-            pagoValido ? "" : "cursor-not-allowed"
-          }`}
-          style={{
-            background: pagoValido
-              ? "linear-gradient(90deg,#8B6749,#B08968)"
-              : "linear-gradient(90deg,#D5C4B3,#C1B2A3)",
-            opacity: pagoValido ? 1 : 0.6,
-          }}
-        >
-          Confirmar cita
-          {brilloActivo && (
-            <motion.span
-              initial={{ left: "-150%" }}
-              animate={{ left: "150%" }}
-              transition={{ duration: 1 }}
-              className="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-transparent via-[#fff3e0]/70 to-transparent blur-lg"
-              style={{ mixBlendMode: "screen" }}
-            />
-          )}
-        </motion.button>
+        {error && <div style={{ background: "#FDE8D8", color: "#922B21", padding: "0.7rem 1rem", borderRadius: 12, marginBottom: "1rem", fontSize: "0.85rem" }}>{error}</div>}
+
+        <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center", flexWrap: "wrap" }}>
+          <button onClick={goBack} style={{ display: "flex", alignItems: "center", gap: 6, padding: "0.75rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer" }}>
+            <ArrowLeft size={16} /> Volver
+          </button>
+          <button onClick={handleConfirmar} disabled={loading}
+            style={{ display: "flex", alignItems: "center", gap: 8, padding: "0.75rem 2rem", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 16px rgba(176,137,104,0.25)", opacity: loading ? 0.7 : 1 }}>
+            <i className="fab fa-whatsapp" style={{ fontSize: "1.1rem" }} /> {loading ? "Confirmando..." : "Confirmar y enviar por WhatsApp"}
+          </button>
+        </div>
       </div>
     </motion.div>
   );

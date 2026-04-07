@@ -1,386 +1,300 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
-import {
-  getProcedimientosApi,
-  createProcedimientoApi,
-  updateProcedimientoApi,
-  deleteProcedimientoApi,
-} from "../../services/procedimientosApi";
-import type { Procedimiento, MediaItem } from "../../types/domain";
+import { getProcedimientosApi, updateProcedimientoApi, deleteProcedimientoApi } from "../../services/procedimientosApi";
+import type { Procedimiento } from "../../types/domain";
+import { Plus, Edit3, Trash2, X, ChevronUp, ChevronDown, Upload, Play } from "lucide-react";
 
-type Categoria = "Facial" | "Corporal" | "Capilar";
+type Cat = "Facial" | "Corporal" | "Capilar";
+const BUCKET = "procedimientos";
+const BURL = "https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/procedimientos";
 
-const emptyForm = {
-  nombre: "",
-  desc: "",
-  precio: "",
-  imagen: "",
-  categoria: "Facial" as Categoria,
-  duracionMin: "",
-  destacado: false,
-};
+interface GalItem { id?: string; url: string; titulo: string; orden: number; tipo: string; }
+
+const emptyForm = { nombre: "", desc: "", descCompleta: "", precio: "", imagen: "", categoria: "Facial" as Cat, duracionMin: "", destacado: false, video: "" };
 
 export default function ProcedimientosList() {
-  const [procedimientos, setProcedimientos] = useState<Procedimiento[]>([]);
-  const [modo, setModo] = useState<"lista" | "crear" | "editar">("lista");
+  const [procs, setProcs] = useState<Procedimiento[]>([]);
+  const [modo, setModo] = useState<"lista" | "form">("lista");
   const [actual, setActual] = useState<Procedimiento | null>(null);
   const [form, setForm] = useState(emptyForm);
-  const [galeria, setGaleria] = useState<MediaItem[]>([]);
+  const [gal, setGal] = useState<GalItem[]>([]);
   const [saving, setSaving] = useState(false);
-  const [uploadingImg, setUploadingImg] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadingGal, setUploadingGal] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [delId, setDelId] = useState<string | number | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
-  // Galeria form
-  const [showGaleriaForm, setShowGaleriaForm] = useState(false);
-  const [galTipo, setGalTipo] = useState<"imagen" | "video">("imagen");
-  const [galTitulo, setGalTitulo] = useState("");
-  const [galDesc, setGalDesc] = useState("");
-  const [galUrl, setGalUrl] = useState("");
+  const showToast = function(msg: string) { setToast(msg); setTimeout(function() { setToast(null); }, 3000); };
 
-  const loadProcedimientos = async () => {
+  const load = useCallback(function() {
+    getProcedimientosApi().then(setProcs).catch(function(e) { setErr(e.message); });
+  }, []);
+  useEffect(function() { load(); }, [load]);
+
+  const loadGal = async function(pid: string | number) {
+    var res = await supabase.from("procedimiento_galeria").select("id, url, titulo, orden, tipo").eq("procedimiento_id", pid).order("orden");
+    if (res.data) setGal(res.data as GalItem[]);
+    else setGal([]);
+  };
+
+  var uploadFile = async function(file: File): Promise<string> {
+    var ext = file.name.split(".").pop();
+    var path = "proc_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5) + "." + ext;
+    var result = await supabase.storage.from(BUCKET).upload(path, file, { upsert: true, contentType: file.type });
+    if (result.error) throw new Error(result.error.message);
+    return BURL + "/" + path;
+  };
+
+  var handleMainImg = async function(e: React.ChangeEvent<HTMLInputElement>) {
+    var f = e.target.files?.[0];
+    if (!f) return;
+    setUploading(true);
+    setErr(null);
     try {
-      const data = await getProcedimientosApi();
-      setProcedimientos(data);
-    } catch (err: any) {
-      setError(err.message);
-    }
+      var url = await uploadFile(f);
+      setForm(function(p) { return { ...p, imagen: url }; });
+      showToast("Imagen subida");
+    } catch (er: any) { setErr("Error: " + er.message); }
+    finally { setUploading(false); e.target.value = ""; }
   };
 
-  const loadGaleria = async (procId: number) => {
-    const { data } = await supabase
-      .from("procedimiento_galeria")
-      .select("id, tipo, url, titulo, descripcion, orden")
-      .eq("procedimiento_id", procId)
-      .order("orden", { ascending: true });
-
-    setGaleria(
-      (data ?? []).map((g: any) => ({
-        id: String(g.id),
-        tipo: g.tipo,
-        url: g.url,
-        titulo: g.titulo || "",
-        descripcion: g.descripcion || "",
-      }))
-    );
-  };
-
-  useEffect(() => { loadProcedimientos(); }, []);
-
-  const handleImageUpload = async (file: File) => {
-    setUploadingImg(true);
-    setError(null);
+  var handleGalAdd = async function(e: React.ChangeEvent<HTMLInputElement>) {
+    var f = e.target.files?.[0];
+    if (!f || !actual) return;
+    setUploadingGal(true);
+    setErr(null);
     try {
-      const ext = file.name.split(".").pop();
-      const path = `${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("procedimientos")
-        .upload(path, file, { upsert: true, contentType: file.type });
-      if (upErr) throw new Error(upErr.message);
-      const { data } = supabase.storage.from("procedimientos").getPublicUrl(path);
-      setForm((prev) => ({ ...prev, imagen: data.publicUrl }));
-    } catch (e: any) {
-      setError("Error subiendo imagen: " + e.message);
-    } finally {
-      setUploadingImg(false);
-    }
+      var url = await uploadFile(f);
+      var ord = gal.length;
+      var res = await supabase.from("procedimiento_galeria").insert({ procedimiento_id: actual.id, tipo: "imagen", url: url, titulo: "", orden: ord }).select().single();
+      if (res.error) throw new Error(res.error.message);
+      setGal(function(prev) { return [...prev, { id: res.data.id, url: url, titulo: "", orden: ord, tipo: "imagen" }]; });
+      showToast("Imagen agregada a galeria");
+    } catch (er: any) { setErr("Error: " + er.message); }
+    finally { setUploadingGal(false); e.target.value = ""; }
   };
 
-  const handleGaleriaImageUpload = async (file: File) => {
-    try {
-      const ext = file.name.split(".").pop();
-      const path = `galeria/${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("procedimientos")
-        .upload(path, file, { upsert: true, contentType: file.type });
-      if (upErr) throw new Error(upErr.message);
-      const { data } = supabase.storage.from("procedimientos").getPublicUrl(path);
-      setGalUrl(data.publicUrl);
-    } catch (e: any) {
-      setError("Error subiendo imagen de galeria: " + e.message);
-    }
+  var galRemove = async function(item: GalItem) {
+    if (item.id) await supabase.from("procedimiento_galeria").delete().eq("id", item.id);
+    setGal(function(prev) { return prev.filter(function(g) { return g.id !== item.id; }); });
   };
 
-  const agregarAGaleria = () => {
-    if (!galUrl.trim()) { setError("La URL es obligatoria."); return; }
-    setGaleria((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        tipo: galTipo,
-        url: galTipo === "video" ? toEmbedUrl(galUrl) : galUrl,
-        titulo: galTitulo,
-        descripcion: galDesc,
-      },
-    ]);
-    setGalTitulo("");
-    setGalDesc("");
-    setGalUrl("");
-    setShowGaleriaForm(false);
+  var galMove = async function(i: number, dir: -1 | 1) {
+    var j = i + dir;
+    if (j < 0 || j >= gal.length) return;
+    var updated = [...gal];
+    var temp = updated[i]; updated[i] = updated[j]; updated[j] = temp;
+    updated.forEach(function(g, idx) { g.orden = idx; });
+    setGal(updated);
+    for (var g of updated) { if (g.id) await supabase.from("procedimiento_galeria").update({ orden: g.orden }).eq("id", g.id); }
   };
 
-  const quitarDeGaleria = (id: string) => {
-    setGaleria((prev) => prev.filter((g) => g.id !== id));
-  };
-
-  function toEmbedUrl(url: string): string {
-    if (!url) return "";
-    if (url.includes("embed/")) return url;
-    const match = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
-    if (match) return `https://www.youtube.com/embed/${match[1]}`;
-    return url;
-  }
-
-  const handleGuardar = async () => {
-    if (!form.nombre.trim() || !form.desc.trim()) {
-      setError("Nombre y descripcion son obligatorios.");
-      return;
-    }
+  var handleSave = async function() {
+    if (!form.nombre.trim()) { setErr("Nombre obligatorio"); return; }
     setSaving(true);
-    setError(null);
+    setErr(null);
     try {
-      const payload = {
+      var dbPayload: Record<string, unknown> = {
         nombre: form.nombre,
-        desc: form.desc,
+        descripcion: form.desc,
+        descripcion_completa: form.descCompleta,
         precio: form.precio || "0",
         imagen: form.imagen,
-        categoria: form.categoria as Procedimiento["categoria"],
-        duracionMin: Number(form.duracionMin) || null,
+        categoria: form.categoria,
+        duracion_min: Number(form.duracionMin) || null,
         destacado: form.destacado,
+        actualizado_en: new Date().toISOString(),
       };
 
-      let procId: number;
-      if (modo === "crear") {
-        const created = await createProcedimientoApi(payload);
-        procId = created.id;
-      } else if (actual) {
-        await updateProcedimientoApi(actual.id, payload);
-        procId = actual.id;
+      if (actual) {
+        var upRes = await supabase.from("procedimientos").update(dbPayload).eq("id", actual.id);
+        if (upRes.error) throw new Error(upRes.error.message);
       } else {
-        return;
+        var inRes = await supabase.from("procedimientos").insert(dbPayload);
+        if (inRes.error) throw new Error(inRes.error.message);
       }
-
-      // Guardar galeria
-      await supabase.from("procedimiento_galeria").delete().eq("procedimiento_id", procId);
-      for (let i = 0; i < galeria.length; i++) {
-        await supabase.from("procedimiento_galeria").insert({
-          procedimiento_id: procId,
-          tipo: galeria[i].tipo,
-          url: galeria[i].url,
-          titulo: galeria[i].titulo || "",
-          descripcion: galeria[i].descripcion || "",
-          orden: i,
-        });
-      }
-
-      loadProcedimientos();
-      resetForm();
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setSaving(false);
-    }
+      showToast(actual ? "Procedimiento actualizado" : "Procedimiento creado");
+      load();
+      reset();
+    } catch (e: any) { setErr(e.message); }
+    finally { setSaving(false); }
   };
 
-  const handleEliminar = async (id: number) => {
-    if (!confirm("Eliminar este procedimiento?")) return;
+  var handleDel = async function(id: string | number) {
     try {
-      await deleteProcedimientoApi(id);
-      loadProcedimientos();
-    } catch (e: any) {
-      setError(e.message);
-    }
+      await supabase.from("procedimientos").delete().eq("id", id);
+      setDelId(null); load();
+    } catch (e: any) { setErr(e.message); }
   };
 
-  const resetForm = () => {
-    setForm(emptyForm);
-    setGaleria([]);
-    setModo("lista");
-    setActual(null);
-    setShowGaleriaForm(false);
-  };
+  var reset = function() { setForm(emptyForm); setModo("lista"); setActual(null); setGal([]); };
 
-  const startEditar = async (p: Procedimiento) => {
+  var startEdit = function(p: Procedimiento) {
     setActual(p);
     setForm({
-      nombre: p.nombre,
-      desc: p.desc,
-      precio: String(p.precio),
-      imagen: p.imagen,
-      categoria: p.categoria,
-      duracionMin: p.duracionMin ? String(p.duracionMin) : "",
-      destacado: p.destacado || false,
+      nombre: p.nombre, desc: p.desc, descCompleta: (p as any).descCompleta || "",
+      precio: String(p.precio), imagen: p.imagen, categoria: p.categoria,
+      duracionMin: p.duracionMin ? String(p.duracionMin) : "", destacado: p.destacado || false, video: "",
     });
-    await loadGaleria(p.id);
-    setModo("editar");
+    setModo("form");
+    loadGal(p.id);
   };
+
+  var IS = { width: "100%", padding: "0.55rem 0.8rem", borderRadius: 12, border: "1px solid #E9DED2", fontSize: "0.88rem" } as React.CSSProperties;
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold" style={{ color: "#4E3B2B" }}>Procedimientos</h2>
-        {modo === "lista" && (
-          <button onClick={() => setModo("crear")} className="btn rounded-pill px-4" style={{ backgroundColor: "#8B6A4B", color: "#fff", border: "none" }}>
-            + Nuevo procedimiento
-          </button>
-        )}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+        <h2 style={{ fontWeight: 700, color: "#3A2A1A" }}>Procedimientos</h2>
+        {modo === "lista" && <motion.button whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 5, padding: "0.55rem 1.2rem", borderRadius: 100, background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", fontWeight: 600, fontSize: "0.82rem", cursor: "pointer" }}><Plus size={15} /> Nuevo</motion.button>}
       </div>
 
-      {error && <div className="alert alert-danger py-2 mb-3">{error}</div>}
+      {toast && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ background: "#E8F5E9", color: "#145A32", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", textAlign: "center" }}>{toast}</motion.div>}
+      {err && <div style={{ background: "#FDE8D8", color: "#922B21", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", display: "flex", justifyContent: "space-between" }}>{err}<button onClick={function() { setErr(null); }} style={{ background: "none", border: "none", cursor: "pointer" }}><X size={13} /></button></div>}
 
       <AnimatePresence>
-        {(modo === "crear" || modo === "editar") && (
+        {modo === "form" && (
           <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
-            className="card border-0 rounded-4 shadow-sm p-4 mb-5" style={{ backgroundColor: "#FFFDF9" }}>
-            <h4 className="fw-semibold mb-4" style={{ color: "#4E3B2B" }}>
-              {modo === "crear" ? "Nuevo procedimiento" : "Editar procedimiento"}
-            </h4>
+            style={{ background: "#FFFDF9", borderRadius: 20, border: "1px solid #E9DED2", padding: "1.8rem", marginBottom: "1.5rem" }}>
+            <h4 style={{ fontWeight: 700, color: "#3A2A1A", marginBottom: "1.2rem" }}>{actual ? "Editar" : "Nuevo"} procedimiento</h4>
 
-            <div className="row g-3">
-              <div className="col-md-6">
-                <label className="form-label small fw-semibold">Nombre *</label>
-                <input className="form-control" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} style={{ borderColor: "#E9DED2" }} />
-              </div>
-              <div className="col-md-3">
-                <label className="form-label small fw-semibold">Precio (COP)</label>
-                <input type="number" className="form-control" value={form.precio} onChange={(e) => setForm({ ...form, precio: e.target.value })} style={{ borderColor: "#E9DED2" }} />
-              </div>
-              <div className="col-md-3">
-                <label className="form-label small fw-semibold">Duracion (min)</label>
-                <input type="number" className="form-control" value={form.duracionMin} onChange={(e) => setForm({ ...form, duracionMin: e.target.value })} style={{ borderColor: "#E9DED2" }} />
-              </div>
-              <div className="col-12">
-                <label className="form-label small fw-semibold">Descripcion *</label>
-                <textarea rows={3} className="form-control" value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })} style={{ borderColor: "#E9DED2" }} />
-              </div>
-              <div className="col-md-4">
-                <label className="form-label small fw-semibold">Categoria</label>
-                <select className="form-select" value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value as Categoria })} style={{ borderColor: "#E9DED2" }}>
-                  <option>Facial</option><option>Corporal</option><option>Capilar</option>
-                </select>
-              </div>
-              <div className="col-md-4 d-flex align-items-end">
-                <div className="form-check">
-                  <input type="checkbox" className="form-check-input" checked={form.destacado} onChange={(e) => setForm({ ...form, destacado: e.target.checked })} id="destacado" />
-                  <label className="form-check-label small fw-semibold" htmlFor="destacado">Destacado</label>
-                </div>
-              </div>
-              <div className="col-12">
-                <label className="form-label small fw-semibold">Imagen principal</label>
-                <div className="d-flex gap-3 align-items-center flex-wrap">
-                  <input type="file" accept="image/*" className="form-control" style={{ maxWidth: 280, borderColor: "#E9DED2" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); }} />
-                  {uploadingImg && <div className="spinner-border spinner-border-sm" style={{ color: "#B08968" }} role="status" />}
-                  {form.imagen && !uploadingImg && <img src={form.imagen} alt="preview" style={{ height: 60, borderRadius: 8, objectFit: "cover", border: "1px solid #E9DED2" }} />}
-                </div>
-                <small className="text-muted">O pega una URL:</small>
-                <input className="form-control mt-1" placeholder="https://..." value={form.imagen} onChange={(e) => setForm({ ...form, imagen: e.target.value })} style={{ borderColor: "#E9DED2" }} />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", marginBottom: "1rem" }}>
+              <div style={{ gridColumn: "1 / -1" }}><Lbl>Nombre *</Lbl><input style={IS} value={form.nombre} onChange={function(e) { setForm({ ...form, nombre: e.target.value }); }} placeholder="Acido Hialuronico" /></div>
+              <div><Lbl>Precio (COP)</Lbl><input type="number" style={IS} value={form.precio} onChange={function(e) { setForm({ ...form, precio: e.target.value }); }} placeholder="350000" /></div>
+              <div><Lbl>Duracion (min)</Lbl><input type="number" style={IS} value={form.duracionMin} onChange={function(e) { setForm({ ...form, duracionMin: e.target.value }); }} placeholder="60" /></div>
+              <div><Lbl>Categoria</Lbl><select value={form.categoria} onChange={function(e) { setForm({ ...form, categoria: e.target.value as Cat }); }} style={IS}><option>Facial</option><option>Corporal</option><option>Capilar</option></select></div>
+              <div style={{ display: "flex", alignItems: "end", paddingBottom: 4 }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                  <input type="checkbox" checked={form.destacado} onChange={function(e) { setForm({ ...form, destacado: e.target.checked }); }} style={{ width: 17, height: 17, accentColor: "#B08968" }} />
+                  <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#4E3B2B" }}>Destacado</span>
+                </label>
               </div>
             </div>
 
-            {/* GALERIA */}
-            <div className="mt-4">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="fw-semibold m-0" style={{ color: "#4E3B2B" }}>Galeria multimedia</h5>
-                <button onClick={() => setShowGaleriaForm(true)} className="btn btn-sm rounded-pill" style={{ backgroundColor: "#E9DED2", color: "#4E3B2B", border: "none" }}>
-                  + Agregar
-                </button>
-              </div>
+            <div style={{ marginBottom: "0.8rem" }}><Lbl>Descripcion breve</Lbl><textarea style={{ ...IS, resize: "vertical" as const }} value={form.desc} onChange={function(e) { setForm({ ...form, desc: e.target.value }); }} rows={2} placeholder="Se muestra en las cards..." /></div>
+            <div style={{ marginBottom: "1.2rem" }}><Lbl>Descripcion completa</Lbl><textarea style={{ ...IS, resize: "vertical" as const }} value={form.descCompleta} onChange={function(e) { setForm({ ...form, descCompleta: e.target.value }); }} rows={4} placeholder="Se muestra en la pagina de detalle..." /></div>
 
-              {/* Form para agregar item de galeria */}
-              {showGaleriaForm && (
-                <div className="rounded-3 p-3 mb-3" style={{ backgroundColor: "#F5EEE6", border: "1px solid #E9DED2" }}>
-                  <div className="row g-2">
-                    <div className="col-md-3">
-                      <select className="form-select form-select-sm" value={galTipo} onChange={(e) => setGalTipo(e.target.value as "imagen" | "video")} style={{ borderColor: "#E9DED2" }}>
-                        <option value="imagen">Imagen</option>
-                        <option value="video">Video YouTube</option>
-                      </select>
-                    </div>
-                    <div className="col-md-4">
-                      <input className="form-control form-control-sm" placeholder="Titulo" value={galTitulo} onChange={(e) => setGalTitulo(e.target.value)} style={{ borderColor: "#E9DED2" }} />
-                    </div>
-                    <div className="col-md-5">
-                      <input className="form-control form-control-sm" placeholder="Descripcion breve" value={galDesc} onChange={(e) => setGalDesc(e.target.value)} style={{ borderColor: "#E9DED2" }} />
-                    </div>
-                    <div className="col-12">
-                      {galTipo === "imagen" ? (
-                        <div className="d-flex gap-2 align-items-center">
-                          <input type="file" accept="image/*" className="form-control form-control-sm" style={{ maxWidth: 260, borderColor: "#E9DED2" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleGaleriaImageUpload(f); }} />
-                          <span className="text-muted small">o URL:</span>
-                          <input className="form-control form-control-sm" placeholder="https://..." value={galUrl} onChange={(e) => setGalUrl(e.target.value)} style={{ borderColor: "#E9DED2" }} />
+            {/* MAIN IMAGE - only 1, upload replaces */}
+            <div style={{ background: "#F5EEE6", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}>
+              <Lbl>Foto principal</Lbl>
+              <div style={{ display: "flex", gap: "0.8rem", alignItems: "center", flexWrap: "wrap", marginTop: 6 }}>
+                {form.imagen && (
+                  <div style={{ position: "relative" }}>
+                    <img src={form.imagen} alt="" style={{ height: 80, width: 120, borderRadius: 10, objectFit: "cover", border: "2px solid #B08968" }} />
+                    <button onClick={function() { setForm({ ...form, imagen: "" }); }} style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#C62828", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={10} /></button>
+                  </div>
+                )}
+                <label style={{ padding: "0.5rem 1.2rem", borderRadius: 12, border: "1px dashed #B08968", cursor: uploading ? "wait" : "pointer", fontSize: "0.82rem", color: "#B08968", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: uploading ? 0.6 : 1 }}>
+                  <Upload size={14} /> {uploading ? "Subiendo..." : form.imagen ? "Cambiar foto" : "Subir foto"}
+                  <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleMainImg} disabled={uploading} />
+                </label>
+              </div>
+            </div>
+
+            {/* GALLERY - only in edit mode */}
+            {actual && (
+              <div style={{ background: "#EEF7EE", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}>
+                <Lbl>Galeria de resultados</Lbl>
+                <p style={{ fontSize: "0.72rem", color: "#6C584C", marginBottom: "0.6rem" }}>Sube fotos de antes/despues. Usa las flechas para ordenar.</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.6rem" }}>
+                  {gal.filter(function(g) { return g.tipo === "imagen"; }).map(function(g, i) {
+                    return (
+                      <div key={g.id || i} style={{ position: "relative", borderRadius: 10, overflow: "hidden", border: "1px solid #E9DED2" }}>
+                        <img src={g.url} alt="" style={{ width: 90, height: 70, objectFit: "cover", display: "block" }} />
+                        <button onClick={function() { galRemove(g); }} style={{ position: "absolute", top: 0, right: 0, width: 18, height: 18, background: "rgba(198,40,40,0.85)", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} /></button>
+                        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "center", gap: 2, background: "rgba(0,0,0,0.4)", padding: 1 }}>
+                          <button onClick={function() { galMove(i, -1); }} disabled={i === 0} style={{ background: "none", border: "none", color: "white", cursor: "pointer", opacity: i === 0 ? 0.3 : 1, padding: 0 }}><ChevronUp size={11} /></button>
+                          <span style={{ color: "white", fontSize: "0.55rem" }}>{i + 1}</span>
+                          <button onClick={function() { galMove(i, 1); }} style={{ background: "none", border: "none", color: "white", cursor: "pointer", padding: 0 }}><ChevronDown size={11} /></button>
                         </div>
-                      ) : (
-                        <input className="form-control form-control-sm" placeholder="https://youtube.com/watch?v=... o link de embed" value={galUrl} onChange={(e) => setGalUrl(e.target.value)} style={{ borderColor: "#E9DED2" }} />
-                      )}
-                    </div>
-                  </div>
-                  <div className="d-flex gap-2 mt-2">
-                    <button onClick={agregarAGaleria} className="btn btn-sm rounded-pill" style={{ backgroundColor: "#8B6A4B", color: "#fff", border: "none" }}>Agregar</button>
-                    <button onClick={() => { setShowGaleriaForm(false); setGalUrl(""); setGalTitulo(""); setGalDesc(""); }} className="btn btn-sm rounded-pill" style={{ backgroundColor: "#E9DED2", color: "#4E3B2B", border: "none" }}>Cancelar</button>
-                  </div>
-                </div>
-              )}
-
-              {/* Items de galeria */}
-              {galeria.length === 0 ? (
-                <p className="small" style={{ color: "#8B7060" }}>Sin elementos en la galeria.</p>
-              ) : (
-                <div className="d-flex flex-column gap-2">
-                  {galeria.map((g) => (
-                    <div key={g.id} className="d-flex align-items-center gap-3 p-2 rounded-3" style={{ backgroundColor: "#F5EEE6", border: "1px solid #E9DED2" }}>
-                      {g.tipo === "imagen" ? (
-                        <img src={g.url} alt={g.titulo} style={{ width: 48, height: 48, borderRadius: 6, objectFit: "cover" }} />
-                      ) : (
-                        <div className="d-flex align-items-center justify-content-center" style={{ width: 48, height: 48, borderRadius: 6, backgroundColor: "#E9DED2", color: "#4E3B2B", fontSize: "0.7rem", fontWeight: 700 }}>VIDEO</div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="small fw-semibold mb-0" style={{ color: "#4E3B2B" }}>{g.titulo || "(Sin titulo)"}</p>
-                        <p className="small mb-0 text-truncate" style={{ color: "#8B7060" }}>{g.url}</p>
                       </div>
-                      <button onClick={() => quitarDeGaleria(g.id)} className="btn btn-sm" style={{ color: "#b02e2e" }}>x</button>
-                    </div>
-                  ))}
+                    );
+                  })}
+                  <label style={{ width: 90, height: 70, borderRadius: 10, border: "2px dashed #A0D8A8", display: "flex", alignItems: "center", justifyContent: "center", cursor: uploadingGal ? "wait" : "pointer", fontSize: "0.68rem", color: "#2D6A4F", fontWeight: 600, textAlign: "center", opacity: uploadingGal ? 0.6 : 1 }}>
+                    {uploadingGal ? "..." : "+ Foto"}
+                    <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleGalAdd} disabled={uploadingGal} />
+                  </label>
                 </div>
-              )}
-            </div>
 
-            <div className="d-flex gap-3 mt-4">
-              <button onClick={handleGuardar} disabled={saving || uploadingImg} className="btn rounded-pill fw-semibold flex-1" style={{ backgroundColor: "#8B6A4B", color: "#fff", border: "none" }}>
+                {/* Videos en galeria */}
+                <div style={{ marginTop: "0.8rem", borderTop: "1px solid #C8E6C9", paddingTop: "0.8rem" }}>
+                  <Lbl>Videos (YouTube / Instagram)</Lbl>
+                  <p style={{ fontSize: "0.72rem", color: "#6C584C", marginBottom: "0.5rem" }}>Agrega links de videos del procedimiento</p>
+                  {gal.filter(function(g) { return g.tipo === "video"; }).map(function(g, i) {
+                    return (
+                      <div key={g.id || "v" + i} style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.4rem" }}>
+                        <Play size={14} color="#B08968" />
+                        <span style={{ flex: 1, fontSize: "0.78rem", color: "#4E3B2B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.url}</span>
+                        <button onClick={function() { galRemove(g); }} style={{ width: 20, height: 20, borderRadius: "50%", background: "#FDE8D8", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} color="#C62828" /></button>
+                      </div>
+                    );
+                  })}
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <input id="videoLinkInput" style={{ ...IS, flex: 1, fontSize: "0.82rem" }} placeholder="https://youtube.com/watch?v=... o https://instagram.com/reel/..." />
+                    <button onClick={async function() {
+                      var input = document.getElementById("videoLinkInput") as HTMLInputElement;
+                      var url = input?.value?.trim();
+                      if (!url || !actual) return;
+                      try {
+                        var ord = gal.length;
+                        var r = await supabase.from("procedimiento_galeria").insert({ procedimiento_id: actual.id, tipo: "video", url: url, titulo: "", orden: ord }).select().single();
+                        if (r.error) throw new Error(r.error.message);
+                        setGal(function(prev) { return [...prev, { id: r.data.id, url: url, titulo: "", orden: ord, tipo: "video" }]; });
+                        input.value = "";
+                        showToast("Video agregado");
+                      } catch (e: any) { setErr(e.message); }
+                    }} style={{ padding: "0.45rem 1rem", borderRadius: 10, background: "#B08968", color: "white", border: "none", fontWeight: 600, fontSize: "0.78rem", cursor: "pointer", whiteSpace: "nowrap" }}>+ Agregar</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: "0.6rem" }}>
+              <motion.button whileTap={{ scale: 0.97 }} onClick={handleSave} disabled={saving}
+                style={{ flex: 1, padding: "0.65rem", borderRadius: 100, background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", fontWeight: 600, cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Guardando..." : "Guardar"}
-              </button>
-              <button onClick={resetForm} className="btn rounded-pill fw-semibold" style={{ backgroundColor: "#E9DED2", color: "#4E3B2B", border: "none" }}>Cancelar</button>
+              </motion.button>
+              <button onClick={reset} style={{ padding: "0.65rem 1.5rem", borderRadius: 100, background: "#F5EEE6", color: "#4E3B2B", border: "none", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* LISTA */}
-      {procedimientos.length === 0 ? (
-        <p className="text-center py-5" style={{ color: "#8B7060" }}>No hay procedimientos aun.</p>
-      ) : (
-        <div className="d-flex flex-column gap-3">
-          {procedimientos.map((p) => (
-            <div key={p.id} className="card border-0 rounded-4 shadow-sm p-3 d-flex flex-row align-items-center gap-3" style={{ backgroundColor: "#FFFDF9" }}>
-              {p.imagen && <img src={p.imagen} alt={p.nombre} style={{ width: 64, height: 64, borderRadius: 12, objectFit: "cover", border: "1px solid #E9DED2", flexShrink: 0 }} />}
-              <div className="flex-1 min-w-0">
-                <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
-                  <span className="fw-bold" style={{ color: "#4E3B2B" }}>{p.nombre}</span>
-                  <span className="badge rounded-pill px-2" style={{ backgroundColor: "#E9DED2", color: "#8B6A4B", fontSize: "0.72rem" }}>{p.categoria}</span>
-                  {p.destacado && <span className="badge rounded-pill px-2" style={{ backgroundColor: "#FFF3E6", color: "#B08968", fontSize: "0.72rem" }}>Destacado</span>}
+      {procs.length === 0 ? <p style={{ textAlign: "center", color: "#8B7060", padding: "2rem 0" }}>No hay procedimientos</p> : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+          {procs.map(function(p, i) {
+            return (
+              <motion.div key={p.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }}
+                style={{ background: "#FFFDF9", borderRadius: 14, border: "1px solid #E9DED2", padding: "0.7rem 1rem", display: "flex", alignItems: "center", gap: "0.7rem" }}>
+                {p.imagen ? <img src={p.imagen} alt="" style={{ width: 50, height: 50, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 50, height: 50, borderRadius: 10, background: "#E9DED2", flexShrink: 0 }} />}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
+                    <span style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "0.88rem" }}>{p.nombre}</span>
+                    <span style={{ background: "#E9DED2", color: "#8B6A4B", padding: "0.1rem 0.5rem", borderRadius: 100, fontSize: "0.65rem", fontWeight: 600 }}>{p.categoria}</span>
+                    {p.destacado && <span style={{ background: "#FFF3E6", color: "#B08968", padding: "0.1rem 0.5rem", borderRadius: 100, fontSize: "0.65rem" }}>★</span>}
+                  </div>
+                  <p style={{ fontSize: "0.78rem", color: "#6C584C", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.desc}</p>
                 </div>
-                <p className="small mb-0 text-truncate" style={{ color: "#6C584C" }}>{p.desc}</p>
-                {p.precio !== undefined && <p className="small mb-0 fw-semibold" style={{ color: "#B08968" }}>${Number(p.precio).toLocaleString("es-CO")} COP</p>}
-              </div>
-              <div className="d-flex gap-2 flex-shrink-0">
-                <button onClick={() => startEditar(p)} className="btn btn-sm rounded-pill" style={{ backgroundColor: "#E9DED2", color: "#4E3B2B", border: "none" }}>Editar</button>
-                <button onClick={() => handleEliminar(p.id)} className="btn btn-sm rounded-pill" style={{ backgroundColor: "#fff3ef", color: "#b02e2e", border: "1px solid #e4bfbf" }}>Eliminar</button>
-              </div>
-            </div>
-          ))}
+                <span style={{ fontSize: "0.82rem", color: "#B08968", fontWeight: 700, whiteSpace: "nowrap" }}>${Number(p.precio).toLocaleString("es-CO")}</span>
+                <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+                  <motion.button whileTap={{ scale: 0.95 }} onClick={function() { startEdit(p); }} style={{ width: 32, height: 32, borderRadius: 8, background: "#F5EEE6", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Edit3 size={13} color="#4E3B2B" /></motion.button>
+                  {delId === p.id ? (
+                    <><button onClick={function() { handleDel(p.id); }} style={{ padding: "0.2rem 0.5rem", borderRadius: 6, background: "#C62828", color: "white", border: "none", fontSize: "0.68rem", fontWeight: 600, cursor: "pointer" }}>Si</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.2rem 0.5rem", borderRadius: 6, background: "#E9DED2", border: "none", fontSize: "0.68rem", cursor: "pointer" }}>No</button></>
+                  ) : (
+                    <motion.button whileTap={{ scale: 0.95 }} onClick={function() { setDelId(p.id); }} style={{ width: 32, height: 32, borderRadius: 8, background: "#fff3ef", border: "1px solid #e4bfbf", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={13} color="#b02e2e" /></motion.button>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
+
+function Lbl(props: { children: string }) { return <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 3 }}>{props.children}</label>; }

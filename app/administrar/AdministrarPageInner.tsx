@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import CitasAgendadas from "./citas/citasAgendadas";
 import ProcedimientosList from "./procedimientos/procedimientosList";
 import TestimoniosList from "./testimonios/testimoniosList";
-import Ingresos from "./ingresos/ingresos";
+import Ingresos from "./analitica/ingresos";
 import CharlasList from "./charlas/charlasList";
 import AdministrarHorarios from "./horario/horariosHabilitados";
 

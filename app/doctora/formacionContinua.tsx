@@ -1,237 +1,599 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
+import { X, ChevronLeft, ChevronRight, Calendar, ImageIcon, Stethoscope } from "lucide-react";
 
 interface Charla {
-  id: number; titulo: string; descripcion: string;
-  detalle?: string; imagen: string; galeria?: string[]; fecha?: string;
+  id: number;
+  titulo: string;
+  descripcion: string;
+  detalle?: string;
+  imagen: string;
+  galeria?: string[];
+  fecha?: string;
 }
 
+/* ──────────────────────────────────────────────
+   CARD
+────────────────────────────────────────────── */
+function CardItem({
+  charla, inView, fromLeft, onClick, fechaFmt,
+}: {
+  charla: Charla;
+  inView: boolean;
+  fromLeft: boolean;
+  onClick: () => void;
+  fechaFmt: string | null;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: fromLeft ? -40 : 40 }}
+      animate={inView ? { opacity: 1, x: 0 } : {}}
+      transition={{ duration: 0.55, ease: "easeOut", delay: 0.15 }}
+      whileHover={{ y: -5, boxShadow: "0 20px 50px rgba(78,59,43,0.14)" }}
+      onClick={onClick}
+      style={{
+        width: "100%",
+        background: "#FFFDF9",
+        borderRadius: 18,
+        border: "1px solid #EDE4D8",
+        overflow: "hidden",
+        cursor: "pointer",
+        boxShadow: "0 3px 16px rgba(78,59,43,0.07)",
+        transition: "box-shadow 0.3s",
+      }}
+    >
+      {/* Imagen */}
+      <div style={{ position: "relative", height: 145, overflow: "hidden" }}>
+        <img
+          src={charla.imagen || undefined}
+          alt={charla.titulo}
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(0deg, rgba(40,26,14,0.52) 0%, transparent 58%)",
+        }} />
+        {fechaFmt && (
+          <div style={{
+            position: "absolute", bottom: 9, left: 10,
+            display: "flex", alignItems: "center", gap: 4,
+            background: "rgba(139,106,75,0.88)",
+            borderRadius: 20, padding: "3px 9px",
+            fontSize: "0.64rem", color: "white", fontWeight: 600,
+          }}>
+            <Calendar size={10} /> {fechaFmt}
+          </div>
+        )}
+        {charla.galeria && charla.galeria.length > 0 && (
+          <div style={{
+            position: "absolute", top: 9, right: 9,
+            display: "flex", alignItems: "center", gap: 3,
+            background: "rgba(255,253,249,0.92)",
+            borderRadius: 20, padding: "3px 8px",
+            fontSize: "0.62rem", color: "#8B6A4B", fontWeight: 700,
+          }}>
+            <ImageIcon size={9} /> {charla.galeria.length} fotos
+          </div>
+        )}
+      </div>
+
+      {/* Texto */}
+      <div style={{ padding: "0.85rem 1.1rem 0.95rem" }}>
+        <h4 style={{
+          fontSize: "0.9rem", fontWeight: 700, color: "#3A2A1A",
+          marginBottom: "0.25rem", fontFamily: "'Playfair Display', serif",
+          lineHeight: 1.35,
+        }}>
+          {charla.titulo}
+        </h4>
+        <p style={{
+          fontSize: "0.73rem", color: "#7C5B3E", lineHeight: 1.55, margin: 0,
+          display: "-webkit-box", WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical", overflow: "hidden",
+        }}>
+          {charla.descripcion}
+        </p>
+        <div style={{
+          marginTop: "0.6rem", fontSize: "0.68rem",
+          color: "#B08968", fontWeight: 600,
+        }}>
+          Ver galería →
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ──────────────────────────────────────────────
+   NODO DEL TIMELINE
+────────────────────────────────────────────── */
+function TimelineNode({
+  charla, index, onClick,
+}: {
+  charla: Charla;
+  index: number;
+  onClick: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const isLeft = index % 2 === 0;
+
+  const fechaFmt = charla.fecha
+    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString("es-CO", {
+        year: "numeric", month: "long", day: "numeric",
+      })
+    : null;
+
+  const anio = charla.fecha
+    ? new Date(charla.fecha + "T12:00:00").getFullYear()
+    : null;
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 60px 1fr",
+        alignItems: "center",
+        marginBottom: "3rem",
+      }}
+    >
+      {/* Izquierda */}
+      <div style={{ paddingRight: 24, display: "flex", justifyContent: "flex-end" }}>
+        {isLeft ? (
+          <CardItem charla={charla} inView={inView} fromLeft onClick={onClick} fechaFmt={fechaFmt} />
+        ) : (
+          anio && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={inView ? { opacity: 1 } : {}}
+              transition={{ delay: 0.4 }}
+              style={{
+                fontSize: "0.65rem", color: "#C9AD8D", fontWeight: 700,
+                letterSpacing: "0.12em", textTransform: "uppercase",
+              }}
+            >
+              {anio}
+            </motion.span>
+          )
+        )}
+      </div>
+
+      {/* Centro: dot */}
+      <div style={{ display: "flex", justifyContent: "center", position: "relative", zIndex: 2 }}>
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={inView ? { scale: 1, opacity: 1 } : {}}
+          transition={{ delay: 0.08, type: "spring", stiffness: 320, damping: 22 }}
+          whileHover={{ scale: 1.4 }}
+          onClick={onClick}
+          aria-label={`Ver ${charla.titulo}`}
+          style={{
+            width: 20, height: 20, borderRadius: "50%",
+            background: "linear-gradient(135deg, #B08968, #8B6A4B)",
+            border: "3px solid #FBF8F4",
+            boxShadow: "0 0 0 4px #DDD0C2",
+            cursor: "pointer", outline: "none",
+          }}
+        />
+      </div>
+
+      {/* Derecha */}
+      <div style={{ paddingLeft: 24, display: "flex", justifyContent: "flex-start" }}>
+        {!isLeft ? (
+          <CardItem charla={charla} inView={inView} fromLeft={false} onClick={onClick} fechaFmt={fechaFmt} />
+        ) : (
+          anio && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={inView ? { opacity: 1 } : {}}
+              transition={{ delay: 0.4 }}
+              style={{
+                fontSize: "0.65rem", color: "#C9AD8D", fontWeight: 700,
+                letterSpacing: "0.12em", textTransform: "uppercase",
+              }}
+            >
+              {anio}
+            </motion.span>
+          )
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────
+   MODAL
+────────────────────────────────────────────── */
+function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void }) {
+  const [idx, setIdx] = useState(0);
+  const media = charla.galeria && charla.galeria.length > 0 ? charla.galeria : [charla.imagen];
+  const total = media.length;
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  const prev = () => setIdx(i => (i === 0 ? total - 1 : i - 1));
+  const next = () => setIdx(i => (i + 1) % total);
+
+  const fechaFmt = charla.fecha
+    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString("es-CO", {
+        year: "numeric", month: "long", day: "numeric",
+      })
+    : null;
+
+  const current = media[idx];
+  const isYoutube = typeof current === "string" && current.includes("youtube");
+  const isVideo   = typeof current === "string" && current.endsWith(".mp4");
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: "fixed", inset: 0, zIndex: 9999,
+        background: "rgba(12,6,2,0.8)", backdropFilter: "blur(10px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "1rem",
+      }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, y: 22, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        exit={{ scale: 0.9, y: 22, opacity: 0 }}
+        transition={{ type: "spring", damping: 28, stiffness: 320 }}
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: "#FFFDF9", borderRadius: 26,
+          width: "100%", maxWidth: 780,
+          maxHeight: "92vh", overflowY: "auto",
+          boxShadow: "0 40px 100px rgba(0,0,0,0.45)",
+        }}
+      >
+        {/* Franja dorada */}
+        <div style={{
+          height: 5, borderRadius: "26px 26px 0 0",
+          background: "linear-gradient(90deg, #8B6A4B, #C9AD8D, #8B6A4B)",
+        }} />
+
+        <div style={{ padding: "1.6rem 2rem 2rem" }}>
+          {/* Header */}
+          <div style={{
+            display: "flex", justifyContent: "space-between",
+            alignItems: "flex-start", marginBottom: "1.2rem",
+          }}>
+            <div>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                background: "#F5EEE6", borderRadius: 20, padding: "3px 11px",
+                fontSize: "0.65rem", color: "#8B6A4B", fontWeight: 700,
+                marginBottom: "0.45rem", textTransform: "uppercase", letterSpacing: "0.05em",
+              }}>
+                <Stethoscope size={10} /> Actualización profesional
+              </div>
+              <h3 style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: "1.4rem", fontWeight: 700,
+                color: "#3A2A1A", margin: 0, lineHeight: 1.3,
+              }}>
+                {charla.titulo}
+              </h3>
+              {fechaFmt && (
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 5,
+                  marginTop: "0.4rem", fontSize: "0.73rem", color: "#8B7060",
+                }}>
+                  <Calendar size={12} color="#B08968" /> {fechaFmt}
+                </div>
+              )}
+            </div>
+            <button onClick={onClose} style={{
+              width: 34, height: 34, borderRadius: "50%",
+              background: "#F5EEE6", border: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              flexShrink: 0, marginLeft: "1rem",
+            }}>
+              <X size={16} color="#6C584C" />
+            </button>
+          </div>
+
+          {/* Descripción con acento */}
+          <p style={{
+            fontSize: "0.86rem", color: "#6C584C", lineHeight: 1.75,
+            marginBottom: "1.4rem",
+            borderLeft: "3px solid #C9AD8D",
+            paddingLeft: "0.9rem",
+          }}>
+            {charla.detalle || charla.descripcion}
+          </p>
+
+          {/* Visor principal */}
+          <div style={{
+            position: "relative", borderRadius: 14, overflow: "hidden",
+            background: "#1a0f08", aspectRatio: "16/9",
+            marginBottom: "0.75rem",
+          }}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{ width: "100%", height: "100%" }}
+              >
+                {isYoutube ? (
+                  <iframe
+                    src={current.replace("watch?v=", "embed/")}
+                    title="Video charla"
+                    style={{ width: "100%", height: "100%", border: "none" }}
+                    allowFullScreen
+                  />
+                ) : isVideo ? (
+                  <video src={current} controls
+                    style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                ) : (
+                  <img
+                    src={current || charla.imagen || undefined}
+                    alt={`Foto ${idx + 1}`}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
+
+            {total > 1 && (
+              <>
+                <button onClick={prev} style={{
+                  position: "absolute", left: 10, top: "50%",
+                  transform: "translateY(-50%)",
+                  width: 36, height: 36, borderRadius: "50%",
+                  background: "rgba(255,253,249,0.9)", border: "none",
+                  cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                }}>
+                  <ChevronLeft size={18} color="#4E3B2B" />
+                </button>
+                <button onClick={next} style={{
+                  position: "absolute", right: 10, top: "50%",
+                  transform: "translateY(-50%)",
+                  width: 36, height: 36, borderRadius: "50%",
+                  background: "rgba(255,253,249,0.9)", border: "none",
+                  cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                }}>
+                  <ChevronRight size={18} color="#4E3B2B" />
+                </button>
+                <div style={{
+                  position: "absolute", bottom: 10, right: 12,
+                  background: "rgba(139,106,75,0.9)", borderRadius: 20,
+                  padding: "3px 10px", fontSize: "0.68rem",
+                  color: "white", fontWeight: 700,
+                }}>
+                  {idx + 1} / {total}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Thumbnails */}
+          {total > 1 && (
+            <div style={{
+              display: "flex", gap: "0.4rem",
+              overflowX: "auto", paddingBottom: "0.2rem",
+            }}>
+              {media.map((src, i) => (
+                <motion.div
+                  key={i}
+                  onClick={() => setIdx(i)}
+                  whileHover={{ scale: 1.08 }}
+                  style={{
+                    width: 56, height: 42, borderRadius: 8,
+                    overflow: "hidden", cursor: "pointer", flexShrink: 0,
+                    border: i === idx ? "2px solid #B08968" : "2px solid transparent",
+                    opacity: i === idx ? 1 : 0.5,
+                    transition: "opacity 0.2s, border-color 0.2s",
+                  }}
+                >
+                  {typeof src === "string" && (src.includes("youtube") || src.endsWith(".mp4")) ? (
+                    <div style={{
+                      width: "100%", height: "100%", background: "#2a1a0e",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: "0.8rem", color: "white",
+                    }}>▶</div>
+                  ) : (
+                    <img src={src || undefined} alt=""
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ──────────────────────────────────────────────
+   COMPONENTE PRINCIPAL
+────────────────────────────────────────────── */
 export default function FormacionContinua() {
   const [charlas, setCharlas] = useState<Charla[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [cooldown, setCooldown] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [charlaSeleccionada, setCharlaSeleccionada] = useState<number | null>(null);
-  const [galeriaIndex, setGaleriaIndex] = useState(0);
-  const seccionRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<Charla | null>(null);
 
   useEffect(() => {
-    (async () => {
+    async function fetchCharlas() {
       try {
-        const { data, error } = await supabase.from("charlas").select("id, titulo, descripcion, detalle, imagen, fecha").order("fecha", { ascending: false, nullsFirst: false }).order("creado_en", { ascending: false });
-        if (error) throw error;
-        const lista = data ?? [];
-        const full = await Promise.all(lista.map(async (c) => {
-          const { data: g } = await supabase.from("charla_galeria").select("url").eq("charla_id", c.id).order("orden", { ascending: true });
-          return { ...c, galeria: (g ?? []).map((x: { url: string }) => x.url) } as Charla;
-        }));
-        setCharlas(full);
-      } catch (e) { console.error("Error charlas:", e); }
-    })();
+        const { data, error } = await supabase
+          .from("charlas")
+          .select("id, titulo, descripcion, detalle, imagen, fecha")
+          .order("fecha", { ascending: false, nullsFirst: false })
+          .order("creado_en", { ascending: false });
+
+        if (error) throw new Error(error.message);
+
+        const charlasConGaleria = await Promise.all(
+          (data ?? []).map(async c => {
+            const { data: galeriaData } = await supabase
+              .from("charla_galeria")
+              .select("url")
+              .eq("charla_id", c.id)
+              .order("orden", { ascending: true });
+
+            return {
+              ...c,
+              galeria: (galeriaData ?? []).map((g: { url: string }) => g.url),
+            } as Charla;
+          })
+        );
+
+        setCharlas(charlasConGaleria);
+      } catch (err) {
+        console.error("Error cargando charlas:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCharlas();
   }, []);
 
-  useEffect(() => {
-    const handle = (e: WheelEvent) => {
-      if (cooldown || showModal || charlas.length === 0) return;
-      const sec = seccionRef.current;
-      if (!sec) return;
-      const r = sec.getBoundingClientRect();
-      if (r.top <= window.innerHeight * 0.5 && r.bottom >= window.innerHeight * 0.5) {
-        e.preventDefault();
-        setCooldown(true);
-        setActiveIndex(p => e.deltaY > 0 ? (p + 1) % charlas.length : p === 0 ? charlas.length - 1 : p - 1);
-        setTimeout(() => setCooldown(false), 900);
-      }
-    };
-    window.addEventListener("wheel", handle, { passive: false });
-    return () => window.removeEventListener("wheel", handle);
-  }, [cooldown, showModal, charlas]);
+  if (loading) {
+    return (
+      <section style={{
+        minHeight: "50vh", display: "flex", alignItems: "center",
+        justifyContent: "center", background: "#FBF8F4",
+      }}>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1.1, ease: "linear" }}
+          style={{
+            width: 32, height: 32, borderRadius: "50%",
+            border: "3px solid #E9DED2", borderTopColor: "#B08968",
+          }}
+        />
+      </section>
+    );
+  }
 
-  const siguiente = () => charlaSeleccionada !== null && setGaleriaIndex(p => (p + 1) % (charlas[charlaSeleccionada]?.galeria?.length || 1));
-  const anterior = () => charlaSeleccionada !== null && setGaleriaIndex(p => p === 0 ? (charlas[charlaSeleccionada]?.galeria?.length || 1) - 1 : p - 1);
-
-  if (charlas.length === 0) return (
-    <section style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "50vh", background: "#FBF8F4" }}>
-      <div className="spinner-border" style={{ color: "#B08968" }} role="status" />
-    </section>
-  );
-
-  const charla = charlas[activeIndex];
+  if (charlas.length === 0) {
+    return (
+      <section style={{
+        minHeight: "40vh", display: "flex", alignItems: "center",
+        justifyContent: "center", background: "#FBF8F4",
+      }}>
+        <p style={{ color: "#8B7060", fontStyle: "italic", fontSize: "0.88rem" }}>
+          Sin actividades registradas aún.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <>
-      <section ref={seccionRef} style={{ position: "relative", minHeight: "85vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "4rem 1.5rem", background: "linear-gradient(175deg, #F7EFE7 0%, #FBF8F4 100%)", overflow: "hidden" }}>
+      <section style={{
+        background: "linear-gradient(180deg, #F7EFE7 0%, #FBF8F4 100%)",
+        padding: "5rem 1.5rem 6rem",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        {/* Decoración fondo */}
+        <div style={{
+          position: "absolute", top: "8%", left: "50%",
+          transform: "translateX(-50%)",
+          width: 520, height: 520, borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(176,137,104,0.06) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
 
-        {/* Orbes decorativos */}
-        <div style={{ position: "absolute", width: 350, height: 350, top: "5%", right: "10%", borderRadius: "50%", background: "radial-gradient(circle, rgba(176,137,104,0.08) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", width: 300, height: 300, bottom: "10%", left: "5%", borderRadius: "50%", background: "radial-gradient(circle, rgba(201,173,141,0.1) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none" }} />
+        {/* Título */}
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.55 }}
+          style={{ textAlign: "center", marginBottom: "4.5rem" }}
+        >
+          <p style={{
+            fontSize: "0.67rem", letterSpacing: "0.22em",
+            textTransform: "uppercase", color: "#B08968",
+            fontWeight: 700, marginBottom: "0.45rem",
+          }}>
+            Crecimiento profesional
+          </p>
+          <h2 style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: "clamp(1.9rem, 4vw, 2.6rem)",
+            fontWeight: 700, color: "#3A2A1A", margin: 0,
+          }}>
+            Formación Continua
+          </h2>
+          <p style={{
+            fontSize: "0.82rem", color: "#8B7060",
+            maxWidth: 430, margin: "0.7rem auto 0", lineHeight: 1.65,
+          }}>
+            Charlas, congresos con colegas, nuevas técnicas y equipos
+          </p>
+          <div style={{
+            width: 42, height: 3,
+            background: "linear-gradient(90deg, #B08968, #C9AD8D)",
+            borderRadius: 2, margin: "1rem auto 0",
+          }} />
+        </motion.div>
 
-        {/* Label */}
-        <motion.span initial={{ opacity: 0, y: -15 }} animate={{ opacity: 1, y: 0 }} style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B08968", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "2rem" }}>
-          Formacion Continua
-        </motion.span>
-
-        {/* Card principal */}
-        <AnimatePresence mode="wait">
+        {/* Timeline */}
+        <div style={{ position: "relative", maxWidth: 860, margin: "0 auto" }}>
+          {/* Línea vertical */}
           <motion.div
-            key={activeIndex}
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -30 }}
-            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            style={{ width: "100%", maxWidth: 920, background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 20px 60px rgba(78,59,43,0.1)", overflow: "hidden" }}
-          >
-            {/* Imagen grande */}
-            <div style={{ position: "relative", width: "100%", height: 420, overflow: "hidden" }}>
-              {charla.imagen ? (
-                <img src={charla.imagen} alt={charla.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.6s ease" }} />
-              ) : (
-                <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #4E3B2B, #B08968)" }} />
-              )}
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(0deg, rgba(0,0,0,0.4) 0%, transparent 50%)" }} />
+            initial={{ scaleY: 0 }}
+            whileInView={{ scaleY: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.4, ease: "easeInOut" }}
+            style={{
+              position: "absolute",
+              left: "calc(50% - 1px)",
+              top: 0, bottom: 0, width: 2,
+              background: "linear-gradient(180deg, #C9AD8D 0%, #EDE4D8 100%)",
+              transformOrigin: "top",
+              zIndex: 0,
+            }}
+          />
 
-              {/* Fecha badge */}
-              {charla.fecha && (
-                <div style={{ position: "absolute", top: 16, left: 16, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(8px)", color: "white", padding: "0.35rem 1rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>
-                  {new Date(charla.fecha).toLocaleDateString("es-CO", { year: "numeric", month: "long", day: "numeric" })}
-                </div>
-              )}
-
-              {/* Counter badge */}
-              <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(8px)", color: "white", padding: "0.35rem 1rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>
-                {activeIndex + 1} / {charlas.length}
-              </div>
-            </div>
-
-            {/* Texto */}
-            <div style={{ padding: "2rem 2.5rem 2.5rem" }}>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.8rem", lineHeight: 1.2 }}>
-                {charla.titulo}
-              </h3>
-              <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, marginBottom: "1rem" }} />
-              <p style={{ fontSize: "0.98rem", color: "#5A4A3A", lineHeight: 1.7, marginBottom: "1.5rem" }}>
-                {charla.descripcion}
-              </p>
-              <motion.button
-                whileHover={{ scale: 1.04, boxShadow: "0 8px 28px rgba(176,137,104,0.35)" }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => { setShowModal(true); setCharlaSeleccionada(activeIndex); setGaleriaIndex(0); }}
-                style={{ background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", borderRadius: 100, padding: "0.8rem 2.2rem", fontWeight: 600, fontSize: "0.92rem", cursor: "pointer", boxShadow: "0 4px 16px rgba(176,137,104,0.25)" }}
-              >
-                Ver detalle y galeria
-              </motion.button>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Nav */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem", marginTop: "2rem" }}>
-          <button onClick={() => setActiveIndex(activeIndex === 0 ? charlas.length - 1 : activeIndex - 1)}
-            style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(176,137,104,0.08)", border: "1px solid rgba(176,137,104,0.2)", color: "#B08968", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(176,137,104,0.2)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(176,137,104,0.08)"; }}>
-            <i className="fas fa-chevron-left" style={{ fontSize: "0.75rem" }} />
-          </button>
-          <div style={{ display: "flex", gap: 6 }}>
-            {charlas.map((_, i) => (
-              <button key={i} onClick={() => setActiveIndex(i)}
-                style={{ width: activeIndex === i ? 24 : 10, height: 10, borderRadius: 5, border: "none", background: activeIndex === i ? "#B08968" : "rgba(176,137,104,0.25)", cursor: "pointer", transition: "all 0.3s" }} />
-            ))}
-          </div>
-          <button onClick={() => setActiveIndex((activeIndex + 1) % charlas.length)}
-            style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(176,137,104,0.08)", border: "1px solid rgba(176,137,104,0.2)", color: "#B08968", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(176,137,104,0.2)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(176,137,104,0.08)"; }}>
-            <i className="fas fa-chevron-right" style={{ fontSize: "0.75rem" }} />
-          </button>
+          {charlas.map((charla, i) => (
+            <TimelineNode
+              key={charla.id}
+              charla={charla}
+              index={i}
+              onClick={() => setSelected(charla)}
+            />
+          ))}
         </div>
-        <p style={{ textAlign: "center", fontSize: "0.73rem", color: "#9B8575", marginTop: "0.8rem", fontStyle: "italic" }}>Desplaza con la rueda o usa las flechas</p>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          style={{
+            textAlign: "center", marginTop: "1.5rem",
+            fontSize: "0.7rem", color: "#C9AD8D", fontStyle: "italic",
+          }}
+        >
+          Haz clic en cualquier evento para ver detalles y galería
+        </motion.p>
       </section>
 
-      {/* MODAL */}
       <AnimatePresence>
-        {showModal && charlaSeleccionada !== null && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, padding: "1rem" }}
-            onClick={() => setShowModal(false)}>
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 30 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 30 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              style={{ background: "#FFFDF9", borderRadius: 24, boxShadow: "0 30px 80px rgba(0,0,0,0.3)", width: "90%", maxWidth: 860, maxHeight: "90vh", overflowY: "auto", position: "relative" }}
-              onClick={e => e.stopPropagation()}>
-
-              <button onClick={() => setShowModal(false)}
-                style={{ position: "absolute", top: 16, right: 16, width: 36, height: 36, borderRadius: "50%", background: "rgba(78,59,43,0.08)", border: "none", color: "#4E3B2B", fontSize: "1.1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}
-                onMouseEnter={e => { e.currentTarget.style.background = "rgba(78,59,43,0.15)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "rgba(78,59,43,0.08)"; }}>
-                <i className="fas fa-times" />
-              </button>
-
-              {(charlas[charlaSeleccionada].galeria?.length || 0) > 0 ? (
-                <div style={{ position: "relative", borderRadius: "24px 24px 0 0", overflow: "hidden", background: "#000" }}>
-                  <AnimatePresence mode="wait">
-                    <motion.div key={galeriaIndex} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
-                      {(() => {
-                        const m = charlas[charlaSeleccionada].galeria?.[galeriaIndex] || "";
-                        if (m.includes("youtube") || m.includes("youtu.be")) {
-                          const embed = m.includes("embed/") ? m : m.replace("watch?v=", "embed/");
-                          return <iframe src={embed} title="Video" allowFullScreen style={{ width: "100%", height: 420, border: "none" }} />;
-                        }
-                        return <img src={m} alt="Galeria" style={{ width: "100%", height: 420, objectFit: "cover" }} />;
-                      })()}
-                    </motion.div>
-                  </AnimatePresence>
-                  {(charlas[charlaSeleccionada].galeria?.length || 0) > 1 && (
-                    <>
-                      <button onClick={anterior} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 40, height: 40, borderRadius: "50%", background: "rgba(0,0,0,0.4)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.15)", color: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <i className="fas fa-chevron-left" style={{ fontSize: "0.8rem" }} />
-                      </button>
-                      <button onClick={siguiente} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", width: 40, height: 40, borderRadius: "50%", background: "rgba(0,0,0,0.4)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.15)", color: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <i className="fas fa-chevron-right" style={{ fontSize: "0.8rem" }} />
-                      </button>
-                    </>
-                  )}
-                  <div style={{ position: "absolute", top: 12, right: 60, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)", color: "white", padding: "0.3rem 0.9rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>
-                    {galeriaIndex + 1} / {charlas[charlaSeleccionada]?.galeria?.length || 1}
-                  </div>
-                  <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6 }}>
-                    {charlas[charlaSeleccionada].galeria?.map((_, i) => (
-                      <button key={i} onClick={() => setGaleriaIndex(i)} style={{ width: galeriaIndex === i ? 20 : 8, height: 8, borderRadius: 4, border: "none", background: galeriaIndex === i ? "#C9AD8D" : "rgba(255,255,255,0.5)", cursor: "pointer", transition: "all 0.3s" }} />
-                    ))}
-                  </div>
-                </div>
-              ) : charlas[charlaSeleccionada].imagen ? (
-                <div style={{ borderRadius: "24px 24px 0 0", overflow: "hidden" }}>
-                  <img src={charlas[charlaSeleccionada].imagen} alt={charlas[charlaSeleccionada].titulo} style={{ width: "100%", height: 380, objectFit: "cover" }} />
-                </div>
-              ) : null}
-
-              <div style={{ padding: "2rem 2.5rem 2.5rem" }}>
-                {charlas[charlaSeleccionada].fecha && (
-                  <p style={{ fontSize: "0.8rem", color: "#B08968", fontWeight: 600, marginBottom: "0.5rem" }}>
-                    {new Date(charlas[charlaSeleccionada].fecha!).toLocaleDateString("es-CO", { year: "numeric", month: "long", day: "numeric" })}
-                  </p>
-                )}
-                <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "1rem", lineHeight: 1.2 }}>
-                  {charlas[charlaSeleccionada].titulo}
-                </h4>
-                <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, marginBottom: "1.2rem" }} />
-                <p style={{ fontSize: "1rem", color: "#5A4A3A", lineHeight: 1.75 }}>
-                  {charlas[charlaSeleccionada].detalle || charlas[charlaSeleccionada].descripcion}
-                </p>
-                <div style={{ textAlign: "center", marginTop: "2rem" }}>
-                  <button onClick={() => setShowModal(false)}
-                    style={{ background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", borderRadius: 100, padding: "0.75rem 2.2rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer", boxShadow: "0 4px 16px rgba(176,137,104,0.25)", transition: "all 0.3s" }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = ""; }}>
-                    Cerrar
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+        {selected && (
+          <CharlaModal charla={selected} onClose={() => setSelected(null)} />
         )}
       </AnimatePresence>
     </>

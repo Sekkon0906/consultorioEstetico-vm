@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+// Nota: asegúrate de tener instalado react-datepicker:
+//   npm install react-datepicker @types/react-datepicker
+// El CSS se importa globalmente en globals.css para evitar el error de módulo:
+//   @import 'react-datepicker/dist/react-datepicker.css';
 import { PALETTE } from "./palette";
 
 interface Props {
@@ -19,6 +21,18 @@ interface Props {
   canEdit: boolean;
 }
 
+const inputStyle = (borderColor: string): React.CSSProperties => ({
+  borderColor,
+  borderRadius: "0.5rem",
+  boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+  padding: "0.45rem 0.75rem",
+  border: `1px solid ${borderColor}`,
+  width: "100%",
+  outline: "none",
+  fontSize: "0.9rem",
+  background: "#FFFCF8",
+});
+
 export default function DatosPersonalesForm({
   nombres,
   apellidos,
@@ -32,80 +46,82 @@ export default function DatosPersonalesForm({
   setEdad,
   canEdit,
 }: Props) {
+  const border = PALETTE.border ?? "#D4A97A";
+  const text   = PALETTE.text  ?? "#4E3B2B";
+  const main   = PALETTE.main  ?? "#5C3D2E";
+
+  const labelStyle: React.CSSProperties = {
+    display: "block",
+    fontWeight: 600,
+    marginBottom: "0.3rem",
+    color: text,
+    fontSize: "0.85rem",
+  };
+
+  const fieldClass = "mb-3";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="text-start"
+      style={{ textAlign: "start" }}
     >
-      <h5 className="fw-semibold mb-3" style={{ color: PALETTE.main }}>
+      <h5 style={{ color: main, fontWeight: 600, marginBottom: "1rem" }}>
         Datos personales
       </h5>
 
-      <div className="mb-3">
-        <label className="form-label fw-semibold" style={{ color: PALETTE.text }}>
-          Nombres
-        </label>
+      <div className={fieldClass}>
+        <label style={labelStyle}>Nombres</label>
         <input
           value={nombres}
           onChange={(e) => setNombres(e.target.value)}
-          className="form-control rounded-3 shadow-sm"
           disabled={!canEdit}
-          style={{ borderColor: PALETTE.border }}
+          style={inputStyle(border)}
         />
       </div>
 
-      <div className="mb-3">
-        <label className="form-label fw-semibold" style={{ color: PALETTE.text }}>
-          Apellidos
-        </label>
+      <div className={fieldClass}>
+        <label style={labelStyle}>Apellidos</label>
         <input
           value={apellidos}
           onChange={(e) => setApellidos(e.target.value)}
-          className="form-control rounded-3 shadow-sm"
           disabled={!canEdit}
-          style={{ borderColor: PALETTE.border }}
+          style={inputStyle(border)}
         />
       </div>
 
-      <div className="mb-3">
-        <label className="form-label fw-semibold" style={{ color: PALETTE.text }}>
-          Teléfono
-        </label>
+      <div className={fieldClass}>
+        <label style={labelStyle}>Teléfono</label>
         <input
           value={telefono}
           onChange={(e) => setTelefono(e.target.value)}
-          className="form-control rounded-3 shadow-sm"
           disabled={!canEdit}
-          style={{ borderColor: PALETTE.border }}
+          style={inputStyle(border)}
         />
       </div>
 
-      <div className="mb-3">
-        <label className="form-label fw-semibold" style={{ color: PALETTE.text }}>
-          Edad
-        </label>
+      <div className={fieldClass}>
+        <label style={labelStyle}>Edad</label>
         <input
           type="number"
-          value={edad}
-          onChange={(e) => setEdad(Number(e.target.value))}
-          className="form-control rounded-3 shadow-sm"
+          value={edad || ""}
+          onChange={(e) => setEdad(Number(e.target.value) || 0)}
+          placeholder="Ej: 28"
           disabled={!canEdit}
-          style={{ borderColor: PALETTE.border }}
+          style={inputStyle(border)}
         />
       </div>
 
-      <div className="mb-3">
-        <label className="form-label fw-semibold" style={{ color: PALETTE.text }}>
-          Género
-        </label>
+      <div className={fieldClass}>
+        <label style={labelStyle}>Género</label>
         <select
           value={genero}
-          onChange={(e) => setGenero(e.target.value as "Masculino" | "Femenino" | "Otro")}
-          className="form-select rounded-3 shadow-sm"
+          onChange={(e) =>
+            setGenero(e.target.value as "Masculino" | "Femenino" | "Otro")
+          }
           disabled={!canEdit}
-          style={{ borderColor: PALETTE.border }}
+          style={inputStyle(border)}
         >
           <option value="Masculino">Masculino</option>
           <option value="Femenino">Femenino</option>

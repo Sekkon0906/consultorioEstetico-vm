@@ -5,14 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
 
 const HORAS_BASE = [
-  "08:00 AM","08:30 AM","09:00 AM","09:30 AM",
-  "10:00 AM","10:30 AM","11:00 AM","11:30 AM",
-  "12:00 PM","12:30 PM","01:00 PM","01:30 PM",
-  "02:00 PM","02:30 PM","03:00 PM","03:30 PM",
-  "04:00 PM","04:30 PM","05:00 PM","05:30 PM","06:00 PM",
+  "08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM","10:30 AM",
+  "11:00 AM","11:30 AM","12:00 PM","12:30 PM","01:00 PM","01:30 PM",
+  "02:00 PM","02:30 PM","03:00 PM","03:30 PM","04:00 PM","04:30 PM",
+  "05:00 PM","05:30 PM","06:00 PM",
 ];
 
-interface Bloqueo { id?: number; fecha: string; hora: string; motivo: string; }
+interface CitaHora { hora: string; estado: string; nombres: string; procedimiento: string; }
 interface ConfirmAction { tipo: "bloquear" | "desbloquear" | "global_bloquear" | "global_desbloquear"; hora: string; }
 
 export default function HorariosHabilitados() {
@@ -20,40 +19,35 @@ export default function HorariosHabilitados() {
   const [mes, setMes] = useState(hoy.getMonth());
   const [anio, setAnio] = useState(hoy.getFullYear());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [bloqueos, setBloqueos] = useState<Bloqueo[]>([]);
+  const [bloqueosHoras, setBloqueosHoras] = useState<Set<string>>(new Set());
   const [bloqueosGlobales, setBloqueosGlobales] = useState<Set<string>>(new Set());
-  const [citasOcupadas, setCitasOcupadas] = useState<Set<string>>(new Set());
+  const [citasDelDia, setCitasDelDia] = useState<CitaHora[]>([]);
   const [loadingDia, setLoadingDia] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const [motivoNuevo, setMotivoNuevo] = useState("Bloqueo manual");
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(null);
   const [tab, setTab] = useState<"diario" | "global">("diario");
 
-  const showToast = (msg: string) => {
-    setToast(msg); setTimeout(() => setToast(null), 2500);
-  };
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
 
-  useEffect(() => { cargarBloqueosGlobales(); }, []);
+  useEffect(() => { cargarGlobales(); }, []);
 
-  const cargarBloqueosGlobales = async () => {
-    const { data, error } = await supabase.from("bloqueos_globales").select("hora");
-    if (!error && data) setBloqueosGlobales(new Set(data.map((b: any) => b.hora)));
+  const cargarGlobales = async () => {
+    const { data } = await supabase.from("bloqueos_globales").select("hora");
+    if (data) setBloqueosGlobales(new Set(data.map((b: any) => b.hora)));
   };
 
   const cargarDia = async (fecha: string) => {
     setLoadingDia(true);
     try {
-      const [bloqRes, citasRes] = await Promise.all([
-        supabase.from("bloqueos_horas").select("id, fecha, hora, motivo").eq("fecha", fecha),
-        supabase.from("citas").select("hora, estado").eq("fecha", fecha),
+      const [bRes, cRes] = await Promise.all([
+        supabase.from("bloqueos_horas").select("hora").eq("fecha", fecha),
+        supabase.from("citas").select("hora, estado, nombres, procedimiento").eq("fecha", fecha),
       ]);
-      if (!bloqRes.error) setBloqueos((bloqRes.data ?? []).map((b: any) => ({ id: b.id, fecha: b.fecha, hora: b.hora, motivo: b.motivo })));
-      if (!citasRes.error) setCitasOcupadas(new Set((citasRes.data ?? []).filter((c: any) => c.estado !== "cancelada").map((c: any) => c.hora)));
+      if (!bRes.error) setBloqueosHoras(new Set((bRes.data ?? []).map((b: any) => b.hora)));
+      if (!cRes.error) setCitasDelDia((cRes.data ?? []).filter((c: any) => c.estado !== "cancelada") as CitaHora[]);
     } catch (e) { console.error(e); }
     finally { setLoadingDia(false); }
   };
-
-  const seleccionarDia = (iso: string) => { setSelectedDate(iso); cargarDia(iso); };
 
   const ejecutarAccion = async () => {
     if (!confirmAction) return;
@@ -61,31 +55,23 @@ export default function HorariosHabilitados() {
     setConfirmAction(null);
     try {
       if (tipo === "bloquear" && selectedDate) {
-        const { error } = await supabase.from("bloqueos_horas").insert({ fecha: selectedDate, hora, motivo: motivoNuevo });
-        if (error) throw new Error(error.message);
-        showToast(`Hora ${hora} bloqueada`);
-        cargarDia(selectedDate);
+        await supabase.from("bloqueos_horas").insert({ fecha: selectedDate, hora, motivo: "Bloqueo manual" });
+        showToast(`${hora} bloqueada`); cargarDia(selectedDate);
       } else if (tipo === "desbloquear" && selectedDate) {
-        const { error } = await supabase.from("bloqueos_horas").delete().eq("fecha", selectedDate).eq("hora", hora);
-        if (error) throw new Error(error.message);
-        showToast(`Hora ${hora} desbloqueada`);
-        cargarDia(selectedDate);
+        await supabase.from("bloqueos_horas").delete().eq("fecha", selectedDate).eq("hora", hora);
+        showToast(`${hora} desbloqueada`); cargarDia(selectedDate);
       } else if (tipo === "global_bloquear") {
-        const { error } = await supabase.from("bloqueos_globales").insert({ hora, motivo: "Bloqueo global permanente" });
-        if (error) throw new Error(error.message);
-        showToast(`Hora ${hora} bloqueada globalmente`);
-        cargarBloqueosGlobales();
+        await supabase.from("bloqueos_globales").insert({ hora, motivo: "Bloqueo global" });
+        showToast(`${hora} bloqueada globalmente`); cargarGlobales();
       } else if (tipo === "global_desbloquear") {
-        const { error } = await supabase.from("bloqueos_globales").delete().eq("hora", hora);
-        if (error) throw new Error(error.message);
-        showToast(`Hora ${hora} desbloqueada globalmente`);
-        cargarBloqueosGlobales();
+        await supabase.from("bloqueos_globales").delete().eq("hora", hora);
+        showToast(`${hora} desbloqueada globalmente`); cargarGlobales();
       }
     } catch (e: any) { showToast("Error: " + e.message); }
   };
 
-  const esBloqueada = (hora: string) => bloqueos.some((b) => b.hora === hora);
-  const esCita = (hora: string) => citasOcupadas.has(hora);
+  const getCitaEnHora = (hora: string) => citasDelDia.find(c => c.hora === hora);
+  const esBloqueada = (hora: string) => bloqueosHoras.has(hora);
   const esGlobal = (hora: string) => bloqueosGlobales.has(hora);
 
   const primerDia = new Date(anio, mes, 1).getDay() || 7;
@@ -93,43 +79,51 @@ export default function HorariosHabilitados() {
   const diasCal: (number | null)[] = [];
   for (let i = 1; i < primerDia; i++) diasCal.push(null);
   for (let d = 1; d <= diasEnMes; d++) diasCal.push(d);
-  const nombresMes = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
-  const mensajeConfirmacion = () => {
-    if (!confirmAction) return "";
-    const { tipo, hora } = confirmAction;
-    if (tipo === "bloquear") return `Deseas bloquear la hora ${hora} para el dia ${selectedDate}?`;
-    if (tipo === "desbloquear") return `Deseas quitar el bloqueo de la hora ${hora} para el dia ${selectedDate}?`;
-    if (tipo === "global_bloquear") return `Deseas bloquear la hora ${hora} de forma permanente en todos los dias?`;
-    if (tipo === "global_desbloquear") return `Deseas desbloquear la hora ${hora} globalmente?`;
-    return "";
+  const getHoraStyle = (hora: string): { bg: string; color: string; border: string; label: string } => {
+    const cita = getCitaEnHora(hora);
+    if (esGlobal(hora)) return { bg: "#EDE0F0", color: "#5B2C8E", border: "#C8B0E0", label: "Global" };
+    if (cita) {
+      if (cita.estado === "pendiente") return { bg: "#FFF8E1", color: "#7D6608", border: "#F0E0A0", label: `${cita.nombres} - ${cita.procedimiento}` };
+      if (cita.estado === "confirmada") return { bg: "#E3F2FD", color: "#0B3C78", border: "#A0C8F0", label: `${cita.nombres} - ${cita.procedimiento}` };
+      if (cita.estado === "atendida") return { bg: "#E8F5E9", color: "#145A32", border: "#A0D8A8", label: `${cita.nombres} - ${cita.procedimiento}` };
+      return { bg: "#EEF7EE", color: "#2D6A4F", border: "#A8D8B9", label: `${cita.nombres}` };
+    }
+    if (esBloqueada(hora)) return { bg: "#FDE8D8", color: "#922B21", border: "#F0A898", label: "Bloqueada" };
+    return { bg: "#F5EEE6", color: "#4E3B2B", border: "#E9DED2", label: "Disponible" };
   };
 
   return (
     <div>
-      <h2 className="fw-bold mb-4" style={{ color: "#4E3B2B" }}>Gestion de Horarios</h2>
+      <h2 style={{ fontWeight: 700, color: "#4E3B2B", marginBottom: "1.5rem" }}>Gestion de Horarios</h2>
 
-      {toast && (
-        <div className="alert rounded-3 py-2 px-4 mb-3 text-center fw-semibold" style={{ backgroundColor: "#E9DED2", color: "#4E3B2B", border: "1px solid #D4C4B0" }}>{toast}</div>
-      )}
+      {toast && <div style={{ background: "#E9DED2", color: "#4E3B2B", border: "1px solid #D4C4B0", borderRadius: 12, padding: "0.6rem 1rem", textAlign: "center", fontWeight: 600, marginBottom: "1rem", fontSize: "0.88rem" }}>{toast}</div>}
 
-      <div className="d-flex gap-2 mb-4">
-        <button onClick={() => setTab("diario")} className="btn rounded-pill px-4 fw-semibold" style={{ backgroundColor: tab === "diario" ? "#8B6A4B" : "#F5EEE6", color: tab === "diario" ? "#fff" : "#4E3B2B", border: "none" }}>Bloqueo por dia</button>
-        <button onClick={() => setTab("global")} className="btn rounded-pill px-4 fw-semibold" style={{ backgroundColor: tab === "global" ? "#8B6A4B" : "#F5EEE6", color: tab === "global" ? "#fff" : "#4E3B2B", border: "none" }}>Bloqueo global permanente</button>
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem" }}>
+        {[{ k: "diario", l: "Bloqueo por dia" }, { k: "global", l: "Bloqueo global" }].map(t => (
+          <button key={t.k} onClick={() => setTab(t.k as any)}
+            style={{ padding: "0.6rem 1.3rem", borderRadius: 100, fontWeight: 600, fontSize: "0.85rem", border: "none", cursor: "pointer",
+              background: tab === t.k ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "#F5EEE6", color: tab === t.k ? "white" : "#4E3B2B" }}>
+            {t.l}
+          </button>
+        ))}
       </div>
 
-      {/* TAB GLOBAL */}
+      {/* GLOBAL TAB */}
       {tab === "global" && (
-        <div className="rounded-4 p-4 shadow-sm" style={{ backgroundColor: "#FFFDF9", border: "1px solid #E9DED2" }}>
-          <h5 className="fw-semibold mb-2" style={{ color: "#4E3B2B" }}>Horarios bloqueados permanentemente</h5>
-          <p className="small mb-4" style={{ color: "#8B7060" }}>Las horas bloqueadas aqui nunca se mostraran como disponibles, sin importar el dia.</p>
-          <div className="d-grid" style={{ gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-            {HORAS_BASE.map((hora) => {
-              const bloqueada = esGlobal(hora);
+        <div style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, padding: "1.5rem" }}>
+          <h5 style={{ fontWeight: 600, color: "#4E3B2B", marginBottom: "0.5rem" }}>Horarios bloqueados permanentemente</h5>
+          <p style={{ fontSize: "0.82rem", color: "#8B7060", marginBottom: "1.2rem" }}>Estas horas nunca se mostraran como disponibles</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+            {HORAS_BASE.map(hora => {
+              const bl = esGlobal(hora);
               return (
-                <button key={hora} onClick={() => setConfirmAction({ tipo: bloqueada ? "global_desbloquear" : "global_bloquear", hora })}
-                  className="btn btn-sm rounded-pill fw-semibold py-2" style={{ fontSize: "0.75rem", backgroundColor: bloqueada ? "#FDE8D8" : "#F5EEE6", color: bloqueada ? "#922B21" : "#4E3B2B", border: bloqueada ? "1px solid #F0A898" : "1px solid #E9DED2", cursor: "pointer" }}>
-                  {hora} {bloqueada ? "(Bloqueada)" : ""}
+                <button key={hora} onClick={() => setConfirmAction({ tipo: bl ? "global_desbloquear" : "global_bloquear", hora })}
+                  style={{ padding: "0.6rem", borderRadius: 12, fontWeight: 600, fontSize: "0.78rem", border: `1px solid ${bl ? "#C8B0E0" : "#E9DED2"}`, cursor: "pointer",
+                    background: bl ? "#EDE0F0" : "#F5EEE6", color: bl ? "#5B2C8E" : "#4E3B2B" }}>
+                  {hora} {bl ? "(Bloqueada)" : ""}
                 </button>
               );
             })}
@@ -137,28 +131,36 @@ export default function HorariosHabilitados() {
         </div>
       )}
 
-      {/* TAB DIARIO */}
+      {/* DIARIO TAB */}
       {tab === "diario" && (
         <div className="row g-4">
           <div className="col-md-5">
-            <div className="rounded-4 p-4 shadow-sm" style={{ backgroundColor: "#FFFDF9", border: "1px solid #E9DED2" }}>
-              <div className="d-flex justify-content-between align-items-center mb-4">
-                <button onClick={() => { if (mes === 0) { setMes(11); setAnio(a => a - 1); } else setMes(m => m - 1); }} className="btn btn-sm rounded-circle" style={{ backgroundColor: "#E9DED2", color: "#4E3B2B" }}>&lsaquo;</button>
-                <h5 className="fw-semibold m-0" style={{ color: "#4E3B2B" }}>{nombresMes[mes]} {anio}</h5>
-                <button onClick={() => { if (mes === 11) { setMes(0); setAnio(a => a + 1); } else setMes(m => m + 1); }} className="btn btn-sm rounded-circle" style={{ backgroundColor: "#E9DED2", color: "#4E3B2B" }}>&rsaquo;</button>
+            <div style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, padding: "1.5rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.2rem" }}>
+                <button onClick={() => { if (mes === 0) { setMes(11); setAnio(a => a - 1); } else setMes(m => m - 1); }}
+                  style={{ width: 34, height: 34, borderRadius: "50%", background: "#E9DED2", border: "none", color: "#4E3B2B", cursor: "pointer" }}>&lsaquo;</button>
+                <h5 style={{ fontWeight: 600, color: "#4E3B2B", margin: 0, fontSize: "1rem" }}>{MESES[mes]} {anio}</h5>
+                <button onClick={() => { if (mes === 11) { setMes(0); setAnio(a => a + 1); } else setMes(m => m + 1); }}
+                  style={{ width: 34, height: 34, borderRadius: "50%", background: "#E9DED2", border: "none", color: "#4E3B2B", cursor: "pointer" }}>&rsaquo;</button>
               </div>
-              <div className="d-grid mb-2" style={{ gridTemplateColumns: "repeat(7,1fr)", textAlign: "center" }}>
-                {["L","M","X","J","V","S","D"].map((d) => (<div key={d} style={{ fontSize: "0.72rem", fontWeight: 700, color: "#8B7060" }}>{d}</div>))}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", textAlign: "center", marginBottom: 4 }}>
+                {["L","M","X","J","V","S","D"].map(d => <div key={d} style={{ fontSize: "0.72rem", fontWeight: 700, color: "#8B7060" }}>{d}</div>)}
               </div>
-              <div className="d-grid" style={{ gridTemplateColumns: "repeat(7,1fr)", gap: 4 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 4 }}>
                 {diasCal.map((dia, i) => {
                   if (!dia) return <div key={`e-${i}`} />;
                   const iso = `${anio}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
-                  const isSelected = iso === selectedDate;
+                  const sel = iso === selectedDate;
+                  const pasado = (() => { const d = new Date(anio, mes, dia); const h = new Date(); h.setHours(0,0,0,0); return d < h; })();
+                  const hoy = new Date(anio, mes, dia).toDateString() === new Date().toDateString();
                   return (
-                    <motion.button key={dia} whileHover={{ scale: 1.1 }} onClick={() => seleccionarDia(iso)}
-                      style={{ width: 34, height: 34, borderRadius: "50%", border: "none", margin: "0 auto", backgroundColor: isSelected ? "#8B6A4B" : "#F5EEE6", color: isSelected ? "#fff" : "#4E3B2B", fontWeight: isSelected ? 700 : 400, fontSize: "0.82rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {dia}
+                    <motion.button key={dia} whileHover={pasado ? {} : { scale: 1.1 }} onClick={() => !pasado && (setSelectedDate(iso), cargarDia(iso))} disabled={pasado}
+                      style={{ width: 34, height: 34, borderRadius: "50%", border: hoy && !sel ? "2px solid #B08968" : "none", margin: "0 auto",
+                        background: sel ? "#8B6A4B" : pasado ? "transparent" : "#F5EEE6",
+                        color: sel ? "white" : pasado ? "#ccc" : "#4E3B2B",
+                        fontWeight: sel || hoy ? 700 : 400, fontSize: "0.82rem", cursor: pasado ? "not-allowed" : "pointer",
+                        display: "flex", alignItems: "center", justifyContent: "center", opacity: pasado ? 0.4 : 1,
+                      }}>{dia}
                     </motion.button>
                   );
                 })}
@@ -168,40 +170,69 @@ export default function HorariosHabilitados() {
 
           <div className="col-md-7">
             {!selectedDate ? (
-              <div className="rounded-4 p-5 text-center" style={{ backgroundColor: "#FFFDF9", border: "1px solid #E9DED2" }}>
-                <p style={{ color: "#8B7060" }}>Selecciona un dia para gestionar las horas.</p>
+              <div style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, padding: "3rem", textAlign: "center" }}>
+                <p style={{ color: "#8B7060" }}>Selecciona un dia para gestionar las horas</p>
               </div>
             ) : (
-              <div className="rounded-4 p-4 shadow-sm" style={{ backgroundColor: "#FFFDF9", border: "1px solid #E9DED2" }}>
-                <h5 className="fw-semibold mb-3" style={{ color: "#4E3B2B" }}>{selectedDate}</h5>
-                <div className="mb-3 d-flex gap-2 align-items-center">
-                  <input className="form-control form-control-sm" placeholder="Motivo del bloqueo" value={motivoNuevo} onChange={(e) => setMotivoNuevo(e.target.value)} style={{ borderColor: "#E9DED2", maxWidth: 260 }} />
-                </div>
+              <div style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, padding: "1.5rem" }}>
+                <h5 style={{ fontWeight: 600, color: "#4E3B2B", marginBottom: "1rem" }}>
+                  {new Date(selectedDate + "T12:00:00").toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+                </h5>
+
                 {loadingDia ? (
-                  <div className="text-center py-4"><div className="spinner-border spinner-border-sm" style={{ color: "#B08968" }} role="status" /></div>
+                  <div style={{ textAlign: "center", padding: "2rem 0" }}><div className="spinner-border spinner-border-sm" style={{ color: "#B08968" }} /></div>
                 ) : (
-                  <div className="d-grid" style={{ gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-                    {HORAS_BASE.map((hora) => {
-                      const bloqueada = esBloqueada(hora);
-                      const citada = esCita(hora);
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+                    {HORAS_BASE.map(hora => {
+                      const s = getHoraStyle(hora);
+                      const cita = getCitaEnHora(hora);
                       const global = esGlobal(hora);
+                      const bloqueada = esBloqueada(hora);
+                      // Check if hour is past for today
+                      const esHoy = selectedDate === new Date().toISOString().slice(0, 10);
+                      const horaPasada = esHoy && (() => {
+                        const [hStr] = hora.split(":");
+                        let h = parseInt(hStr);
+                        if (hora.includes("PM") && h !== 12) h += 12;
+                        if (hora.includes("AM") && h === 12) h = 0;
+                        return h < new Date().getHours() || (h === new Date().getHours() && parseInt(hora.split(":")[1]) <= new Date().getMinutes());
+                      })();
+                      const disabled = !!cita || global || !!horaPasada;
+
                       return (
                         <button key={hora}
-                          onClick={() => { if (!citada && !global) setConfirmAction({ tipo: bloqueada ? "desbloquear" : "bloquear", hora }); }}
-                          disabled={citada || global}
-                          className="btn btn-sm rounded-pill fw-semibold py-2"
-                          style={{ fontSize: "0.75rem", backgroundColor: global ? "#E8E0F0" : citada ? "#EEF7EE" : bloqueada ? "#FDE8D8" : "#F5EEE6", color: global ? "#5B2C8E" : citada ? "#2D6A4F" : bloqueada ? "#922B21" : "#4E3B2B", border: global ? "1px solid #C8B8E0" : citada ? "1px solid #A8D8B9" : bloqueada ? "1px solid #F0A898" : "1px solid #E9DED2", cursor: (citada || global) ? "not-allowed" : "pointer" }}>
-                          {hora} {global ? "(Global)" : ""}
+                          onClick={() => { if (!disabled) setConfirmAction({ tipo: bloqueada ? "desbloquear" : "bloquear", hora }); }}
+                          disabled={disabled}
+                          title={horaPasada ? "Hora pasada" : s.label}
+                          style={{ padding: "0.55rem 0.3rem", borderRadius: 12, fontWeight: 600, fontSize: "0.75rem",
+                            background: horaPasada ? "transparent" : s.bg, color: horaPasada ? "#ccc" : s.color, border: `1px solid ${horaPasada ? "#eee" : s.border}`,
+                            cursor: disabled ? "default" : "pointer", transition: "all 0.2s", opacity: horaPasada ? 0.4 : 1,
+                            display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+                          }}>
+                          <span>{hora}</span>
+                          {cita && <span style={{ fontSize: "0.62rem", fontWeight: 500, opacity: 0.8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" }}>{cita.nombres.split(" ")[0]}</span>}
+                          {global && <span style={{ fontSize: "0.62rem" }}>Global</span>}
                         </button>
                       );
                     })}
                   </div>
                 )}
-                <div className="d-flex gap-3 mt-3 flex-wrap" style={{ fontSize: "0.75rem", color: "#8B7060" }}>
-                  <span>Disponible</span>
-                  <span>Bloqueada manualmente</span>
-                  <span>Con cita activa</span>
-                  <span>Bloqueo global</span>
+
+                {/* Legend */}
+                <div style={{ display: "flex", gap: "0.8rem", marginTop: "1rem", flexWrap: "wrap", fontSize: "0.72rem" }}>
+                  {[
+                    { bg: "#F5EEE6", border: "#E9DED2", label: "Disponible" },
+                    { bg: "#FFF8E1", border: "#F0E0A0", label: "Pendiente" },
+                    { bg: "#E3F2FD", border: "#A0C8F0", label: "Confirmada" },
+                    { bg: "#E8F5E9", border: "#A0D8A8", label: "Atendida" },
+                    { bg: "#FDE8D8", border: "#F0A898", label: "Bloqueada" },
+                    { bg: "#EDE0F0", border: "#C8B0E0", label: "Global" },
+                  ].map(l => (
+                    <span key={l.label} style={{ display: "flex", alignItems: "center", gap: 4, color: "#6C584C" }}>
+                      <span style={{ width: 12, height: 12, borderRadius: 3, background: l.bg, border: `1px solid ${l.border}`, display: "inline-block" }} />
+                      {l.label}
+                    </span>
+                  ))}
                 </div>
               </div>
             )}
@@ -209,21 +240,25 @@ export default function HorariosHabilitados() {
         </div>
       )}
 
-      {/* MODAL DE CONFIRMACION */}
+      {/* Confirm modal */}
       <AnimatePresence>
         {confirmAction && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="position-fixed d-flex align-items-center justify-content-center"
-            style={{ inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(3px)" }}
+            style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(3px)", display: "flex", alignItems: "center", justifyContent: "center" }}
             onClick={() => setConfirmAction(null)}>
             <motion.div initial={{ scale: 0.85 }} animate={{ scale: 1 }} exit={{ scale: 0.85 }}
-              className="bg-white rounded-4 shadow-lg p-5 text-center" style={{ maxWidth: 420, width: "90%" }}
-              onClick={(e) => e.stopPropagation()}>
-              <h5 className="fw-bold mb-3" style={{ color: "#4E3B2B" }}>Confirmar accion</h5>
-              <p className="mb-4" style={{ color: "#6C584C" }}>{mensajeConfirmacion()}</p>
-              <div className="d-flex gap-3 justify-content-center">
-                <button onClick={ejecutarAccion} className="btn rounded-pill fw-semibold px-4" style={{ backgroundColor: "#8B6A4B", color: "#fff", border: "none" }}>Si, confirmar</button>
-                <button onClick={() => setConfirmAction(null)} className="btn rounded-pill fw-semibold px-4" style={{ backgroundColor: "#E9DED2", color: "#4E3B2B", border: "none" }}>Cancelar</button>
+              style={{ background: "white", borderRadius: 20, padding: "2rem", maxWidth: 400, width: "90%", textAlign: "center" }}
+              onClick={e => e.stopPropagation()}>
+              <h5 style={{ fontWeight: 700, color: "#4E3B2B", marginBottom: "0.8rem" }}>Confirmar accion</h5>
+              <p style={{ color: "#6C584C", marginBottom: "1.5rem", fontSize: "0.92rem" }}>
+                {confirmAction.tipo === "bloquear" && `Bloquear ${confirmAction.hora} para ${selectedDate}?`}
+                {confirmAction.tipo === "desbloquear" && `Desbloquear ${confirmAction.hora} para ${selectedDate}?`}
+                {confirmAction.tipo === "global_bloquear" && `Bloquear ${confirmAction.hora} en todos los dias?`}
+                {confirmAction.tipo === "global_desbloquear" && `Desbloquear ${confirmAction.hora} globalmente?`}
+              </p>
+              <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
+                <button onClick={() => setConfirmAction(null)} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, border: "1px solid #E9DED2", background: "transparent", color: "#4E3B2B", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
+                <button onClick={ejecutarAccion} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, background: "#8B6A4B", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>Confirmar</button>
               </div>
             </motion.div>
           </motion.div>

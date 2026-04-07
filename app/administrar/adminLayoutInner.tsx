@@ -45,7 +45,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
     { id: "procedimientos", label: "Procedimientos" },
     { id: "testimonios",    label: "Testimonios" },
     { id: "charlas",        label: "Formación" },
-    { id: "ingresos",       label: "Ingresos" },
+    { id: "ingresos",       label: "Analítica" },
   ];
 
   const NavLinks = () => (

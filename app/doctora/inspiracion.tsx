@@ -2,7 +2,6 @@
 
 import { IMG } from "@/lib/imagenes";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { TypeAnimation } from "react-type-animation";
 
@@ -32,12 +31,11 @@ export default function Inspiracion() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}
             >
-              <Image
+              <img
                 src={IMG.inspiracion}
                 alt="Inspiración"
-                width={500}
-                height={500}
                 className="rounded-4 shadow-lg"
+                style={{ width: "100%", maxWidth: 500, height: "auto", objectFit: "cover" }}
               />
             </motion.div>
           </div>

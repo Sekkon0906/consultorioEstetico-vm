@@ -11,7 +11,6 @@ export function useEditarInfo() {
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
-  // Campos del formulario
   const [nombres, setNombres] = useState("");
   const [apellidos, setApellidos] = useState("");
   const [telefono, setTelefono] = useState("");
@@ -26,7 +25,6 @@ export function useEditarInfo() {
   const [alergiasDescripcion, setAlergiasDescripcion] = useState("");
   const [medicamentosDescripcion, setMedicamentosDescripcion] = useState("");
 
-  /*  Cargar datos desde el backend  */
   useEffect(() => {
     async function loadProfile() {
       try {
@@ -37,15 +35,12 @@ export function useEditarInfo() {
         setNombres(u.nombres || "");
         setApellidos(u.apellidos || "");
         setTelefono(u.telefono || "");
-        setEdad(u.edad || 0);
+        setEdad(u.edad ? Number(u.edad) : 0);
         setGenero(u.genero || "Otro");
         setPhoto(u.photo || undefined);
 
         const toMulti = (s: string) =>
-          !s
-            ? []
-            : s === "No tengo"
-            ? [{ value: "No tengo", label: "No tengo" }]
+          !s ? [] : s === "No tengo" ? [{ value: "No tengo", label: "No tengo" }]
             : s.split(",").map((p) => ({ value: p.trim(), label: p.trim() }));
 
         setAntecedentes(toMulti(u.antecedentes || ""));
@@ -58,31 +53,36 @@ export function useEditarInfo() {
         console.error("Error cargando perfil:", err);
       }
     }
-
     if (user) loadProfile();
   }, [user]);
 
-  /*  Guardar datos personales  */
   async function handleSavePersonal() {
     setSaving(true);
     setMessage("");
     try {
-      await updateCurrentUser({ nombres, apellidos, telefono, edad, genero, photo });
-      await refreshUser();
-      setMessage(" Datos personales actualizados.");
+      const result = await updateCurrentUser({
+        nombres, apellidos, telefono,
+        edad: edad || null,
+        genero, photo,
+      });
+      if (!result.ok) {
+        setMessage("Error: No se pudieron guardar los datos personales.");
+      } else {
+        await refreshUser();
+        setMessage("Datos personales actualizados.");
+      }
     } catch (err: any) {
-      setMessage(" " + (err.message || "Error al guardar."));
+      setMessage("Error: " + (err.message || "Error al guardar."));
     } finally {
       setSaving(false);
     }
   }
 
-  /*  Guardar datos médicos  */
   async function handleSaveMedical() {
     setSaving(true);
     setMessage("");
     try {
-      await updateCurrentUser({
+      const result = await updateCurrentUser({
         antecedentes: antecedentes.map((a) => a.value).join(", "),
         antecedentesDescripcion,
         alergias: alergias.map((a) => a.value).join(", "),
@@ -90,28 +90,25 @@ export function useEditarInfo() {
         medicamentos: medicamentos.map((a) => a.value).join(", "),
         medicamentosDescripcion,
       });
-      await refreshUser();
-      setMessage(" Información médica actualizada.");
+      if (!result.ok) {
+        setMessage("Error: No se pudieron guardar los datos medicos.");
+      } else {
+        await refreshUser();
+        setMessage("Informacion medica actualizada.");
+      }
     } catch (err: any) {
-      setMessage(" " + (err.message || "Error al guardar."));
+      setMessage("Error: " + (err.message || "Error al guardar."));
     } finally {
       setSaving(false);
     }
   }
 
   return {
-    user,
-    saving,
-    message,
-    setMessage,
-    nombres, setNombres,
-    apellidos, setApellidos,
-    telefono, setTelefono,
-    edad, setEdad,
-    genero, setGenero,
-    photo, setPhoto,
-    antecedentes, setAntecedentes,
-    alergias, setAlergias,
+    user, saving, message, setMessage,
+    nombres, setNombres, apellidos, setApellidos,
+    telefono, setTelefono, edad, setEdad,
+    genero, setGenero, photo, setPhoto,
+    antecedentes, setAntecedentes, alergias, setAlergias,
     medicamentos, setMedicamentos,
     antecedentesDescripcion, setAntecedentesDescripcion,
     alergiasDescripcion, setAlergiasDescripcion,

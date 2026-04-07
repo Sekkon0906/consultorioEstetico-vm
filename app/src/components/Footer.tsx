@@ -147,7 +147,7 @@ export default function Footer() {
           </div>
           <p style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.5)" }}>2023 Clinica Estetica Dra. Julieth Medina. Todos los derechos reservados.</p>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.5)", marginTop: "0.2rem" }}>
-            Disenada por{" "}
+            Diseñada por{" "}
             <a href="https://portafoliojmo.vercel.app" target="_blank" rel="noopener noreferrer" className="designer-credit">
               <span className="designer-text">Juan Medina O.</span>
               <span className="designer-sparkle" />

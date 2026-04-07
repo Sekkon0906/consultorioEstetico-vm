@@ -1,20 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Galeria3D from "./src/components/Galeria3D";
 import dynamic from "next/dynamic";
-import { IMG } from "@/lib/imagenes";
 
 const VideoAnim = dynamic(() => import("./src/components/VideoAnim"), {
   ssr: false,
 });
 
+import { IMG } from "./src/lib/imagenes";
+
 export default function HomePage() {
   const imagenes = IMG.homeCarrusel;
+
   const [imagenActual, setImagenActual] = useState(0);
-  const [heroVisible, setHeroVisible] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const intervalo = setInterval(
@@ -24,61 +24,60 @@ export default function HomePage() {
     return () => clearInterval(intervalo);
   }, [imagenes.length]);
 
-  useEffect(() => {
-    setTimeout(() => setHeroVisible(true), 100);
-  }, []);
-
   const memoizedVideo = useMemo(() => <VideoAnim />, []);
 
   return (
     <>
       {/* ===== HERO ===== */}
-      <section className="hero hero-home" ref={heroRef}>
+      <section className="hero hero-home">
+        {/* Lado izquierdo: carrusel de imágenes */}
         <div className="hero-left">
           {imagenes.map((img, index) => (
             <img
               key={index}
               src={img}
-              alt={`Procedimiento ${index + 1}`}
-              className={`hero-slide ${index === imagenActual ? "is-active" : ""}`}
+              alt={`Imagen ${index + 1}`}
+              className={`hero-slide ${
+                index === imagenActual ? "is-active" : ""
+              }`}
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
             />
           ))}
         </div>
 
+        {/* Lado derecho: texto + CTA */}
         <div className="hero-right">
-          <div className={`hero-content container ${heroVisible ? "hero-content-visible" : ""}`}>
+          <div className="hero-content container">
             <h1 className="hero-title">
-              La innovadora y exclusiva tecnologia de Hydrafacial esta en el
-              consultorio de la Dra. Vanessa Medina
+              La innovadora y exclusiva tecnología de Hydrafacial está en el
+              consultorio de la Dra. Vanessa Medina!
             </h1>
 
-            <div className="hero-separator" />
-
+            {/* Texto escritorio */}
             <p className="hero-desc-long">
-              <strong>Que es HydraFacial?</strong> Es una tecnologia estetica
-              de ultima generacion que combina limpieza profunda, exfoliacion,
-              extraccion de impurezas e hidratacion avanzada en un solo
+              <strong>¿Qué es HydraFacial?</strong> Es una tecnología estética
+              de última generación que combina limpieza profunda, exfoliación,
+              extracción de impurezas e hidratación avanzada en un solo
               procedimiento. Su sistema patentado utiliza un aplicador con
-              succion controlada y sueros enriquecidos que renuevan la piel
-              desde la primera sesion, sin necesidad de tiempo de recuperacion.
-            </p>
-
-            <p className="hero-desc-long">
-              <strong>Para que sirve?</strong> Revitaliza la piel, trata poros
-              dilatados, lineas de expresion, manchas y deshidratacion,
+              succión controlada y sueros enriquecidos que renuevan la piel
+              desde la primera sesión, sin necesidad de tiempo de recuperación.
+              <br />
+              <br />
+              <strong>¿Para qué sirve?</strong> Revitaliza la piel, trata poros
+              dilatados, líneas de expresión, manchas y deshidratación,
               devolviendo su luminosidad natural.
-            </p>
-
-            <p className="hero-desc-long">
+              <br />
+              <br />
               <strong>Un tratamiento exclusivo en el Tolima.</strong> El
-              consultorio de la Dra. Vanessa Medina es el unico en la region con
-              tecnologia original HydraFacial, certificada internacionalmente.
+              consultorio de la Dra. Vanessa Medina es el único en la región con
+              tecnología original HydraFacial®, certificada internacionalmente.
             </p>
 
+            {/* Texto móvil */}
             <p className="hero-desc-short">
-              <strong>HydraFacial:</strong> tecnologia que limpia, exfolia e
+              <strong>HydraFacial:</strong> tecnología que limpia, exfolia e
               hidrata profundamente la piel con resultados visibles desde la
-              primera sesion.
+              primera sesión.
             </p>
 
             <div className="hero-cta">
@@ -97,15 +96,17 @@ export default function HomePage() {
                 className="hero-btn hero-btn-secondary d-inline-flex align-items-center"
               >
                 <i className="fab fa-instagram me-2"></i>
-                Conocer mas de HydraFacial
+                Conocer más de HydraFacial
               </a>
             </div>
           </div>
         </div>
       </section>
 
+      {/* VIDEO CENTRAL */}
       {memoizedVideo}
 
+      {/* GALERÍA 3D */}
       <section
         className="py-5"
         style={{
@@ -117,31 +118,47 @@ export default function HomePage() {
         <div className="text-center mb-5">
           <h2
             className="fw-bold"
-            style={{ fontFamily: "'Playfair Display', serif", color: "#4E3B2B" }}
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "#4E3B2B",
+            }}
           >
-            Tratamientos mas demandados
+            Tratamientos más demandados
           </h2>
           <p className="lead" style={{ color: "#6C584C" }}>
-            Explora de forma interactiva algunos de nuestros procedimientos mas aclamados
+            Explora de forma interactiva algunos de nuestros procedimientos más
+            aclamados
           </p>
         </div>
         <Galeria3D />
       </section>
 
+      {/* UBICACIÓN */}
       <section
         className="py-5 text-center"
-        style={{ backgroundColor: "#E9DED2", color: "#4E3B2B" }}
+        style={{
+          backgroundColor: "#E9DED2",
+          color: "#4E3B2B",
+        }}
       >
-        <h2 className="fw-bold mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
-          Nuestra ubicacion
+        <h2
+          className="fw-bold mb-3"
+          style={{ fontFamily: "'Playfair Display', serif" }}
+        >
+          Nuestra ubicación
         </h2>
         <p className="mb-4" style={{ color: "#6C584C" }}>
-          Encuentranos en el corazon de Ibague, dentro de la Torre Empresarial.
+          Encuéntranos en el corazón de Ibagué, dentro de la Torre Empresarial.
         </p>
+
         <div
           style={{
-            width: "90%", maxWidth: "900px", height: "450px",
-            margin: "0 auto", borderRadius: "20px", overflow: "hidden",
+            width: "90%",
+            maxWidth: "900px",
+            height: "450px",
+            margin: "0 auto",
+            borderRadius: "20px",
+            overflow: "hidden",
             boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
           }}
         >
@@ -153,15 +170,20 @@ export default function HomePage() {
             allowFullScreen
           />
         </div>
+
         <a
-          href="https://www.google.com/maps?q=Carrera+5ta+%2311-24,+Torre+Empresarial,+Consultorio+502,+Ibague,+Tolima"
+          href="https://www.google.com/maps?q=Carrera+5ta+%2311-24,+Torre+Empresarial,+Consultorio+502,+Ibagué,+Tolima"
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-lg fw-semibold mt-4"
           style={{
-            backgroundColor: "#B08968", color: "white", border: "none",
-            borderRadius: "50px", padding: "0.8rem 2rem",
+            backgroundColor: "#B08968",
+            color: "white",
+            border: "none",
+            borderRadius: "50px",
+            padding: "0.8rem 2rem",
             boxShadow: "0 4px 12px rgba(176, 137, 104, 0.25)",
+            transition: "all 0.3s ease",
           }}
         >
           <i className="fas fa-map-marker-alt me-2"></i> Ver en Google Maps

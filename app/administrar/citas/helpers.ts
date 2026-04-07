@@ -26,10 +26,14 @@ export interface Cita {
   estado: EstadoCita;
   qrCita: string | null;
   motivoCancelacion: string | null;
+  consentimientoFirmado: boolean;
+  firmaUrl: string | null;
+  firmaFecha: string | null;
+  consentimientoPdf: string | null;
 }
 
 const CITA_COLUMNS =
-  "id, user_id, nombres, apellidos, telefono, correo, procedimiento, tipo_cita, nota, fecha, hora, estado, pagado, monto, monto_pagado, monto_restante, metodo_pago, tipo_pago_consultorio, tipo_pago_online, creada_por, creado_en, motivo_cancelacion";
+  "id, user_id, nombres, apellidos, telefono, correo, procedimiento, tipo_cita, nota, fecha, hora, estado, pagado, monto, monto_pagado, monto_restante, metodo_pago, tipo_pago_consultorio, tipo_pago_online, creada_por, creado_en, motivo_cancelacion, consentimiento_firmado, firma_url, firma_fecha, consentimiento_pdf";
 
 function mapCita(row: Record<string, unknown>): Cita {
   return {
@@ -55,6 +59,10 @@ function mapCita(row: Record<string, unknown>): Cita {
     creadaPor: (row.creada_por as Cita["creadaPor"]) || "usuario",
     fechaCreacion: (row.creado_en as string) || "",
     motivoCancelacion: (row.motivo_cancelacion as string) || null,
+    consentimientoFirmado: !!row.consentimiento_firmado,
+    firmaUrl: (row.firma_url as string) || null,
+    firmaFecha: (row.firma_fecha as string) || null,
+    consentimientoPdf: (row.consentimiento_pdf as string) || null,
     qrCita: null,
   };
 }
@@ -156,21 +164,24 @@ export async function confirmarPagoCitaAPI(
 ): Promise<void> {
   const montoPagado = datos.monto_pagado ?? 0;
   const pagado = montoPagado >= datos.monto;
-  const montoRestante = Math.max(datos.monto - montoPagado, 0);
 
-  const { error } = await supabase
-    .from("citas")
-    .update({
-      pagado,
-      monto: datos.monto,
-      monto_pagado: montoPagado,
-      monto_restante: montoRestante,
-      metodo_pago: datos.metodo_pago || "Consultorio",
-      tipo_pago_consultorio: datos.tipo_pago_consultorio || null,
-      estado: pagado ? "atendida" : "confirmada",
-      actualizado_en: new Date().toISOString(),
-    })
-    .eq("id", id);
+  const updateData: Record<string, unknown> = {
+    pagado,
+    monto: datos.monto,
+    monto_pagado: montoPagado,
+    metodo_pago: datos.metodo_pago || "Consultorio",
+    tipo_pago_consultorio: datos.tipo_pago_consultorio || null,
+    estado: pagado ? "atendida" : "confirmada",
+    actualizado_en: new Date().toISOString(),
+  };
+
+  // Try with monto_restante first, if fails retry without it (generated column)
+  let { error } = await supabase.from("citas").update({ ...updateData, monto_restante: Math.max(datos.monto - montoPagado, 0) }).eq("id", id);
+
+  if (error && error.message.includes("monto_restante")) {
+    const res = await supabase.from("citas").update(updateData).eq("id", id);
+    error = res.error;
+  }
 
   if (error) throw new Error(error.message);
 }

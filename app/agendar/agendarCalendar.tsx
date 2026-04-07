@@ -1,29 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { PALETTE } from "./page";
 import { supabase } from "@/lib/supabaseClient";
 
-const nombresMes = [
-  "enero","febrero","marzo","abril","mayo","junio",
-  "julio","agosto","septiembre","octubre","noviembre","diciembre",
-];
+const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const HORAS_BASE = ["08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","01:00 PM","01:30 PM","02:00 PM","02:30 PM","03:00 PM","03:30 PM","04:00 PM","04:30 PM","05:00 PM","05:30 PM","06:00 PM"];
 
-const HORAS_BASE = [
-  "08:00 AM","08:30 AM","09:00 AM","09:30 AM",
-  "10:00 AM","10:30 AM","11:00 AM","11:30 AM",
-  "12:00 PM","12:30 PM","01:00 PM","01:30 PM",
-  "02:00 PM","02:30 PM","03:00 PM","03:30 PM",
-  "04:00 PM","04:30 PM","05:00 PM","05:30 PM","06:00 PM",
-];
+function BgCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const c = ref.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    let anim: number;
+    const resize = () => { const p = c.parentElement; if (!p) return; c.width = p.offsetWidth; c.height = p.offsetHeight; };
+    resize(); window.addEventListener("resize", resize);
+    interface P { x: number; y: number; vx: number; vy: number; r: number; a: number; da: number; }
+    const ps: P[] = Array.from({ length: 25 }, () => ({
+      x: Math.random() * (c.width || 900), y: Math.random() * (c.height || 500),
+      vx: (Math.random() - 0.5) * 0.3, vy: -0.08 - Math.random() * 0.15,
+      r: 1.5 + Math.random() * 3.5, a: Math.random(), da: 0.004 + Math.random() * 0.007,
+    }));
+    const draw = () => {
+      ctx.clearRect(0, 0, c.width, c.height);
+      for (const p of ps) {
+        p.x += p.vx; p.y += p.vy; p.a += p.da;
+        if (p.a > 1) p.da = -Math.abs(p.da);
+        if (p.a < 0) { p.da = Math.abs(p.da); p.y = c.height + 5; p.x = Math.random() * c.width; }
+        if (p.y < -10) { p.y = c.height + 5; p.x = Math.random() * c.width; }
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(176,137,104,${Math.max(0, p.a * 0.2)})`;
+        ctx.fill();
+      }
+      anim = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => { cancelAnimationFrame(anim); window.removeEventListener("resize", resize); };
+  }, []);
+  return <canvas ref={ref} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }} />;
+}
 
-export default function AgendarCalendar({
-  fecha, hora, onFechaSelect, onHoraSelect, usuario,
-}: {
-  fecha: Date | null; hora: string;
-  onFechaSelect: (v: Date) => void; onHoraSelect: (v: string) => void;
-  usuario?: any;
+export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSelect, usuario }: {
+  fecha: Date | null; hora: string; onFechaSelect: (v: Date) => void; onHoraSelect: (v: string) => void; usuario?: any;
 }) {
   const hoy = new Date();
   const [anio, setAnio] = useState(hoy.getFullYear());
@@ -32,104 +51,171 @@ export default function AgendarCalendar({
   const [horasOcupadas, setHorasOcupadas] = useState<Set<string>>(new Set());
   const [bloqueosGlobales, setBloqueosGlobales] = useState<Set<string>>(new Set());
   const [loadingHoras, setLoadingHoras] = useState(false);
+  const [horasKey, setHorasKey] = useState(0);
 
   useEffect(() => {
-    supabase.from("bloqueos_globales").select("hora").then(({ data, error }) => {
-      if (!error && data) setBloqueosGlobales(new Set(data.map((b: any) => b.hora)));
+    supabase.from("bloqueos_globales").select("hora").then(({ data }) => {
+      if (data) setBloqueosGlobales(new Set(data.map((b: any) => b.hora)));
     });
   }, []);
 
   const generarDias = () => {
-    const primerDia = new Date(anio, mes, 1).getDay() || 7;
-    const diasEnMes = new Date(anio, mes + 1, 0).getDate();
+    const p = new Date(anio, mes, 1).getDay() || 7;
+    const d = new Date(anio, mes + 1, 0).getDate();
     const dias: (number | null)[] = [];
-    for (let i = 1; i < primerDia; i++) dias.push(null);
-    for (let d = 1; d <= diasEnMes; d++) dias.push(d);
+    for (let i = 1; i < p; i++) dias.push(null);
+    for (let i = 1; i <= d; i++) dias.push(i);
     return dias;
   };
 
-  const cargarHorasOcupadas = async (fechaISO: string) => {
+  const cargarHoras = async (iso: string) => {
     setLoadingHoras(true);
     try {
-      const [bloqueosRes, citasRes] = await Promise.all([
-        supabase.from("bloqueos_horas").select("hora").eq("fecha", fechaISO),
-        supabase.from("citas").select("hora, estado").eq("fecha", fechaISO),
+      const [bRes, cRes] = await Promise.all([
+        supabase.from("bloqueos_horas").select("hora").eq("fecha", iso),
+        supabase.from("citas").select("hora, estado").eq("fecha", iso),
       ]);
-      const ocupadas = new Set<string>();
-      bloqueosGlobales.forEach((h) => ocupadas.add(h));
-      if (!bloqueosRes.error) (bloqueosRes.data ?? []).forEach((b: any) => ocupadas.add(b.hora));
-      if (!citasRes.error) (citasRes.data ?? []).filter((c: any) => c.estado !== "cancelada").forEach((c: any) => ocupadas.add(c.hora));
-      setHorasOcupadas(ocupadas);
-    } catch (err) { console.error("Error cargando horas:", err); }
-    finally { setLoadingHoras(false); }
+      const occ = new Set<string>();
+      bloqueosGlobales.forEach(h => occ.add(h));
+      if (!bRes.error) (bRes.data ?? []).forEach((b: any) => occ.add(b.hora));
+      if (!cRes.error) (cRes.data ?? []).filter((c: any) => c.estado !== "cancelada").forEach((c: any) => occ.add(c.hora));
+      setHorasOcupadas(occ);
+    } catch (e) { console.error(e); }
+    finally { setLoadingHoras(false); setHorasKey(k => k + 1); }
   };
 
-  const handleDiaClick = (dia: number | null) => {
+  const handleDia = (dia: number | null) => {
     if (!dia) return;
-    const dateObj = new Date(anio, mes, dia);
-    const hoyStart = new Date(); hoyStart.setHours(0, 0, 0, 0);
-    if (dateObj < hoyStart) return;
+    const d = new Date(anio, mes, dia); const h2 = new Date(); h2.setHours(0, 0, 0, 0);
+    if (d < h2 || d.getDay() === 0) return;
     const iso = `${anio}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
-    setSelectedDate(iso);
-    onFechaSelect(dateObj);
-    onHoraSelect("");
-    cargarHorasOcupadas(iso);
+    setSelectedDate(iso); onFechaSelect(d); onHoraSelect(""); cargarHoras(iso);
   };
 
+  const esPasado = (dia: number) => { const d = new Date(anio, mes, dia); const h2 = new Date(); h2.setHours(0, 0, 0, 0); return d < h2; };
+  const esHoy = (dia: number) => { const d = new Date(anio, mes, dia); const h2 = new Date(); return d.toDateString() === h2.toDateString(); };
   const esDomingo = (dia: number) => new Date(anio, mes, dia).getDay() === 0;
-  const esPasado = (dia: number) => { const d = new Date(anio, mes, dia); const h = new Date(); h.setHours(0,0,0,0); return d < h; };
-  const diasMes = generarDias();
+  const horasFiltradas = HORAS_BASE.filter(h => !bloqueosGlobales.has(h));
 
   return (
-    <div className="w-full max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
-      <div className="rounded-3xl p-5 shadow-md" style={{ background: "#FBF7F2", border: "1px solid #E9DED2" }}>
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <button onClick={() => { if (mes === 0) { setMes(11); setAnio(a => a - 1); } else setMes(m => m - 1); }} className="btn btn-sm rounded-circle" style={{ backgroundColor: "#E9DED2", color: PALETTE.text, width: 36, height: 36 }}>&lsaquo;</button>
-          <h3 className="fw-bold m-0" style={{ color: PALETTE.text, fontSize: "1.1rem" }}>{nombresMes[mes]} {anio}</h3>
-          <button onClick={() => { if (mes === 11) { setMes(0); setAnio(a => a + 1); } else setMes(m => m + 1); }} className="btn btn-sm rounded-circle" style={{ backgroundColor: "#E9DED2", color: PALETTE.text, width: 36, height: 36 }}>&rsaquo;</button>
-        </div>
-        <div className="d-grid mb-2" style={{ gridTemplateColumns: "repeat(7,1fr)", textAlign: "center" }}>
-          {["L","M","X","J","V","S","D"].map((d) => (<div key={d} style={{ fontSize: "0.75rem", color: PALETTE.textSoft, fontWeight: 700, paddingBottom: 4 }}>{d}</div>))}
-        </div>
-        <div className="d-grid" style={{ gridTemplateColumns: "repeat(7,1fr)", gap: 4 }}>
-          {diasMes.map((dia, i) => {
-            if (!dia) return <div key={`e-${i}`} />;
-            const iso = `${anio}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
-            const isSelected = iso === selectedDate;
-            const disabled = esPasado(dia) || esDomingo(dia);
-            return (
-              <motion.button key={dia} whileHover={disabled ? {} : { scale: 1.15 }} whileTap={disabled ? {} : { scale: 0.95 }}
-                onClick={() => handleDiaClick(dia)} disabled={disabled}
-                style={{ width: 36, height: 36, borderRadius: "50%", border: "none", backgroundColor: isSelected ? PALETTE.main : disabled ? "transparent" : "#fff", color: isSelected ? "#fff" : disabled ? "#ccc" : PALETTE.text, fontWeight: isSelected ? 700 : 400, cursor: disabled ? "not-allowed" : "pointer", fontSize: "0.85rem", boxShadow: isSelected ? "0 2px 8px rgba(0,0,0,0.15)" : "none" }}>
-                {dia}
-              </motion.button>
-            );
-          })}
-        </div>
-      </div>
+    <>
+      <style>{`
+        .cal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media(max-width:768px) { .cal-grid { grid-template-columns: 1fr; } }
+      `}</style>
 
-      <div className="rounded-3xl p-5 shadow-md" style={{ background: "#FBF7F2", border: "1px solid #E9DED2" }}>
-        <h3 className="fw-bold mb-4 text-center" style={{ color: PALETTE.text, fontSize: "1.1rem" }}>
-          {selectedDate ? `Horas disponibles - ${selectedDate}` : "Selecciona un dia"}
-        </h3>
-        {!selectedDate && <p className="text-center" style={{ color: PALETTE.textSoft }}>Elige un dia en el calendario para ver las horas disponibles.</p>}
-        {selectedDate && loadingHoras && <div className="text-center py-4"><div className="spinner-border spinner-border-sm" style={{ color: PALETTE.main }} role="status" /></div>}
-        {selectedDate && !loadingHoras && (
-          <div className="d-grid" style={{ gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-            {HORAS_BASE.filter((h) => !bloqueosGlobales.has(h)).map((h) => {
-              const ocupada = horasOcupadas.has(h);
-              const isSelected = hora === h;
-              return (
-                <motion.button key={h} whileHover={ocupada ? {} : { scale: 1.06 }} whileTap={ocupada ? {} : { scale: 0.96 }}
-                  disabled={ocupada} onClick={() => onHoraSelect(h)} className="rounded-pill py-2 px-1 fw-semibold"
-                  style={{ fontSize: "0.78rem", border: "none", backgroundColor: isSelected ? PALETTE.main : ocupada ? "#F0E8E0" : "#fff", color: isSelected ? "#fff" : ocupada ? "#ccc" : PALETTE.text, cursor: ocupada ? "not-allowed" : "pointer", boxShadow: isSelected ? "0 2px 8px rgba(0,0,0,0.15)" : "0 1px 3px rgba(0,0,0,0.06)" }}>
-                  {h}
-                </motion.button>
-              );
-            })}
-          </div>
-        )}
+      <div style={{ position: "relative", maxWidth: 950, margin: "0 auto", padding: "1rem 0" }}>
+        <BgCanvas />
+        <div style={{ position: "absolute", width: 300, height: 300, top: "-8%", right: "-3%", borderRadius: "50%", background: "radial-gradient(circle, rgba(176,137,104,0.07) 0%, transparent 70%)", filter: "blur(50px)", pointerEvents: "none" }} />
+
+        <div className="cal-grid" style={{ position: "relative", zIndex: 1 }}>
+          {/* CALENDAR */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)", padding: "2rem" }}>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+              <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                onClick={() => { if (mes === 0) { setMes(11); setAnio(a => a - 1); } else setMes(m => m - 1); }}
+                style={{ width: 40, height: 40, borderRadius: "50%", background: "#E9DED2", border: "none", color: "#4E3B2B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <i className="fas fa-chevron-left" style={{ fontSize: "0.7rem" }} />
+              </motion.button>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.25rem", fontWeight: 700, color: "#3A2A1A", margin: 0 }}>{MESES[mes]} {anio}</h3>
+              <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                onClick={() => { if (mes === 11) { setMes(0); setAnio(a => a + 1); } else setMes(m => m + 1); }}
+                style={{ width: 40, height: 40, borderRadius: "50%", background: "#E9DED2", border: "none", color: "#4E3B2B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <i className="fas fa-chevron-right" style={{ fontSize: "0.7rem" }} />
+              </motion.button>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", textAlign: "center", marginBottom: "0.5rem" }}>
+              {["L","M","X","J","V","S","D"].map(d => <div key={d} style={{ fontSize: "0.8rem", fontWeight: 700, color: "#8A7565", paddingBottom: 8 }}>{d}</div>)}
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 5 }}>
+              {generarDias().map((dia, i) => {
+                if (!dia) return <div key={`e-${i}`} />;
+                const iso = `${anio}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+                const sel = iso === selectedDate;
+                const disabled = esPasado(dia) || esDomingo(dia);
+                const today = esHoy(dia);
+                return (
+                  <motion.button key={dia}
+                    whileHover={disabled ? {} : { scale: 1.2 }} whileTap={disabled ? {} : { scale: 0.9 }}
+                    onClick={() => handleDia(dia)} disabled={disabled}
+                    style={{
+                      width: 44, height: 44, borderRadius: "50%", margin: "0 auto",
+                      border: today && !sel ? "2px solid #B08968" : "none",
+                      background: sel ? "linear-gradient(135deg, #B08968, #C9AD8D)" : disabled ? "transparent" : "rgba(255,255,255,0.8)",
+                      color: sel ? "white" : disabled ? "#ccc" : "#3A2A1A",
+                      fontWeight: sel || today ? 700 : 400, fontSize: "0.92rem",
+                      cursor: disabled ? "not-allowed" : "pointer",
+                      boxShadow: sel ? "0 4px 14px rgba(176,137,104,0.35)" : "none",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      transition: "background 0.2s, box-shadow 0.2s",
+                    }}>
+                    {dia}
+                  </motion.button>
+                );
+              })}
+            </div>
+          </motion.div>
+
+          {/* HOURS */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
+            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)", padding: "2rem" }}>
+
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.3rem", textAlign: "center" }}>
+              {selectedDate ? "Horas disponibles" : "Selecciona un dia"}
+            </h3>
+
+            {selectedDate && (
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: "center", fontSize: "0.85rem", color: "#8A7565", marginBottom: "1.2rem" }}>
+                {new Date(selectedDate + "T12:00:00").toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" })}
+              </motion.p>
+            )}
+
+            {!selectedDate && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: "center", padding: "3rem 1rem" }}>
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, #E9DED2, #F5EEE6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
+                  <i className="fas fa-calendar-day" style={{ color: "#B08968", fontSize: "1.4rem" }} />
+                </div>
+                <p style={{ color: "#8A7565", fontSize: "0.92rem" }}>Elige un dia en el calendario</p>
+              </motion.div>
+            )}
+
+            {selectedDate && loadingHoras && (
+              <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border spinner-border-sm" style={{ color: "#B08968" }} /></div>
+            )}
+
+            {selectedDate && !loadingHoras && (
+              <div key={horasKey} style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+                {horasFiltradas.map((h, i) => {
+                  const occ = horasOcupadas.has(h);
+                  const sel = hora === h;
+                  return (
+                    <motion.button key={h}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25, delay: i * 0.025 }}
+                      whileHover={occ ? {} : { scale: 1.06 }}
+                      whileTap={occ ? {} : { scale: 0.95 }}
+                      disabled={occ} onClick={() => onHoraSelect(h)}
+                      style={{
+                        padding: "0.65rem 0.3rem", borderRadius: 12, border: "none", fontSize: "0.82rem", fontWeight: 600,
+                        background: sel ? "linear-gradient(135deg, #B08968, #C9AD8D)" : occ ? "rgba(176,137,104,0.04)" : "rgba(255,255,255,0.9)",
+                        color: sel ? "white" : occ ? "#ccc" : "#3A2A1A",
+                        cursor: occ ? "not-allowed" : "pointer",
+                        boxShadow: sel ? "0 4px 14px rgba(176,137,104,0.3)" : "0 1px 4px rgba(0,0,0,0.04)",
+                      }}>
+                      {h}
+                    </motion.button>
+                  );
+                })}
+              </div>
+            )}
+          </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

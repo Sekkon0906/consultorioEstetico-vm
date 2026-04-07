@@ -31,7 +31,7 @@
     "firebase": "^12.8.0",
     "flubber": "^0.4.2",
     "framer-motion": "^12.23.24",
-    "jspdf": "^3.0.3",
+    "jspdf": "^3.0.4",
     "jspdf-autotable": "^5.0.2",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.548.0",

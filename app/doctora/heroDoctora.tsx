@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { IMG } from "@/lib/imagenes";
@@ -72,13 +71,12 @@ export default function HeroDoctora() {
 
       <div className="doc-hero-right">
         {imagenes.map((img, i) => (
-          <Image
+          <img
             key={i}
             src={img}
             alt={`Doctora ${i + 1}`}
-            fill
-            priority={i === 0}
             className={`doc-hero-slide ${i === imagenActual ? "is-active" : ""}`}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
           />
         ))}
       </div>

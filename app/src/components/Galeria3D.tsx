@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { getProcedimientosApi } from "../../services/procedimientosApi"; //  API real
@@ -196,11 +195,10 @@ export default function Galeria3D() {
                     cursor: "pointer",
                   }}
                 >
-                  <Image
-                    src={t.imagen}
+                  <img
+                    src={t.imagen || undefined}
                     alt={t.nombre}
-                    fill
-                    style={{ objectFit: "cover" }}
+                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
                   />
                   <div className="badgeTitle">
                     <p className="badgeText">{t.nombre}</p>
@@ -256,11 +254,9 @@ export default function Galeria3D() {
               boxShadow: "0 5px 20px rgba(176, 137, 104, 0.25)",
             }}
           >
-            <Image
+            <img
               src={tratamientos.find((t) => t.id === selected)?.imagen || "/placeholder.png"}
               alt="Detalle"
-              width={500}
-              height={400}
               style={{ objectFit: "cover", width: "100%", height: "100%" }}
             />
           </div>
@@ -286,7 +282,7 @@ export default function Galeria3D() {
               {tratamientos.find((t) => t.id === selected)?.desc}
             </p>
             <Link
-              href="/procedimientos"
+              href={"/procedimientos/" + (tratamientos.find(function(t) { return t.id === selected; })?.id || "")}
               className="btn btn-lg fw-semibold"
               style={{
                 backgroundColor: "#B08968",

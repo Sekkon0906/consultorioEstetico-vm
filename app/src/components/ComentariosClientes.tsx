@@ -6,148 +6,159 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/context/AuthContext";
 
 interface Comentario {
-  id: number; nombre: string; procedimiento: string;
-  texto: string; puntuacion: number; creado_en: string;
+  id: number;
+  nombre: string;
+  procedimiento: string;
+  texto: string;
+  puntuacion: number;
+  creado_en: string;
 }
 
-interface CitaAtendida { procedimiento: string; }
-
 export default function ComentariosClientes() {
-  const { user } = useAuth();
-  const [comentarios, setComentarios] = useState<Comentario[]>([]);
-  const [citasAtendidas, setCitasAtendidas] = useState<CitaAtendida[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [enviando, setEnviando] = useState(false);
-  const [mensaje, setMensaje] = useState<string | null>(null);
+  var { user } = useAuth();
+  var [comentarios, setComentarios] = useState<Comentario[]>([]);
+  var [citasAtendidas, setCitasAtendidas] = useState<string[]>([]);
+  var [yaComento, setYaComento] = useState(false);
+  var [loading, setLoading] = useState(true);
+  var [showForm, setShowForm] = useState(false);
+  var [enviando, setEnviando] = useState(false);
+  var [mensaje, setMensaje] = useState<string | null>(null);
+  var [procSeleccionado, setProcSeleccionado] = useState("");
+  var [texto, setTexto] = useState("");
+  var [puntuacion, setPuntuacion] = useState(0);
+  var [hoverStar, setHoverStar] = useState(0);
 
-  const [procSeleccionado, setProcSeleccionado] = useState("");
-  const [texto, setTexto] = useState("");
-  const [puntuacion, setPuntuacion] = useState(0);
-  const [hoverStar, setHoverStar] = useState(0);
+  useEffect(function() {
+    supabase.from("comentarios_pacientes").select("id, nombre, procedimiento, texto, puntuacion, creado_en")
+      .eq("aprobado", true).order("creado_en", { ascending: false }).limit(20)
+      .then(function(res) { if (res.data) setComentarios(res.data); setLoading(false); });
+  }, []);
 
-  useEffect(() => { cargarComentarios(); }, []);
-
-  useEffect(() => {
+  useEffect(function() {
     if (!user) return;
+    // Get procedures where patient was attended
     supabase.from("citas").select("procedimiento").eq("user_id", user.id).eq("estado", "atendida")
-      .then(({ data }) => {
-        if (data) {
-          const unicos = Array.from(new Set(data.map((c: any) => c.procedimiento))).map((p) => ({ procedimiento: p }));
-          setCitasAtendidas(unicos);
-        }
+      .then(function(res) {
+        if (res.data) setCitasAtendidas([...new Set(res.data.map(function(c: any) { return c.procedimiento; }))]);
       });
+    // Check if already commented
+    supabase.from("comentarios_pacientes").select("id").eq("user_id", user.id).limit(1)
+      .then(function(res) { if (res.data && res.data.length > 0) setYaComento(true); });
   }, [user]);
 
-  const cargarComentarios = async () => {
-    const { data } = await supabase.from("comentarios_pacientes")
-      .select("id, nombre, procedimiento, texto, puntuacion, creado_en")
-      .eq("aprobado", true).order("creado_en", { ascending: false }).limit(20);
-    if (data) setComentarios(data);
-    setLoading(false);
-  };
+  var nombreCompleto = user ? ((user.nombres || "") + " " + (user.apellidos || "")).trim() : "";
+  var puedeOpinar = citasAtendidas.length > 0 && !yaComento;
 
-  const nombreCompleto = user ? `${user.nombres || ""} ${user.apellidos || ""}`.trim() : "";
-  const puedeOpinar = citasAtendidas.length > 0;
-
-  const handleEnviar = async () => {
-    if (!procSeleccionado) { setMensaje("Selecciona un procedimiento."); return; }
-    if (!texto.trim()) { setMensaje("Escribe tu experiencia."); return; }
-    if (puntuacion === 0) { setMensaje("Selecciona una puntuacion."); return; }
+  var handleEnviar = async function() {
+    if (!procSeleccionado || !texto.trim() || puntuacion === 0) { setMensaje("Completa todos los campos."); return; }
     setEnviando(true); setMensaje(null);
     try {
-      const { error } = await supabase.from("comentarios_pacientes").insert({
-        user_id: user?.id || null, nombre: nombreCompleto,
-        procedimiento: procSeleccionado, texto: texto.trim(),
-        puntuacion, aprobado: false,
+      var res = await supabase.from("comentarios_pacientes").insert({
+        user_id: user?.id || null, nombre: nombreCompleto, procedimiento: procSeleccionado,
+        texto: texto.trim(), puntuacion: puntuacion, aprobado: false,
       });
-      if (error) throw new Error(error.message);
-      setMensaje("Comentario enviado. Sera visible una vez aprobado.");
-      setTexto(""); setPuntuacion(0); setProcSeleccionado(""); setShowForm(false);
-    } catch (err: any) { setMensaje("Error al enviar: " + err.message); }
+      if (res.error) throw new Error(res.error.message);
+      setMensaje("Comentario enviado. Sera visible una vez aprobado por la doctora.");
+      setTexto(""); setPuntuacion(0); setProcSeleccionado(""); setShowForm(false); setYaComento(true);
+    } catch (e: any) { setMensaje("Error: " + e.message); }
     finally { setEnviando(false); }
   };
 
-  const renderStars = (rating: number) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) stars.push(rating >= i ? <FaStar key={i} color="#C0A080" /> : <FaRegStar key={i} color="#C0A080" />);
-    return stars;
-  };
-
-  const etiqueta = ["", "Muy malo", "Malo", "Regular", "Bueno", "Excelente"];
+  var etiqueta = ["", "Muy malo", "Malo", "Regular", "Bueno", "Excelente"];
 
   return (
-    <section className="relative z-10 py-16 px-6 text-center" style={{ backgroundColor: "#FAF7F2", color: "#4E3B2B", borderTop: "1px solid #E9DED2", borderBottom: "1px solid #E9DED2" }}>
-      <h2 className="text-3xl font-semibold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Comentarios de Nuestros Pacientes</h2>
-      <p className="text-sm italic text-[#6C584C] mb-6">Experiencias reales de quienes confiaron en nosotros</p>
+    <section style={{ position: "relative", zIndex: 10, padding: "4rem 1.5rem", textAlign: "center", backgroundColor: "#FAF7F2", color: "#4E3B2B", borderTop: "1px solid #E9DED2", borderBottom: "1px solid #E9DED2" }}>
+      <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 600, marginBottom: "0.4rem" }}>Comentarios de Nuestros Pacientes</h2>
+      <p style={{ fontSize: "0.88rem", fontStyle: "italic", color: "#6C584C", marginBottom: "1.5rem" }}>Experiencias reales de quienes confiaron en nosotros</p>
 
-      {/* Boton solo si tiene citas atendidas */}
+      {/* Button to leave comment - only if attended and hasn't commented */}
       {user && puedeOpinar && (
-        <div className="mb-8">
-          <button onClick={() => setShowForm(!showForm)} className="btn rounded-pill px-5 py-2 fw-semibold" style={{ backgroundColor: "#B08968", color: "#fff", border: "none" }}>
+        <div style={{ marginBottom: "1.5rem" }}>
+          <button onClick={function() { setShowForm(!showForm); }} style={{ background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", borderRadius: 100, padding: "0.7rem 2rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer" }}>
             {showForm ? "Cerrar formulario" : "Dejar mi comentario"}
           </button>
         </div>
       )}
 
-      {mensaje && (
-        <div className="mx-auto mb-4 p-3 rounded-3 text-center" style={{ maxWidth: 500, backgroundColor: "#E9DED2", color: "#4E3B2B", border: "1px solid #D4C4B0" }}>{mensaje}</div>
+      {user && yaComento && (
+        <p style={{ fontSize: "0.82rem", color: "#8A7565", marginBottom: "1rem", fontStyle: "italic" }}>Ya enviaste tu comentario. Gracias por compartir tu experiencia.</p>
       )}
 
+      {mensaje && <div style={{ maxWidth: 500, margin: "0 auto 1rem", padding: "0.8rem 1.2rem", borderRadius: 12, background: "#E9DED2", color: "#4E3B2B", border: "1px solid #D4C4B0", fontSize: "0.88rem" }}>{mensaje}</div>}
+
+      {/* Comment form */}
       {showForm && (
-        <div className="mx-auto mb-8 p-5 rounded-4 shadow-sm text-start" style={{ maxWidth: 550, backgroundColor: "#FFFDF9", border: "1px solid #E9DED2" }}>
-          <h4 className="fw-semibold mb-4 text-center" style={{ color: "#4E3B2B" }}>Cuenta tu experiencia</h4>
-          <div className="mb-3">
-            <label className="form-label small fw-semibold" style={{ color: "#6C584C" }}>Tu nombre</label>
-            <input className="form-control" value={nombreCompleto} disabled style={{ borderColor: "#E9DED2", backgroundColor: "#F5EEE6" }} />
+        <div style={{ maxWidth: 520, margin: "0 auto 2rem", padding: "1.8rem", borderRadius: 18, background: "#FFFDF9", border: "1px solid #E9DED2", textAlign: "left", boxShadow: "0 4px 16px rgba(78,59,43,0.06)" }}>
+          <h4 style={{ fontWeight: 600, color: "#4E3B2B", marginBottom: "1.2rem", textAlign: "center" }}>Cuenta tu experiencia</h4>
+          
+          <div style={{ marginBottom: "0.8rem" }}>
+            <label style={{ fontSize: "0.82rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Tu nombre</label>
+            <input value={nombreCompleto} disabled style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: 10, border: "1px solid #E9DED2", background: "#F5EEE6", color: "#4E3B2B", fontSize: "0.9rem" }} />
           </div>
-          <div className="mb-3">
-            <label className="form-label small fw-semibold" style={{ color: "#6C584C" }}>Procedimiento realizado</label>
-            <select className="form-select" value={procSeleccionado} onChange={(e) => setProcSeleccionado(e.target.value)} style={{ borderColor: "#E9DED2" }}>
-              <option value="">Selecciona un procedimiento...</option>
-              {citasAtendidas.map((c, i) => <option key={i} value={c.procedimiento}>{c.procedimiento}</option>)}
+
+          <div style={{ marginBottom: "0.8rem" }}>
+            <label style={{ fontSize: "0.82rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Procedimiento realizado</label>
+            <select value={procSeleccionado} onChange={function(e) { setProcSeleccionado(e.target.value); }} style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: 10, border: "1px solid #E9DED2", fontSize: "0.9rem" }}>
+              <option value="">Selecciona...</option>
+              {citasAtendidas.map(function(p, i) { return <option key={i} value={p}>{p}</option>; })}
             </select>
           </div>
-          <div className="mb-3">
-            <label className="form-label small fw-semibold" style={{ color: "#6C584C" }}>Tu experiencia</label>
-            <textarea className="form-control" rows={4} value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Cuentanos como fue tu experiencia..." style={{ borderColor: "#E9DED2" }} />
+
+          <div style={{ marginBottom: "0.8rem" }}>
+            <label style={{ fontSize: "0.82rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Tu experiencia</label>
+            <textarea value={texto} onChange={function(e) { setTexto(e.target.value); }} rows={4} placeholder="Cuentanos como fue..."
+              style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: 10, border: "1px solid #E9DED2", fontSize: "0.9rem", resize: "vertical" }} />
           </div>
-          <div className="mb-4 text-center">
-            <label className="form-label small fw-semibold d-block" style={{ color: "#6C584C" }}>Puntuacion</label>
-            <div className="d-flex justify-content-center gap-1 mb-1">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <button key={i} type="button" onMouseEnter={() => setHoverStar(i)} onMouseLeave={() => setHoverStar(0)} onClick={() => setPuntuacion(i)}
-                  style={{ background: "none", border: "none", cursor: "pointer", padding: "2px" }}>
-                  {i <= (hoverStar || puntuacion) ? <FaStar size={28} color="#C0A080" /> : <FaRegStar size={28} color="#C0A080" />}
-                </button>
-              ))}
+
+          <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+            <label style={{ fontSize: "0.82rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 6 }}>Puntuacion</label>
+            <div style={{ display: "flex", justifyContent: "center", gap: 4, marginBottom: 4 }}>
+              {[1,2,3,4,5].map(function(i) {
+                return (
+                  <button key={i} type="button"
+                    onMouseEnter={function() { setHoverStar(i); }} onMouseLeave={function() { setHoverStar(0); }}
+                    onClick={function() { setPuntuacion(i); }}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}>
+                    {i <= (hoverStar || puntuacion) ? <FaStar size={26} color="#C0A080" /> : <FaRegStar size={26} color="#C0A080" />}
+                  </button>
+                );
+              })}
             </div>
-            {puntuacion > 0 && <span className="small" style={{ color: "#B08968" }}>{etiqueta[puntuacion]}</span>}
+            {puntuacion > 0 && <span style={{ fontSize: "0.78rem", color: "#B08968" }}>{etiqueta[puntuacion]}</span>}
           </div>
-          <button onClick={handleEnviar} disabled={enviando} className="btn w-100 rounded-pill fw-semibold py-2" style={{ backgroundColor: "#8B6A4B", color: "#fff", border: "none" }}>
+
+          <button onClick={handleEnviar} disabled={enviando}
+            style={{ width: "100%", background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", borderRadius: 100, padding: "0.7rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer", opacity: enviando ? 0.7 : 1 }}>
             {enviando ? "Enviando..." : "Enviar comentario"}
           </button>
         </div>
       )}
 
-      {loading && <p className="text-[#6C584C] italic animate-pulse">Cargando comentarios...</p>}
+      {/* Comments display */}
+      {loading && <p style={{ color: "#6C584C", fontStyle: "italic" }}>Cargando comentarios...</p>}
 
       {!loading && comentarios.length > 0 && (
-        <div className="flex gap-6 overflow-x-auto px-4 py-4" style={{ scrollbarWidth: "thin" }}>
-          {comentarios.map((c) => (
-            <div key={c.id} className="min-w-[280px] max-w-[320px] bg-[#FFFDF9] border border-[#E9DED2] rounded-xl shadow-sm flex flex-col items-center justify-between p-4 transition-transform duration-300 hover:scale-105">
-              <div className="rounded-circle d-flex align-items-center justify-content-center mb-3" style={{ width: 56, height: 56, backgroundColor: "#E9DED2", color: "#4E3B2B", fontSize: "1.2rem", fontWeight: 700 }}>{c.nombre.charAt(0).toUpperCase()}</div>
-              <h4 className="font-semibold text-[#4E3B2B] mb-1">{c.nombre}</h4>
-              <span className="badge rounded-pill mb-2 px-3 py-1" style={{ backgroundColor: "#F5EEE6", color: "#8B6A4B", fontSize: "0.72rem" }}>{c.procedimiento}</span>
-              <div className="flex justify-center mb-2">{renderStars(c.puntuacion)}</div>
-              <p className="text-[#6C584C] text-sm italic mb-2" style={{ lineHeight: "1.4" }}>&quot;{c.texto.length > 150 ? c.texto.slice(0, 150) + "..." : c.texto}&quot;</p>
-              <span className="text-xs text-[#8B7A6E]">{new Date(c.creado_en).toLocaleDateString("es-CO", { year: "numeric", month: "long", day: "numeric" })}</span>
-            </div>
-          ))}
+        <div style={{ display: "flex", gap: "1.2rem", overflowX: "auto", padding: "0.5rem 0.5rem 1rem", scrollbarWidth: "thin" }}>
+          {comentarios.map(function(c) {
+            return (
+              <div key={c.id} style={{ minWidth: 270, maxWidth: 310, background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 16, padding: "1.2rem", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", transition: "transform 0.3s", flexShrink: 0 }}
+                onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-4px)"; }}
+                onMouseLeave={function(e) { e.currentTarget.style.transform = ""; }}>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#E9DED2", display: "flex", alignItems: "center", justifyContent: "center", color: "#4E3B2B", fontSize: "1.1rem", fontWeight: 700 }}>{c.nombre.charAt(0).toUpperCase()}</div>
+                <h4 style={{ fontWeight: 600, color: "#4E3B2B", fontSize: "0.95rem", margin: 0 }}>{c.nombre}</h4>
+                <span style={{ background: "#F5EEE6", color: "#8B6A4B", padding: "0.2rem 0.8rem", borderRadius: 100, fontSize: "0.7rem", fontWeight: 600 }}>{c.procedimiento}</span>
+                <div style={{ display: "flex", gap: 2 }}>
+                  {[1,2,3,4,5].map(function(i) { return c.puntuacion >= i ? <FaStar key={i} size={14} color="#C0A080" /> : <FaRegStar key={i} size={14} color="#C0A080" />; })}
+                </div>
+                <p style={{ fontSize: "0.85rem", color: "#6C584C", fontStyle: "italic", lineHeight: 1.4, textAlign: "center" }}>&quot;{c.texto.length > 140 ? c.texto.slice(0, 140) + "..." : c.texto}&quot;</p>
+                <span style={{ fontSize: "0.72rem", color: "#8B7A6E" }}>{new Date(c.creado_en).toLocaleDateString("es-CO", { year: "numeric", month: "long", day: "numeric" })}</span>
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {!loading && comentarios.length === 0 && <p className="text-[#6C584C] italic">Se el primero en compartir tu experiencia.</p>}
+      {!loading && comentarios.length === 0 && <p style={{ color: "#6C584C", fontStyle: "italic" }}>Se el primero en compartir tu experiencia.</p>}
     </section>
   );
 }

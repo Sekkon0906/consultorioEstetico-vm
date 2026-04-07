@@ -3,8 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Cita } from "./helpers";
-import { PALETTE } from "../../agendar/page";
-import { CalendarCheck, Edit3, XCircle, Eye } from "lucide-react";
+import { CalendarCheck, Edit3, XCircle, Eye, ClipboardList, Phone, Mail, Calendar, Clock } from "lucide-react";
 
 interface Props {
   cita: Cita;
@@ -12,160 +11,102 @@ interface Props {
   onConfirmar?: (cita: Cita) => void;
   onCancelar?: (cita: Cita) => void;
   onReagendar?: (cita: Cita) => void;
+  onVerMotivo?: (cita: Cita) => void;
+  onVerResumen?: (cita: Cita) => void;
 }
 
-const coloresEstado: Record<
-  Cita["estado"],
-  { color: string; texto: string }
-> = {
-  pendiente: { color: "#F7D774", texto: "#7D6608" },
-  confirmada: { color: "#A7D4F5", texto: "#0B3C78" },
-  atendida: { color: "#A9E4C4", texto: "#145A32" },
-  cancelada: { color: "#F8B6B6", texto: "#7E1F1F" },
+const CE: Record<string, { bg: string; text: string; dot: string }> = {
+  pendiente:  { bg: "#FFF8E1", text: "#7D6608", dot: "#D4A017" },
+  confirmada: { bg: "#E3F2FD", text: "#0B3C78", dot: "#4A90D9" },
+  atendida:   { bg: "#E8F5E9", text: "#145A32", dot: "#2E7D32" },
+  cancelada:  { bg: "#FCE4EC", text: "#7E1F1F", dot: "#C62828" },
 };
 
 export default function CitasAgendadasCard({
-  cita,
-  onVerDetalles,
-  onConfirmar,
-  onCancelar,
-  onReagendar,
+  cita, onVerDetalles, onConfirmar, onCancelar, onReagendar, onVerMotivo, onVerResumen,
 }: Props) {
-  const estilo = coloresEstado[cita.estado];
+  const e = CE[cita.estado] || CE.pendiente;
 
   return (
     <motion.div
-      className="relative rounded-2xl border shadow-md p-6 flex flex-col gap-4 transition-all duration-300"
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
       style={{
-        borderColor: "#E5D8C8",
-        background: "#FFFCF8",
+        background: "#fff",
+        borderRadius: 16,
+        border: "1px solid #F0E8DE",
+        padding: "1.2rem 1.4rem",
+        transition: "box-shadow 0.25s",
       }}
-      whileHover={{
-        scale: 1.02,
-        boxShadow: "0px 6px 22px rgba(176,137,104,0.2)",
-      }}
+      whileHover={{ boxShadow: "0 4px 20px rgba(176,137,104,0.12)" }}
     >
-      {/* Oreja de estado */}
-      <motion.div
-        className="absolute top-0 right-0 w-0 h-0 border-t-[100px] border-l-[100px] border-l-transparent rounded-tr-2xl origin-top-right overflow-hidden"
-        style={{
-          borderTopColor: estilo.color,
-          filter: "brightness(1.05)",
-        }}
-        whileHover={{ rotateZ: 2, scale: 1.02 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
-      >
-        <span
-          className="absolute text-[13px] font-bold uppercase tracking-wide select-none"
-          style={{
-            color: estilo.texto,
-            top: "-62px",
-            right: "18px",
-            transform: "rotate(45deg)",
-            textShadow: "0 0 2px rgba(255,255,255,0.8)",
-            letterSpacing: "0.05em",
-          }}
-        >
-          {cita.estado}
-        </span>
-      </motion.div>
-
-      {/* Contenido principal */}
-      <div className="flex flex-col gap-1 mt-1">
-        <h3
-          className="text-lg font-semibold"
-          style={{ color: PALETTE.main }}
-        >
+      {/* Top row: name + estado */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
+        <h3 style={{ fontSize: "1.05rem", fontWeight: 600, color: "#2B2218", margin: 0, lineHeight: 1.3 }}>
           {cita.nombres} {cita.apellidos}
         </h3>
-
-        <p className="text-sm text-[#4E3B2B]">
-          <strong>Hora:</strong> {cita.hora}
-        </p>
-        <p className="text-sm text-[#4E3B2B]">
-          <strong>Procedimiento:</strong> {cita.procedimiento}
-        </p>
-        <p className="text-sm text-[#4E3B2B]">
-          <strong>Telefono:</strong> {cita.telefono}
-        </p>
-        <p className="text-sm text-[#4E3B2B]">
-          <strong>Correo:</strong> {cita.correo}
-        </p>
+        <span style={{
+          display: "inline-flex", alignItems: "center", gap: 5,
+          background: e.bg, color: e.text,
+          padding: "0.28rem 0.75rem", borderRadius: 100,
+          fontSize: "0.7rem", fontWeight: 700, textTransform: "capitalize",
+          letterSpacing: "0.02em", whiteSpace: "nowrap", flexShrink: 0,
+        }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: e.dot }} />
+          {cita.estado}
+        </span>
       </div>
 
-      {/* Botones */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 place-items-center">
+      {/* Procedure */}
+      <p style={{ fontSize: "0.88rem", color: "#8B6A4B", fontWeight: 600, margin: "0 0 0.5rem" }}>
+        {cita.procedimiento}
+      </p>
+
+      {/* Info rows */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.8rem", color: "#6C584C", marginBottom: "0.8rem" }}>
+        <div style={{ display: "flex", gap: "1.2rem", flexWrap: "wrap" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Phone size={12} color="#8B6A4B" /> {cita.telefono}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Mail size={12} color="#8B6A4B" /> {cita.correo}</span>
+        </div>
+        <div style={{ display: "flex", gap: "1.2rem", flexWrap: "wrap" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} color="#8B6A4B" /> {cita.fecha}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={12} color="#8B6A4B" /> {cita.hora}</span>
+        </div>
+      </div>
+
+      {/* Buttons row */}
+      <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap", alignItems: "center" }}>
         {cita.estado === "pendiente" && (
-          <motion.button
-            type="button"
-            whileHover={{
-              scale: 1.06,
-              boxShadow: "0 0 12px rgba(33,118,214,0.35)",
-            }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onConfirmar?.(cita)}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 w-full text-sm font-semibold text-white rounded-full shadow-sm transition-all"
-            style={{
-              background: "linear-gradient(90deg, #3A8DFF, #2176D6)",
-            }}
-          >
-            <CalendarCheck size={16} /> Confirmar
-          </motion.button>
+          <>
+            <Btn label="Confirmar" icon={<CalendarCheck size={14} />} bg="#8B6A4B" color="#fff" onClick={() => onConfirmar?.(cita)} />
+            <Btn label="Reagendar" icon={<Edit3 size={14} />} bg="#F0E8DE" color="#4E3B2B" onClick={() => onReagendar?.(cita)} />
+            <Btn label="Cancelar" icon={<XCircle size={14} />} bg="#C62828" color="#fff" onClick={() => onCancelar?.(cita)} />
+          </>
         )}
-
-        {cita.estado !== "atendida" && cita.estado !== "cancelada" && (
-          <motion.button
-            type="button"
-            whileHover={{
-              scale: 1.06,
-              boxShadow: "0 0 10px rgba(220,199,172,0.4)",
-            }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onReagendar?.(cita)}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 w-full text-sm font-semibold rounded-full shadow-sm transition-all"
-            style={{
-              background: "#E5D8C8",
-              color: "#4E3B2B",
-            }}
-          >
-            <Edit3 size={16} /> Reagendar
-          </motion.button>
+        {cita.estado === "confirmada" && (
+          <>
+            <Btn label="Facturar" icon={<Eye size={14} />} bg="#B08968" color="#fff" onClick={() => onVerDetalles?.(cita)} />
+            <Btn label="Reagendar" icon={<Edit3 size={14} />} bg="#F0E8DE" color="#4E3B2B" onClick={() => onReagendar?.(cita)} />
+            <Btn label="Cancelar" icon={<XCircle size={14} />} bg="#C62828" color="#fff" onClick={() => onCancelar?.(cita)} />
+          </>
         )}
-
-        <motion.button
-          type="button"
-          whileHover={{
-            scale: 1.06,
-            boxShadow: "0 0 12px rgba(176,137,104,0.4)",
-          }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => onVerDetalles?.(cita)}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 w-full text-sm font-semibold text-white rounded-full shadow-sm transition-all"
-          style={{
-            background: "linear-gradient(90deg, #B08968, #A07855)",
-          }}
-        >
-          <Eye size={16} /> Factura
-        </motion.button>
-
-        {cita.estado !== "cancelada" && cita.estado !== "atendida" && (
-          <motion.button
-            type="button"
-            whileHover={{
-              scale: 1.06,
-              boxShadow: "0 0 12px rgba(255,107,107,0.3)",
-            }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onCancelar?.(cita)}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 w-full text-sm font-semibold text-white rounded-full shadow-sm transition-all"
-            style={{
-              background: "linear-gradient(90deg, #FF6B6B, #E04E4E)",
-            }}
-          >
-            <XCircle size={16} /> Cancelar
-          </motion.button>
+        {cita.estado === "atendida" && (
+          <Btn label="Ver resumen" icon={<ClipboardList size={14} />} bg="#E8F5E9" color="#145A32" onClick={() => onVerResumen?.(cita)} />
+        )}
+        {cita.estado === "cancelada" && (
+          <Btn label="Ver motivo" icon={<Eye size={14} />} bg="#FCE4EC" color="#7E1F1F" onClick={() => onVerMotivo?.(cita)} />
         )}
       </div>
     </motion.div>
+  );
+}
+
+function Btn({ label, icon, bg, color, onClick }: { label: string; icon: React.ReactNode; bg: string; color: string; onClick: () => void }) {
+  return (
+    <motion.button type="button" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={onClick}
+      style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "0.42rem 0.9rem", borderRadius: 100, border: "none", background: bg, color, fontSize: "0.78rem", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>
+      {icon} {label}
+    </motion.button>
   );
 }

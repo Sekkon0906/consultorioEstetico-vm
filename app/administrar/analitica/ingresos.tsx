@@ -1,0 +1,126 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { motion } from "framer-motion";
+import { supabase } from "@/lib/supabaseClient";
+import { CheckCircle, XCircle, Clock, Calendar, Users, Activity } from "lucide-react";
+
+var MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+
+export default function IngresosPage() {
+  var [stats, setStats] = useState<any>(null);
+  var [topProcs, setTopProcs] = useState<any[]>([]);
+  var [citasMes, setCitasMes] = useState<any[]>([]);
+  var [loading, setLoading] = useState(true);
+
+  useEffect(function() {
+    async function load() {
+      try {
+        var hoy = new Date();
+        var hoyISO = hoy.toISOString().slice(0, 10);
+
+        // Citas
+        var res = await supabase.from("citas").select("id, estado, fecha, procedimiento, user_id");
+        var citas = res.data || [];
+
+        // Pacientes unicos registrados
+        var usersRes = await supabase.from("usuarios").select("id", { count: "exact", head: true });
+        var totalPacientes = usersRes.count || 0;
+
+        setStats({
+          totalCitas: citas.length,
+          atendidas: citas.filter(function(c: any) { return c.estado === "atendida"; }).length,
+          canceladas: citas.filter(function(c: any) { return c.estado === "cancelada"; }).length,
+          pendientes: citas.filter(function(c: any) { return c.estado === "pendiente" || c.estado === "confirmada"; }).length,
+          citasHoy: citas.filter(function(c: any) { return c.fecha === hoyISO; }).length,
+          pacientes: totalPacientes,
+        });
+
+        // Top procs
+        var procMap: Record<string, number> = {};
+        citas.forEach(function(c: any) { procMap[c.procedimiento] = (procMap[c.procedimiento] || 0) + 1; });
+        setTopProcs(Object.entries(procMap).map(function(e) { return { nombre: e[0], total: e[1] }; }).sort(function(a, b) { return b.total - a.total; }).slice(0, 6));
+
+        // Ultimos 6 meses
+        var mData: any[] = [];
+        for (var i = 5; i >= 0; i--) {
+          var d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+          var m = d.getMonth(); var a = d.getFullYear();
+          var ini = a + "-" + String(m + 1).padStart(2, "0") + "-01";
+          var fin = a + "-" + String(m + 1).padStart(2, "0") + "-31";
+          var cm = citas.filter(function(c: any) { return c.fecha >= ini && c.fecha <= fin; });
+          mData.push({ mes: MESES[m], total: cm.length, atendidas: cm.filter(function(c: any) { return c.estado === "atendida"; }).length });
+        }
+        setCitasMes(mData);
+      } catch (e) { console.error(e); }
+      finally { setLoading(false); }
+    }
+    load();
+  }, []);
+
+  if (loading) return <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border" style={{ color: "#B08968" }} /></div>;
+
+  return (
+    <div>
+      <h2 style={{ fontWeight: 700, color: "#3A2A1A", marginBottom: "1.5rem" }}>Analitica del Consultorio</h2>
+
+      {stats && (
+        <>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", marginBottom: "2rem" }}>
+            <KPI icon={<CheckCircle size={18} />} label="Atendidas" value={stats.atendidas} color="#2E7D32" />
+            <KPI icon={<Clock size={18} />} label="Pendientes / Confirmadas" value={stats.pendientes} color="#F9A825" />
+            <KPI icon={<XCircle size={18} />} label="Canceladas" value={stats.canceladas} color="#C62828" />
+            <KPI icon={<Activity size={18} />} label="Citas hoy" value={stats.citasHoy} color="#1565C0" />
+            <KPI icon={<Users size={18} />} label="Pacientes registrados" value={stats.pacientes} color="#6A1B9A" />
+            <KPI icon={<Calendar size={18} />} label="Total historico" value={stats.totalCitas} color="#B08968" />
+          </div>
+
+          <div style={{ background: "#FFFDF9", borderRadius: 18, border: "1px solid #E9DED2", padding: "1.5rem", marginBottom: "2rem" }}>
+            <h4 style={{ fontWeight: 600, color: "#3A2A1A", marginBottom: "1rem" }}>Citas por mes</h4>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={citasMes}>
+                <XAxis dataKey="mes" tick={{ fill: "#6C584C", fontSize: 12 }} />
+                <YAxis tick={{ fill: "#6C584C", fontSize: 12 }} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #E9DED2" }} />
+                <Bar dataKey="total" name="Total" fill="#C9AD8D" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="atendidas" name="Atendidas" fill="#66BB6A" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div style={{ background: "#FFFDF9", borderRadius: 18, border: "1px solid #E9DED2", padding: "1.5rem" }}>
+            <h4 style={{ fontWeight: 600, color: "#3A2A1A", marginBottom: "1rem" }}>Top procedimientos</h4>
+            {topProcs.map(function(p, i) {
+              var pct = stats.totalCitas > 0 ? Math.round((p.total / stats.totalCitas) * 100) : 0;
+              return (
+                <motion.div key={p.nombre} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+                  style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "0.5rem 0.8rem", borderRadius: 12, background: i % 2 === 0 ? "#F5EEE6" : "transparent", marginBottom: "0.3rem" }}>
+                  <span style={{ width: 22, height: 22, borderRadius: 6, background: "#B08968", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.68rem", fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontWeight: 600, color: "#3A2A1A", fontSize: "0.85rem", margin: 0 }}>{p.nombre}</p>
+                    <div style={{ height: 4, borderRadius: 2, background: "#E9DED2", marginTop: 3 }}><div style={{ height: "100%", borderRadius: 2, background: "#B08968", width: pct + "%" }} /></div>
+                  </div>
+                  <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#3A2A1A" }}>{p.total}</span>
+                </motion.div>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function KPI(props: { icon: React.ReactNode; label: string; value: number; color: string }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      style={{ background: "#FFFDF9", borderRadius: 16, border: "1px solid #E9DED2", padding: "1rem", display: "flex", alignItems: "center", gap: "0.8rem" }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: props.color + "18", display: "flex", alignItems: "center", justifyContent: "center", color: props.color, flexShrink: 0 }}>{props.icon}</div>
+      <div>
+        <p style={{ fontSize: "0.7rem", color: "#8A7565", fontWeight: 600, margin: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>{props.label}</p>
+        <p style={{ fontSize: "1.2rem", fontWeight: 700, color: "#3A2A1A", margin: 0 }}>{props.value}</p>
+      </div>
+    </motion.div>
+  );
+}
