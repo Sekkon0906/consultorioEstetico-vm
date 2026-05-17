@@ -1,36 +1,136 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Consultorio Estético — Dra. Julieth Vanessa Medina Orjuela
 
-## Getting Started
+Aplicación web del consultorio de medicina estética y antienvejecimiento
+(Ibagué – Tolima): página pública, agendamiento de citas en línea, panel
+administrativo, testimonios, galería de procedimientos y consentimiento
+informado con firma digital.
 
-First, run the development server:
+## Tech stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Frontend:** Next.js 15 (App Router, Turbopack), React 19, TypeScript
+- **Estilos / animación:** CSS global + Bootstrap, Tailwind v4, Framer Motion
+- **Datos / Auth:** Supabase (Postgres + Auth + Storage), consultado
+  directamente desde el frontend con `@supabase/supabase-js`
+- **Backend auxiliar:** Express (`server/`) para sincronía de usuario,
+  reagendas, subida de imágenes de charlas y otras operaciones con
+  `service_role`
+- **Otros:** jsPDF (PDF de consentimiento), Three.js / R3F (fondos),
+  Recharts (analítica)
+
+## Estructura
+
+```
+app/                     # Next.js (App Router)
+  page.tsx               # Home
+  doctora/ consultorio/  # Páginas públicas
+  procedimientos/        # Listado + detalle [id]
+  testimonios/           # Testimonios + comentarios
+  agendar/               # Flujo de cita (calendario → datos → pago)
+  perfil/                # Editar info y "Mis citas agendadas"
+  administrar/           # Panel admin (horarios, citas, procedimientos,
+                         #  testimonios, formación, analítica)
+  src/
+    components/          # Navbar, Footer, Galeria3D, VideoAnim, Firma...
+    context/AuthContext  # Sesión Supabase
+    lib/                 # supabaseClient, api
+  services/              # Acceso a datos (Supabase) por dominio
+server/
+  src/                   # API Express (rutas, middlewares, lib)
+  sql/indexes.sql        # Índices recomendados (ejecutar en Supabase)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Requisitos
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Node.js 20+
+- Cuenta/proyecto de Supabase
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Variables de entorno
 
-## Learn More
+### Frontend — `.env.local` (raíz)
 
-To learn more about Next.js, take a look at the following resources:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://<tu-proyecto>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key pública>
+NEXT_PUBLIC_API_URL=http://localhost:4000
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Backend — `server/.env`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```env
+SUPABASE_URL=https://<tu-proyecto>.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<service_role key — SECRETA, nunca al frontend>
+DATABASE_URL=postgres://...
+CORS_ORIGIN=http://localhost:3000
+PORT=4000
+NODE_ENV=development
+```
 
-## Deploy on Vercel
+> ⚠️ **Seguridad:** `.env*` está en `.gitignore`. La `service_role key` y
+> el `DATABASE_URL` son secretos: no se exponen en el frontend ni se
+> commitean. Si una clave se filtró, rótala desde Supabase
+> (Settings → API → Reset).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Puesta en marcha
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# 1. Dependencias
+npm install
+cd server && npm install && cd ..
+
+# 2. Base de datos: ejecuta server/sql/indexes.sql en el
+#    SQL Editor de Supabase (mejora el rendimiento; es idempotente)
+
+# 3. Backend (terminal 1)
+cd server && npm run dev      # http://localhost:4000
+
+# 4. Frontend (terminal 2)
+npm run dev                   # http://localhost:3000
+```
+
+## Scripts
+
+| Comando | Descripción |
+|---|---|
+| `npm run dev` | Frontend en desarrollo (Turbopack) |
+| `npm run build` | Build de producción |
+| `npm run start` | Sirve el build |
+| `npm run lint` | ESLint |
+| `cd server && npm run dev` | Backend Express (nodemon) |
+
+> Nota: el build de producción no bloquea por ESLint (el proyecto usa
+> estilo `var`/`any` heredado); el chequeo de tipos de TypeScript sí
+> permanece activo.
+
+## Funcionalidades
+
+- **Público:** home, perfil de la doctora, consultorio, procedimientos
+  por categoría con galería, testimonios en video y comentarios de
+  pacientes.
+- **Agendamiento:** calendario con horas disponibles (bloquea horas
+  pasadas y ocupadas), datos del paciente, pago en consultorio + aviso
+  por WhatsApp, tarjeta de confirmación.
+- **Cuenta:** registro, login (email y Google), recuperar contraseña,
+  editar perfil, "Mis citas agendadas" con aceptar/rechazar reagenda.
+- **Consentimiento informado:** el paciente firma (canvas); se genera un
+  PDF que solo ve la doctora.
+- **Admin:** gestión de horarios, citas (confirmar, reagendar, facturar,
+  cancelar), procedimientos, testimonios, formación y analítica.
+
+## Despliegue
+
+- **Frontend:** Vercel (configurar las variables `NEXT_PUBLIC_*`).
+- **Backend:** cualquier host Node (Render/Railway/VPS) con las variables
+  de `server/.env` y `CORS_ORIGIN` apuntando al dominio del frontend.
+- Ejecutar `server/sql/indexes.sql` una vez en la base de datos.
+
+## Pendiente / por configurar
+
+- Página de **términos y condiciones / tratamiento de datos** (requiere
+  el texto legal y el **NIT** del consultorio).
+- **NIT / Registro Profesional** en el PDF de consentimiento.
+- Verificar políticas RLS de los buckets de Storage y de la tabla
+  `reagendas` en Supabase.
+
+---
+
+© Consultorio Estético Dra. Julieth Medina. Todos los derechos reservados.
