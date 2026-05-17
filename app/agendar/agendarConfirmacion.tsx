@@ -42,6 +42,7 @@ export default function AgendarConfirmacion({
   const [estado, setEstado] = useState<Cita["estado"]>(
     cita.estado ?? "pendiente"
   );
+  const [errorEstado, setErrorEstado] = useState<string | null>(null);
 
   useEffect(() => {
     void generarQR();
@@ -86,6 +87,7 @@ export default function AgendarConfirmacion({
 
   const avanzarEstado = async (): Promise<void> => {
     try {
+      setErrorEstado(null);
       if (estado === "pendiente") {
         await updateCitaApi(cita.id, { estado: "confirmada" });
         setEstado("confirmada");
@@ -95,7 +97,7 @@ export default function AgendarConfirmacion({
       }
     } catch (err) {
       console.error("Error actualizando estado de la cita:", err);
-      alert("Ocurrió un error al actualizar el estado de la cita.");
+      setErrorEstado("Ocurrió un error al actualizar el estado de la cita.");
     }
   };
 
@@ -202,6 +204,23 @@ export default function AgendarConfirmacion({
           <p className="mt-3 text-sm text-[#6C584C]">
             Escanea este código para confirmar tu asistencia
           </p>
+        </div>
+      )}
+
+      {errorEstado && (
+        <div
+          className="mt-8 mx-auto max-w-lg rounded-2xl px-4 py-3 text-sm font-medium flex items-center justify-between gap-3"
+          style={{ background: "#FDE8D8", color: "#922B21" }}
+        >
+          <span className="flex-1 text-left">{errorEstado}</span>
+          <button
+            type="button"
+            onClick={() => setErrorEstado(null)}
+            aria-label="Cerrar"
+            style={{ background: "none", border: "none", color: "#922B21", cursor: "pointer", fontWeight: 700 }}
+          >
+            ×
+          </button>
         </div>
       )}
 

@@ -220,12 +220,46 @@ export default function ConsultorioPage() {
                 ‹
               </button>
 
-              {/* Imagen */}
-              <img
-                src={currentImage.src}
-                alt={currentImage.label}
-                style={{ width: "100%", maxHeight: "80vh", objectFit: "contain", borderRadius: 16, background: "black" }}
-              />
+              {/* Imagen — completa, sin barras negras (fondo difuminado) */}
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  maxHeight: "80vh",
+                  aspectRatio: "16 / 10",
+                  borderRadius: 16,
+                  overflow: "hidden",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <img
+                  src={currentImage.src}
+                  alt=""
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    filter: "blur(28px) brightness(0.55)",
+                    transform: "scale(1.15)",
+                  }}
+                />
+                <img
+                  src={currentImage.src}
+                  alt={currentImage.label}
+                  style={{
+                    position: "relative",
+                    maxWidth: "100%",
+                    maxHeight: "80vh",
+                    objectFit: "contain",
+                    display: "block",
+                  }}
+                />
+              </div>
 
               {/* Flecha derecha */}
               <button

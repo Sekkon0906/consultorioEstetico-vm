@@ -41,7 +41,7 @@ export default function LoginForm({ setErr }: Props) {
         : error.message);
       return;
     }
-    router.push("/");
+    router.push("/testimonios");
   };
 
   const handleGoogle = async () => {

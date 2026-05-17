@@ -200,6 +200,7 @@ export default function FirmaConsentimiento(props: Props) {
   var canvasRef = useRef<HTMLCanvasElement>(null);
   var [isDrawing, setIsDrawing] = useState(false);
   var [hasFirma, setHasFirma] = useState(false);
+  var [firmaError, setFirmaError] = useState<string | null>(null);
 
   useEffect(function() {
     if (step !== "firma") return;
@@ -229,6 +230,7 @@ export default function FirmaConsentimiento(props: Props) {
 
   var guardarFirma = async function() {
     var c = canvasRef.current; if (!c || !hasFirma) return;
+    setFirmaError(null);
     setStep("guardando");
     try {
       var firmaDataUrl = c.toDataURL("image/png");
@@ -254,7 +256,7 @@ export default function FirmaConsentimiento(props: Props) {
 
       setStep("listo");
       if (props.onFirmado) props.onFirmado();
-    } catch (err: any) { console.error(err); alert("Error: " + err.message); setStep("firma"); }
+    } catch (err: any) { console.error(err); setFirmaError("No se pudo guardar la firma: " + (err?.message || "error desconocido")); setStep("firma"); }
   };
 
   var cerrar = function() { setShowModal(false); setTimeout(function() { setStep("intro"); }, 300); };
@@ -304,8 +306,11 @@ export default function FirmaConsentimiento(props: Props) {
                         style={{ width: "100%", height: 180, cursor: "crosshair", touchAction: "none", display: "block" }} />
                     </div>
                     <div style={{ display: "flex", gap: "0.6rem", justifyContent: "center", marginBottom: "1rem" }}>
-                      <button onClick={limpiar} style={{ padding: "0.5rem 1.2rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.82rem", cursor: "pointer" }}>Limpiar</button>
+                      <button onClick={function() { limpiar(); setFirmaError(null); }} style={{ padding: "0.5rem 1.2rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.82rem", cursor: "pointer" }}>Limpiar</button>
                     </div>
+                    {firmaError && (
+                      <p style={{ color: "#b02e2e", fontSize: "0.82rem", textAlign: "center", marginBottom: "0.8rem" }}>{firmaError}</p>
+                    )}
                     <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
                       <button onClick={function() { setStep("intro"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer" }}>Volver</button>
                       <button onClick={guardarFirma} disabled={!hasFirma} style={{ padding: "0.7rem 1.8rem", borderRadius: 100, background: hasFirma ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#E9DED2", color: hasFirma ? "white" : "#9B8575", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: hasFirma ? "pointer" : "not-allowed" }}>Confirmar firma</button>

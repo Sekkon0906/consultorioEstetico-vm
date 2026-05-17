@@ -223,21 +223,26 @@ export default function ProcedimientosPage() {
                               </div>
 
                               {/* Botones */}
-                              <div className="flex justify-center gap-4 mt-auto pt-4 border-t border-[#E9DED2] pb-6">
+                              <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-[#E9DED2] pb-6">
                                 {/* Agendar cita */}
                                 <Link
                                   href={`/agendar?proc=${encodeURIComponent(p.nombre)}`}
-                                  className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-medium shadow-sm transition-all duration-300"
+                                  className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full font-semibold shadow-sm transition-all duration-300"
                                   style={{
-                                    backgroundColor: "#B08968",
-                                    color: "#FAF9F7",
-                                    fontSize: "0.95rem",
+                                    background: "linear-gradient(135deg, #B98E63, #8C6A45)",
+                                    color: "#FFFFFF",
+                                    fontSize: "1rem",
+                                    whiteSpace: "nowrap",
                                   }}
                                   onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = "#9A7458";
+                                    e.currentTarget.style.background = "linear-gradient(135deg, #A87C52, #785A3A)";
+                                    e.currentTarget.style.transform = "translateY(-2px)";
+                                    e.currentTarget.style.boxShadow = "0 8px 20px rgba(176,137,104,0.35)";
                                   }}
                                   onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = "#B08968";
+                                    e.currentTarget.style.background = "linear-gradient(135deg, #B98E63, #8C6A45)";
+                                    e.currentTarget.style.transform = "";
+                                    e.currentTarget.style.boxShadow = "";
                                   }}
                                 >
                                   <FaCalendarCheck className="text-base" />
@@ -247,11 +252,12 @@ export default function ProcedimientosPage() {
                                 {/* Ver más */}
                                 <Link
                                   href={`/procedimientos/${p.id}`}
-                                  className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full border font-medium shadow-sm transition-all duration-300"
+                                  className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full border font-medium shadow-sm transition-all duration-300"
                                   style={{
                                     borderColor: "#B08968",
                                     color: "#6C584C",
-                                    fontSize: "0.95rem",
+                                    fontSize: "1rem",
+                                    whiteSpace: "nowrap",
                                   }}
                                   onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundColor = "#B08968";

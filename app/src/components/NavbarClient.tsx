@@ -15,6 +15,7 @@ export default function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [confirmLogout, setConfirmLogout] = useState(false);
   const [indicator, setIndicator] = useState({ left: 0, width: 0 });
   const linkRefs = useRef<(HTMLLIElement | null)[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -55,8 +56,29 @@ export default function Navbar() {
     return () => window.removeEventListener("resize", onResize);
   }, [pathname, menuItems.length]);
 
+  /* === SECCIÓN ACTUAL (pt 22) === */
+  const currentSection = useMemo(() => {
+    const exact = menuItems.find((i) => i.href === pathname);
+    if (exact) return exact.label;
+    const prefix = menuItems
+      .filter((i) => i.href !== "/" && pathname.startsWith(i.href))
+      .sort((a, b) => b.href.length - a.href.length)[0];
+    if (prefix) return prefix.label;
+    if (pathname.startsWith("/perfil")) return "Mi perfil";
+    if (pathname.startsWith("/login") || pathname.startsWith("/register"))
+      return "Acceso";
+    return "Inicio";
+  }, [pathname, menuItems]);
+
   /* === LOGOUT === */
+  const requestLogout = () => {
+    setMenuOpen(false);
+    setMobileOpen(false);
+    setConfirmLogout(true);
+  };
+
   const handleLogout = async () => {
+    setConfirmLogout(false);
     await logout();
     router.push("/");
   };
@@ -95,16 +117,37 @@ export default function Navbar() {
         className="container-fluid d-flex align-items-center justify-content-between"
         style={{ padding: "0 1.2rem", position: "relative" }}
       >
-        {/* LOGO */}
-        <Link href="/" className="navbar-logo d-flex align-items-center">
-          <img
-            src={IMG.logo}
-            alt="Logo JM"
-            width={75}
-            height={55}
-            className="me-2"
-          />
-        </Link>
+        {/* LOGO + SECCIÓN ACTUAL */}
+        <div className="d-flex align-items-center" style={{ gap: "0.6rem" }}>
+          <Link href="/" className="navbar-logo d-flex align-items-center">
+            <img
+              src={IMG.logo}
+              alt="Logo JM"
+              width={75}
+              height={55}
+              className="me-2"
+            />
+          </Link>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={currentSection}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 8 }}
+              transition={{ duration: 0.25 }}
+              style={{
+                fontWeight: 600,
+                fontSize: "0.92rem",
+                color: "#8d7a6a",
+                borderLeft: "1px solid #E6CCB2",
+                paddingLeft: "0.6rem",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {currentSection}
+            </motion.span>
+          </AnimatePresence>
+        </div>
 
         {/* MENÚ DESKTOP */}
         <div
@@ -113,8 +156,8 @@ export default function Navbar() {
           onMouseLeave={handleMenuLeave}
         >
           <ul
-            className="navbar-menu d-flex justify-content-center align-items-center gap-4 mb-0"
-            style={{ fontWeight: 600, listStyle: "none" }}
+            className="navbar-menu d-flex justify-content-center align-items-center mb-0"
+            style={{ fontWeight: 600, listStyle: "none", gap: "2.4rem" }}
           >
             {menuItems.map((item, index) => {
               const isActive = pathname === item.href;
@@ -131,7 +174,7 @@ export default function Navbar() {
                   <Link
                     href={item.href}
                     className="text-decoration-none"
-                    style={{ color: isActive ? "#B08968" : "#2B2B2B", fontWeight: 600 }}
+                    style={{ color: isActive ? "#B08968" : "#2B2B2B", fontWeight: 600, fontSize: "1.08rem", letterSpacing: "0.01em", whiteSpace: "nowrap" }}
                   >
                     {item.label}
                   </Link>
@@ -258,7 +301,7 @@ export default function Navbar() {
                       <button
                         className="btn mt-2"
                         style={{ background: "#fff3ef", color: "#b02e2e", fontWeight: 600, border: "1px solid #e4bfbf", borderRadius: "10px" }}
-                        onClick={handleLogout}
+                        onClick={requestLogout}
                       >
                         Cerrar sesión
                       </button>
@@ -285,7 +328,7 @@ export default function Navbar() {
               <button className="user-action-btn" onClick={() => { setMobileOpen(false); router.push("/perfil/citas_agendadas"); }}>
                 Citas agendadas
               </button>
-              <button className="user-action-btn" onClick={handleLogout} style={{ color: "#b02e2e" }}>
+              <button className="user-action-btn" onClick={requestLogout} style={{ color: "#b02e2e" }}>
                 Cerrar sesión
               </button>
             </div>
@@ -307,6 +350,59 @@ export default function Navbar() {
           </ul>
         </div>
       </div>
+
+      {/* MODAL CONFIRMAR CERRAR SESIÓN (pt 27) */}
+      <AnimatePresence>
+        {confirmLogout && (
+          <motion.div
+            key="logout-confirm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setConfirmLogout(false)}
+            style={{
+              position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)",
+              backdropFilter: "blur(3px)", zIndex: 2000,
+              display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem",
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-4 shadow-lg p-4 text-center"
+              style={{ maxWidth: 360, width: "100%", background: "linear-gradient(135deg, #fffdfb 0%, #f8f3ed 100%)" }}
+            >
+              <div style={{ fontSize: "2.4rem", marginBottom: "0.5rem" }}>👋</div>
+              <h5 className="fw-bold mb-2" style={{ color: "#6B4E3D" }}>
+                ¿Cerrar sesión?
+              </h5>
+              <p className="mb-4" style={{ color: "#8d7a6a", fontSize: "0.92rem" }}>
+                Tendrás que iniciar sesión nuevamente para acceder a tu cuenta.
+              </p>
+              <div className="d-flex gap-2">
+                <button
+                  className="btn flex-fill"
+                  style={{ background: "#E9E0D1", color: "#4B3A2E", fontWeight: 600, border: "none", borderRadius: "10px" }}
+                  onClick={() => setConfirmLogout(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn flex-fill"
+                  style={{ background: "#b02e2e", color: "#fff", fontWeight: 600, border: "none", borderRadius: "10px" }}
+                  onClick={handleLogout}
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* BACKDROP MÓVIL */}
       <AnimatePresence>

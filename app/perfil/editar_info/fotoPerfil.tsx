@@ -1,61 +1,33 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { PALETTE } from "./palette";
-import { supabase } from "@/lib/supabaseClient";
-import { updateCurrentUser } from "@/lib/api";
 
 interface Props {
   photo?: string;
   email?: string;
-  canEdit: boolean;
-  setPhoto: (value: string | undefined) => void;
+  /** Compatibilidad: ya no se permite subir foto (seguridad). */
+  canEdit?: boolean;
+  setPhoto?: (value: string | undefined) => void;
 }
 
-export default function FotoPerfil({ photo, email, canEdit, setPhoto }: Props) {
-  const [uploading, setUploading] = useState(false);
+/**
+ * Foto de perfil — SOLO LECTURA.
+ * Por seguridad informática los usuarios no suben archivos:
+ * se usa la foto de la cuenta de Google (avatar_url) o un avatar generado.
+ */
+export default function FotoPerfil({ photo, email }: Props) {
   const [preview, setPreview] = useState<string | undefined>(photo);
 
-  useEffect(() => { setPreview(photo); }, [photo]);
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !email) return;
-
-    const localUrl = URL.createObjectURL(file);
-    setPreview(localUrl);
-    setUploading(true);
-
-    try {
-      const ext = file.name.split(".").pop();
-      // Nombre único basado en el email del usuario
-      const path = `${email.replace(/[@.]/g, "_")}_${Date.now()}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("fotos-perfil")                                      //  bucket correcto
-        .upload(path, file, { upsert: true, contentType: file.type });
-
-      if (uploadError) throw new Error(uploadError.message);
-
-      const { data } = supabase.storage.from("fotos-perfil").getPublicUrl(path);
-      const publicUrl = data.publicUrl;
-
-      await updateCurrentUser({ photo: publicUrl });
-
-      setPhoto(publicUrl);
-      setPreview(publicUrl);
-    } catch (err: any) {
-      console.error("Error subiendo foto:", err);
-      alert("No se pudo subir la foto: " + err.message);
-      setPreview(photo);
-    } finally {
-      setUploading(false);
-    }
-  };
+  useEffect(() => {
+    setPreview(photo);
+  }, [photo]);
 
   const displayPhoto =
     preview ||
     (email
-      ? `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}&background=E6CCB2&color=7F5539`
+      ? `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          email
+        )}&background=E6CCB2&color=7F5539`
       : "/default-avatar.png");
 
   return (
@@ -80,43 +52,14 @@ export default function FotoPerfil({ photo, email, canEdit, setPhoto }: Props) {
         <img
           src={displayPhoto}
           alt="Foto de perfil"
+          referrerPolicy="no-referrer"
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
-        {uploading && (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: "rgba(0,0,0,0.4)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <div className="spinner-border spinner-border-sm text-white" role="status" />
-          </div>
-        )}
       </div>
 
-      {canEdit && (
-        <>
-          <label
-            htmlFor="fileInput"
-            className="btn btn-outline-secondary btn-sm"
-            style={{ borderColor: PALETTE.main, color: PALETTE.main, cursor: "pointer" }}
-          >
-            {uploading ? "Subiendo…" : "Cambiar foto"}
-          </label>
-          <input
-            id="fileInput"
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handleFileChange}
-            disabled={uploading}
-          />
-        </>
-      )}
+      <p className="small mb-0" style={{ color: PALETTE.main, opacity: 0.75 }}>
+        Tu foto se toma de tu cuenta de Google
+      </p>
     </motion.div>
   );
 }

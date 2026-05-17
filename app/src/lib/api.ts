@@ -12,8 +12,9 @@ export async function syncUserWithSupabase(): Promise<{
 }> {
   try {
     const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+    const authUser = session?.user ?? null;
 
     if (!authUser) return { ok: false, user: null };
 
@@ -72,8 +73,9 @@ export async function getCurrentUser(): Promise<{
 }> {
   try {
     const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+    const authUser = session?.user ?? null;
 
     if (!authUser) return { ok: false, user: null };
 
@@ -109,8 +111,9 @@ export async function updateCurrentUser(
 ): Promise<{ ok: boolean; user: Record<string, unknown> | null }> {
   try {
     const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+    const authUser = session?.user ?? null;
 
     if (!authUser) return { ok: false, user: null };
 

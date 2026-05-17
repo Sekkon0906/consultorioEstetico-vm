@@ -33,6 +33,7 @@ function AgendarPageContent() {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [fecha, setFecha] = useState<Date | null>(null);
   const [hora, setHora] = useState<string>("");
+  const [aviso, setAviso] = useState<string | null>(null);
   const [procedimientos, setProcedimientos] = useState<Procedimiento[]>([]);
   const [citaDraft, setCitaDraft] = useState<CitaSinPagos | null>(null);
   const [citaCreada, setCitaCreada] = useState<Cita | null>(null);
@@ -80,14 +81,15 @@ function AgendarPageContent() {
   // Paso 1 → 2
   const handleAvanzar = () => {
     if (!fecha || !hora) {
-      alert("Selecciona un día y una hora antes de continuar.");
+      setAviso("Selecciona un día y una hora antes de continuar.");
       return;
     }
     if (!usuario) {
-      alert("Debes iniciar sesión para agendar una cita.");
+      setAviso("Debes iniciar sesión para agendar una cita.");
       router.push("/login");
       return;
     }
+    setAviso(null);
     const fechaISO = fecha.toISOString().slice(0, 10);
     setFormData((prev) => ({ ...prev, fecha: fechaISO, hora }));
     setStep(2);
@@ -141,6 +143,26 @@ function AgendarPageContent() {
                 onHoraSelect={setHora}
                 usuario={usuario}
               />
+              {aviso && (
+                <div
+                  className="mx-auto mt-6 max-w-md text-center rounded-2xl px-4 py-3 text-sm font-medium flex items-center justify-between gap-3"
+                  style={{
+                    background: PALETTE.surface,
+                    color: "#b02e2e",
+                    border: "1px solid #e4bfbf",
+                  }}
+                >
+                  <span className="flex-1">{aviso}</span>
+                  <button
+                    type="button"
+                    onClick={() => setAviso(null)}
+                    aria-label="Cerrar aviso"
+                    style={{ background: "none", border: "none", color: "#b02e2e", cursor: "pointer", fontWeight: 700 }}
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
               <div className="text-center mt-8">
                 <motion.button
                   whileHover={{ scale: 1.05 }}

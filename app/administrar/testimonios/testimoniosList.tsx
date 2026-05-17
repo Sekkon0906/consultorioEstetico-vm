@@ -177,20 +177,20 @@ export default function TestimoniosList() {
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               {list.map(function(t, i) {
                 return (
-                  <motion.div key={t.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }} style={{ background: "#FFFDF9", borderRadius: 14, border: "1px solid #E9DED2", padding: "0.8rem 1rem", display: "flex", alignItems: "center", gap: "0.7rem", opacity: t.activo ? 1 : 0.5 }}>
-                    {t.thumb ? <img src={t.thumb} alt="" style={{ width: 48, height: 48, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 48, height: 48, borderRadius: 10, background: "#E9DED2", flexShrink: 0 }} />}
+                  <motion.div key={t.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }} style={{ background: "#FFFDF9", borderRadius: 18, border: "1px solid #E9DED2", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem", opacity: t.activo ? 1 : 0.5 }}>
+                    {t.thumb ? <img src={t.thumb} alt="" style={{ width: 72, height: 72, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 72, height: 72, borderRadius: 14, background: "#E9DED2", flexShrink: 0 }} />}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 5 }}><span style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "0.88rem" }}>{t.nombre}</span>{t.video && <Play size={12} color="#B08968" />}</div>
-                      <p style={{ fontSize: "0.78rem", color: "#6C584C", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.texto}</p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 7 }}><span style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "1.08rem" }}>{t.nombre}</span>{t.video && <Play size={16} color="#B08968" />}</div>
+                      <p style={{ fontSize: "0.92rem", color: "#6C584C", margin: "0.25rem 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.texto}</p>
                     </div>
-                    <div style={{ display: "flex", gap: 3, flexShrink: 0 }}>
-                      <IBtn icon={t.activo ? <Eye size={12} /> : <EyeOff size={12} />} bg={t.activo ? "#D8F3DC" : "#F5EEE6"} onClick={function() { toggle(t, "activo"); }} />
-                      <IBtn icon={<Star size={12} fill={t.destacado ? "#B08968" : "none"} />} bg={t.destacado ? "#FFF3E6" : "#F5EEE6"} onClick={function() { toggle(t, "destacado"); }} />
-                      <IBtn icon={<Edit3 size={12} />} bg="#F5EEE6" onClick={function() { startEdit(t); }} />
+                    <div style={{ display: "flex", gap: 7, flexShrink: 0 }}>
+                      <IBtn icon={t.activo ? <Eye size={18} /> : <EyeOff size={18} />} bg={t.activo ? "#D8F3DC" : "#F5EEE6"} onClick={function() { toggle(t, "activo"); }} />
+                      <IBtn icon={<Star size={18} fill={t.destacado ? "#B08968" : "none"} />} bg={t.destacado ? "#FFF3E6" : "#F5EEE6"} onClick={function() { toggle(t, "destacado"); }} />
+                      <IBtn icon={<Edit3 size={18} />} bg="#F5EEE6" onClick={function() { startEdit(t); }} />
                       {delId === t.id ? (
-                        <><button onClick={function() { handleDel(t.id); }} style={{ padding: "0.15rem 0.4rem", borderRadius: 6, background: "#C62828", color: "white", border: "none", fontSize: "0.65rem", fontWeight: 600, cursor: "pointer" }}>Si</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.15rem 0.4rem", borderRadius: 6, background: "#E9DED2", border: "none", fontSize: "0.65rem", cursor: "pointer" }}>No</button></>
+                        <><button onClick={function() { handleDel(t.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#C62828", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>Sí</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#E9DED2", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
                       ) : (
-                        <IBtn icon={<Trash2 size={12} color="#b02e2e" />} bg="#fff3ef" onClick={function() { setDelId(t.id); }} />
+                        <IBtn icon={<Trash2 size={18} color="#b02e2e" />} bg="#fff3ef" onClick={function() { setDelId(t.id); }} />
                       )}
                     </div>
                   </motion.div>
@@ -206,5 +206,5 @@ export default function TestimoniosList() {
 
 function Lbl(props: { children: string }) { return <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 3 }}>{props.children}</label>; }
 function IBtn(props: { icon: React.ReactNode; bg: string; onClick: () => void }) {
-  return <motion.button whileTap={{ scale: 0.95 }} onClick={props.onClick} style={{ width: 28, height: 28, borderRadius: 7, background: props.bg, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{props.icon}</motion.button>;
+  return <motion.button whileTap={{ scale: 0.95 }} onClick={props.onClick} style={{ width: 42, height: 42, borderRadius: 12, background: props.bg, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>{props.icon}</motion.button>;
 }

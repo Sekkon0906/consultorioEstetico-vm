@@ -23,6 +23,19 @@
   }
 }
 /* ==========================
+   ESCALA GLOBAL (legibilidad)
+   Sube el tamaño base ~+12% en escritorio (rem/Bootstrap/estilos
+   inline en rem escalan proporcional). Conservador en móvil.
+========================== */
+html {
+  font-size: clamp(16px, 15.2px + 0.25vw, 18px);
+}
+body {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ==========================
    HERO HOME (HOME PAGE)
 ========================== */
 
@@ -202,22 +215,30 @@
     align-items: center;
   }
 
+  .hero-right {
+    display: grid;
+    place-items: center;
+  }
+
   .hero-content {
-    max-width: 620px;
-    padding: 3.5rem 3rem;
+    width: min(760px, 100%);
+    max-width: none;
+    padding: 4rem 4rem;
   }
 
   .hero-title {
-    font-size: 2.3rem;
+    font-size: clamp(2rem, 1.1rem + 2.4vw, 2.9rem);
+    line-height: 1.22;
     text-align: left;
+    margin-bottom: 1.6rem;
   }
 
   .hero-desc-long {
     display: block;
-    font-size: 1rem;
-    line-height: 1.75;
+    font-size: 1.08rem;
+    line-height: 1.85;
     color: #6c584c;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.6rem;
     text-align: justify;
   }
 
@@ -844,7 +865,9 @@ footer a:hover i {
 .doc-hero {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: clamp(560px, 90vh, 880px);
+  /* Ocupa toda la primera pantalla (como el hero del home) */
+  min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
   overflow: hidden;
   background: #faf9f7;
@@ -909,7 +932,8 @@ footer a:hover i {
   opacity: 0;
   transform: scale(1.06);
   object-fit: cover;
-  object-position: center;
+  /* Enfoca la parte superior para no recortar la cabeza/cara */
+  object-position: center 18%;
   transition: opacity 1.6s ease, transform 5s ease;
   will-change: opacity, transform;
 }
@@ -1018,24 +1042,39 @@ footer a:hover i {
   padding:6px 0;
 }
 
-/* Ventana (oculta lo que sale) */
+/* Ventana (oculta lo que sale) — con desvanecido en los bordes
+   para que entre/salga suave y NO se corte en seco */
 .topbar-marquee{
   overflow:hidden;
   width:100%;
   position:relative;
-  padding:0 70px;                 /* margen lateral como tenías */
+  height:1.7rem;                  /* alto fijo (la pista va en absolute) */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
 }
 
-/* Pista que se mueve (UNA sola copia) */
+/* Pista: UN solo bloque. Empieza totalmente fuera por la IZQUIERDA
+   (right:100% => su borde derecho toca el borde izquierdo de la ventana)
+   y cruza hasta salir completa por la DERECHA. Sin reiniciar a la mitad. */
 .topbar-track{
-  --gap: clamp(28px, 6vw, 90px);  /* separación entre items */
-  --dur: 28s;                     /* velocidad: mayor = más lento */
-  display:inline-flex;
+  --gap: clamp(28px, 4vw, 64px);  /* separación entre bloques de texto */
+  --dur: 26s;                     /* velocidad: mayor = más lento */
+  position:absolute;
+  right:100%;
+  top:50%;
+  display:flex;
   align-items:center;
   gap: var(--gap);
   white-space: nowrap;
   will-change: transform;
-  animation: slide-ltr var(--dur) linear infinite;
+  animation: topbar-ltr var(--dur) linear infinite;
+}
+
+/* Iconos de redes juntos */
+.topbar-social{
+  display:inline-flex;
+  align-items:center;
+  gap: 16px;
 }
 
 /* Cada ítem */
@@ -1045,10 +1084,11 @@ footer a:hover i {
   gap:8px;
 }
 
-/* Animación: izquierda → derecha y reinicia */
-@keyframes slide-ltr{
-  from{ transform: translateX(-100%); }  /* empieza fuera por la izquierda */
-  to  { transform: translateX(130%);  }  /* termina fuera por la derecha  */
+/* Izquierda → derecha: recorre todo el ancho (100vw) + su propio ancho (100%)
+   para que TODA la info pase y salga completa antes de reiniciar */
+@keyframes topbar-ltr{
+  from{ transform: translate(0, -50%); }
+  to  { transform: translate(calc(100vw + 100%), -50%); }
 }
 
 /* Cambiar el color de los íconos */
@@ -1058,18 +1098,25 @@ footer a:hover i {
 
 /* Responsive */
 @media (max-width: 992px){
-  .topbar-marquee{ padding:0 24px; }
-  .topbar-track{ --dur: 40s; --gap: clamp(20px, 7vw, 64px); }
+  .topbar-track{ --dur: 32s; --gap: clamp(20px, 6vw, 48px); }
 }
 
 @media (max-width: 576px){
   .topbar{ font-size:.85rem; }
-  .topbar-track{ --dur: 45s; --gap: clamp(16px, 8vw, 48px); }
+  .topbar-track{ --dur: 36s; --gap: clamp(16px, 7vw, 40px); }
 }
 
-/* Accesibilidad: respeta usuarios que prefieran menos movimiento */
+/* Accesibilidad: si el usuario prefiere menos movimiento, mostrar
+   la info estática y centrada (sin dejar la barra vacía) */
 @media (prefers-reduced-motion: reduce){
-  .topbar-track{ animation: none; transform: none; }
+  .topbar-track{
+    animation: none;
+    position: static;
+    transform: none;
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+  }
 }
 
 /* ==========================

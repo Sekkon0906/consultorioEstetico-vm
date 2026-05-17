@@ -19,10 +19,12 @@ export default function TestimoniosForm({ testimonio, onGuardar }: Props) {
   const [texto, setTexto] = useState<string>(testimonio?.texto ?? "");
   const [video, setVideo] = useState<string>(testimonio?.video ?? "");
   const [saving, setSaving] = useState<boolean>(false);
+  const [aviso, setAviso] = useState<{ tipo: "ok" | "error"; msg: string } | null>(null);
 
   const handleSave = async () => {
+    setAviso(null);
     if (!nombre.trim() || !texto.trim()) {
-      alert("Por favor, completa el nombre y el texto del testimonio.");
+      setAviso({ tipo: "error", msg: "Por favor, completa el nombre y el texto del testimonio." });
       return;
     }
 
@@ -42,11 +44,11 @@ export default function TestimoniosForm({ testimonio, onGuardar }: Props) {
       if (testimonio) {
         //  Editar existente en la BD
         await updateTestimonioApi(testimonio.id, payload);
-        alert("Testimonio actualizado correctamente ");
+        setAviso({ tipo: "ok", msg: "Testimonio actualizado correctamente." });
       } else {
         //  Crear nuevo en la BD
         await createTestimonioApi(payload);
-        alert("Testimonio creado correctamente ");
+        setAviso({ tipo: "ok", msg: "Testimonio creado correctamente." });
       }
 
       // Limpiar formulario
@@ -57,7 +59,7 @@ export default function TestimoniosForm({ testimonio, onGuardar }: Props) {
       if (onGuardar) onGuardar();
     } catch (error) {
       console.error("Error guardando testimonio:", error);
-      alert("Ocurrió un error al guardar el testimonio.");
+      setAviso({ tipo: "error", msg: "Ocurrió un error al guardar el testimonio." });
     } finally {
       setSaving(false);
     }
@@ -91,6 +93,19 @@ export default function TestimoniosForm({ testimonio, onGuardar }: Props) {
         placeholder="URL del video (opcional)"
         className="w-full mb-4 p-2 border rounded-md border-[--border] focus:outline-none focus:ring-2 focus:ring-[--main]"
       />
+
+      {aviso && (
+        <div
+          className="w-full mb-3 p-2 rounded-md text-sm text-center"
+          style={{
+            background: aviso.tipo === "ok" ? "#EAF6EC" : "#FBEAEA",
+            color: aviso.tipo === "ok" ? "#2E7D32" : "#b02e2e",
+            border: `1px solid ${aviso.tipo === "ok" ? "#BFE3C6" : "#E9C2C2"}`,
+          }}
+        >
+          {aviso.msg}
+        </div>
+      )}
 
       <button
         onClick={() => void handleSave()}

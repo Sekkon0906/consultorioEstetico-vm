@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PALETTE } from "../../agendar/page";
-import { Cita, getCitasByDayAPI, getCitasAPI, confirmarCitaAPI, cancelarCitaAPI, updateCitaAPI } from "./helpers";
+import { Cita, getCitasByDayAPI, getCitasAPI, confirmarCitaAPI, cancelarCitaAPI, solicitarReagendaAPI } from "./helpers";
 import CitasAgendadasCard from "./citasAgendadasCard";
 import CitasAgendadasModal from "./citasAgendadasModal";
 import { ChevronUp, ChevronDown, CalendarDays, Inbox, Phone, Mail, Calendar, Clock } from "lucide-react";
@@ -32,7 +32,10 @@ export default function CitasAgendadas() {
   const [reagendarModal, setReagendarModal] = useState<Cita | null>(null);
   const [reagendarFecha, setReagendarFecha] = useState("");
   const [reagendarHora, setReagendarHora] = useState("");
+  const [reagendarMotivo, setReagendarMotivo] = useState("");
   const [reagendarSaving, setReagendarSaving] = useState(false);
+  const [reagendarOk, setReagendarOk] = useState(false);
+  const [reagendarError, setReagendarError] = useState<string | null>(null);
   const [motivoModal, setMotivoModal] = useState<Cita | null>(null);
   const [resumenModal, setResumenModal] = useState<Cita | null>(null);
 
@@ -86,9 +89,29 @@ export default function CitasAgendadas() {
   const doCancel = async () => { if (!cancelModal || !cancelMotivo.trim()) return; try { await cancelarCitaAPI(cancelModal.id, cancelMotivo); } catch (e) { console.error(e); } setCancelModal(null); setCancelMotivo(""); setRecargar((v) => !v); };
   const doReagendar = async () => {
     if (!reagendarModal || !reagendarFecha || !reagendarHora) return;
+    if (!reagendarMotivo.trim()) { setReagendarError("Indica el motivo de la solicitud."); return; }
     setReagendarSaving(true);
-    try { await updateCitaAPI(reagendarModal.id, { fecha: reagendarFecha, hora: reagendarHora }); } catch (e) { console.error(e); }
-    setReagendarSaving(false); setReagendarModal(null); setRecargar((v) => !v);
+    setReagendarError(null);
+    try {
+      await solicitarReagendaAPI(
+        reagendarModal.id,
+        reagendarModal.userId,
+        reagendarFecha,
+        reagendarHora,
+        reagendarMotivo.trim()
+      );
+      setReagendarOk(true);
+      setRecargar((v) => !v);
+      setTimeout(() => {
+        setReagendarModal(null);
+        setReagendarOk(false);
+        setReagendarMotivo("");
+      }, 2200);
+    } catch (e) {
+      setReagendarError(e instanceof Error ? e.message : "No se pudo enviar la solicitud.");
+    } finally {
+      setReagendarSaving(false);
+    }
   };
 
   if (!isClient) return <div className="text-center py-20 text-[#6E5A49]">Cargando citas...</div>;
@@ -166,7 +189,7 @@ export default function CitasAgendadas() {
                   <CitasAgendadasCard key={c.id} cita={c} onVerDetalles={setDetalle}
                     onConfirmar={setConfirmModal}
                     onCancelar={(c) => { setCancelModal(c); setCancelMotivo(""); }}
-                    onReagendar={(c) => { setReagendarModal(c); setReagendarFecha(c.fecha); setReagendarHora(c.hora); }}
+                    onReagendar={(c) => { setReagendarModal(c); setReagendarFecha(c.fecha); setReagendarHora(c.hora); setReagendarMotivo(""); setReagendarOk(false); setReagendarError(null); }}
                     onVerMotivo={setMotivoModal} onVerResumen={setResumenModal} />
                 )) : <p className="text-[#6E5A49] text-center mt-20 italic">No hay citas.</p>}
               </div>
@@ -203,27 +226,52 @@ export default function CitasAgendadas() {
         </Overlay>
       )}</AnimatePresence>
 
-      {/* REAGENDAR */}
+      {/* SOLICITAR REAGENDA AL CLIENTE (pt 10) */}
       <AnimatePresence>{reagendarModal && (
         <Overlay onClose={() => setReagendarModal(null)}>
-          <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3A2A1A", textAlign: "center", marginBottom: "1rem" }}>Reagendar cita</h4>
-          <InfoBlock cita={reagendarModal} />
-          <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.8rem" }}>
-            <div>
-              <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Nueva fecha</label>
-              <input type="date" value={reagendarFecha} onChange={(e) => setReagendarFecha(e.target.value)} style={IS} />
+          {reagendarOk ? (
+            <div style={{ textAlign: "center", padding: "1rem 0" }}>
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#E8F5E9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+              </div>
+              <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.4rem" }}>Solicitud enviada</h4>
+              <p style={{ fontSize: "0.88rem", color: "#6C584C", margin: 0 }}>
+                La solicitud de reagenda quedó registrada. El cliente deberá confirmarla;
+                la cita no se mueve hasta que la apruebe.
+              </p>
             </div>
-            <div>
-              <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Nueva hora</label>
-              <select value={reagendarHora} onChange={(e) => setReagendarHora(e.target.value)} style={IS}>
-                {HORAS.map((h) => <option key={h} value={h}>{h}</option>)}
-              </select>
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center", marginTop: "1.2rem" }}>
-            <BtnM label="Cancelar" bg="#F0E8DE" color="#4E3B2B" onClick={() => setReagendarModal(null)} />
-            <BtnM label={reagendarSaving ? "Guardando..." : "Confirmar reagendamiento"} bg="#8B6A4B" color="#fff" onClick={doReagendar} disabled={reagendarSaving || !reagendarFecha || !reagendarHora} />
-          </div>
+          ) : (
+            <>
+              <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3A2A1A", textAlign: "center", marginBottom: "0.3rem" }}>Solicitar reagenda al cliente</h4>
+              <p style={{ fontSize: "0.8rem", color: "#8A7565", textAlign: "center", marginBottom: "1rem" }}>
+                Se enviará una solicitud al cliente con la nueva propuesta. La cita actual NO se modifica hasta que el cliente confirme.
+              </p>
+              <InfoBlock cita={reagendarModal} />
+              <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.8rem" }}>
+                <div style={{ display: "flex", gap: "0.8rem" }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Nueva fecha</label>
+                    <input type="date" value={reagendarFecha} onChange={(e) => setReagendarFecha(e.target.value)} style={IS} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Nueva hora</label>
+                    <select value={reagendarHora} onChange={(e) => setReagendarHora(e.target.value)} style={IS}>
+                      {HORAS.map((h) => <option key={h} value={h}>{h}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Motivo de la reagenda *</label>
+                  <textarea value={reagendarMotivo} onChange={(e) => { setReagendarMotivo(e.target.value); if (reagendarError) setReagendarError(null); }} rows={3} placeholder="Explica al cliente por qué se propone reagendar..." style={{ ...IS, resize: "vertical" as const }} />
+                </div>
+              </div>
+              {reagendarError && <p style={{ color: "#b02e2e", fontSize: "0.82rem", marginTop: "0.6rem", textAlign: "center" }}>{reagendarError}</p>}
+              <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center", marginTop: "1.2rem" }}>
+                <BtnM label="Cancelar" bg="#F0E8DE" color="#4E3B2B" onClick={() => setReagendarModal(null)} />
+                <BtnM label={reagendarSaving ? "Enviando..." : "Enviar solicitud"} bg="#8B6A4B" color="#fff" onClick={doReagendar} disabled={reagendarSaving || !reagendarFecha || !reagendarHora || !reagendarMotivo.trim()} />
+              </div>
+            </>
+          )}
         </Overlay>
       )}</AnimatePresence>
 

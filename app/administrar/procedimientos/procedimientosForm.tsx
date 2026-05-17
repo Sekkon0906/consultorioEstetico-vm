@@ -25,9 +25,20 @@ export default function ProcedimientosForm({ procedimiento, onGuardar }: Props) 
     procedimiento?.categoria || "Facial"
   );
   const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const handleSave = async () => {
-    if (!nombre.trim()) return alert("El nombre del procedimiento es obligatorio");
+    if (!nombre.trim()) {
+      setErr("El nombre del procedimiento es obligatorio");
+      return;
+    }
+    setErr(null);
 
     const precioString = precio.trim(); //  SIEMPRE STRING
 
@@ -49,11 +60,11 @@ const payload = {
       if (procedimiento) {
         //  Editar en BD real
         await updateProcedimientoApi(procedimiento.id, payload);
-        alert("Procedimiento actualizado correctamente ");
+        showToast("Procedimiento actualizado correctamente");
       } else {
         //  Crear en BD real
         await createProcedimientoApi(payload);
-        alert("Procedimiento creado correctamente ");
+        showToast("Procedimiento creado correctamente");
       }
 
       if (onGuardar) onGuardar();
@@ -65,7 +76,7 @@ const payload = {
       setCategoria("Facial");
     } catch (err) {
       console.error("Error guardando procedimiento:", err);
-      alert("Ocurrió un error al guardar el procedimiento.");
+      setErr("Ocurrió un error al guardar el procedimiento.");
     } finally {
       setSaving(false);
     }
@@ -76,6 +87,29 @@ const payload = {
       <h2 className="text-xl font-semibold mb-4 text-[--main]">
         {procedimiento ? "Editar Procedimiento" : "Crear Procedimiento"}
       </h2>
+
+      {toast && (
+        <div
+          style={{ background: "#E8F5E9", color: "#145A32", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.85rem", textAlign: "center" }}
+        >
+          {toast}
+        </div>
+      )}
+      {err && (
+        <div
+          style={{ background: "#FDE8D8", color: "#922B21", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.85rem", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}
+        >
+          <span>{err}</span>
+          <button
+            type="button"
+            onClick={() => setErr(null)}
+            aria-label="Cerrar"
+            style={{ background: "none", border: "none", color: "#922B21", cursor: "pointer", fontWeight: 700 }}
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       <div className="flex flex-col gap-3">
         <input

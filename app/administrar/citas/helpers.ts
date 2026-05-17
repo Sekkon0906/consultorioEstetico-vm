@@ -152,6 +152,30 @@ export async function updateCitaAPI(
   if (error) throw new Error(error.message);
 }
 
+/**
+ * Solicitar reagenda al cliente (pt 10).
+ * El admin/doctora NO mueve la cita directamente: crea una solicitud en
+ * `reagendas` para que el cliente la confirme. Reusa la misma tabla que
+ * usa el backend (cita_id, user_id, nueva_fecha, nueva_hora, motivo).
+ */
+export async function solicitarReagendaAPI(
+  citaId: number,
+  userId: number,
+  nuevaFecha: string,
+  nuevaHora: string,
+  motivo: string
+): Promise<void> {
+  const { error } = await supabase.from("reagendas").insert({
+    cita_id: citaId,
+    user_id: userId,
+    nueva_fecha: nuevaFecha,
+    nueva_hora: nuevaHora,
+    motivo: motivo || "",
+    estado: "pendiente",
+  });
+  if (error) throw new Error(error.message);
+}
+
 /** Confirmar pago de cita */
 export async function confirmarPagoCitaAPI(
   id: number,

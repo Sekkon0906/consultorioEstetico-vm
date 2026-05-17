@@ -37,30 +37,32 @@ export default function RootLayout({
                   <i className="fas fa-map-marker-alt me-2"></i>
                   Carrera 5ta #11-24. Edificio Torre Empresarial. Consultorio 502. Ibagué – Tolima.
                 </span>
-                <a
-                  className="topbar-item"
-                  href="https://www.facebook.com/profile.php?id=61556167276406"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="fab fa-facebook-f"></i>
-                </a>
-                <a
-                  className="topbar-item"
-                  href="https://www.instagram.com/dravanessamedinao28/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="fab fa-instagram"></i>
-                </a>
-                <a
-                  className="topbar-item"
-                  href="https://api.whatsapp.com/message/SEJTQDVCRWGSP1?autoload=1&app_absent=0"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="fab fa-whatsapp"></i>
-                </a>
+                <span className="topbar-social">
+                  <a
+                    className="topbar-item"
+                    href="https://www.facebook.com/profile.php?id=61556167276406"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <i className="fab fa-facebook-f"></i>
+                  </a>
+                  <a
+                    className="topbar-item"
+                    href="https://www.instagram.com/dravanessamedinao28/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <i className="fab fa-instagram"></i>
+                  </a>
+                  <a
+                    className="topbar-item"
+                    href="https://api.whatsapp.com/message/SEJTQDVCRWGSP1?autoload=1&app_absent=0"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <i className="fab fa-whatsapp"></i>
+                  </a>
+                </span>
               </div>
             </div>
           </div>

@@ -264,35 +264,64 @@ export default function ProcedimientosList() {
         )}
       </AnimatePresence>
 
-      {procs.length === 0 ? <p style={{ textAlign: "center", color: "#8B7060", padding: "2rem 0" }}>No hay procedimientos</p> : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-          {procs.map(function(p, i) {
-            return (
-              <motion.div key={p.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }}
-                style={{ background: "#FFFDF9", borderRadius: 14, border: "1px solid #E9DED2", padding: "0.7rem 1rem", display: "flex", alignItems: "center", gap: "0.7rem" }}>
-                {p.imagen ? <img src={p.imagen} alt="" style={{ width: 50, height: 50, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 50, height: 50, borderRadius: 10, background: "#E9DED2", flexShrink: 0 }} />}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-                    <span style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "0.88rem" }}>{p.nombre}</span>
-                    <span style={{ background: "#E9DED2", color: "#8B6A4B", padding: "0.1rem 0.5rem", borderRadius: 100, fontSize: "0.65rem", fontWeight: 600 }}>{p.categoria}</span>
-                    {p.destacado && <span style={{ background: "#FFF3E6", color: "#B08968", padding: "0.1rem 0.5rem", borderRadius: 100, fontSize: "0.65rem" }}>★</span>}
+      {procs.length === 0 ? <p style={{ textAlign: "center", color: "#8B7060", padding: "2rem 0" }}>No hay procedimientos</p> : (() => {
+        const ORDEN = ["Facial", "Corporal", "Capilar"];
+        const grupos: Record<string, typeof procs> = {};
+        procs.forEach(function(p) {
+          const k = p.categoria || "Otros";
+          (grupos[k] = grupos[k] || []).push(p);
+        });
+        const cats = Object.keys(grupos).sort(function(a, b) {
+          const ia = ORDEN.indexOf(a), ib = ORDEN.indexOf(b);
+          if (ia === -1 && ib === -1) return a.localeCompare(b);
+          if (ia === -1) return 1;
+          if (ib === -1) return -1;
+          return ia - ib;
+        });
+        return (
+          <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+            {cats.map(function(cat) {
+              const items = grupos[cat];
+              return (
+                <div key={cat}>
+                  {/* Encabezado de categoria */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.9rem" }}>
+                    <h3 style={{ margin: 0, fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", fontWeight: 700, color: "#3A2A1A" }}>{cat}</h3>
+                    <span style={{ background: "#E9DED2", color: "#8B6A4B", padding: "0.15rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 700 }}>{items.length}</span>
+                    <div style={{ flex: 1, height: 1, background: "#E9DED2" }} />
                   </div>
-                  <p style={{ fontSize: "0.78rem", color: "#6C584C", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.desc}</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
+                    {items.map(function(p, i) {
+                      return (
+                        <motion.div key={p.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }}
+                          style={{ background: "#FFFDF9", borderRadius: 18, border: "1px solid #E9DED2", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}>
+                          {p.imagen ? <img src={p.imagen} alt="" style={{ width: 76, height: 76, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 76, height: 76, borderRadius: 14, background: "#E9DED2", flexShrink: 0 }} />}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                              <span style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "1.08rem" }}>{p.nombre}</span>
+                              {p.destacado && <span style={{ background: "#FFF3E6", color: "#B08968", padding: "0.2rem 0.6rem", borderRadius: 100, fontSize: "0.78rem" }}>★</span>}
+                            </div>
+                            <p style={{ fontSize: "0.92rem", color: "#6C584C", margin: "0.25rem 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.desc}</p>
+                          </div>
+                          <span style={{ fontSize: "1.1rem", color: "#B08968", fontWeight: 700, whiteSpace: "nowrap" }}>${Number(p.precio).toLocaleString("es-CO")}</span>
+                          <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                            <motion.button whileTap={{ scale: 0.95 }} onClick={function() { startEdit(p); }} style={{ width: 42, height: 42, borderRadius: 12, background: "#F5EEE6", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Edit3 size={18} color="#4E3B2B" /></motion.button>
+                            {delId === p.id ? (
+                              <><button onClick={function() { handleDel(p.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#C62828", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>Sí</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#E9DED2", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
+                            ) : (
+                              <motion.button whileTap={{ scale: 0.95 }} onClick={function() { setDelId(p.id); }} style={{ width: 42, height: 42, borderRadius: 12, background: "#fff3ef", border: "1px solid #e4bfbf", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={18} color="#b02e2e" /></motion.button>
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <span style={{ fontSize: "0.82rem", color: "#B08968", fontWeight: 700, whiteSpace: "nowrap" }}>${Number(p.precio).toLocaleString("es-CO")}</span>
-                <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-                  <motion.button whileTap={{ scale: 0.95 }} onClick={function() { startEdit(p); }} style={{ width: 32, height: 32, borderRadius: 8, background: "#F5EEE6", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Edit3 size={13} color="#4E3B2B" /></motion.button>
-                  {delId === p.id ? (
-                    <><button onClick={function() { handleDel(p.id); }} style={{ padding: "0.2rem 0.5rem", borderRadius: 6, background: "#C62828", color: "white", border: "none", fontSize: "0.68rem", fontWeight: 600, cursor: "pointer" }}>Si</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.2rem 0.5rem", borderRadius: 6, background: "#E9DED2", border: "none", fontSize: "0.68rem", cursor: "pointer" }}>No</button></>
-                  ) : (
-                    <motion.button whileTap={{ scale: 0.95 }} onClick={function() { setDelId(p.id); }} style={{ width: 32, height: 32, borderRadius: 8, background: "#fff3ef", border: "1px solid #e4bfbf", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={13} color="#b02e2e" /></motion.button>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        );
+      })()}
     </div>
   );
 }

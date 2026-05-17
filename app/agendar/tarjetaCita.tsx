@@ -130,10 +130,10 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
 
 function InfoRow({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: "0.8rem", padding: "0.55rem 0.8rem", borderRadius: 12, background: "#FDFBF8", border: "1px solid rgba(176,137,104,0.06)" }}>
+    <div style={{ display: "flex", alignItems: "flex-start", gap: "0.8rem", padding: "0.55rem 0.8rem", borderRadius: 12, background: "#FDFBF8", border: "1px solid rgba(176,137,104,0.06)", textAlign: "left" }}>
       <div style={{ marginTop: 2, flexShrink: 0 }}>{icon}</div>
-      <div>
-        <span style={{ fontSize: "0.7rem", color: "#8A7565", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
+      <div style={{ textAlign: "left" }}>
+        <span style={{ display: "block", fontSize: "0.7rem", color: "#8A7565", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
         <p style={{ fontSize: "0.9rem", color: "#3A2A1A", fontWeight: 500, margin: 0 }}>{value}</p>
       </div>
     </div>

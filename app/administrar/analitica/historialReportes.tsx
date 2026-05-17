@@ -18,25 +18,32 @@ export default function HistorialReportes() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.from("reportes")
-      .select("*")
-      .order("creado_en", { ascending: false })
-      .then(({ data, error }) => {
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("reportes")
+          .select("*")
+          .order("creado_en", { ascending: false });
         if (!error && data) {
-          setReportes(data.map((r: any) => ({
-            id: r.id,
-            mes: r.mes,
-            anio: r.anio,
-            fechaGeneracion: r.creado_en,
-            totalOnline: r.total_online ?? 0,
-            totalConsultorio: r.total_consultorio ?? 0,
-            totalEsperado: r.total_esperado ?? 0,
-            archivoURL: r.archivo_url,
-          })));
+          setReportes(
+            data.map((r: any) => ({
+              id: r.id,
+              mes: r.mes,
+              anio: r.anio,
+              fechaGeneracion: r.creado_en,
+              totalOnline: r.total_online ?? 0,
+              totalConsultorio: r.total_consultorio ?? 0,
+              totalEsperado: r.total_esperado ?? 0,
+              archivoURL: r.archivo_url,
+            }))
+          );
         }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   if (loading) {

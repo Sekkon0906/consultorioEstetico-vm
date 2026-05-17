@@ -76,7 +76,7 @@ export default function HeroDoctora() {
             src={img}
             alt={`Doctora ${i + 1}`}
             className={`doc-hero-slide ${i === imagenActual ? "is-active" : ""}`}
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 18%" }}
           />
         ))}
       </div>

@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  // El proyecto usa estilo `var`/`any` de forma sistémica. ESLint NO debe
+  // bloquear el build de producción (sigue corriendo con `npm run lint`).
+  // El chequeo de tipos de TypeScript SÍ se mantiene activo.
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     // ✅ remotePatterns reemplaza el deprecated "domains"
     remotePatterns: [

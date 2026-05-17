@@ -63,7 +63,7 @@ export default function SiluetasAnimadas({ tipo }: { tipo?: string | null }) {
     const drawPath = (
       points: { x: number; y: number }[],
       progress: number,
-      color: string,
+      color: string | CanvasGradient,
       lineW: number
     ): { x: number; y: number } | null => {
       if (points.length < 2 || progress <= 0) return null;
@@ -81,26 +81,41 @@ export default function SiluetasAnimadas({ tipo }: { tipo?: string | null }) {
       let drawn = 0;
       let tipX = points[0].x, tipY = points[0].y;
 
+      // Reúne los puntos ya alcanzados + el punto parcial (la "punta")
+      const reached: { x: number; y: number }[] = [points[0]];
+      for (let i = 0; i < segLens.length; i++) {
+        if (drawn + segLens[i] <= targetLen) {
+          drawn += segLens[i];
+          tipX = points[i + 1].x;
+          tipY = points[i + 1].y;
+          reached.push({ x: tipX, y: tipY });
+        } else {
+          const t = (targetLen - drawn) / segLens[i];
+          tipX = points[i].x + (points[i + 1].x - points[i].x) * t;
+          tipY = points[i].y + (points[i + 1].y - points[i].y) * t;
+          reached.push({ x: tipX, y: tipY });
+          break;
+        }
+      }
+
       ctx.beginPath();
       ctx.strokeStyle = color;
       ctx.lineWidth = lineW;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      ctx.moveTo(points[0].x, points[0].y);
+      ctx.moveTo(reached[0].x, reached[0].y);
 
-      for (let i = 0; i < segLens.length; i++) {
-        if (drawn + segLens[i] <= targetLen) {
-          ctx.lineTo(points[i + 1].x, points[i + 1].y);
-          drawn += segLens[i];
-          tipX = points[i + 1].x;
-          tipY = points[i + 1].y;
-        } else {
-          const t = (targetLen - drawn) / segLens[i];
-          tipX = points[i].x + (points[i + 1].x - points[i].x) * t;
-          tipY = points[i].y + (points[i + 1].y - points[i].y) * t;
-          ctx.lineTo(tipX, tipY);
-          break;
+      if (reached.length === 2) {
+        ctx.lineTo(reached[1].x, reached[1].y);
+      } else {
+        // Suavizado: curva cuadrática pasando por los puntos medios
+        for (let i = 1; i < reached.length - 1; i++) {
+          const mx = (reached[i].x + reached[i + 1].x) / 2;
+          const my = (reached[i].y + reached[i + 1].y) / 2;
+          ctx.quadraticCurveTo(reached[i].x, reached[i].y, mx, my);
         }
+        const last = reached[reached.length - 1];
+        ctx.lineTo(last.x, last.y);
       }
       ctx.stroke();
       return { x: tipX, y: tipY };
@@ -128,36 +143,44 @@ export default function SiluetasAnimadas({ tipo }: { tipo?: string | null }) {
       const cycle = 10;
       const t = elapsed % cycle;
 
-      let jProg = 0, mProg = 0, alpha = 0.09;
+      const BASE = 0.16; // presencia base (watermark elegante)
+      let jProg = 0, mProg = 0, alpha = BASE;
 
       if (t < 3) {
         const p = t / 3;
         const e = 1 - Math.pow(1 - p, 3);
         jProg = Math.min(1, e * 1.4);        // J finishes first
         mProg = Math.max(0, (e - 0.15) * 1.3); // M starts after J is ~15% done
-        alpha = 0.09;
+        alpha = BASE;
       } else if (t < 7.5) {
         jProg = 1;
         mProg = 1;
-        alpha = 0.09 + Math.sin((t - 3) * 1.2) * 0.015;
+        alpha = BASE + Math.sin((t - 3) * 1.2) * 0.025; // respiración sutil
       } else {
         const fp = (t - 7.5) / 2.5;
         jProg = 1;
         mProg = 1;
-        alpha = 0.09 * (1 - fp * fp);
+        alpha = BASE * (1 - fp * fp);
       }
 
       if (alpha < 0.002) { anim = requestAnimationFrame(draw); return; }
 
+      // Trazo con degradado cálido (tonos de la marca) en vez de plano
+      const halfH = Math.min(w, h) * 0.42;
+      const ink = ctx.createLinearGradient(0, h * 0.5 - halfH, 0, h * 0.5 + halfH);
+      ink.addColorStop(0, "#6C584C");
+      ink.addColorStop(0.5, "#8B6A4B");
+      ink.addColorStop(1, "#C9AD8D");
+
       ctx.globalAlpha = alpha;
-      ctx.shadowColor = "rgba(139,106,75,0.1)";
-      ctx.shadowBlur = 12;
-      ctx.shadowOffsetY = 2;
+      ctx.shadowColor = "rgba(176,137,104,0.28)";
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetY = 0;
 
-      const lw = Math.max(4, Math.min(w, h) * 0.016);
+      const lw = Math.max(3, Math.min(w, h) * 0.0135);
 
-      const jTip = drawPath(jPath, jProg, "#3A2A1A", lw);
-      const mTip = drawPath(mPath, mProg, "#3A2A1A", lw);
+      const jTip = drawPath(jPath, jProg, ink, lw);
+      const mTip = drawPath(mPath, mProg, ink, lw);
 
       // Pen glow while writing
       ctx.shadowColor = "transparent";

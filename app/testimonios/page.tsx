@@ -5,23 +5,28 @@ import ComentariosClientes from "../src/components/ComentariosClientes";
 import type { Testimonio } from "../types/domain";
 import { getTestimoniosApi } from "../services/testimoniosApi";
 
+function getYouTubeId(url: string): string {
+  if (!url) return "";
+  // Soporta watch?v=, youtu.be/, embed/, shorts/ y live/
+  var match = url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([^&?/]+)/);
+  return match ? match[1] : "";
+}
+
+function esArchivoVideo(url: string | null | undefined): boolean {
+  return !!url && /\.(mp4|webm|mov|m4v|ogg)(\?.*)?$/i.test(url.trim());
+}
+
 function toEmbedUrl(url: string): string {
   if (!url) return "";
   if (url.includes("embed/")) return url;
-  var match = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
-  if (match) return "https://www.youtube.com/embed/" + match[1];
+  var id = getYouTubeId(url);
+  if (id) return "https://www.youtube.com/embed/" + id;
   return url;
-}
-
-function getYouTubeId(url: string): string {
-  if (!url) return "";
-  var match = url.match(/(?:v=|youtu\.be\/|embed\/)([^&?/]+)/);
-  return match ? match[1] : "";
 }
 
 function tieneVideoValido(video: string | null | undefined): boolean {
   if (!video || !video.trim()) return false;
-  return getYouTubeId(video).length > 0;
+  return getYouTubeId(video).length > 0 || esArchivoVideo(video);
 }
 
 export default function TestimoniosPage() {
@@ -47,7 +52,7 @@ export default function TestimoniosPage() {
         {activos.length === 0 ? (
           <p style={{ textAlign: "center", color: "#9B8575" }}>No hay testimonios disponibles por el momento.</p>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "1.5rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "1.5rem", maxWidth: 1240, margin: "0 auto" }}>
             {activos.map(function(t, i) {
               var videoValido = tieneVideoValido(t.video);
               var ytId = getYouTubeId(t.video || "");
@@ -55,9 +60,13 @@ export default function TestimoniosPage() {
                 <div key={t.id} style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, overflow: "hidden", boxShadow: "0 4px 14px rgba(78,59,43,0.06)", transition: "transform 0.3s", animation: "fadeInUp 0.6s ease " + (i * 0.08) + "s both" }}
                   onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-4px)"; }}
                   onMouseLeave={function(e) { e.currentTarget.style.transform = ""; }}>
-                  <div style={{ position: "relative", width: "100%", aspectRatio: "9/16", maxHeight: 450, overflow: "hidden", background: "#000" }}>
+                  <div style={{ position: "relative", width: "100%", aspectRatio: "9/16", maxHeight: 420, overflow: "hidden", background: "#000" }}>
                     {videoActivo === t.id && videoValido ? (
-                      <iframe src={toEmbedUrl(t.video!) + "?autoplay=1&modestbranding=1&rel=0"} title={t.nombre} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }} />
+                      esArchivoVideo(t.video) ? (
+                        <video src={t.video!} controls autoPlay playsInline style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", background: "#000" }} />
+                      ) : (
+                        <iframe src={toEmbedUrl(t.video!) + "?autoplay=1&modestbranding=1&rel=0"} title={t.nombre} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }} />
+                      )
                     ) : (
                       <div style={{ position: "absolute", inset: 0, cursor: videoValido ? "pointer" : "default" }} onClick={function() { if (videoValido) setVideoActivo(t.id); }}>
                         {t.thumb ? (
@@ -76,9 +85,9 @@ export default function TestimoniosPage() {
                       </div>
                     )}
                   </div>
-                  <div style={{ padding: "1rem 1.2rem", textAlign: "center" }}>
-                    <h5 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "#4E3B2B", fontSize: "1rem", marginBottom: "0.4rem" }}>{t.nombre}</h5>
-                    <p style={{ color: "#6C584C", fontSize: "0.88rem", lineHeight: 1.5, fontStyle: "italic" }}>&quot;{t.texto}&quot;</p>
+                  <div style={{ padding: "1rem 1.1rem", textAlign: "center" }}>
+                    <h5 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "#4E3B2B", fontSize: "1.05rem", marginBottom: "0.4rem" }}>{t.nombre}</h5>
+                    <p style={{ color: "#6C584C", fontSize: "0.9rem", lineHeight: 1.55, fontStyle: "italic" }}>&quot;{t.texto}&quot;</p>
                   </div>
                 </div>
               );

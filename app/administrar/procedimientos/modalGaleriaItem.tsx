@@ -25,6 +25,7 @@ export default function ModalGaleriaItem({
   const [descripcion, setDescripcion] = useState(item?.descripcion || "");
   const [url, setUrl] = useState(item?.url || "");
   const [preview, setPreview] = useState(item?.url || "");
+  const [error, setError] = useState<string | null>(null);
 
   const handleFile = (file: File) => {
     const reader = new FileReader();
@@ -36,9 +37,15 @@ export default function ModalGaleriaItem({
   };
 
   const handleGuardar = () => {
-    if (!titulo.trim()) return alert("Debe ingresar un título.");
-    if (tipo === "imagen" && !url)
-      return alert("Debe subir una imagen o URL válida.");
+    if (!titulo.trim()) {
+      setError("Debe ingresar un título.");
+      return;
+    }
+    if (tipo === "imagen" && !url) {
+      setError("Debe subir una imagen o URL válida.");
+      return;
+    }
+    setError(null);
 
     const nuevo: MediaItem = {
       id: crypto.randomUUID(),
@@ -69,6 +76,23 @@ export default function ModalGaleriaItem({
           <h3 className="text-lg font-semibold text-[#6E4F37] mb-4">
             {modo === "crear" ? "Añadir elemento a galería" : "Ver elemento"}
           </h3>
+
+          {error && (
+            <div
+              className="mb-3 rounded px-3 py-2 text-sm flex items-center justify-between gap-2"
+              style={{ background: "#FDE8D8", color: "#922B21" }}
+            >
+              <span>{error}</span>
+              <button
+                type="button"
+                onClick={() => setError(null)}
+                aria-label="Cerrar"
+                style={{ background: "none", border: "none", color: "#922B21", cursor: "pointer", fontWeight: 700 }}
+              >
+                ×
+              </button>
+            </div>
+          )}
 
           <div className="flex flex-col gap-3">
             <select

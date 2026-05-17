@@ -132,7 +132,7 @@ export default function VideoAnim() {
         </div>
 
         {/* 3 COLUMN LAYOUT */}
-        <div className="va-3col" style={{ display: "grid", gridTemplateColumns: "230px 1fr 230px", gap: "1rem", maxWidth: 1280, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1, alignItems: "center" }}>
+        <div className="va-3col" style={{ display: "grid", gridTemplateColumns: "250px minmax(0, 1fr) 250px", gap: "1.75rem", maxWidth: 1560, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1, alignItems: "center" }}>
 
           {/* LEFT - Features */}
           <div ref={lft.ref} style={{ ...rs(lft.v, 0.15), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.8rem 1.2rem" }}>

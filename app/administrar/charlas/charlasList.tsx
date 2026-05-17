@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Edit3, Trash2, Calendar } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface Charla {
@@ -31,6 +32,7 @@ export default function CharlasList() {
   const [saving, setSaving] = useState(false);
   const [uploadingImg, setUploadingImg] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmEliminarId, setConfirmEliminarId] = useState<number | null>(null);
 
   const loadCharlas = async () => {
     try {
@@ -196,7 +198,7 @@ export default function CharlasList() {
 
   /* -- Eliminar -- */
   const handleEliminar = async (id: number) => {
-    if (!confirm("Eliminar esta charla?")) return;
+    setConfirmEliminarId(null);
     try {
       const { error: err } = await supabase
         .from("charlas")
@@ -252,6 +254,55 @@ export default function CharlasList() {
       {error && (
         <div className="alert alert-danger py-2 mb-3">{error}</div>
       )}
+
+      {/* CONFIRMAR ELIMINAR (pt 17/18 — sin confirm() nativo) */}
+      <AnimatePresence>
+        {confirmEliminarId !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setConfirmEliminarId(null)}
+            style={{
+              position: "fixed", inset: 0, zIndex: 9999, display: "flex",
+              alignItems: "center", justifyContent: "center", padding: "1rem",
+              background: "rgba(0,0,0,0.45)", backdropFilter: "blur(3px)",
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 18 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 18 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-4 shadow-lg p-4 text-center"
+              style={{ maxWidth: 360, width: "100%" }}
+            >
+              <h5 className="fw-bold mb-2" style={{ color: "#6B4E3D" }}>
+                ¿Eliminar esta charla?
+              </h5>
+              <p className="mb-4" style={{ color: "#8d7a6a", fontSize: "0.9rem" }}>
+                Esta acción no se puede deshacer.
+              </p>
+              <div className="d-flex gap-2">
+                <button
+                  className="btn flex-fill rounded-pill"
+                  style={{ background: "#E9E0D1", color: "#4B3A2E", fontWeight: 600, border: "none" }}
+                  onClick={() => setConfirmEliminarId(null)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn flex-fill rounded-pill"
+                  style={{ background: "#b02e2e", color: "#fff", fontWeight: 600, border: "none" }}
+                  onClick={() => handleEliminar(confirmEliminarId)}
+                >
+                  Eliminar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* FORMULARIO */}
       <AnimatePresence>
@@ -439,77 +490,48 @@ export default function CharlasList() {
         )}
       </AnimatePresence>
 
-      {/* LISTA */}
+      {/* LISTA — mismo patrón que Procedimientos / Testimonios */}
       {charlas.length === 0 ? (
-        <p className="text-center py-5" style={{ color: "#8B7060" }}>
+        <p style={{ textAlign: "center", color: "#8B7060", padding: "2rem 0" }}>
           No hay charlas aun.
         </p>
       ) : (
-        <div className="d-flex flex-column gap-3">
-          {charlas.map((c) => (
-            <div
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
+          {charlas.map((c, i) => (
+            <motion.div
               key={c.id}
-              className="card border-0 rounded-4 shadow-sm p-3 d-flex flex-row gap-3 align-items-start"
-              style={{ backgroundColor: "#FFFDF9" }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.02 }}
+              style={{ background: "#FFFDF9", borderRadius: 18, border: "1px solid #E9DED2", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}
             >
-              {c.imagen && (
-                <img
-                  src={c.imagen}
-                  alt={c.titulo}
-                  style={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: 10,
-                    objectFit: "cover",
-                    border: "1px solid #E9DED2",
-                    flexShrink: 0,
-                  }}
-                />
+              {c.imagen ? (
+                <img src={c.imagen} alt={c.titulo} style={{ width: 76, height: 76, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} />
+              ) : (
+                <div style={{ width: 76, height: 76, borderRadius: 14, background: "#E9DED2", flexShrink: 0 }} />
               )}
-              <div className="flex-1 min-w-0">
-                <p className="fw-bold mb-1" style={{ color: "#4E3B2B" }}>
-                  {c.titulo}
-                </p>
-                <p
-                  className="small mb-0 text-truncate"
-                  style={{ color: "#6C584C" }}
-                >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "1.08rem" }}>{c.titulo}</span>
+                  {c.fecha && (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#E9DED2", color: "#8B6A4B", padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>
+                      <Calendar size={13} /> {c.fecha}
+                    </span>
+                  )}
+                </div>
+                <p style={{ fontSize: "0.92rem", color: "#6C584C", margin: "0.25rem 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {c.descripcion}
                 </p>
-                {c.fecha && (
-                  <p
-                    className="small mb-0"
-                    style={{ color: "#8B7060" }}
-                  >
-                    Fecha: {c.fecha}
-                  </p>
-                )}
               </div>
-              <div className="d-flex gap-2 flex-shrink-0">
-                <button
-                  onClick={() => startEditar(c)}
-                  className="btn btn-sm rounded-pill"
-                  style={{
-                    backgroundColor: "#E9DED2",
-                    color: "#4E3B2B",
-                    border: "none",
-                  }}
-                >
-                  Editar
-                </button>
-                <button
-                  onClick={() => handleEliminar(c.id)}
-                  className="btn btn-sm rounded-pill"
-                  style={{
-                    backgroundColor: "#fff3ef",
-                    color: "#b02e2e",
-                    border: "1px solid #e4bfbf",
-                  }}
-                >
-                  Eliminar
-                </button>
+              <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                <motion.button whileTap={{ scale: 0.95 }} onClick={() => startEditar(c)} style={{ width: 42, height: 42, borderRadius: 12, background: "#F5EEE6", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Edit3 size={18} color="#4E3B2B" />
+                </motion.button>
+                <motion.button whileTap={{ scale: 0.95 }} onClick={() => setConfirmEliminarId(c.id)} style={{ width: 42, height: 42, borderRadius: 12, background: "#fff3ef", border: "1px solid #e4bfbf", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Trash2 size={18} color="#b02e2e" />
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}

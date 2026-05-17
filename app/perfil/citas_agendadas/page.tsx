@@ -6,6 +6,15 @@ import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle
 import { getMisCitasApi } from "../../services/citasApi";
 import FirmaConsentimiento from "../../src/components/FirmaConsentimiento";
 import type { Cita } from "../../types/domain";
+import { supabase } from "@/lib/supabaseClient";
+
+interface ReagendaPend {
+  id: number;
+  cita_id: number;
+  nueva_fecha: string;
+  nueva_hora: string;
+  motivo: string;
+}
 const ESTADOS = {
   pendiente: { bg: "#FFF8E1", text: "#7D6608", icon: Loader, label: "Pendiente", step: 1 },
   confirmada: { bg: "#E3F2FD", text: "#0B3C78", icon: CheckCircle, label: "Confirmada", step: 2 },
@@ -59,11 +68,58 @@ export default function CitasAgendadas() {
   const [ascendente, setAscendente] = useState(false);
   const [filtroEstado, setFiltroEstado] = useState("todos");
   const [error, setError] = useState<string | null>(null);
+  const [reagendas, setReagendas] = useState<Record<number, ReagendaPend>>({});
+  const [reagProcesando, setReagProcesando] = useState<number | null>(null);
+
+  const cargarReagendas = async (ids: number[]) => {
+    if (ids.length === 0) { setReagendas({}); return; }
+    const { data } = await supabase
+      .from("reagendas")
+      .select("id, cita_id, nueva_fecha, nueva_hora, motivo, estado")
+      .in("cita_id", ids)
+      .eq("estado", "pendiente");
+    const map: Record<number, ReagendaPend> = {};
+    (data ?? []).forEach((r: any) => { map[r.cita_id] = r; });
+    setReagendas(map);
+  };
 
   useEffect(() => {
     setLoading(true);
-    getMisCitasApi().then(setCitas).catch(() => setError("No se pudieron cargar las citas.")).finally(() => setLoading(false));
+    getMisCitasApi()
+      .then((cs) => { setCitas(cs); return cargarReagendas(cs.map((c) => c.id)); })
+      .catch(() => setError("No se pudieron cargar las citas."))
+      .finally(() => setLoading(false));
   }, []);
+
+  const aceptarReagenda = async (cita: Cita, r: ReagendaPend) => {
+    setReagProcesando(r.id);
+    try {
+      const { error: e1 } = await supabase
+        .from("citas")
+        .update({ fecha: r.nueva_fecha, hora: r.nueva_hora, actualizado_en: new Date().toISOString() })
+        .eq("id", cita.id);
+      if (e1) throw new Error(e1.message);
+      await supabase.from("reagendas").update({ estado: "aprobada" }).eq("id", r.id);
+      setCitas((prev) => prev.map((c) => c.id === cita.id ? { ...c, fecha: r.nueva_fecha, hora: r.nueva_hora } : c));
+      setReagendas((prev) => { const n = { ...prev }; delete n[cita.id]; return n; });
+    } catch {
+      setError("No se pudo aplicar la reagenda. Intenta de nuevo.");
+    } finally {
+      setReagProcesando(null);
+    }
+  };
+
+  const rechazarReagenda = async (cita: Cita, r: ReagendaPend) => {
+    setReagProcesando(r.id);
+    try {
+      await supabase.from("reagendas").update({ estado: "rechazada" }).eq("id", r.id);
+      setReagendas((prev) => { const n = { ...prev }; delete n[cita.id]; return n; });
+    } catch {
+      setError("No se pudo rechazar la solicitud. Intenta de nuevo.");
+    } finally {
+      setReagProcesando(null);
+    }
+  };
 
   const citasFiltradas = useMemo(() => {
     let lista = [...citas];
@@ -85,38 +141,50 @@ export default function CitasAgendadas() {
   if (error) return <div style={{ textAlign: "center", padding: "3rem" }}><p style={{ color: "#7E1F1F" }}>{error}</p><button onClick={() => window.location.reload()} style={{ marginTop: "1rem", padding: "0.6rem 2rem", borderRadius: 100, background: "#B08968", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>Reintentar</button></div>;
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
+    <div style={{ maxWidth: 1180, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", marginBottom: "2rem" }}>
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.5rem" }}>Mis Citas Agendadas</h2>
         <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, margin: "0 auto 1.2rem" }} />
       </motion.div>
 
-      {/* Summary badges */}
-      <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center", flexWrap: "wrap", marginBottom: "1.2rem" }}>
-        {Object.entries(resumen).map(([estado, count]) => {
-          const c = ESTADOS[estado as keyof typeof ESTADOS];
-          return <span key={estado} style={{ background: c.bg, color: c.text, padding: "0.35rem 1rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>{c.label}: {count}</span>;
-        })}
-      </div>
+      {/* Layout: filtros a la izquierda (pila) · citas a la derecha */}
+      <div className="citas-layout" style={{ display: "flex", gap: "1.8rem", alignItems: "flex-start" }}>
+        <style>{`@media (max-width: 820px){ .citas-layout{ flex-direction: column; } .citas-side{ position: static !important; width: 100% !important; flex-direction: row !important; flex-wrap: wrap; } }`}</style>
 
-      {/* Filters */}
-      <div style={{ display: "flex", gap: "0.4rem", justifyContent: "center", flexWrap: "wrap", marginBottom: "2rem" }}>
-        {["todos", "pendiente", "confirmada", "atendida", "cancelada"].map(f => (
-          <button key={f} onClick={() => setFiltroEstado(f)}
-            style={{ padding: "0.45rem 1rem", borderRadius: 100, fontSize: "0.8rem", fontWeight: 600, border: "none", cursor: "pointer", textTransform: "capitalize",
-              background: filtroEstado === f ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#F5EEE6",
-              color: filtroEstado === f ? "white" : "#4E3B2B",
-              boxShadow: filtroEstado === f ? "0 2px 10px rgba(176,137,104,0.25)" : "none",
-            }}>{f}</button>
-        ))}
-        <button onClick={() => setAscendente(a => !a)}
-          style={{ padding: "0.45rem 0.8rem", borderRadius: 100, fontSize: "0.8rem", fontWeight: 600, border: "none", cursor: "pointer", background: "#F5EEE6", color: "#4E3B2B", display: "flex", alignItems: "center", gap: 4 }}>
-          {ascendente ? <ChevronUp size={14} /> : <ChevronDown size={14} />} Fecha
-        </button>
-      </div>
+        {/* SIDEBAR FILTROS */}
+        <div className="citas-side" style={{ width: 220, flexShrink: 0, display: "flex", flexDirection: "column", gap: "0.5rem", position: "sticky", top: 90 }}>
+          {([
+            { key: "todos", label: "Todos", count: citas.length },
+            { key: "pendiente", label: "Pendiente", count: resumen.pendiente },
+            { key: "confirmada", label: "Confirmada", count: resumen.confirmada },
+            { key: "atendida", label: "Atendida", count: resumen.atendida },
+            { key: "cancelada", label: "Cancelada", count: resumen.cancelada },
+          ]).map(({ key, label, count }) => {
+            const activo = filtroEstado === key;
+            return (
+              <button key={key} onClick={() => setFiltroEstado(key)}
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "0.6rem 1rem", borderRadius: 12, fontSize: "0.86rem", fontWeight: 600, border: "none", cursor: "pointer",
+                  background: activo ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#F5EEE6",
+                  color: activo ? "white" : "#4E3B2B",
+                  boxShadow: activo ? "0 4px 14px rgba(176,137,104,0.25)" : "none",
+                  transition: "background 0.2s, box-shadow 0.2s",
+                }}>
+                {label}
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 22, height: 22, padding: "0 6px", borderRadius: 100, fontSize: "0.73rem", fontWeight: 700,
+                  background: activo ? "rgba(255,255,255,0.28)" : "rgba(176,137,104,0.18)",
+                  color: activo ? "white" : "#8A5A12" }}>{count}</span>
+              </button>
+            );
+          })}
+          <button onClick={() => setAscendente(a => !a)}
+            style={{ marginTop: "0.4rem", padding: "0.55rem 1rem", borderRadius: 12, fontSize: "0.84rem", fontWeight: 600, border: "1px solid rgba(176,137,104,0.25)", cursor: "pointer", background: "#FFFDF9", color: "#4E3B2B", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            {ascendente ? <ChevronUp size={14} /> : <ChevronDown size={14} />} Ordenar por fecha
+          </button>
+        </div>
 
-      {/* Cards */}
+        {/* COLUMNA DE CITAS */}
+        <div style={{ flex: 1, minWidth: 0 }}>
       {citasFiltradas.length === 0 ? (
         <p style={{ textAlign: "center", color: "#8B7060", padding: "2rem 0" }}>No hay citas{filtroEstado !== "todos" ? ` con estado "${filtroEstado}"` : ""}</p>
       ) : (
@@ -138,54 +206,98 @@ export default function CitasAgendadas() {
                   {/* Top accent bar */}
                   <div style={{ height: 4, background: isCancelada ? "#E57373" : "linear-gradient(90deg, #B08968, #C9AD8D)" }} />
 
-                  <div style={{ padding: "1.5rem 1.8rem" }}>
-                    {/* Progress bar (not for cancelled) */}
-                    {!isCancelada && <ProgressBar estado={cita.estado} />}
+                  <div style={{ padding: "1.4rem 1.7rem" }}>
 
-                    {/* Header row */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem", gap: "1rem", flexWrap: "wrap" }}>
+                    {isCancelada ? (
+                      /* === CANCELADA — vista colapsada === */
                       <div>
-                        <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.2rem" }}>{cita.procedimiento}</h3>
-                        <span style={{ fontSize: "0.78rem", color: "#8A7565" }}>{cita.tipoCita === "valoracion" ? "Valoracion" : "Implementacion"}</span>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+                          <div>
+                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", fontWeight: 700, color: "#7A6554", margin: 0, textDecoration: "line-through", textDecorationColor: "rgba(122,101,84,0.4)" }}>{cita.procedimiento}</h3>
+                            <span style={{ fontSize: "0.78rem", color: "#9B8575" }}>{formatFecha(cita.fecha)} · {cita.hora}</span>
+                          </div>
+                          <span style={{ background: est.bg, color: est.text, padding: "0.3rem 1rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 700, whiteSpace: "nowrap" }}>Cancelada</span>
+                        </div>
+                        {cita.motivoCancelacion && (
+                          <div style={{ marginTop: "0.7rem", padding: "0.55rem 0.9rem", background: "#FCE4EC", borderRadius: 10, fontSize: "0.8rem", color: "#7E1F1F", display: "flex", alignItems: "center", gap: 8 }}>
+                            <AlertCircle size={13} /> Motivo: {cita.motivoCancelacion}
+                          </div>
+                        )}
                       </div>
-                      <span style={{ background: est.bg, color: est.text, padding: "0.3rem 1rem", borderRadius: 100, fontSize: "0.75rem", fontWeight: 700, textTransform: "capitalize", whiteSpace: "nowrap" }}>{est.label}</span>
-                    </div>
+                    ) : (
+                      <>
+                        {/* Barra de progreso (única fuente del estado) */}
+                        <ProgressBar estado={cita.estado} />
 
-                    {/* Details grid */}
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem 1.5rem", marginBottom: "1rem" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", color: "#5A4A3A" }}><Clock size={14} color="#B08968" /> {formatFecha(cita.fecha)} - {cita.hora}</div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", color: "#5A4A3A" }}><User size={14} color="#B08968" /> {cita.nombres} {cita.apellidos}</div>
-                      {cita.telefono && <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", color: "#6C584C" }}><Phone size={14} color="#B08968" /> {cita.telefono}</div>}
-                      {cita.correo && <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", color: "#6C584C" }}><Mail size={14} color="#B08968" /> {cita.correo}</div>}
-                    </div>
+                        {/* Cabecera: procedimiento (izq) + fecha/hora destacada (der) */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.1rem", gap: "1rem", flexWrap: "wrap" }}>
+                          <div>
+                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.15rem" }}>{cita.procedimiento}</h3>
+                            <span style={{ fontSize: "0.76rem", color: "#8A7565", textTransform: "uppercase", letterSpacing: "0.05em" }}>{cita.tipoCita === "valoracion" ? "Valoración" : "Implementación"}</span>
+                          </div>
+                          <div style={{ textAlign: "right", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 14, padding: "0.6rem 1rem", minWidth: 150 }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6, fontSize: "0.9rem", fontWeight: 700, color: "#3A2A1A" }}>
+                              <Clock size={14} color="#B08968" /> {cita.hora}
+                            </div>
+                            <div style={{ fontSize: "0.76rem", color: "#8A7565", marginTop: 2 }}>{formatFecha(cita.fecha)}</div>
+                          </div>
+                        </div>
 
-                    {cita.nota && (
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: "0.85rem", color: "#6C584C", padding: "0.6rem 0.8rem", background: "#F5EEE6", borderRadius: 10, marginBottom: "1rem" }}>
-                        <FileText size={14} color="#B08968" style={{ marginTop: 2, flexShrink: 0 }} /> {cita.nota}
-                      </div>
+                        {/* Metadatos compactos (una sola línea tenue) */}
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem 1.2rem", fontSize: "0.8rem", color: "#8A7565", marginBottom: "1rem" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 5 }}><User size={13} color="#B08968" /> {cita.nombres} {cita.apellidos}</span>
+                          {cita.telefono && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Phone size={13} color="#B08968" /> {cita.telefono}</span>}
+                          {cita.correo && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Mail size={13} color="#B08968" /> {cita.correo}</span>}
+                          {cita.metodoPago && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><i className="fas fa-wallet" style={{ color: "#B08968" }} /> {cita.metodoPago} ({cita.tipoPagoConsultorio || cita.tipoPagoOnline || ""})</span>}
+                        </div>
+
+                        {cita.nota && (
+                          <div style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: "0.83rem", color: "#6C584C", padding: "0.55rem 0.8rem", background: "#F5EEE6", borderRadius: 10, marginBottom: "0.8rem" }}>
+                            <FileText size={14} color="#B08968" style={{ marginTop: 2, flexShrink: 0 }} /> {cita.nota}
+                          </div>
+                        )}
+
+                        {/* Monto */}
+                        {cita.monto != null && cita.monto > 0 && (
+                          <div style={{ padding: "0.55rem 1rem", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", borderRadius: 12, border: "1px solid rgba(176,137,104,0.1)", fontSize: "0.83rem", color: "#3A2A1A", marginBottom: "0.5rem" }}>
+                            <strong>Monto:</strong> ${cita.monto.toLocaleString("es-CO")}
+                            {cita.montoPagado != null && <span> · Pagado: ${cita.montoPagado.toLocaleString("es-CO")}</span>}
+                            {cita.montoRestante != null && cita.montoRestante > 0 && <span> · Restante: ${cita.montoRestante.toLocaleString("es-CO")}</span>}
+                          </div>
+                        )}
+                      </>
                     )}
 
-                    {/* Payment info */}
-                    {cita.metodoPago && (
-                      <div style={{ fontSize: "0.82rem", color: "#8A7565", marginBottom: "0.5rem" }}>
-                        <i className="fas fa-wallet" style={{ marginRight: 6, color: "#B08968" }} />
-                        Pago en {cita.metodoPago} ({cita.tipoPagoConsultorio || cita.tipoPagoOnline || ""})
-                      </div>
-                    )}
-
-                    {/* Amount */}
-                    {cita.monto != null && cita.monto > 0 && (
-                      <div style={{ padding: "0.6rem 1rem", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", borderRadius: 12, border: "1px solid rgba(176,137,104,0.1)", fontSize: "0.85rem", color: "#3A2A1A", marginBottom: "0.5rem" }}>
-                        <strong>Monto:</strong> ${cita.monto.toLocaleString("es-CO")}
-                        {cita.montoPagado != null && <span> | Pagado: ${cita.montoPagado.toLocaleString("es-CO")}</span>}
-                        {cita.montoRestante != null && cita.montoRestante > 0 && <span> | Restante: ${cita.montoRestante.toLocaleString("es-CO")}</span>}
-                      </div>
-                    )}
-
-                    {/* Cancellation reason */}
-                    {isCancelada && cita.motivoCancelacion && (
-                      <div style={{ padding: "0.6rem 1rem", background: "#FCE4EC", borderRadius: 12, fontSize: "0.82rem", color: "#7E1F1F", display: "flex", alignItems: "center", gap: 8 }}>
-                        <AlertCircle size={14} /> Motivo: {cita.motivoCancelacion}
+                    {/* Solicitud de reagenda del consultorio (pt 10) */}
+                    {!isCancelada && cita.estado !== "atendida" && reagendas[cita.id] && (
+                      <div style={{ marginTop: "1rem", padding: "1rem 1.2rem", background: "#FFF6E9", border: "1px solid #E8C98A", borderRadius: 14 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, color: "#8A5A12", fontSize: "0.9rem", marginBottom: "0.5rem" }}>
+                          <AlertCircle size={16} /> El consultorio propone reagendar tu cita
+                        </div>
+                        <div style={{ fontSize: "0.85rem", color: "#5A4A3A", marginBottom: "0.3rem" }}>
+                          Nueva propuesta: <strong>{formatFecha(reagendas[cita.id].nueva_fecha)} — {reagendas[cita.id].nueva_hora}</strong>
+                        </div>
+                        {reagendas[cita.id].motivo && (
+                          <div style={{ fontSize: "0.82rem", color: "#6C584C", fontStyle: "italic", marginBottom: "0.7rem" }}>
+                            Motivo: {reagendas[cita.id].motivo}
+                          </div>
+                        )}
+                        <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+                          <button
+                            disabled={reagProcesando === reagendas[cita.id].id}
+                            onClick={() => aceptarReagenda(cita, reagendas[cita.id])}
+                            style={{ flex: 1, minWidth: 130, padding: "0.55rem 1rem", borderRadius: 100, border: "none", background: "linear-gradient(135deg, #2E7D32, #43A047)", color: "white", fontWeight: 600, fontSize: "0.83rem", cursor: "pointer", opacity: reagProcesando === reagendas[cita.id].id ? 0.6 : 1 }}
+                          >
+                            {reagProcesando === reagendas[cita.id].id ? "Aplicando..." : "Aceptar nueva fecha"}
+                          </button>
+                          <button
+                            disabled={reagProcesando === reagendas[cita.id].id}
+                            onClick={() => rechazarReagenda(cita, reagendas[cita.id])}
+                            style={{ flex: 1, minWidth: 130, padding: "0.55rem 1rem", borderRadius: 100, border: "1px solid #E0CDB5", background: "#FFF", color: "#7E1F1F", fontWeight: 600, fontSize: "0.83rem", cursor: "pointer", opacity: reagProcesando === reagendas[cita.id].id ? 0.6 : 1 }}
+                          >
+                            Rechazar
+                          </button>
+                        </div>
                       </div>
                     )}
 
@@ -218,6 +330,8 @@ export default function CitasAgendadas() {
           </AnimatePresence>
         </div>
       )}
+        </div>
+      </div>
     </div>
   );
 }

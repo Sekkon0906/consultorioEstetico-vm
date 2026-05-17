@@ -292,7 +292,7 @@ export default function Galeria3D() {
                 textDecoration: "none",
               }}
             >
-              Investigar más
+              Ver más
             </Link>
           </div>
         </div>

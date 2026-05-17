@@ -97,21 +97,45 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
   const esDomingo = (dia: number) => new Date(anio, mes, dia).getDay() === 0;
   const horasFiltradas = HORAS_BASE.filter(h => !bloqueosGlobales.has(h));
 
+  // Convierte "08:30 AM" a minutos desde medianoche
+  const horaAMinutos = (h: string): number => {
+    const m = h.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!m) return 0;
+    let hh = parseInt(m[1], 10);
+    const mm = parseInt(m[2], 10);
+    const ap = m[3].toUpperCase();
+    if (ap === "PM" && hh !== 12) hh += 12;
+    if (ap === "AM" && hh === 12) hh = 0;
+    return hh * 60 + mm;
+  };
+
+  // ¿La fecha seleccionada es hoy?
+  const hoyISO = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
+  const esHoySeleccionado = selectedDate === hoyISO;
+  const minutosAhora = hoy.getHours() * 60 + hoy.getMinutes();
+  // Una hora ya no es reservable si hoy y ya pasó (con 30 min de margen)
+  const horaPasada = (h: string): boolean =>
+    esHoySeleccionado && horaAMinutos(h) <= minutosAhora + 30;
+
+  const hayHorasDisponibles = horasFiltradas.some(
+    (h) => !horasOcupadas.has(h) && !horaPasada(h)
+  );
+
   return (
     <>
       <style>{`
-        .cal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .cal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
         @media(max-width:768px) { .cal-grid { grid-template-columns: 1fr; } }
       `}</style>
 
-      <div style={{ position: "relative", maxWidth: 950, margin: "0 auto", padding: "1rem 0" }}>
+      <div style={{ position: "relative", maxWidth: 1240, margin: "0 auto", padding: "1.5rem 0" }}>
         <BgCanvas />
         <div style={{ position: "absolute", width: 300, height: 300, top: "-8%", right: "-3%", borderRadius: "50%", background: "radial-gradient(circle, rgba(176,137,104,0.07) 0%, transparent 70%)", filter: "blur(50px)", pointerEvents: "none" }} />
 
         <div className="cal-grid" style={{ position: "relative", zIndex: 1 }}>
           {/* CALENDAR */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)", padding: "2rem" }}>
+            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)", padding: "2.6rem" }}>
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
@@ -119,7 +143,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
                 style={{ width: 40, height: 40, borderRadius: "50%", background: "#E9DED2", border: "none", color: "#4E3B2B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <i className="fas fa-chevron-left" style={{ fontSize: "0.7rem" }} />
               </motion.button>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.25rem", fontWeight: 700, color: "#3A2A1A", margin: 0 }}>{MESES[mes]} {anio}</h3>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.65rem", fontWeight: 700, color: "#3A2A1A", margin: 0 }}>{MESES[mes]} {anio}</h3>
               <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
                 onClick={() => { if (mes === 11) { setMes(0); setAnio(a => a + 1); } else setMes(m => m + 1); }}
                 style={{ width: 40, height: 40, borderRadius: "50%", background: "#E9DED2", border: "none", color: "#4E3B2B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -128,10 +152,10 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", textAlign: "center", marginBottom: "0.5rem" }}>
-              {["L","M","X","J","V","S","D"].map(d => <div key={d} style={{ fontSize: "0.8rem", fontWeight: 700, color: "#8A7565", paddingBottom: 8 }}>{d}</div>)}
+              {["L","M","X","J","V","S","D"].map(d => <div key={d} style={{ fontSize: "0.95rem", fontWeight: 700, color: "#8A7565", paddingBottom: 10 }}>{d}</div>)}
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 5 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 7 }}>
               {generarDias().map((dia, i) => {
                 if (!dia) return <div key={`e-${i}`} />;
                 const iso = `${anio}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
@@ -143,11 +167,11 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
                     whileHover={disabled ? {} : { scale: 1.2 }} whileTap={disabled ? {} : { scale: 0.9 }}
                     onClick={() => handleDia(dia)} disabled={disabled}
                     style={{
-                      width: 44, height: 44, borderRadius: "50%", margin: "0 auto",
+                      width: 54, height: 54, borderRadius: "50%", margin: "0 auto",
                       border: today && !sel ? "2px solid #B08968" : "none",
                       background: sel ? "linear-gradient(135deg, #B08968, #C9AD8D)" : disabled ? "transparent" : "rgba(255,255,255,0.8)",
                       color: sel ? "white" : disabled ? "#ccc" : "#3A2A1A",
-                      fontWeight: sel || today ? 700 : 400, fontSize: "0.92rem",
+                      fontWeight: sel || today ? 700 : 400, fontSize: "1.05rem",
                       cursor: disabled ? "not-allowed" : "pointer",
                       boxShadow: sel ? "0 4px 14px rgba(176,137,104,0.35)" : "none",
                       display: "flex", alignItems: "center", justifyContent: "center",
@@ -162,9 +186,9 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
 
           {/* HOURS */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
-            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)", padding: "2rem" }}>
+            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)", padding: "2.6rem" }}>
 
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.3rem", textAlign: "center" }}>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.5rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.3rem", textAlign: "center" }}>
               {selectedDate ? "Horas disponibles" : "Selecciona un dia"}
             </h3>
 
@@ -187,10 +211,23 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
               <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border spinner-border-sm" style={{ color: "#B08968" }} /></div>
             )}
 
-            {selectedDate && !loadingHoras && (
+            {selectedDate && !loadingHoras && !hayHorasDisponibles && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: "center", padding: "2.5rem 1rem" }}>
+                <div style={{ width: 60, height: 60, borderRadius: "50%", background: "linear-gradient(135deg, #F3DDD2, #F5EEE6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
+                  <i className="fas fa-clock" style={{ color: "#B08968", fontSize: "1.3rem" }} />
+                </div>
+                <p style={{ color: "#8A7565", fontSize: "0.95rem", margin: 0 }}>
+                  {esHoySeleccionado
+                    ? "Ya no hay horas disponibles para hoy. Elige otro día."
+                    : "No hay horas disponibles para este día."}
+                </p>
+              </motion.div>
+            )}
+
+            {selectedDate && !loadingHoras && hayHorasDisponibles && (
               <div key={horasKey} style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
                 {horasFiltradas.map((h, i) => {
-                  const occ = horasOcupadas.has(h);
+                  const occ = horasOcupadas.has(h) || horaPasada(h);
                   const sel = hora === h;
                   return (
                     <motion.button key={h}
@@ -201,7 +238,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
                       whileTap={occ ? {} : { scale: 0.95 }}
                       disabled={occ} onClick={() => onHoraSelect(h)}
                       style={{
-                        padding: "0.65rem 0.3rem", borderRadius: 12, border: "none", fontSize: "0.82rem", fontWeight: 600,
+                        padding: "0.9rem 0.4rem", borderRadius: 12, border: "none", fontSize: "0.95rem", fontWeight: 600,
                         background: sel ? "linear-gradient(135deg, #B08968, #C9AD8D)" : occ ? "rgba(176,137,104,0.04)" : "rgba(255,255,255,0.9)",
                         color: sel ? "white" : occ ? "#ccc" : "#3A2A1A",
                         cursor: occ ? "not-allowed" : "pointer",

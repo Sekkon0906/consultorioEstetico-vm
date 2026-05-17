@@ -40,7 +40,8 @@ export async function getCitasByDayApi(fechaISO: string): Promise<Cita[]> {
 }
 
 export async function getCitasApi(): Promise<Cita[]> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
   if (!user) throw new Error("No autenticado");
   const { data: userData } = await supabase.from("usuarios").select("rol").eq("id", user.id).single();
   const isAdmin = userData?.rol === "admin" || userData?.rol === "developer" || userData?.rol === "ayudante";
@@ -52,7 +53,8 @@ export async function getCitasApi(): Promise<Cita[]> {
 }
 
 export async function getMisCitasApi(): Promise<Cita[]> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
   if (!user) throw new Error("No autenticado");
   const { data, error } = await supabase.from("citas").select(CITA_COLUMNS).eq("user_id", user.id).order("fecha", { ascending: false }).order("hora", { ascending: true });
   if (error) throw new Error(error.message);
@@ -60,7 +62,8 @@ export async function getMisCitasApi(): Promise<Cita[]> {
 }
 
 export async function createCitaApi(payload: Omit<Cita, "id" | "fechaCreacion">): Promise<Cita> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
   if (!user) throw new Error("No autenticado");
   const { data: ocupada } = await supabase.from("citas").select("id").eq("fecha", payload.fecha).eq("hora", payload.hora).neq("estado", "cancelada");
   if (ocupada && ocupada.length > 0) throw new Error("Hora no disponible para esa fecha");

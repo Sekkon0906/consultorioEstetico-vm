@@ -15,6 +15,7 @@ export default function HomePage() {
   const imagenes = IMG.homeCarrusel;
 
   const [imagenActual, setImagenActual] = useState(0);
+  const [heroVisible, setHeroVisible] = useState(false);
 
   useEffect(() => {
     const intervalo = setInterval(
@@ -23,6 +24,12 @@ export default function HomePage() {
     );
     return () => clearInterval(intervalo);
   }, [imagenes.length]);
+
+  // Activa la animación de entrada del contenido del hero (antes quedaba en opacity:0)
+  useEffect(() => {
+    const t = setTimeout(() => setHeroVisible(true), 80);
+    return () => clearTimeout(t);
+  }, []);
 
   const memoizedVideo = useMemo(() => <VideoAnim />, []);
 
@@ -47,7 +54,7 @@ export default function HomePage() {
 
         {/* Lado derecho: texto + CTA */}
         <div className="hero-right">
-          <div className="hero-content container">
+          <div className={`hero-content container ${heroVisible ? "hero-content-visible" : ""}`}>
             <h1 className="hero-title">
               La innovadora y exclusiva tecnología de Hydrafacial está en el
               consultorio de la Dra. Vanessa Medina!

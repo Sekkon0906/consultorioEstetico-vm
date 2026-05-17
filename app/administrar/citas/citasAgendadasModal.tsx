@@ -91,24 +91,27 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
 
               <div style={{ display: "flex", gap: "0.8rem", marginBottom: "1rem" }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Total a pagar</label>
+                  <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 5 }}>Total a pagar</label>
                   <input type="number" value={monto} onChange={e => setMonto(e.target.value)} placeholder="350000"
-                    style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: 12, border: "1px solid #E9DED2", fontSize: "0.92rem" }} />
+                    style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 14, border: "1px solid #E9DED2", fontSize: "1.05rem", background: "#FFFDF9" }} />
+                  <span style={{ fontSize: "0.78rem", color: "#B08968", fontWeight: 600, display: "block", marginTop: 4, minHeight: 16 }}>{montoNum > 0 ? `$ ${montoNum.toLocaleString("es-CO")}` : ""}</span>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Pago total cliente</label>
+                  <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 5 }}>Pago total cliente</label>
                   <input type="number" value={pagoCliente} onChange={e => setPagoCliente(e.target.value)} placeholder="350000"
-                    style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: 12, border: "1px solid #E9DED2", fontSize: "0.92rem" }} />
+                    style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 14, border: "1px solid #E9DED2", fontSize: "1.05rem", background: "#FFFDF9" }} />
+                  <span style={{ fontSize: "0.78rem", color: "#B08968", fontWeight: 600, display: "block", marginTop: 4, minHeight: 16 }}>{pagoNum > 0 ? `$ ${pagoNum.toLocaleString("es-CO")}` : ""}</span>
                 </div>
               </div>
 
               {/* Method toggle */}
               <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
                 {(["Efectivo", "Tarjeta"] as const).map(m => (
-                  <motion.button key={m} whileTap={{ scale: 0.95 }} onClick={() => setModoPago(m)}
-                    style={{ flex: 1, padding: "0.55rem", borderRadius: 12, fontWeight: 600, fontSize: "0.85rem", border: "none", cursor: "pointer", transition: "all 0.25s",
+                  <motion.button key={m} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} onClick={() => setModoPago(m)}
+                    style={{ flex: 1, padding: "0.75rem", borderRadius: 14, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", transition: "all 0.25s",
                       background: modoPago === m ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "#F5EEE6",
                       color: modoPago === m ? "white" : "#4E3B2B",
+                      boxShadow: modoPago === m ? "0 4px 14px rgba(176,137,104,0.3)" : "none",
                     }}>{m}</motion.button>
                 ))}
               </div>
@@ -139,14 +142,14 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
           <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", justifyContent: "center" }}>
             {cita.estado === "pendiente" && (
               <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setShowConfirm(true)} disabled={saving}
-                style={{ flex: 1, padding: "0.7rem", borderRadius: 100, background: "linear-gradient(135deg, #2D6A4F, #43A047)", color: "white", border: "none", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                <CheckCircle2 size={15} /> Confirmar cita
+                style={{ flex: 1, padding: "0.9rem", borderRadius: 100, background: "linear-gradient(135deg, #2D6A4F, #43A047)", color: "white", border: "none", fontWeight: 700, fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, boxShadow: "0 6px 18px rgba(45,106,79,0.28)" }}>
+                <CheckCircle2 size={17} /> Confirmar cita
               </motion.button>
             )}
 
             {cita.estado === "confirmada" && !concluida && (
               <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={handleConcluir} disabled={saving}
-                style={{ flex: 1, padding: "0.7rem", borderRadius: 100, background: "linear-gradient(135deg, #1B4F72, #2980B9)", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>
+                style={{ flex: 1, padding: "0.9rem", borderRadius: 100, background: "linear-gradient(135deg, #1B4F72, #2980B9)", color: "white", border: "none", fontWeight: 700, fontSize: "1rem", cursor: "pointer", boxShadow: "0 6px 18px rgba(27,79,114,0.28)" }}>
                 {saving ? "Guardando..." : "Concluir y cobrar"}
               </motion.button>
             )}

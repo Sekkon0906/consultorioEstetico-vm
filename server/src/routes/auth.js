@@ -42,6 +42,17 @@ router.post("/callback", async (req, res) => {
     );
 
     if (existing.length) {
+      // Refrescar la foto desde Google (avatar_url) en cada login.
+      // Si Google no envía foto, se conserva la almacenada.
+      if (photoURL && photoURL !== existing[0].photo) {
+        const { rows: updated } = await pool.query(
+          `UPDATE usuarios SET photo = $1
+           WHERE id = $2
+           RETURNING id, nombres, apellidos, rol, photo, telefono`,
+          [photoURL, user.id]
+        );
+        return res.json({ ok: true, user: { ...updated[0], email } });
+      }
       return res.json({ ok: true, user: { ...existing[0], email } });
     }
 

@@ -9,4 +9,27 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+/**
+ * Lock pass-through.
+ *
+ * Por defecto supabase-js usa `navigator.locks` para coordinar el token de
+ * auth. En Next.js (App Router), al navegar entre páginas sin recargar, ese
+ * lock puede quedar bloqueado y TODAS las consultas (incluso públicas) se
+ * quedan colgadas en "Cargando..." hasta hacer F5. Sustituirlo por un lock
+ * que simplemente ejecuta la función elimina el deadlock. La app usa una sola
+ * pestaña/cliente, así que no se pierde coordinación real.
+ */
+const passThroughLock = <R>(
+  _name: string,
+  _acquireTimeout: number,
+  fn: () => Promise<R>
+): Promise<R> => fn();
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    lock: passThroughLock,
+  },
+});

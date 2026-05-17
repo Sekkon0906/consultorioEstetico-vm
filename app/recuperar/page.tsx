@@ -2,19 +2,36 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function RecuperarPage() {
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [ok, setOk] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
-    setTimeout(() => {
-      setSent(false);
-      router.push("/login");
-    }, 2500);
+    setError(null);
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setError("Ingresa un correo válido.");
+      return;
+    }
+    setSending(true);
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+      email,
+      { redirectTo: `${window.location.origin}/login` }
+    );
+    setSending(false);
+    if (resetError) {
+      setError(
+        "No se pudo enviar el enlace. Verifica el correo e inténtalo de nuevo."
+      );
+      return;
+    }
+    setOk(true);
+    setTimeout(() => router.push("/login"), 4000);
   };
 
   return (
@@ -46,33 +63,53 @@ export default function RecuperarPage() {
                 Ingresa tu correo para recibir un enlace de recuperación.
               </p>
 
-              <form onSubmit={handleSubmit}>
-                <input
-                  type="email"
-                  className="form-control mb-3"
-                  placeholder="tucorreo@dominio.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  style={{
-                    borderColor: "#E9DED2",
-                    backgroundColor: "#FFFDF9",
-                  }}
-                />
-
-                <button
-                  type="submit"
-                  className="btn w-100 py-2 fw-semibold"
-                  style={{
-                    backgroundColor: "#B08968",
-                    border: "none",
-                    color: "#FFF",
-                    borderRadius: "50px",
-                  }}
-                  disabled={sent}
+              {ok ? (
+                <div
+                  className="p-3 mb-2 rounded-3"
+                  style={{ background: "#EAF6EC", color: "#2E7D32", fontSize: "0.92rem" }}
                 >
-                  {sent ? "Enviando enlace..." : "Enviar enlace"}
-                </button>
-              </form>
+                  Si el correo está registrado, te enviamos un enlace para
+                  restablecer tu contraseña. Revisa tu bandeja (y spam).
+                  Te llevaremos al inicio de sesión…
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit}>
+                  <input
+                    type="email"
+                    className="form-control mb-2"
+                    placeholder="tucorreo@dominio.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{
+                      borderColor: "#E9DED2",
+                      backgroundColor: "#FFFDF9",
+                    }}
+                  />
+
+                  {error && (
+                    <p
+                      className="mb-2"
+                      style={{ color: "#b02e2e", fontSize: "0.85rem" }}
+                    >
+                      {error}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="btn w-100 py-2 fw-semibold"
+                    style={{
+                      backgroundColor: "#B08968",
+                      border: "none",
+                      color: "#FFF",
+                      borderRadius: "50px",
+                    }}
+                    disabled={sending}
+                  >
+                    {sending ? "Enviando enlace..." : "Enviar enlace"}
+                  </button>
+                </form>
+              )}
 
               <p
                 onClick={() => router.push("/login")}
