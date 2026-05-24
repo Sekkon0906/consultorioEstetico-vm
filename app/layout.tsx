@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./globals.css";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import NavbarClient from "@/components/NavbarClient";
 import Footer from "@/components/Footer";
+import CookieBanner from "@/components/CookieBanner";
 import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
@@ -12,19 +15,24 @@ export const metadata: Metadata = {
     "Especialista en Medicina Estética, Nutrición y Antiedad en Ibagué",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+  const tTop = await getTranslations("topbar");
+
   return (
-    <html lang="es">
+    <html lang={locale}>
       <body
         style={{
           backgroundColor: "#F6F4EF",
           fontFamily: "'Montserrat', sans-serif",
         }}
       >
+        <NextIntlClientProvider locale={locale} messages={messages}>
         <AuthProvider>
           {/* BARRA SUPERIOR */}
           <div className="topbar">
@@ -35,7 +43,7 @@ export default function RootLayout({
                 </span>
                 <span className="topbar-item">
                   <i className="fas fa-map-marker-alt me-2"></i>
-                  Carrera 5ta #11-24. Edificio Torre Empresarial. Consultorio 502. Ibagué – Tolima.
+                  {tTop("address")}
                 </span>
                 <span className="topbar-social">
                   <a
@@ -75,7 +83,11 @@ export default function RootLayout({
 
           {/* FOOTER */}
           <Footer />
+
+          {/* BANNER DE COOKIES (solo aparece si el usuario no ha decidido) */}
+          <CookieBanner />
         </AuthProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

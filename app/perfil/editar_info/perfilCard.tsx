@@ -55,12 +55,6 @@ export default function PerfilCard() {
                 setNombres={setNombres} setApellidos={setApellidos} setTelefono={setTelefono} setEdad={setEdad} setGenero={setGenero}
                 canEdit={canEdit}
               />
-              <div style={{ textAlign: "center", marginTop: "1rem" }}>
-                <motion.button whileTap={{ scale: 0.97 }} onClick={handleSavePersonal} disabled={!canEdit || saving}
-                  style={{ padding: "0.65rem 1.5rem", borderRadius: 100, background: canEdit && !saving ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "#E9DED2", color: canEdit && !saving ? "white" : "#9B8575", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: canEdit && !saving ? "pointer" : "not-allowed" }}>
-                  {saving ? "Guardando..." : "Guardar datos personales"}
-                </motion.button>
-              </div>
             </div>
           </div>
 
@@ -74,14 +68,21 @@ export default function PerfilCard() {
                 setAntecedentesDescripcion={setAntecedentesDescripcion} setAlergiasDescripcion={setAlergiasDescripcion} setMedicamentosDescripcion={setMedicamentosDescripcion}
                 canEdit={canEdit}
               />
-              <div style={{ textAlign: "center", marginTop: "1rem" }}>
-                <motion.button whileTap={{ scale: 0.97 }} onClick={handleSaveMedical} disabled={!canEdit || saving}
-                  style={{ padding: "0.65rem 1.5rem", borderRadius: 100, background: canEdit && !saving ? "linear-gradient(135deg, #2D6A4F, #43A047)" : "#E9DED2", color: canEdit && !saving ? "white" : "#9B8575", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: canEdit && !saving ? "pointer" : "not-allowed" }}>
-                  {saving ? "Guardando..." : "Guardar datos medicos"}
-                </motion.button>
-              </div>
             </div>
           </div>
+        </div>
+
+        {/* Botón único: guarda datos personales + médicos */}
+        <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
+          <motion.button
+            whileHover={canEdit && !saving ? { scale: 1.04 } : {}}
+            whileTap={canEdit && !saving ? { scale: 0.97 } : {}}
+            onClick={async () => { await handleSavePersonal(); await handleSaveMedical(); }}
+            disabled={!canEdit || saving}
+            style={{ padding: "0.85rem 2.5rem", borderRadius: 100, background: canEdit && !saving ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "#E9DED2", color: canEdit && !saving ? "white" : "#9B8575", border: "none", fontWeight: 700, fontSize: "1rem", cursor: canEdit && !saving ? "pointer" : "not-allowed", boxShadow: canEdit && !saving ? "0 6px 18px rgba(176,137,104,0.3)" : "none" }}
+          >
+            {saving ? "Guardando..." : "Guardar cambios"}
+          </motion.button>
         </div>
 
         <p style={{ textAlign: "center", fontSize: "0.82rem", color: "#8A7565", marginTop: "1.2rem" }}>

@@ -88,17 +88,17 @@ export default function TestimoniosList() {
   var reset = function() { setForm(emptyForm); setModo("lista"); setActual(null); };
   var startEdit = function(t: Testimonio) { setActual(t); setForm({ nombre: t.nombre, texto: t.texto, video: t.video || "", thumb: t.thumb || "" }); setModo("form"); };
 
-  var IS = { width: "100%", padding: "0.55rem 0.8rem", borderRadius: 12, border: "1px solid #E9DED2", fontSize: "0.88rem" } as React.CSSProperties;
+  var IS = { width: "100%", padding: "0.75rem 1rem", borderRadius: 14, border: "1px solid #E9DED2", fontSize: "0.98rem", background: "#FFFDF9" } as React.CSSProperties;
   var pendientes = comentarios.filter(function(c) { return !c.aprobado; }).length;
 
   return (
     <div>
       <h2 style={{ fontWeight: 700, color: "#3A2A1A", marginBottom: "1rem" }}>Testimonios y Comentarios</h2>
 
-      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem" }}>
-        <button onClick={function() { setTab("testimonios"); }} style={{ padding: "0.55rem 1.2rem", borderRadius: 100, fontWeight: 600, fontSize: "0.85rem", border: "none", cursor: "pointer", background: tab === "testimonios" ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "#F5EEE6", color: tab === "testimonios" ? "white" : "#4E3B2B" }}>Testimonios</button>
-        <button onClick={function() { setTab("comentarios"); }} style={{ padding: "0.55rem 1.2rem", borderRadius: 100, fontWeight: 600, fontSize: "0.85rem", border: "none", cursor: "pointer", background: tab === "comentarios" ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "#F5EEE6", color: tab === "comentarios" ? "white" : "#4E3B2B" }}>
-          Comentarios {pendientes > 0 && <span style={{ background: "#C62828", color: "white", borderRadius: "50%", padding: "0.1rem 0.4rem", fontSize: "0.68rem", marginLeft: 4 }}>{pendientes}</span>}
+      <div style={{ display: "flex", gap: "0.7rem", marginBottom: "1.5rem" }}>
+        <button onClick={function() { setTab("testimonios"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", background: tab === "testimonios" ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "#F5EEE6", color: tab === "testimonios" ? "white" : "#4E3B2B", boxShadow: tab === "testimonios" ? "0 4px 14px rgba(176,137,104,0.25)" : "none", transition: "all 0.2s" }}>Testimonios</button>
+        <button onClick={function() { setTab("comentarios"); }} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "0.7rem 1.5rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", background: tab === "comentarios" ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "#F5EEE6", color: tab === "comentarios" ? "white" : "#4E3B2B", boxShadow: tab === "comentarios" ? "0 4px 14px rgba(176,137,104,0.25)" : "none", transition: "all 0.2s" }}>
+          Comentarios {pendientes > 0 && <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 22, height: 22, padding: "0 7px", borderRadius: 100, background: tab === "comentarios" ? "rgba(255,255,255,0.28)" : "#C62828", color: "white", fontSize: "0.78rem", fontWeight: 700 }}>{pendientes}</span>}
         </button>
       </div>
 
@@ -111,25 +111,25 @@ export default function TestimoniosList() {
           {comentarios.length === 0 ? (
             <p style={{ textAlign: "center", color: "#8B7060", padding: "2rem 0" }}>No hay comentarios de pacientes</p>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
               {comentarios.map(function(c) {
                 return (
-                  <div key={c.id} style={{ background: "#FFFDF9", borderRadius: 14, border: "1px solid " + (c.aprobado ? "#A0D8A8" : "#F0E0A0"), padding: "0.8rem 1rem", display: "flex", alignItems: "center", gap: "0.8rem" }}>
-                    <div style={{ width: 38, height: 38, borderRadius: "50%", background: "#E9DED2", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#4E3B2B", flexShrink: 0, fontSize: "0.88rem" }}>{(c.nombre || "?").charAt(0).toUpperCase()}</div>
+                  <div key={c.id} style={{ background: "#FFFDF9", borderRadius: 18, border: "1px solid " + (c.aprobado ? "#A0D8A8" : "#F0E0A0"), padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}>
+                    <div style={{ width: 60, height: 60, borderRadius: "50%", background: "#E9DED2", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#4E3B2B", flexShrink: 0, fontSize: "1.3rem" }}>{(c.nombre || "?").charAt(0).toUpperCase()}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-                        <span style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "0.85rem" }}>{c.nombre}</span>
-                        <span style={{ background: "#F5EEE6", color: "#8B6A4B", padding: "0.1rem 0.5rem", borderRadius: 100, fontSize: "0.62rem", fontWeight: 600 }}>{c.procedimiento}</span>
-                        <span style={{ fontSize: "0.62rem", color: c.aprobado ? "#2E7D32" : "#F9A825", fontWeight: 600 }}>{c.aprobado ? "Visible" : "Pendiente"}</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                        <span style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "1.05rem" }}>{c.nombre}</span>
+                        <span style={{ background: "#F5EEE6", color: "#8B6A4B", padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>{c.procedimiento}</span>
+                        <span style={{ background: c.aprobado ? "#E8F5E9" : "#FFF8E1", color: c.aprobado ? "#2E7D32" : "#A07800", padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.74rem", fontWeight: 700 }}>{c.aprobado ? "Visible" : "Pendiente"}</span>
                       </div>
-                      <p style={{ fontSize: "0.78rem", color: "#6C584C", margin: "0.2rem 0 0", fontStyle: "italic" }}>&quot;{c.texto}&quot;</p>
-                      <div style={{ display: "flex", gap: 1, marginTop: 2 }}>
-                        {[1,2,3,4,5].map(function(i) { return <span key={i} style={{ color: i <= c.puntuacion ? "#C0A080" : "#ddd", fontSize: "0.65rem" }}>★</span>; })}
+                      <p style={{ fontSize: "0.92rem", color: "#6C584C", margin: "0.35rem 0 0", fontStyle: "italic" }}>&quot;{c.texto}&quot;</p>
+                      <div style={{ display: "flex", gap: 2, marginTop: 4 }}>
+                        {[1,2,3,4,5].map(function(i) { return <span key={i} style={{ color: i <= c.puntuacion ? "#C0A080" : "#ddd", fontSize: "0.95rem" }}>★</span>; })}
                       </div>
                     </div>
-                    <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-                      <button onClick={function() { toggleAprobado(c.id, c.aprobado); }} style={{ padding: "0.25rem 0.6rem", borderRadius: 8, background: c.aprobado ? "#FFF3E6" : "#D8F3DC", color: c.aprobado ? "#B08968" : "#2E7D32", border: "none", fontSize: "0.7rem", fontWeight: 600, cursor: "pointer" }}>{c.aprobado ? "Ocultar" : "Aprobar"}</button>
-                      <button onClick={function() { deleteCom(c.id); }} style={{ padding: "0.25rem 0.6rem", borderRadius: 8, background: "#FDE8D8", color: "#C62828", border: "none", fontSize: "0.7rem", fontWeight: 600, cursor: "pointer" }}>Eliminar</button>
+                    <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                      <button onClick={function() { toggleAprobado(c.id, c.aprobado); }} style={{ padding: "0.5rem 1rem", borderRadius: 100, background: c.aprobado ? "#FFF3E6" : "#D8F3DC", color: c.aprobado ? "#B08968" : "#2E7D32", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>{c.aprobado ? "Ocultar" : "Aprobar"}</button>
+                      <button onClick={function() { deleteCom(c.id); }} style={{ padding: "0.5rem 1rem", borderRadius: 100, background: "#FDE8D8", color: "#C62828", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>Eliminar</button>
                     </div>
                   </div>
                 );
@@ -143,7 +143,7 @@ export default function TestimoniosList() {
       {tab === "testimonios" && (
         <div>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
-            {modo === "lista" && <motion.button whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 5, padding: "0.55rem 1.2rem", borderRadius: 100, background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", fontWeight: 600, fontSize: "0.82rem", cursor: "pointer" }}><Plus size={15} /> Nuevo</motion.button>}
+            {modo === "lista" && <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 7, padding: "0.7rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(176,137,104,0.28)" }}><Plus size={17} /> Nuevo</motion.button>}
           </div>
 
           <AnimatePresence>

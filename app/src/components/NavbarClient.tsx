@@ -5,13 +5,17 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
 import { IMG } from "@/lib/imagenes";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
   const pathname = usePathname() || "/";
   const router = useRouter();
   const { user, loading, logout } = useAuth();
+  const t = useTranslations("navbar");
+  const tc = useTranslations("common");
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -23,37 +27,45 @@ export default function Navbar() {
   /* === MENÚ PRINCIPAL === */
   const menuItems = useMemo(() => {
     const base = [
-      { label: "Inicio", href: "/" },
-      { label: "Dra. Vanessa Medina", href: "/doctora" },
-      { label: "Consultorio", href: "/consultorio" },
-      { label: "Procedimientos", href: "/procedimientos" },
-      { label: "Testimonios", href: "/testimonios" },
-      { label: "Agendar cita", href: "/agendar" },
+      { label: t("home"), href: "/" },
+      { label: t("doctor"), href: "/doctora" },
+      { label: t("office"), href: "/consultorio" },
+      { label: t("procedures"), href: "/procedimientos" },
+      { label: t("testimonials"), href: "/testimonios" },
+      { label: t("book"), href: "/agendar" },
     ];
     if (user?.rol === "admin" || user?.rol === "developer")
-      base.push({ label: "Administrar", href: "/administrar" });
+      base.push({ label: t("admin"), href: "/administrar" });
     return base;
-  }, [user?.rol]);
+  }, [user?.rol, t]);
 
   /* === INDICADOR ACTIVO === */
   const updateIndicatorTo = (el: HTMLLIElement | null) => {
     if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const parent = el.parentElement?.getBoundingClientRect();
-    if (!rect || !parent) return;
-    const next = { left: rect.left - parent.left, width: rect.width };
+    // offsetLeft/offsetWidth son valores de layout (NO afectados por el
+    // scale del hover ni por transforms), y son relativos al mismo
+    // offsetParent que el indicador → alineación correcta.
+    const next = { left: el.offsetLeft, width: el.offsetWidth };
     setIndicator((prev) =>
       prev.left !== next.left || prev.width !== next.width ? next : prev
     );
   };
 
   useEffect(() => {
-    const activeIndex = menuItems.findIndex((item) => item.href === pathname);
-    const activeEl = activeIndex !== -1 ? linkRefs.current[activeIndex] : null;
-    updateIndicatorTo(activeEl);
-    const onResize = () => updateIndicatorTo(activeEl);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    const measure = () => {
+      const activeIndex = menuItems.findIndex((item) => item.href === pathname);
+      const activeEl = activeIndex !== -1 ? linkRefs.current[activeIndex] : null;
+      updateIndicatorTo(activeEl);
+    };
+    // Espera a que el layout/tipografías se asienten tras el cambio de ruta
+    const r1 = requestAnimationFrame(() => requestAnimationFrame(measure));
+    const t = setTimeout(measure, 250);
+    window.addEventListener("resize", measure);
+    return () => {
+      cancelAnimationFrame(r1);
+      clearTimeout(t);
+      window.removeEventListener("resize", measure);
+    };
   }, [pathname, menuItems.length]);
 
   /* === SECCIÓN ACTUAL (pt 22) === */
@@ -208,6 +220,11 @@ export default function Navbar() {
           className="navbar-user"
           style={{ position: "relative", display: "flex", justifyContent: "flex-end", flex: "0 0 auto" }}
         >
+          {/* Selector de idioma (siempre visible en desktop) */}
+          <div className="d-none d-md-inline-flex me-2 align-items-center">
+            <LanguageSwitcher />
+          </div>
+
           {/* HAMBURGUESA MÓVIL */}
           <button
             className={`hamburger-btn d-md-none ${mobileOpen ? "active" : ""}`}
@@ -229,13 +246,16 @@ export default function Navbar() {
 
           {/* PERFIL DESKTOP */}
           {loading ? null : !user ? (
-            <button
+            <motion.button
               onClick={() => router.push("/login")}
-              className="btn btn-outline-dark rounded-4 px-3 py-2 d-none d-md-inline"
-              style={{ borderColor: "#B08968", color: "#6B4E3D", backgroundColor: "#fff8f3", fontWeight: 500 }}
+              className="btn rounded-pill px-4 py-2 d-none d-md-inline-flex align-items-center gap-2"
+              style={{ border: "1.5px solid #B08968", color: "#6B4E3D", backgroundColor: "#fff8f3", fontWeight: 600 }}
+              whileHover={{ scale: 1.05, backgroundColor: "#B08968", color: "#fff", boxShadow: "0 6px 18px rgba(176,137,104,0.35)" }}
+              whileTap={{ scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 320, damping: 20 }}
             >
-              Iniciar sesión
-            </button>
+              {t("login")}
+            </motion.button>
           ) : (
             <>
               <motion.button
@@ -289,21 +309,21 @@ export default function Navbar() {
                         style={{ background: "#E9E0D1", color: "#4B3A2E", fontWeight: 600, border: "none", borderRadius: "10px" }}
                         onClick={() => { setMenuOpen(false); router.push("/perfil/editar_info"); }}
                       >
-                        Editar perfil
+                        {t("editProfile")}
                       </button>
                       <button
                         className="btn"
                         style={{ background: "#C9AD8D", color: "#fff", fontWeight: 600, border: "none", borderRadius: "10px" }}
                         onClick={() => { setMenuOpen(false); router.push("/perfil/citas_agendadas"); }}
                       >
-                        Citas agendadas
+                        {t("myAppointments")}
                       </button>
                       <button
                         className="btn mt-2"
                         style={{ background: "#fff3ef", color: "#b02e2e", fontWeight: 600, border: "1px solid #e4bfbf", borderRadius: "10px" }}
                         onClick={requestLogout}
                       >
-                        Cerrar sesión
+                        {t("logout")}
                       </button>
                     </div>
                   </motion.div>
@@ -329,7 +349,7 @@ export default function Navbar() {
                 Citas agendadas
               </button>
               <button className="user-action-btn" onClick={requestLogout} style={{ color: "#b02e2e" }}>
-                Cerrar sesión
+                {t("logout")}
               </button>
             </div>
           </div>
@@ -376,12 +396,11 @@ export default function Navbar() {
               className="bg-white rounded-4 shadow-lg p-4 text-center"
               style={{ maxWidth: 360, width: "100%", background: "linear-gradient(135deg, #fffdfb 0%, #f8f3ed 100%)" }}
             >
-              <div style={{ fontSize: "2.4rem", marginBottom: "0.5rem" }}>👋</div>
               <h5 className="fw-bold mb-2" style={{ color: "#6B4E3D" }}>
-                ¿Cerrar sesión?
+                {t("logoutConfirm")}
               </h5>
               <p className="mb-4" style={{ color: "#8d7a6a", fontSize: "0.92rem" }}>
-                Tendrás que iniciar sesión nuevamente para acceder a tu cuenta.
+                {t("logoutMessage")}
               </p>
               <div className="d-flex gap-2">
                 <button
@@ -389,7 +408,7 @@ export default function Navbar() {
                   style={{ background: "#E9E0D1", color: "#4B3A2E", fontWeight: 600, border: "none", borderRadius: "10px" }}
                   onClick={() => setConfirmLogout(false)}
                 >
-                  Cancelar
+                  {tc("cancel")}
                 </button>
                 <button
                   className="btn flex-fill"

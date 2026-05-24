@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { PALETTE } from "./page";
+import { PALETTE } from "./palette";
 import { supabase } from "@/lib/supabaseClient";
 
 const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
@@ -125,17 +125,37 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
     <>
       <style>{`
         .cal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        @media(max-width:768px) { .cal-grid { grid-template-columns: 1fr; } }
+        .cal-card { padding: 2.6rem; }
+        .cal-day-btn { width: 54px; height: 54px; font-size: 1.05rem; }
+        .cal-month-title { font-size: 1.65rem; }
+        .cal-hours-title { font-size: 1.5rem; }
+        .cal-hour-btn { padding: 0.9rem 0.4rem; font-size: 0.95rem; }
+        .cal-wrap { padding: 1.5rem 1rem; }
+        @media (max-width: 900px) {
+          .cal-grid { grid-template-columns: 1fr; gap: 1.2rem; }
+          .cal-card { padding: 1.4rem; }
+          .cal-day-btn { width: 42px; height: 42px; font-size: 0.92rem; }
+          .cal-month-title { font-size: 1.25rem; }
+          .cal-hours-title { font-size: 1.2rem; }
+          .cal-hour-btn { padding: 0.65rem 0.25rem; font-size: 0.82rem; }
+          .cal-wrap { padding: 1rem 0.6rem; }
+        }
+        @media (max-width: 420px) {
+          .cal-day-btn { width: 36px; height: 36px; font-size: 0.82rem; }
+          .cal-hour-btn { padding: 0.55rem 0.2rem; font-size: 0.78rem; }
+          .cal-card { padding: 1rem; }
+        }
       `}</style>
 
-      <div style={{ position: "relative", maxWidth: 1240, margin: "0 auto", padding: "1.5rem 0" }}>
+      <div className="cal-wrap" style={{ position: "relative", maxWidth: 1240, margin: "0 auto" }}>
         <BgCanvas />
         <div style={{ position: "absolute", width: 300, height: 300, top: "-8%", right: "-3%", borderRadius: "50%", background: "radial-gradient(circle, rgba(176,137,104,0.07) 0%, transparent 70%)", filter: "blur(50px)", pointerEvents: "none" }} />
 
         <div className="cal-grid" style={{ position: "relative", zIndex: 1 }}>
           {/* CALENDAR */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)", padding: "2.6rem" }}>
+            className="cal-card"
+            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)" }}>
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
@@ -143,7 +163,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
                 style={{ width: 40, height: 40, borderRadius: "50%", background: "#E9DED2", border: "none", color: "#4E3B2B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <i className="fas fa-chevron-left" style={{ fontSize: "0.7rem" }} />
               </motion.button>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.65rem", fontWeight: 700, color: "#3A2A1A", margin: 0 }}>{MESES[mes]} {anio}</h3>
+              <h3 className="cal-month-title" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "#3A2A1A", margin: 0 }}>{MESES[mes]} {anio}</h3>
               <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
                 onClick={() => { if (mes === 11) { setMes(0); setAnio(a => a + 1); } else setMes(m => m + 1); }}
                 style={{ width: 40, height: 40, borderRadius: "50%", background: "#E9DED2", border: "none", color: "#4E3B2B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -166,12 +186,13 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
                   <motion.button key={dia}
                     whileHover={disabled ? {} : { scale: 1.2 }} whileTap={disabled ? {} : { scale: 0.9 }}
                     onClick={() => handleDia(dia)} disabled={disabled}
+                    className="cal-day-btn"
                     style={{
-                      width: 54, height: 54, borderRadius: "50%", margin: "0 auto",
+                      borderRadius: "50%", margin: "0 auto",
                       border: today && !sel ? "2px solid #B08968" : "none",
                       background: sel ? "linear-gradient(135deg, #B08968, #C9AD8D)" : disabled ? "transparent" : "rgba(255,255,255,0.8)",
                       color: sel ? "white" : disabled ? "#ccc" : "#3A2A1A",
-                      fontWeight: sel || today ? 700 : 400, fontSize: "1.05rem",
+                      fontWeight: sel || today ? 700 : 400,
                       cursor: disabled ? "not-allowed" : "pointer",
                       boxShadow: sel ? "0 4px 14px rgba(176,137,104,0.35)" : "none",
                       display: "flex", alignItems: "center", justifyContent: "center",
@@ -186,9 +207,10 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
 
           {/* HOURS */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
-            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)", padding: "2.6rem" }}>
+            className="cal-card"
+            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)" }}>
 
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.5rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.3rem", textAlign: "center" }}>
+            <h3 className="cal-hours-title" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.3rem", textAlign: "center" }}>
               {selectedDate ? "Horas disponibles" : "Selecciona un dia"}
             </h3>
 
@@ -237,8 +259,9 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
                       whileHover={occ ? {} : { scale: 1.06 }}
                       whileTap={occ ? {} : { scale: 0.95 }}
                       disabled={occ} onClick={() => onHoraSelect(h)}
+                      className="cal-hour-btn"
                       style={{
-                        padding: "0.9rem 0.4rem", borderRadius: 12, border: "none", fontSize: "0.95rem", fontWeight: 600,
+                        borderRadius: 12, border: "none", fontWeight: 600,
                         background: sel ? "linear-gradient(135deg, #B08968, #C9AD8D)" : occ ? "rgba(176,137,104,0.04)" : "rgba(255,255,255,0.9)",
                         color: sel ? "white" : occ ? "#ccc" : "#3A2A1A",
                         cursor: occ ? "not-allowed" : "pointer",

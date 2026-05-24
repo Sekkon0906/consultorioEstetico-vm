@@ -1,0 +1,83 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "back": "Back",
+    "language": "Language"
+  },
+  "topbar": {
+    "address": "Carrera 5ta #11-24. Torre Empresarial Building. Office 502. Ibagué – Tolima, Colombia."
+  },
+  "navbar": {
+    "home": "Home",
+    "doctor": "Dr. Vanessa Medina",
+    "office": "Clinic",
+    "procedures": "Procedures",
+    "testimonials": "Testimonials",
+    "book": "Book appointment",
+    "admin": "Admin",
+    "login": "Sign in",
+    "editProfile": "Edit profile",
+    "myAppointments": "My appointments",
+    "logout": "Sign out",
+    "logoutConfirm": "Sign out?",
+    "logoutMessage": "You'll need to sign in again to access your account."
+  },
+  "hero": {
+    "kicker": "Aesthetic medicine · Ibagué",
+    "title1": "Your best version",
+    "title2": "starts with",
+    "rotator": ["harmony.", "authenticity.", "natural beauty.", "confidence."],
+    "subtitle": "Personalized treatments with state-of-the-art technology. Natural results that highlight your essence, in the hands of Dr. Vanessa Medina.",
+    "ctaPrimary": "Book appointment",
+    "ctaSecondary": "Explore procedures"
+  },
+  "footer": {
+    "contactTitle": "Have a question?",
+    "contactSub": "Contact me directly via WhatsApp",
+    "form": {
+      "name": "Full name",
+      "email": "Email address",
+      "procedure": "Select a procedure",
+      "phone": "Phone",
+      "message": "Your message",
+      "acceptIntro": "I accept the",
+      "acceptTerms": "terms and conditions",
+      "acceptAnd": "and the",
+      "acceptPrivacy": "privacy policy",
+      "submit": "Send via WhatsApp"
+    },
+    "clinic": "Aesthetic Clinic",
+    "clinicDesc": "Personalized care and facial, body and hair aesthetic treatments.",
+    "address": "Address",
+    "addressLines": "Carrera 5ta #11-24. Torre Empresarial. Office 502. Ibagué - Tolima.\nMonday to Saturday, 9:00 a.m. - 6:00 p.m.",
+    "contact": "Contact",
+    "contactLines": "WhatsApp: +57 315 544 5748\nEmail: dra.vanessamedinao@gmail.com",
+    "legalLinks": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions",
+      "cookies": "Cookies",
+      "notice": "Privacy Notice"
+    },
+    "rights": "© Aesthetic Clinic Dr. Julieth Medina. All rights reserved.",
+    "designedBy": "Designed by"
+  },
+  "cookies": {
+    "title": "Your privacy matters",
+    "message": "We use essential cookies for the site to work. With your permission we may also use analytics or marketing cookies to improve your experience.",
+    "moreInfo": "Learn more",
+    "essential": "Essential",
+    "essentialDesc": "Required for session and booking. Always on.",
+    "analytics": "Analytics",
+    "analyticsDesc": "Help us understand how you use the site (anonymous).",
+    "marketing": "Marketing",
+    "marketingDesc": "Allow personalized content and campaign measurement.",
+    "acceptAll": "Accept all",
+    "rejectOptional": "Reject optional",
+    "customize": "Customize",
+    "savePreferences": "Save preferences"
+  }
+}

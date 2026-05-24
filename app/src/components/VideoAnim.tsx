@@ -28,7 +28,7 @@ function ParticleCanvas() {
     resize();
     window.addEventListener("resize", resize);
     interface P { x: number; y: number; vx: number; vy: number; r: number; a: number; da: number; shape: number; }
-    const ps: P[] = Array.from({ length: 35 }, () => ({
+    const ps: P[] = Array.from({ length: 14 }, () => ({
       x: Math.random() * (w || 1400), y: Math.random() * (h || 800),
       vx: (Math.random() - 0.5) * 0.4, vy: -0.1 - Math.random() * 0.25,
       r: 2 + Math.random() * 5, a: Math.random(), da: 0.004 + Math.random() * 0.008,
@@ -52,8 +52,18 @@ function ParticleCanvas() {
       }
       animId = requestAnimationFrame(draw);
     };
-    draw();
-    return () => { cancelAnimationFrame(animId); window.removeEventListener("resize", resize); };
+
+    // Solo anima cuando el canvas está visible en pantalla (ahorra CPU/jank)
+    let running = false;
+    const start = () => { if (!running) { running = true; draw(); } };
+    const stop = () => { running = false; cancelAnimationFrame(animId); };
+    const io = new IntersectionObserver(
+      ([e]) => { e.isIntersecting ? start() : stop(); },
+      { threshold: 0 }
+    );
+    io.observe(canvas);
+
+    return () => { io.disconnect(); cancelAnimationFrame(animId); window.removeEventListener("resize", resize); };
   }, []);
   return <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }} />;
 }

@@ -18,7 +18,7 @@ export default function AuthCallbackPage() {
     const go = () => {
       if (done) return;
       done = true;
-      router.replace("/testimonios");
+      router.replace("/perfil/editar_info");
     };
 
     supabase.auth.getSession().then(({ data }) => {

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { Cita, confirmarCitaAPI, cancelarCitaAPI } from "./helpers";
-import { PALETTE } from "../../agendar/page";
+import { PALETTE } from "../../agendar/palette";
 
 type PromptTipo = "confirmar" | "cancelar" | "reagendar" | null;
 

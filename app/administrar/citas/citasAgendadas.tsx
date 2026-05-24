@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PALETTE } from "../../agendar/page";
+import { PALETTE } from "../../agendar/palette";
 import { Cita, getCitasByDayAPI, getCitasAPI, confirmarCitaAPI, cancelarCitaAPI, solicitarReagendaAPI } from "./helpers";
 import CitasAgendadasCard from "./citasAgendadasCard";
 import CitasAgendadasModal from "./citasAgendadasModal";

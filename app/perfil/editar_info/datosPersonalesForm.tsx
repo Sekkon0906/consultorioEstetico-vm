@@ -67,9 +67,6 @@ export default function DatosPersonalesForm({
       transition={{ duration: 0.4 }}
       style={{ textAlign: "start" }}
     >
-      <h5 style={{ color: main, fontWeight: 600, marginBottom: "1rem" }}>
-        Datos personales
-      </h5>
 
       <div className={fieldClass}>
         <label style={labelStyle}>Nombres</label>

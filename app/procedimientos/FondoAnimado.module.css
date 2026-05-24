@@ -19,15 +19,17 @@
 .facial::after {
   content: "";
   position: absolute;
-  width: 250%;
-  height: 250%;
-  top: -75%;
-  left: -75%;
+  width: 140%;
+  height: 140%;
+  top: -20%;
+  left: -20%;
   background-image: radial-gradient(circle, rgba(255, 150, 150, 0.2) 1.5%, transparent 2.5%);
   background-size: 100px 100px;
   opacity: 0.5;
   animation: burbujasFacial 14s ease-in-out infinite;
-  filter: blur(2px);
+  filter: blur(1.5px);
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .facial::after {
@@ -67,15 +69,17 @@
 .corporal::after {
   content: "";
   position: absolute;
-  width: 250%;
-  height: 250%;
-  top: -50%;
-  left: -50%;
+  width: 140%;
+  height: 140%;
+  top: -20%;
+  left: -20%;
   background: radial-gradient(circle, rgba(255, 200, 100, 0.25) 1.5%, transparent 3%);
   background-size: 140px 140px;
   opacity: 0.5;
   animation: ondasCorporales 20s ease-in-out infinite;
-  filter: blur(3px);
+  filter: blur(2px);
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .corporal::after {
@@ -115,15 +119,17 @@
 .capilar::after {
   content: "";
   position: absolute;
-  width: 220%;
-  height: 220%;
-  top: -60%;
-  left: -60%;
+  width: 140%;
+  height: 140%;
+  top: -20%;
+  left: -20%;
   background-image: radial-gradient(circle, rgba(120, 200, 120, 0.25) 2%, transparent 3%);
   background-size: 80px 80px;
   opacity: 0.6;
   animation: hojasAscendentes 22s linear infinite;
-  filter: blur(4px);
+  filter: blur(2px);
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .capilar::after {

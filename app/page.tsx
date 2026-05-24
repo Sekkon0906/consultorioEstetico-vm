@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { TypeAnimation } from "react-type-animation";
 import Galeria3D from "./src/components/Galeria3D";
 import dynamic from "next/dynamic";
 
@@ -10,6 +12,34 @@ const VideoAnim = dynamic(() => import("./src/components/VideoAnim"), {
 });
 
 import { IMG } from "./src/lib/imagenes";
+
+/**
+ * Cinemagraph / video del hero.
+ *
+ * Para activarlo:
+ *   1. Coloca el archivo de video en /public/imagenes/hero/  (ej. doctora-loop.mp4)
+ *   2. Coloca un poster (foto estática del primer frame) en la misma carpeta
+ *      para que aparezca al instante mientras carga el video.
+ *   3. Reemplaza los `null` de abajo por las rutas:
+ *        const HERO_VIDEO  = "/imagenes/hero/doctora-loop.mp4";
+ *        const HERO_POSTER = "/imagenes/hero/doctora-poster.jpg";
+ *   4. (Recomendado) El video: mute, sin audio, en loop, MP4 H.264 o WebM,
+ *      vertical/cuadrado, peso < 3 MB. Idealmente 5–8s, sutil (un mechón de
+ *      pelo, un giro suave del brazo, una sonrisa breve).
+ *
+ * Si HERO_VIDEO es null se usa el carrusel de imágenes actual (sin cambios).
+ */
+const HERO_VIDEO: string | null = null;
+const HERO_POSTER: string | null = null;
+
+/**
+ * Imagen de fondo del hero (cubre toda la pantalla inicial).
+ * Sube la foto a Supabase Storage en:
+ *    ConsultorioImagenes/imagenesPublicas/doctora-hero.jpg
+ * y se carga automáticamente desde IMG.heroDoctora.
+ * Si por algún motivo no existe, hace fallback al primer carrusel.
+ */
+const HERO_IMAGE: string | null = IMG.heroDoctora;
 
 export default function HomePage() {
   const imagenes = IMG.homeCarrusel;
@@ -35,78 +65,101 @@ export default function HomePage() {
 
   return (
     <>
-      {/* ===== HERO ===== */}
-      <section className="hero hero-home">
-        {/* Lado izquierdo: carrusel de imágenes */}
-        <div className="hero-left">
-          {imagenes.map((img, index) => (
-            <img
-              key={index}
-              src={img}
-              alt={`Imagen ${index + 1}`}
-              className={`hero-slide ${
-                index === imagenActual ? "is-active" : ""
-              }`}
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+      {/* ===== HERO FULL-SCREEN ===== */}
+      <section className="hero-fs">
+        {/* Capa de fondo: video (si HERO_VIDEO) o imagen (HERO_IMAGE / fallback) */}
+        <div className="hero-fs-bg">
+          {HERO_VIDEO ? (
+            <video
+              src={HERO_VIDEO}
+              poster={HERO_POSTER || imagenes[0]}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-hidden="true"
             />
-          ))}
+          ) : (
+            <img
+              src={HERO_IMAGE || imagenes[imagenActual]}
+              alt="Dra. Vanessa Medina"
+            />
+          )}
+          <div className="hero-fs-overlay" aria-hidden="true" />
         </div>
 
-        {/* Lado derecho: texto + CTA */}
-        <div className="hero-right">
-          <div className={`hero-content container ${heroVisible ? "hero-content-visible" : ""}`}>
-            <h1 className="hero-title">
-              La innovadora y exclusiva tecnología de Hydrafacial está en el
-              consultorio de la Dra. Vanessa Medina!
-            </h1>
+        {/* Contenido a la derecha con animación */}
+        <div className="hero-fs-content">
+          <motion.div
+            className="hero-fs-text"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: heroVisible ? 1 : 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <motion.span
+              className="hero-fs-kicker"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 12 }}
+              transition={{ duration: 0.6, delay: 0.05 }}
+            >
+              Medicina estética · Ibagué
+            </motion.span>
 
-            {/* Texto escritorio */}
-            <p className="hero-desc-long">
-              <strong>¿Qué es HydraFacial?</strong> Es una tecnología estética
-              de última generación que combina limpieza profunda, exfoliación,
-              extracción de impurezas e hidratación avanzada en un solo
-              procedimiento. Su sistema patentado utiliza un aplicador con
-              succión controlada y sueros enriquecidos que renuevan la piel
-              desde la primera sesión, sin necesidad de tiempo de recuperación.
+            <motion.h1
+              className="hero-fs-title"
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 18 }}
+              transition={{ duration: 0.7, delay: 0.18 }}
+            >
+              Tu mejor versión <br /> empieza con
               <br />
-              <br />
-              <strong>¿Para qué sirve?</strong> Revitaliza la piel, trata poros
-              dilatados, líneas de expresión, manchas y deshidratación,
-              devolviendo su luminosidad natural.
-              <br />
-              <br />
-              <strong>Un tratamiento exclusivo en el Tolima.</strong> El
-              consultorio de la Dra. Vanessa Medina es el único en la región con
-              tecnología original HydraFacial®, certificada internacionalmente.
-            </p>
+              <span className="hero-fs-rotator">
+                <TypeAnimation
+                  sequence={[
+                    "armonía.",
+                    1800,
+                    "autenticidad.",
+                    1800,
+                    "belleza natural.",
+                    1800,
+                    "confianza.",
+                    1800,
+                  ]}
+                  wrapper="span"
+                  speed={55}
+                  deletionSpeed={70}
+                  repeat={Infinity}
+                  cursor={true}
+                />
+              </span>
+            </motion.h1>
 
-            {/* Texto móvil */}
-            <p className="hero-desc-short">
-              <strong>HydraFacial:</strong> tecnología que limpia, exfolia e
-              hidrata profundamente la piel con resultados visibles desde la
-              primera sesión.
-            </p>
+            <motion.p
+              className="hero-fs-sub"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
+              transition={{ duration: 0.7, delay: 0.4 }}
+            >
+              Tratamientos personalizados con tecnología de última generación.
+              Resultados naturales que resaltan tu esencia, en manos de la
+              Dra. Vanessa Medina.
+            </motion.p>
 
-            <div className="hero-cta">
-              <Link
-                href="/agendar"
-                className="hero-btn hero-btn-primary d-inline-flex align-items-center"
-              >
-                <i className="fas fa-calendar-check me-2"></i>
-                Agendar Cita
+            <motion.div
+              className="hero-fs-cta"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
+              transition={{ duration: 0.7, delay: 0.55 }}
+            >
+              <Link href="/agendar" className="hero-fs-btn hero-fs-btn-primary">
+                <i className="fas fa-calendar-check me-2"></i> Agendar cita
               </Link>
-
-              <a
-                href="https://www.instagram.com/hydrafacialcolombia/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hero-btn hero-btn-secondary d-inline-flex align-items-center"
-              >
-                <i className="fab fa-instagram me-2"></i>
-                Conocer más de HydraFacial
-              </a>
-            </div>
-          </div>
+              <Link href="/procedimientos" className="hero-fs-btn hero-fs-btn-ghost">
+                Conoce los procedimientos
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 

@@ -144,13 +144,13 @@ export default function ProcedimientosList() {
     loadGal(p.id);
   };
 
-  var IS = { width: "100%", padding: "0.55rem 0.8rem", borderRadius: 12, border: "1px solid #E9DED2", fontSize: "0.88rem" } as React.CSSProperties;
+  var IS = { width: "100%", padding: "0.75rem 1rem", borderRadius: 14, border: "1px solid #E9DED2", fontSize: "0.98rem", background: "#FFFDF9" } as React.CSSProperties;
 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
         <h2 style={{ fontWeight: 700, color: "#3A2A1A" }}>Procedimientos</h2>
-        {modo === "lista" && <motion.button whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 5, padding: "0.55rem 1.2rem", borderRadius: 100, background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", fontWeight: 600, fontSize: "0.82rem", cursor: "pointer" }}><Plus size={15} /> Nuevo</motion.button>}
+        {modo === "lista" && <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 7, padding: "0.7rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(176,137,104,0.28)" }}><Plus size={17} /> Nuevo</motion.button>}
       </div>
 
       {toast && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ background: "#E8F5E9", color: "#145A32", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", textAlign: "center" }}>{toast}</motion.div>}

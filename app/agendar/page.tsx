@@ -13,17 +13,7 @@ import AgendarForm, { AgendarFormData } from "./agendarForm";
 import AgendarPago, { CitaSinPagos } from "./agendarPago";
 import TarjetaCita from "./tarjetaCita";
 
-export const PALETTE = {
-  bgGradFrom: "#E9E0D1",
-  bgGradTo: "#C9AD8D",
-  surface: "#FBF7F2",
-  border: "#E5D8C8",
-  main: "#7A5534",
-  mainHover: "#604028",
-  accent: "#B98E63",
-  text: "#2A1C12",
-  textSoft: "#4B3726",
-};
+import { PALETTE } from "./palette";
 
 function AgendarPageContent() {
   const router = useRouter();

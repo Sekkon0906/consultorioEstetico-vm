@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { PALETTE } from "./page";
+import { PALETTE } from "./palette";
 
 //  Tipos desde el dominio real (ya no usamos utils/localDB)
 import type { Procedimiento, SessionUser } from "../types/domain";

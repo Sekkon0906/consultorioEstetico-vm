@@ -1,0 +1,83 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "back": "Volver",
+    "language": "Idioma"
+  },
+  "topbar": {
+    "address": "Carrera 5ta #11-24. Edificio Torre Empresarial. Consultorio 502. Ibagué – Tolima."
+  },
+  "navbar": {
+    "home": "Inicio",
+    "doctor": "Dra. Vanessa Medina",
+    "office": "Consultorio",
+    "procedures": "Procedimientos",
+    "testimonials": "Testimonios",
+    "book": "Agendar cita",
+    "admin": "Administrar",
+    "login": "Iniciar sesión",
+    "editProfile": "Editar perfil",
+    "myAppointments": "Citas agendadas",
+    "logout": "Cerrar sesión",
+    "logoutConfirm": "¿Cerrar sesión?",
+    "logoutMessage": "Tendrás que iniciar sesión nuevamente para acceder a tu cuenta."
+  },
+  "hero": {
+    "kicker": "Medicina estética · Ibagué",
+    "title1": "Tu mejor versión",
+    "title2": "empieza con",
+    "rotator": ["armonía.", "autenticidad.", "belleza natural.", "confianza."],
+    "subtitle": "Tratamientos personalizados con tecnología de última generación. Resultados naturales que resaltan tu esencia, en manos de la Dra. Vanessa Medina.",
+    "ctaPrimary": "Agendar cita",
+    "ctaSecondary": "Conoce los procedimientos"
+  },
+  "footer": {
+    "contactTitle": "¿Tienes alguna pregunta?",
+    "contactSub": "Contáctame directamente por WhatsApp",
+    "form": {
+      "name": "Nombre completo",
+      "email": "Correo electrónico",
+      "procedure": "Selecciona un procedimiento",
+      "phone": "Teléfono",
+      "message": "Tu mensaje",
+      "acceptIntro": "Acepto los",
+      "acceptTerms": "términos y condiciones",
+      "acceptAnd": "y la",
+      "acceptPrivacy": "política de privacidad",
+      "submit": "Enviar por WhatsApp"
+    },
+    "clinic": "Clínica Estética",
+    "clinicDesc": "Atención personalizada y tratamientos de estética facial, corporal y capilar.",
+    "address": "Dirección",
+    "addressLines": "Carrera 5ta #11-24. Torre Empresarial. Consultorio 502. Ibagué - Tolima.\nLunes a Sábado, 9:00 a.m. - 6:00 p.m.",
+    "contact": "Contacto",
+    "contactLines": "WhatsApp: +57 315 544 5748\nEmail: dra.vanessamedinao@gmail.com",
+    "legalLinks": {
+      "privacy": "Política de Privacidad",
+      "terms": "Términos y Condiciones",
+      "cookies": "Cookies",
+      "notice": "Aviso de Privacidad"
+    },
+    "rights": "© Clínica Estética Dra. Julieth Medina. Todos los derechos reservados.",
+    "designedBy": "Diseñada por"
+  },
+  "cookies": {
+    "title": "Tu privacidad importa",
+    "message": "Usamos cookies esenciales para que el sitio funcione. Con tu permiso también podemos usar cookies analíticas o de marketing para mejorar tu experiencia.",
+    "moreInfo": "Más información",
+    "essential": "Esenciales",
+    "essentialDesc": "Necesarias para sesión y agendamiento. Siempre activas.",
+    "analytics": "Analíticas",
+    "analyticsDesc": "Nos ayudan a entender cómo usas el sitio (anónimo).",
+    "marketing": "Marketing",
+    "marketingDesc": "Permiten personalizar contenido y medir campañas.",
+    "acceptAll": "Aceptar todas",
+    "rejectOptional": "Rechazar opcionales",
+    "customize": "Personalizar",
+    "savePreferences": "Guardar preferencias"
+  }
+}

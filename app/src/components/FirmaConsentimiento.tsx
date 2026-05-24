@@ -285,10 +285,10 @@ export default function FirmaConsentimiento(props: Props) {
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
                       <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem", boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}><FileText size={22} color="white" /></div>
-                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.8rem" }}>Consentimiento informado</h3>
+                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#2A1C12", marginBottom: "0.8rem" }}>Consentimiento informado</h3>
                     </div>
-                    <div style={{ background: "linear-gradient(145deg, #FFFBF7, #F0E5D8)", borderRadius: 16, padding: "1.3rem", border: "1px solid rgba(176,137,104,0.12)", marginBottom: "1.5rem" }}>
-                      <p style={{ fontSize: "0.9rem", color: "#5A4A3A", lineHeight: 1.7, margin: 0 }}>Estas por agregar tu firma para el documento de consentimiento informado. Este documento solo lo tiene la doctora y es necesario para autorizar el procedimiento. Si tienes una inquietud, puedes hablar con ella directamente.</p>
+                    <div style={{ background: "#F4E9DC", borderRadius: 16, padding: "1.4rem", border: "1px solid rgba(176,137,104,0.3)", marginBottom: "1.5rem" }}>
+                      <p style={{ fontSize: "1.02rem", color: "#3A2A1A", lineHeight: 1.7, margin: 0 }}>Estás por agregar tu firma para el documento de consentimiento informado. Este documento solo lo tiene la doctora y es necesario para autorizar el procedimiento. Si tienes una inquietud, puedes hablar con ella directamente.</p>
                     </div>
                     <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
                       <button onClick={cerrar} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer" }}>Cancelar</button>

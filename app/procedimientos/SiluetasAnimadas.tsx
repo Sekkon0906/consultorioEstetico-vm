@@ -203,10 +203,10 @@ export default function SiluetasAnimadas({ tipo }: { tipo?: string | null }) {
         if (mProg > 0 && mProg < 1) drawGlow(mTip);
       }
 
-      // Orbiting particles
+      // Orbiting particles (reducidas para rendimiento)
       ctx.globalAlpha = alpha * 0.6;
-      for (let i = 0; i < 10; i++) {
-        const angle = elapsed * 0.12 + (i / 10) * Math.PI * 2;
+      for (let i = 0; i < 5; i++) {
+        const angle = elapsed * 0.12 + (i / 5) * Math.PI * 2;
         const r = Math.min(w, h) * 0.32 + Math.sin(elapsed * 0.25 + i * 1.8) * 25;
         const px = w * 0.5 + Math.cos(angle) * r;
         const py = h * 0.5 + Math.sin(angle) * r;
@@ -221,8 +221,17 @@ export default function SiluetasAnimadas({ tipo }: { tipo?: string | null }) {
       anim = requestAnimationFrame(draw);
     };
 
-    anim = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(anim); window.removeEventListener("resize", resize); };
+    // Solo anima cuando el canvas está visible (evita gasto constante de CPU)
+    let running = false;
+    const start = () => { if (!running) { running = true; startTime = 0; anim = requestAnimationFrame(draw); } };
+    const stop = () => { running = false; cancelAnimationFrame(anim); };
+    const io = new IntersectionObserver(
+      ([e]) => { e.isIntersecting ? start() : stop(); },
+      { threshold: 0 }
+    );
+    io.observe(canvas);
+
+    return () => { io.disconnect(); cancelAnimationFrame(anim); window.removeEventListener("resize", resize); };
   }, []);
 
   return <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }} />;

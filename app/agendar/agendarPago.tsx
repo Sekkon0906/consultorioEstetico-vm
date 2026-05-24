@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
-import { PALETTE } from "./page";
+import { PALETTE } from "./palette";
 import type { Cita, MetodoPago, TipoPagoConsultorio, TipoPagoOnline } from "../types/domain";
 import { createCitaApi } from "../services/citasApi";
 

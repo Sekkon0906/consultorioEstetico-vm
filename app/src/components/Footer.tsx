@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -100,7 +101,16 @@ export default function Footer() {
 
             <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
               <input name="terms" type="checkbox" checked={formData.terms} onChange={handleChange} required style={{ accentColor: "#B08968" }} />
-              <small style={{ color: "rgba(233,222,210,0.7)", fontSize: "0.78rem" }}>Acepto los terminos y condiciones</small>
+              <small style={{ color: "rgba(233,222,210,0.7)", fontSize: "0.78rem" }}>
+                Acepto los{" "}
+                <Link href="/legal/terminos" style={{ color: "#E6CCB2", textDecoration: "underline" }}>
+                  términos y condiciones
+                </Link>
+                {" "}y la{" "}
+                <Link href="/legal/privacidad" style={{ color: "#E6CCB2", textDecoration: "underline" }}>
+                  política de privacidad
+                </Link>
+              </small>
             </div>
 
             <div style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "0.5rem" }}>
@@ -145,6 +155,24 @@ export default function Footer() {
               </a>
             ))}
           </div>
+          {/* Enlaces legales */}
+          <div style={{ display: "flex", justifyContent: "center", gap: "1.2rem", flexWrap: "wrap", marginBottom: "0.8rem" }}>
+            {[
+              { href: "/legal/privacidad", label: "Política de Privacidad" },
+              { href: "/legal/terminos", label: "Términos y Condiciones" },
+              { href: "/legal/cookies", label: "Cookies" },
+              { href: "/legal/aviso", label: "Aviso de Privacidad" },
+            ].map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", textDecoration: "none" }}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
+
           <p style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.5)" }}>2023 Clinica Estetica Dra. Julieth Medina. Todos los derechos reservados.</p>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.5)", marginTop: "0.2rem" }}>
             Diseñada por{" "}
