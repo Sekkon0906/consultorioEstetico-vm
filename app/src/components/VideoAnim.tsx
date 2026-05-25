@@ -127,7 +127,7 @@ export default function VideoAnim() {
         @media(max-width:991px){ .va-3col{grid-template-columns:1fr !important} .va-video-col{order:-1} }
       `}</style>
 
-      <section style={{ position: "relative", padding: "5rem 0 4rem", overflow: "hidden", background: "linear-gradient(175deg, #FDFCFA 0%, #F5EEE5 55%, #FBF8F4 100%)" }}>
+      <section style={{ position: "relative", padding: "2.5rem 0 2rem", overflow: "hidden", background: "linear-gradient(175deg, #FDFCFA 0%, #F5EEE5 55%, #FBF8F4 100%)" }}>
         <ParticleCanvas />
 
         {/* Orbs */}
@@ -135,20 +135,19 @@ export default function VideoAnim() {
         <div style={{ position: "absolute", width: 380, height: 380, bottom: "-5%", right: "3%", borderRadius: "50%", background: "radial-gradient(circle, rgba(201,173,141,0.12) 0%, transparent 70%)", filter: "blur(60px)", animation: "va-orb 18s ease-in-out infinite reverse", pointerEvents: "none" }} />
         <div style={{ position: "absolute", width: 280, height: 280, top: "35%", left: "45%", borderRadius: "50%", background: "radial-gradient(circle, rgba(224,184,146,0.08) 0%, transparent 70%)", filter: "blur(50px)", animation: "va-orb 11s ease-in-out infinite 2s", pointerEvents: "none" }} />
 
-        {/* Header */}
-        <div ref={hdr.ref} style={{ ...rs(hdr.v), textAlign: "center", marginBottom: "2.5rem", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
-          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B08968", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("kicker")}</span>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "#3A2A1A", maxWidth: 660, margin: "0 auto 1rem", lineHeight: 1.2 }}>{t("title")}</h2>
-          <div style={{ width: 50, height: 3, background: "linear-gradient(90deg,#C9AD8D,#B08968)", borderRadius: 2, margin: "0 auto 0.8rem" }} />
-          <p style={{ fontSize: "1.05rem", color: "#7A6554", margin: 0 }}>{t("subtitle")}</p>
+        {/* Header — sin kicker para ahorrar vertical y que título+video+CTAs entren juntos en pantalla */}
+        <div ref={hdr.ref} style={{ ...rs(hdr.v), textAlign: "center", marginBottom: "1.4rem", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.4rem, 2.6vw, 2rem)", fontWeight: 700, color: "#3A2A1A", maxWidth: 780, margin: "0 auto 0.6rem", lineHeight: 1.2 }}>{t("title")}</h2>
+          <div style={{ width: 50, height: 3, background: "linear-gradient(90deg,#C9AD8D,#B08968)", borderRadius: 2, margin: "0 auto 0.55rem" }} />
+          <p style={{ fontSize: "0.95rem", color: "#7A6554", margin: 0 }}>{t("subtitle")}</p>
         </div>
 
         {/* 3 COLUMN LAYOUT */}
         <div className="va-3col" style={{ display: "grid", gridTemplateColumns: "250px minmax(0, 1fr) 250px", gap: "1.75rem", maxWidth: 1560, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1, alignItems: "center" }}>
 
           {/* LEFT - Features */}
-          <div ref={lft.ref} style={{ ...rs(lft.v, 0.15), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.8rem 1.2rem" }}>
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "1.2rem", textAlign: "center" }}>{t("distinguishTitle")}</h3>
+          <div ref={lft.ref} style={{ ...rs(lft.v, 0.15), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.2rem 1rem" }}>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.85rem", textAlign: "center" }}>{t("distinguishTitle")}</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               {features.map((f, i) => (
                 <div key={i} style={{
@@ -193,8 +192,8 @@ export default function VideoAnim() {
 
           {/* RIGHT - Counters */}
           <div ref={el => { rgt.ref.current = el; countersRef.current = el; }}
-            style={{ ...rs(rgt.v, 0.2), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.8rem 1.2rem" }}>
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "1.2rem", textAlign: "center" }}>{t("experienceTitle")}</h3>
+            style={{ ...rs(rgt.v, 0.2), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.2rem 1rem" }}>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.85rem", textAlign: "center" }}>{t("experienceTitle")}</h3>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.7rem" }}>
               <Counter value={680} label={t("counters.patients")} suffix="+" icon="fas fa-users" delay={0} />
               <Counter value={15} label={t("counters.treatments")} suffix="+" icon="fas fa-syringe" delay={150} />
@@ -210,10 +209,10 @@ export default function VideoAnim() {
             position: "relative",
             zIndex: 1,
             display: "flex",
-            gap: "1rem",
+            gap: "0.9rem",
             justifyContent: "center",
             flexWrap: "wrap",
-            marginTop: "3rem",
+            marginTop: "1.4rem",
             padding: "0 1.5rem",
           }}
         >

@@ -127,9 +127,9 @@ export default function Galeria3D() {
       style={{
         perspective: "1700px",
         width: "100%",
-        height: selected ? "920px" : "860px",
+        height: "100vh",
+        minHeight: 720,
         overflow: "hidden",
-        transition: "height 0.45s cubic-bezier(0.16,1,0.3,1)",
         backgroundImage: `url(${IMG.galeria3dBg})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
@@ -149,17 +149,18 @@ export default function Galeria3D() {
         }}
       />
 
-      {/* Título arriba-derecha */}
+      {/* Título centrado sobre el eje de la rueda (right: 20%, translateX 50%) */}
       <div
         className="g3d-title-wrap"
         style={{
           position: "absolute",
-          top: "6%",
-          right: 0,
-          width: "55%",
+          top: "8%",
+          right: "20%",
+          transform: "translateX(50%)",
+          width: "min(720px, 50%)",
           textAlign: "center",
           zIndex: 4,
-          padding: "0 2rem",
+          padding: "0 1rem",
         }}
       >
         <h2
@@ -198,15 +199,14 @@ export default function Galeria3D() {
         />
       </div>
 
-      {/* Rueda 3D anclada a la derecha, con margen vertical generoso
-          para no chocar con título ni con dots. */}
+      {/* Rueda 3D centrada verticalmente, anclada al eje right: 20% */}
       <div
         className="g3d-wheel-anchor"
         style={{
           position: "absolute",
-          top: "58%",
+          top: "52%",
           right: "20%",
-          transform: "translateY(-50%)",
+          transform: "translate(50%, -50%)",
           zIndex: 3,
         }}
       >
@@ -397,64 +397,61 @@ export default function Galeria3D() {
         )}
       </div>
 
-      {/* Dots indicadores — anclados al centro de la rueda (right: 20%) */}
+      {/* Dots + CTA "Ver todos los procedimientos" — juntos abajo, mismo
+          eje que el título y la rueda (right: 20%, translateX(50%)). */}
       {selected === null && tratamientos.length > 0 && (
         <div
-          className="g3d-dots"
+          className="g3d-bottom-stack"
           style={{
             position: "absolute",
-            bottom: "13%",
+            bottom: "8%",
             right: "20%",
             transform: "translateX(50%)",
-            display: "flex",
-            gap: 8,
             zIndex: 5,
-            padding: "0.45rem 0.85rem",
-            background: "rgba(255, 253, 249, 0.9)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255, 235, 215, 0.5)",
-            borderRadius: 100,
-            boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1rem",
           }}
         >
-          {tratamientos.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goToCard(i)}
-              aria-label={ta("goToCard", { n: i + 1 })}
-              style={{
-                width: i === frontIndex ? 24 : 8,
-                height: 8,
-                borderRadius: 100,
-                background:
-                  i === frontIndex
-                    ? "linear-gradient(90deg, #B08968, #C9AD8D)"
-                    : "rgba(176,137,104,0.4)",
-                border: "none",
-                cursor: "pointer",
-                transition:
-                  "width 0.4s cubic-bezier(0.16,1,0.3,1), background 0.3s",
-                padding: 0,
-              }}
-            />
-          ))}
-        </div>
-      )}
+          {/* Dots */}
+          <div
+            className="g3d-dots"
+            style={{
+              display: "flex",
+              gap: 8,
+              padding: "0.45rem 0.85rem",
+              background: "rgba(255, 253, 249, 0.9)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255, 235, 215, 0.5)",
+              borderRadius: 100,
+              boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
+            }}
+          >
+            {tratamientos.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goToCard(i)}
+                aria-label={ta("goToCard", { n: i + 1 })}
+                style={{
+                  width: i === frontIndex ? 24 : 8,
+                  height: 8,
+                  borderRadius: 100,
+                  background:
+                    i === frontIndex
+                      ? "linear-gradient(90deg, #B08968, #C9AD8D)"
+                      : "rgba(176,137,104,0.4)",
+                  border: "none",
+                  cursor: "pointer",
+                  transition:
+                    "width 0.4s cubic-bezier(0.16,1,0.3,1), background 0.3s",
+                  padding: 0,
+                }}
+              />
+            ))}
+          </div>
 
-      {/* CTA "Ver todos los procedimientos" — abajo centrado */}
-      {selected === null && (
-        <div
-          className="g3d-cta-wrap"
-          style={{
-            position: "absolute",
-            bottom: "4%",
-            left: 0,
-            right: 0,
-            display: "flex",
-            justifyContent: "center",
-            zIndex: 5,
-          }}
-        >
+          {/* CTA — pill ghost translúcido sobre la imagen oscura */}
           <Link
             href="/procedimientos"
             className="g3d-cta-pill"
@@ -462,18 +459,19 @@ export default function Galeria3D() {
               display: "inline-flex",
               alignItems: "center",
               gap: 8,
-              padding: "0.75rem 1.8rem",
+              padding: "0.7rem 1.6rem",
               borderRadius: 100,
-              background: "transparent",
+              background: "rgba(30, 18, 8, 0.35)",
               color: "#FFFDF9",
-              border: "1.5px solid rgba(255, 253, 249, 0.7)",
+              border: "1.5px solid rgba(255, 253, 249, 0.78)",
               fontWeight: 600,
-              fontSize: "0.95rem",
+              fontSize: "0.92rem",
               textDecoration: "none",
               backdropFilter: "blur(8px)",
               WebkitBackdropFilter: "blur(8px)",
               transition:
                 "background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease",
+              whiteSpace: "nowrap",
             }}
           >
             <i className="fas fa-th-large" />
@@ -729,8 +727,10 @@ export default function Galeria3D() {
           transform: translateY(-3px);
         }
 
-        /* CTA "Ver todos los procedimientos" — hover se rellena con marca */
-        .g3d-cta-pill:hover {
+        /* CTA "Ver todos los procedimientos" — hover se rellena con marca.
+           Mismo gesto que el .hero-fs-btn-ghost para que se sienta familiar. */
+        .g3d-cta-pill:hover,
+        .g3d-cta-pill:focus-visible {
           background: linear-gradient(135deg, #B08968, #C9AD8D) !important;
           color: #FFFFFF !important;
           border-color: transparent !important;
@@ -739,42 +739,44 @@ export default function Galeria3D() {
         }
 
         @media (max-width: 1100px) {
-          .g3d-wheel-anchor { right: 8% !important; }
-          .g3d-title-wrap   { width: 70% !important; }
-          .g3d-dots         { right: 8% !important; }
-          .g3d-detail       {
+          .g3d-wheel-anchor   { right: 12% !important; transform: translate(50%, -50%) !important; }
+          .g3d-title-wrap     { right: 12% !important; width: min(640px, 60%) !important; }
+          .g3d-bottom-stack   { right: 12% !important; }
+          .g3d-detail         {
             right: 4% !important;
             max-width: 70% !important;
             width: auto !important;
           }
         }
         @media (max-width: 820px) {
-          .g3d-stage        { background-position: 30% center !important; height: 1050px !important; }
-          .g3d-overlay      {
+          .g3d-stage          { background-position: 30% center !important; height: auto !important; min-height: 100vh !important; padding: 6rem 0 4rem !important; }
+          .g3d-overlay        {
             background:
               linear-gradient(180deg, rgba(58,42,26,0.55) 0%, rgba(58,42,26,0.35) 35%, rgba(58,42,26,0.55) 100%) !important;
           }
-          .g3d-wheel-anchor {
+          .g3d-title-wrap     {
+            position: relative !important;
+            top: auto !important;
+            right: auto !important;
+            width: 92% !important;
+            transform: none !important;
+            margin: 0 auto !important;
+          }
+          .g3d-wheel-anchor   {
             position: relative !important;
             top: auto !important;
             right: auto !important;
             transform: none !important;
-            margin: 10rem auto 0 !important;
+            margin: 3rem auto 0 !important;
             display: flex;
             justify-content: center;
           }
-          .g3d-title-wrap   {
-            position: relative !important;
-            width: 100% !important;
-            top: auto !important;
-            padding-top: 2.5rem !important;
-          }
-          .g3d-dots {
+          .g3d-bottom-stack   {
             position: relative !important;
             right: auto !important;
             bottom: auto !important;
-            margin: 2rem auto 0 !important;
             transform: none !important;
+            margin: 2rem auto 0 !important;
           }
         }
         @media (max-width: 768px) {

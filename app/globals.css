@@ -279,9 +279,13 @@ body {
 }
 
 .hero-fs-btn-ghost {
-  background: rgba(255, 255, 255, 0.08);
+  /* Fondo OSCURO semi-transparente (no blanco) para que el texto
+     blanco SIEMPRE se lea — antes era rgba(255,255,255,0.08) que sobre
+     ciertos fondos del hero podía verse como "botón blanco con texto
+     que desaparece". */
+  background: rgba(30, 18, 8, 0.32);
   color: #FFFDF9;
-  border: 1px solid rgba(255, 253, 249, 0.6);
+  border: 1.5px solid rgba(255, 253, 249, 0.85);
   backdrop-filter: blur(6px);
 }
 .hero-fs-btn-ghost:hover {
@@ -299,13 +303,16 @@ body {
    en banners, modales, secciones (cookies, ubicación, galería,
    etc). Mismo gesto visual: contorno claro, hover se rellena
    con el gradiente de marca. Mantiene la identidad del sitio. */
+/* IMPORTANT: el reset global a {color: inherit !important} y el de
+   text-decoration ganan por especificidad/!important, así que aquí
+   reforzamos color, border y decoration con !important para que la
+   píldora se vea como botón en cualquier <a>, <Link> o <button>. */
 .btn-ghost-app {
-  background: transparent;
-  color: var(--brand-deep);
-  /* Borde con color de marca → siempre visible (sobre claro u oscuro). */
-  border: 1.5px solid var(--brand);
-  border-radius: 100px;
-  padding: 0.6rem 1.5rem;
+  background: transparent !important;
+  color: var(--brand-deep) !important;
+  border: 1.5px solid var(--brand) !important;
+  border-radius: 100px !important;
+  padding: 0.65rem 1.6rem !important;
   font-weight: 600;
   font-size: 0.9rem;
   line-height: 1.2;
@@ -315,22 +322,24 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  text-decoration: none;
+  text-decoration: none !important;
   white-space: nowrap;
 }
-.btn-ghost-app:hover {
-  background: linear-gradient(135deg, #B08968, #C9AD8D);
-  color: #FFFFFF;
-  border-color: transparent;
+.btn-ghost-app:hover,
+.btn-ghost-app:focus-visible {
+  background: linear-gradient(135deg, #B08968, #C9AD8D) !important;
+  color: #FFFFFF !important;
+  border-color: transparent !important;
   transform: translateY(-2px);
   box-shadow: 0 8px 22px rgba(176, 137, 104, 0.35);
+  text-decoration: none !important;
 }
 
 /* En modo oscuro el texto pasa a cream (más legible sobre el fondo
    taupe) y el borde se intensifica para que la píldora destaque. */
 :root[data-theme="dark"] .btn-ghost-app {
-  color: var(--text);
-  border-color: var(--brand);
+  color: var(--text) !important;
+  border-color: var(--brand) !important;
 }
 
 /* ===== Responsive ===== */
