@@ -176,7 +176,7 @@ export default function Galeria3D() {
         style={{
           position: "absolute",
           top: "5%",
-          right: "30%",
+          right: "22%",
           transform: "translateX(50%)",
           /* Ancho ajustado al espacio horizontal que ocupan las cards
              visibles (~ ±290px del eje). Antes 880px lo hacía verse
@@ -246,7 +246,7 @@ export default function Galeria3D() {
         style={{
           position: "absolute",
           top: "55%",
-          right: "30%",
+          right: "22%",
           transform: "translate(50%, -50%)",
           zIndex: 3,
         }}
@@ -445,7 +445,7 @@ export default function Galeria3D() {
           style={{
             position: "absolute",
             bottom: "13%",
-            right: "30%",
+            right: "22%",
             transform: "translateX(50%)",
             zIndex: 5,
           }}
@@ -497,7 +497,7 @@ export default function Galeria3D() {
           style={{
             position: "absolute",
             bottom: "5%",
-            right: "30%",
+            right: "22%",
             transform: "translateX(50%)",
             zIndex: 5,
           }}
@@ -766,20 +766,20 @@ export default function Galeria3D() {
         }
 
         @media (max-width: 1280px) {
-          .g3d-wheel-anchor   { right: 22% !important; transform: translate(50%, -50%) !important; }
-          .g3d-title-wrap     { right: 22% !important; width: min(620px, 55%) !important; }
-          .g3d-dots-wrap      { right: 22% !important; }
-          .g3d-cta-wrap       { right: 22% !important; }
+          .g3d-wheel-anchor   { right: 16% !important; transform: translate(50%, -50%) !important; }
+          .g3d-title-wrap     { right: 16% !important; width: min(580px, 48%) !important; }
+          .g3d-dots-wrap      { right: 16% !important; }
+          .g3d-cta-wrap       { right: 16% !important; }
           .g3d-detail         {
             max-width: 70% !important;
             width: auto !important;
           }
         }
         @media (max-width: 980px) {
-          .g3d-wheel-anchor   { right: 15% !important; transform: translate(50%, -50%) !important; }
-          .g3d-title-wrap     { right: 15% !important; width: min(560px, 60%) !important; }
-          .g3d-dots-wrap      { right: 15% !important; }
-          .g3d-cta-wrap       { right: 15% !important; }
+          .g3d-wheel-anchor   { right: 10% !important; transform: translate(50%, -50%) !important; }
+          .g3d-title-wrap     { right: 10% !important; width: min(520px, 55%) !important; }
+          .g3d-dots-wrap      { right: 10% !important; }
+          .g3d-cta-wrap       { right: 10% !important; }
         }
         @media (max-width: 820px) {
           .g3d-stage          { background-position: 30% top !important; aspect-ratio: auto !important; height: auto !important; min-height: 100vh !important; padding: 6rem 0 4rem !important; }
