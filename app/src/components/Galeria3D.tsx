@@ -165,9 +165,9 @@ export default function Galeria3D() {
         }}
       />
 
-      {/* Título centrado sobre el eje de la rueda — fijo, con dos
-          palabras destacadas en dorado vibrante para alto contraste
-          sobre la imagen oscura. */}
+      {/* Título sobre el eje de la rueda — ancho ajustado al espacio
+          visual de las cards para que no se sienta "centrado en toda
+          la sección" sino realmente anclado a la columna derecha. */}
       <motion.div
         className="g3d-title-wrap"
         initial={{ opacity: 0, y: -12 }}
@@ -178,12 +178,13 @@ export default function Galeria3D() {
           top: "5%",
           right: "30%",
           transform: "translateX(50%)",
-          /* Ancho mayor para que el título quepa en una sola línea
-             y quede visualmente alineado con la rueda. */
-          width: "min(880px, 62%)",
+          /* Ancho ajustado al espacio horizontal que ocupan las cards
+             visibles (~ ±290px del eje). Antes 880px lo hacía verse
+             centrado en toda la sección. */
+          width: "min(640px, 44%)",
           textAlign: "center",
           zIndex: 4,
-          padding: "0 1rem",
+          padding: "0 0.5rem",
         }}
       >
         <h2
@@ -191,7 +192,7 @@ export default function Galeria3D() {
             fontFamily: "'Playfair Display', serif",
             color: "#FFFDF9",
             fontWeight: 700,
-            fontSize: "clamp(1.5rem, 2.6vw, 2.15rem)",
+            fontSize: "clamp(1.3rem, 2vw, 1.8rem)",
             margin: 0,
             textShadow: "0 4px 18px rgba(0,0,0,0.7)",
             letterSpacing: "0.01em",
@@ -437,13 +438,13 @@ export default function Galeria3D() {
         )}
       </div>
 
-      {/* Dots — pegados a la base de la rueda, mismo eje */}
+      {/* Dots — debajo de la rueda (no encima), mismo eje horizontal */}
       {selected === null && tratamientos.length > 0 && (
         <div
           className="g3d-dots-wrap"
           style={{
             position: "absolute",
-            bottom: "22%",
+            bottom: "13%",
             right: "30%",
             transform: "translateX(50%)",
             zIndex: 5,
