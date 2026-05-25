@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { TypeAnimation } from "react-type-animation";
 import { useTranslations } from "next-intl";
 import { getProcedimientosApi } from "../../services/procedimientosApi";
 import { IMG } from "../lib/imagenes";
@@ -166,15 +168,19 @@ export default function Galeria3D() {
         }}
       />
 
-      {/* Título centrado sobre el eje de la rueda */}
-      <div
+      {/* Título centrado sobre el eje de la rueda — con tipado rotativo
+          al estilo del hero, fade-in y subtítulo informativo. */}
+      <motion.div
         className="g3d-title-wrap"
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
         style={{
           position: "absolute",
           top: "6%",
           right: "30%",
           transform: "translateX(50%)",
-          width: "min(640px, 50%)",
+          width: "min(660px, 52%)",
           textAlign: "center",
           zIndex: 4,
           padding: "0 1rem",
@@ -187,23 +193,28 @@ export default function Galeria3D() {
             fontWeight: 700,
             fontSize: "clamp(1.7rem, 3vw, 2.4rem)",
             margin: 0,
-            textShadow: "0 4px 18px rgba(0,0,0,0.55)",
+            textShadow: "0 4px 18px rgba(0,0,0,0.6)",
             letterSpacing: "0.01em",
+            minHeight: "1.3em",
           }}
         >
-          {t("title")}
+          {/* Tipado rotativo entre 4 variantes */}
+          {mounted && (
+            <TypeAnimation
+              sequence={(() => {
+                const list = t.raw("titleRotator") as string[];
+                return list.flatMap((w) => [w, 2400]);
+              })()}
+              wrapper="span"
+              speed={55}
+              deletionSpeed={70}
+              repeat={Infinity}
+              cursor={true}
+            />
+          )}
+          {/* Fallback estático mientras hidrata (SEO + sin flash) */}
+          {!mounted && t("title")}
         </h2>
-        <p
-          style={{
-            color: "rgba(255, 253, 249, 0.88)",
-            fontSize: "0.95rem",
-            marginTop: "0.55rem",
-            marginBottom: 0,
-            textShadow: "0 2px 10px rgba(0,0,0,0.55)",
-          }}
-        >
-          {t("subtitle")}
-        </p>
         <div
           style={{
             width: 44,
@@ -211,18 +222,28 @@ export default function Galeria3D() {
             background:
               "linear-gradient(90deg, transparent, #E5D2C4, transparent)",
             borderRadius: 2,
-            margin: "0.9rem auto 0",
+            margin: "0.9rem auto 0.7rem",
           }}
         />
-      </div>
+        <p
+          style={{
+            color: "rgba(255, 253, 249, 0.92)",
+            fontSize: "0.95rem",
+            margin: 0,
+            textShadow: "0 2px 10px rgba(0,0,0,0.55)",
+            lineHeight: 1.55,
+          }}
+        >
+          {t("subtitle")}
+        </p>
+      </motion.div>
 
-      {/* Rueda 3D — movida un poco más arriba para que los dots y el
-          CTA queden visualmente cerca de la base de la rueda. */}
+      {/* Rueda 3D — centrada vertical entre el título y la base inferior */}
       <div
         className="g3d-wheel-anchor"
         style={{
           position: "absolute",
-          top: "44%",
+          top: "52%",
           right: "30%",
           transform: "translate(50%, -50%)",
           zIndex: 3,
@@ -415,26 +436,18 @@ export default function Galeria3D() {
         )}
       </div>
 
-      {/* Dots + CTA "Ver todos los procedimientos" — juntos abajo, mismo
-          eje que el título y la rueda (right: 20%, translateX(50%)). */}
+      {/* Dots — pegados a la base de la rueda, mismo eje */}
       {selected === null && tratamientos.length > 0 && (
         <div
-          className="g3d-bottom-stack"
+          className="g3d-dots-wrap"
           style={{
             position: "absolute",
-            /* Sube el stack para que quede pegado al borde inferior
-               de la rueda, no abajo de la sección. */
-            bottom: "16%",
+            bottom: "22%",
             right: "30%",
             transform: "translateX(50%)",
             zIndex: 5,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.55rem",
           }}
         >
-          {/* Dots */}
           <div
             className="g3d-dots"
             style={{
@@ -470,9 +483,26 @@ export default function Galeria3D() {
               />
             ))}
           </div>
+        </div>
+      )}
 
-          {/* CTA — pill cream con borde brand, contraste alto sobre la
-              imagen oscura del fondo. */}
+      {/* CTA "Ver todos los procedimientos" — al fondo de la sección,
+          despegado de los dots para crear una pausa visual. Centrado
+          horizontalmente respecto al viewport (no al eje de la rueda)
+          para que se sienta como el cierre natural de la sección. */}
+      {selected === null && (
+        <div
+          className="g3d-cta-wrap"
+          style={{
+            position: "absolute",
+            bottom: "5%",
+            left: 0,
+            right: 0,
+            display: "flex",
+            justifyContent: "center",
+            zIndex: 5,
+          }}
+        >
           <Link
             href="/procedimientos"
             className="g3d-cta-pill"
@@ -480,15 +510,15 @@ export default function Galeria3D() {
               display: "inline-flex",
               alignItems: "center",
               gap: 8,
-              padding: "0.7rem 1.6rem",
+              padding: "0.75rem 1.8rem",
               borderRadius: 100,
               background: "rgba(255, 253, 249, 0.95)",
               color: "#5A4635",
               border: "1.5px solid rgba(176, 137, 104, 0.55)",
               fontWeight: 600,
-              fontSize: "0.92rem",
+              fontSize: "0.95rem",
               textDecoration: "none",
-              boxShadow: "0 6px 18px rgba(0, 0, 0, 0.22)",
+              boxShadow: "0 8px 22px rgba(0, 0, 0, 0.28)",
               backdropFilter: "blur(8px)",
               WebkitBackdropFilter: "blur(8px)",
               transition:
@@ -740,9 +770,8 @@ export default function Galeria3D() {
         @media (max-width: 1280px) {
           .g3d-wheel-anchor   { right: 22% !important; transform: translate(50%, -50%) !important; }
           .g3d-title-wrap     { right: 22% !important; width: min(620px, 55%) !important; }
-          .g3d-bottom-stack   { right: 22% !important; }
+          .g3d-dots-wrap      { right: 22% !important; }
           .g3d-detail         {
-            right: 4% !important;
             max-width: 70% !important;
             width: auto !important;
           }
@@ -750,10 +779,10 @@ export default function Galeria3D() {
         @media (max-width: 980px) {
           .g3d-wheel-anchor   { right: 15% !important; transform: translate(50%, -50%) !important; }
           .g3d-title-wrap     { right: 15% !important; width: min(560px, 60%) !important; }
-          .g3d-bottom-stack   { right: 15% !important; }
+          .g3d-dots-wrap      { right: 15% !important; }
         }
         @media (max-width: 820px) {
-          .g3d-stage          { background-position: 30% center !important; aspect-ratio: auto !important; height: auto !important; min-height: 100vh !important; padding: 6rem 0 4rem !important; }
+          .g3d-stage          { background-position: 30% top !important; aspect-ratio: auto !important; height: auto !important; min-height: 100vh !important; padding: 6rem 0 4rem !important; }
           .g3d-overlay        {
             background:
               linear-gradient(180deg, rgba(58,42,26,0.55) 0%, rgba(58,42,26,0.35) 35%, rgba(58,42,26,0.55) 100%) !important;
@@ -775,11 +804,18 @@ export default function Galeria3D() {
             display: flex;
             justify-content: center;
           }
-          .g3d-bottom-stack   {
+          .g3d-dots-wrap      {
             position: relative !important;
             right: auto !important;
             bottom: auto !important;
             transform: none !important;
+            margin: 1.5rem auto 0 !important;
+            display: flex;
+            justify-content: center;
+          }
+          .g3d-cta-wrap       {
+            position: relative !important;
+            bottom: auto !important;
             margin: 2rem auto 0 !important;
           }
         }
