@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -38,11 +38,11 @@ export default function ModalGaleriaItem({
 
   const handleGuardar = () => {
     if (!titulo.trim()) {
-      setError("Debe ingresar un título.");
+      setError("Debe ingresar un tÃ­tulo.");
       return;
     }
     if (tipo === "imagen" && !url) {
-      setError("Debe subir una imagen o URL válida.");
+      setError("Debe subir una imagen o URL vÃ¡lida.");
       return;
     }
     setError(null);
@@ -68,13 +68,13 @@ export default function ModalGaleriaItem({
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="bg-[#FBF7F2] rounded-lg shadow-xl p-6 w-[95%] max-w-lg"
+          className="[background:var(--surface)] rounded-lg shadow-xl p-6 w-[95%] max-w-lg"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
         >
           <h3 className="text-lg font-semibold text-[#6E4F37] mb-4">
-            {modo === "crear" ? "Añadir elemento a galería" : "Ver elemento"}
+            {modo === "crear" ? "AÃ±adir elemento a galerÃ­a" : "Ver elemento"}
           </h3>
 
           {error && (
@@ -89,7 +89,7 @@ export default function ModalGaleriaItem({
                 aria-label="Cerrar"
                 style={{ background: "none", border: "none", color: "#922B21", cursor: "pointer", fontWeight: 700 }}
               >
-                ×
+                Ã—
               </button>
             </div>
           )}
@@ -98,7 +98,7 @@ export default function ModalGaleriaItem({
             <select
               value={tipo}
               onChange={(e) => setTipo(e.target.value as "imagen" | "video")}
-              className="border border-[#E5D8C8] rounded p-2"
+              className="border [border-color:var(--border)] rounded p-2"
             >
               <option value="imagen">Imagen</option>
               <option value="video">Video</option>
@@ -108,15 +108,15 @@ export default function ModalGaleriaItem({
               type="text"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
-              placeholder="Título del medio"
-              className="border border-[#E5D8C8] rounded p-2"
+              placeholder="TÃ­tulo del medio"
+              className="border [border-color:var(--border)] rounded p-2"
             />
 
             <textarea
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
-              placeholder="Descripción breve"
-              className="border border-[#E5D8C8] rounded p-2"
+              placeholder="DescripciÃ³n breve"
+              className="border [border-color:var(--border)] rounded p-2"
             />
 
             {tipo === "imagen" ? (
@@ -153,7 +153,7 @@ export default function ModalGaleriaItem({
                 placeholder="Pega URL de video (YouTube o embebido)"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="border border-[#E5D8C8] rounded p-2"
+                className="border [border-color:var(--border)] rounded p-2"
               />
             )}
 

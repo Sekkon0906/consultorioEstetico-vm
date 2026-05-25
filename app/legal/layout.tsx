@@ -9,7 +9,7 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
     <main
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(180deg, #FAF9F7 0%, #F4EBE2 100%)",
+        background: "var(--bg)",
         padding: "3rem 1.25rem 4rem",
       }}
     >
@@ -17,10 +17,10 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
         style={{
           maxWidth: 980,
           margin: "0 auto",
-          background: "#FFFDF9",
+          background: "var(--surface)",
           borderRadius: 24,
-          border: "1px solid rgba(176,137,104,0.12)",
-          boxShadow: "0 12px 40px rgba(78,59,43,0.06)",
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow-md)",
           overflow: "hidden",
         }}
       >

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
@@ -30,13 +30,13 @@ export default function AdministrarPageInner() {
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.25 }}
       >
-        {/* === SECCIÓN INICIAL === */}
+        {/* === SECCIÃ“N INICIAL === */}
         {selected === "inicio" && (
           <div className="text-center py-12">
-            <h1 className="text-3xl font-bold text-[#8B6A4B] mb-4">
+            <h1 className="text-3xl font-bold [color:var(--brand)] mb-4">
               Bienvenido al Panel Administrativo
             </h1>
-            <p className="text-[#6E5A49]">
+            <p className="[color:var(--text-soft)]">
               Usa la barra lateral para administrar horarios, citas,
               procedimientos, testimonios o ingresos.
             </p>

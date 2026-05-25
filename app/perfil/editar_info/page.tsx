@@ -8,7 +8,7 @@ export default function EditarInfoPage() {
     <section
       className="py-5 d-flex justify-content-center align-items-start"
       style={{
-        background: `linear-gradient(180deg,#FAF9F7 0%,#F1E9E0 100%)`,
+        background: `linear-gradient(180deg,var(--bg) 0%,var(--surface-soft) 100%)`,
         minHeight: "100vh",
       }}
     >

@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
 import { IMG } from "@/lib/imagenes";
 import LanguageSwitcher from "./LanguageSwitcher";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   const pathname = usePathname() || "/";
@@ -57,16 +58,22 @@ export default function Navbar() {
       const activeEl = activeIndex !== -1 ? linkRefs.current[activeIndex] : null;
       updateIndicatorTo(activeEl);
     };
-    // Espera a que el layout/tipografías se asienten tras el cambio de ruta
+    // Espera a que el layout/tipografías/traducciones se asienten
     const r1 = requestAnimationFrame(() => requestAnimationFrame(measure));
-    const t = setTimeout(measure, 250);
+    const t1 = setTimeout(measure, 80);
+    const t2 = setTimeout(measure, 250);
+    const t3 = setTimeout(measure, 600); // re-mide tras animaciones de framer-motion
     window.addEventListener("resize", measure);
     return () => {
       cancelAnimationFrame(r1);
-      clearTimeout(t);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
       window.removeEventListener("resize", measure);
     };
-  }, [pathname, menuItems.length]);
+    // Importante: depender de `menuItems` (no solo .length) para que se
+    // re-mida cuando cambian las etiquetas (cambio de idioma).
+  }, [pathname, menuItems]);
 
   /* === SECCIÓN ACTUAL (pt 22) === */
   const currentSection = useMemo(() => {
@@ -123,7 +130,7 @@ export default function Navbar() {
   return (
     <nav
       className="navbar shadow-sm py-3"
-      style={{ backgroundColor: "#FAF9F7", position: "sticky", top: 0, zIndex: 1000 }}
+      style={{ backgroundColor: "var(--bg-elevated)", position: "sticky", top: 0, zIndex: 1000 }}
     >
       <div
         className="container-fluid d-flex align-items-center justify-content-between"
@@ -150,8 +157,8 @@ export default function Navbar() {
               style={{
                 fontWeight: 600,
                 fontSize: "0.92rem",
-                color: "#8d7a6a",
-                borderLeft: "1px solid #E6CCB2",
+                color: "var(--text-muted)",
+                borderLeft: "1px solid var(--border)",
                 paddingLeft: "0.6rem",
                 whiteSpace: "nowrap",
               }}
@@ -185,8 +192,8 @@ export default function Navbar() {
                 >
                   <Link
                     href={item.href}
-                    className="text-decoration-none"
-                    style={{ color: isActive ? "#B08968" : "#2B2B2B", fontWeight: 600, fontSize: "1.08rem", letterSpacing: "0.01em", whiteSpace: "nowrap" }}
+                    className={`text-decoration-none ${isActive ? "navbar-link-active" : ""}`}
+                    style={{ color: isActive ? "var(--brand)" : "var(--text)", fontWeight: 600, fontSize: "1.08rem", letterSpacing: "0.01em", whiteSpace: "nowrap" }}
                   >
                     {item.label}
                   </Link>
@@ -197,6 +204,7 @@ export default function Navbar() {
 
           <motion.div
             layout
+            className="navbar-indicator"
             animate={{
               left: indicator.left,
               width: indicator.width,
@@ -220,11 +228,6 @@ export default function Navbar() {
           className="navbar-user"
           style={{ position: "relative", display: "flex", justifyContent: "flex-end", flex: "0 0 auto" }}
         >
-          {/* Selector de idioma (siempre visible en desktop) */}
-          <div className="d-none d-md-inline-flex me-2 align-items-center">
-            <LanguageSwitcher />
-          </div>
-
           {/* HAMBURGUESA MÓVIL */}
           <button
             className={`hamburger-btn d-md-none ${mobileOpen ? "active" : ""}`}
@@ -237,9 +240,9 @@ export default function Navbar() {
               transition={{ duration: 0.4 }}
             >
               {mobileOpen ? (
-                <X size={30} strokeWidth={2.5} color="#6B4E3D" />
+                <X size={30} strokeWidth={2.5} color="var(--brand-deep)" />
               ) : (
-                <Menu size={30} strokeWidth={2.5} color="#6B4E3D" />
+                <Menu size={30} strokeWidth={2.5} color="var(--brand-deep)" />
               )}
             </motion.div>
           </button>
@@ -249,8 +252,8 @@ export default function Navbar() {
             <motion.button
               onClick={() => router.push("/login")}
               className="btn rounded-pill px-4 py-2 d-none d-md-inline-flex align-items-center gap-2"
-              style={{ border: "1.5px solid #B08968", color: "#6B4E3D", backgroundColor: "#fff8f3", fontWeight: 600 }}
-              whileHover={{ scale: 1.05, backgroundColor: "#B08968", color: "#fff", boxShadow: "0 6px 18px rgba(176,137,104,0.35)" }}
+              style={{ border: "1.5px solid var(--brand)", color: "var(--brand-deep)", backgroundColor: "var(--surface)", fontWeight: 600 }}
+              whileHover={{ scale: 1.05, backgroundColor: "var(--brand)", color: "#fff", boxShadow: "0 6px 18px rgba(176,137,104,0.35)" }}
               whileTap={{ scale: 0.96 }}
               transition={{ type: "spring", stiffness: 320, damping: 20 }}
             >
@@ -281,7 +284,9 @@ export default function Navbar() {
                     style={{
                       top: "110%", right: 0, minWidth: "260px", zIndex: 100,
                       textAlign: "center",
-                      background: "linear-gradient(135deg, #fffdfb 0%, #f8f3ed 100%)",
+                      background: "var(--surface)",
+                      border: "1px solid var(--border)",
+                      color: "var(--text)",
                     }}
                   >
                     <div
@@ -297,7 +302,7 @@ export default function Navbar() {
                         alt={t("profileAlt")}
                         style={{ width: 70, height: 70, borderRadius: "50%", objectFit: "cover", border: "2px solid #FFDDBF", marginBottom: "0.4rem" }}
                       />
-                      <div style={{ fontWeight: 700, color: "#6B4E3D" }}>
+                      <div style={{ fontWeight: 700, color: "var(--brand-deep)" }}>
                         {user.nombres}
                       </div>
                       <div style={{ fontSize: "0.85rem", color: "#8d7a6a" }}>{user.email}</div>
@@ -331,6 +336,12 @@ export default function Navbar() {
               </AnimatePresence>
             </>
           )}
+
+          {/* Selector de tema + idioma — a la derecha del login/avatar */}
+          <div className="d-none d-md-inline-flex ms-2 align-items-center" style={{ gap: 8 }}>
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
         </div>
       </div>
 
@@ -396,7 +407,7 @@ export default function Navbar() {
               className="bg-white rounded-4 shadow-lg p-4 text-center"
               style={{ maxWidth: 360, width: "100%", background: "linear-gradient(135deg, #fffdfb 0%, #f8f3ed 100%)" }}
             >
-              <h5 className="fw-bold mb-2" style={{ color: "#6B4E3D" }}>
+              <h5 className="fw-bold mb-2" style={{ color: "var(--brand-deep)" }}>
                 {t("logoutConfirm")}
               </h5>
               <p className="mb-4" style={{ color: "#8d7a6a", fontSize: "0.92rem" }}>

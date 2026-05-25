@@ -74,3 +74,13 @@ export function acceptAll(): void {
 export function rejectOptional(): void {
   setConsent({ analytics: false, marketing: false });
 }
+
+/**
+ * Borra la decisión guardada (vuelve a estado "no decidido") y
+ * dispara un evento para que el banner se vuelva a mostrar.
+ */
+export function resetConsent(): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(COOKIE_CONSENT_KEY);
+  window.dispatchEvent(new CustomEvent("open-cookie-banner"));
+}

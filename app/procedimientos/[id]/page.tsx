@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { FaCalendarCheck, FaArrowLeft, FaPlay, FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 
 function formatPrecio(precio: string | number): string {
@@ -19,6 +20,7 @@ interface Proc { id: string; nombre: string; descripcion: string; descripcion_co
 interface MediaItem { id: string; tipo: string; url: string; titulo: string; descripcion: string; }
 
 export default function ProcedimientoPage() {
+  const t = useTranslations("procedures.detail");
   const params = useParams();
   const router = useRouter();
   const id = String(params.id || "");
@@ -57,28 +59,28 @@ export default function ProcedimientoPage() {
     return () => window.removeEventListener("keydown", h);
   }, [modalIndex, galeria.length]);
 
-  if (loading) return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#FAF9F7" }}><div className="spinner-border" style={{ color: "#B08968" }} /></div>;
+  if (loading) return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
   if (!proc) return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#FAF9F7", color: "#4E3B2B", gap: "1rem" }}>
-      <p style={{ fontSize: "1.5rem", fontWeight: 600 }}>Procedimiento no encontrado</p>
-      <button onClick={() => router.push("/procedimientos")} style={{ padding: "0.7rem 2rem", background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", borderRadius: 100, fontWeight: 600, cursor: "pointer" }}>Volver</button>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--bg)", color: "var(--text)", gap: "1rem" }}>
+      <p style={{ fontSize: "1.5rem", fontWeight: 600 }}>{t("notFound")}</p>
+      <button onClick={() => router.push("/procedimientos")} style={{ padding: "0.7rem 2rem", background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", borderRadius: 100, fontWeight: 600, cursor: "pointer" }}>{t("back2")}</button>
     </div>
   );
 
   const descDetalle = proc.descripcion_completa || proc.descripcion;
 
   return (
-    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg, #FAF9F7 0%, #F5EEE5 100%)" }}>
+    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%)" }}>
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
 
         <motion.div initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
-          <Link href="/procedimientos" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "#6C584C", fontSize: "0.88rem", fontWeight: 600, textDecoration: "none", marginBottom: "1.5rem", padding: "0.5rem 1rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.2)", background: "rgba(255,253,250,0.8)" }}>
-            <FaArrowLeft style={{ fontSize: "0.75rem" }} /> Volver a procedimientos
+          <Link href="/procedimientos" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--text-soft)", fontSize: "0.88rem", fontWeight: 600, textDecoration: "none", marginBottom: "1.5rem", padding: "0.5rem 1rem", borderRadius: 100, border: "1px solid var(--border)", background: "var(--surface)" }}>
+            <FaArrowLeft style={{ fontSize: "0.75rem" }} /> {t("back")}
           </Link>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
-          style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", overflow: "hidden" }}>
+          style={{ background: "var(--surface)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid var(--border)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", overflow: "hidden" }}>
 
           <div style={{ position: "relative", width: "100%", height: 380, overflow: "hidden" }}>
             {proc.imagen ? (
@@ -94,36 +96,36 @@ export default function ProcedimientoPage() {
           <div style={{ padding: "2rem 2.5rem 2.5rem" }}>
             <div style={{ marginBottom: "2rem" }}>
               <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, marginBottom: "1rem" }} />
-              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.8rem" }}>Descripcion del procedimiento</h2>
-              <p style={{ fontSize: "1rem", color: "#5A4A3A", lineHeight: 1.8, whiteSpace: "pre-line" }}>{descDetalle}</p>
+              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.8rem" }}>{t("descriptionTitle")}</h2>
+              <p style={{ fontSize: "1rem", color: "var(--text-soft)", lineHeight: 1.8, whiteSpace: "pre-line" }}>{descDetalle}</p>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap", padding: "1.5rem 2rem", background: "linear-gradient(145deg, #FFFBF7, #F0E5D8)", borderRadius: 18, border: "1px solid rgba(176,137,104,0.12)", marginBottom: "2rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap", padding: "1.5rem 2rem", background: "var(--bg-elevated)", borderRadius: 18, border: "1px solid var(--border)", marginBottom: "2rem" }}>
               <div style={{ flex: "1 1 auto" }}>
-                <p style={{ fontSize: "0.72rem", color: "#8A7565", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, marginBottom: "0.2rem" }}>Precio estandar</p>
-                <p style={{ fontFamily: "'Playfair Display', serif", fontSize: "2rem", fontWeight: 700, color: "#3A2A1A", lineHeight: 1, marginBottom: "0.2rem" }}>${formatPrecio(proc.precio)}</p>
-                <small style={{ fontSize: "0.72rem", color: "#9B8575" }}>*Puede variar segun valoracion medica</small>
+                <p style={{ fontSize: "0.72rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, marginBottom: "0.2rem" }}>{t("standardPrice")}</p>
+                <p style={{ fontFamily: "'Playfair Display', serif", fontSize: "2rem", fontWeight: 700, color: "var(--text)", lineHeight: 1, marginBottom: "0.2rem" }}>${formatPrecio(proc.precio)}</p>
+                <small style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{t("priceNote")}</small>
               </div>
               <Link href={`/agendar?proc=${encodeURIComponent(proc.nombre)}`}
                 style={{ display: "flex", alignItems: "center", gap: 8, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", padding: "0.9rem 2.2rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", textDecoration: "none", boxShadow: "0 4px 18px rgba(176,137,104,0.3)", whiteSpace: "nowrap" }}>
-                <FaCalendarCheck /> Agendar cita
+                <FaCalendarCheck /> {t("bookCta")}
               </Link>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
               {proc.duracion_min && (
-                <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem", borderRadius: 14, background: "#FFFBF7", border: "1px solid rgba(176,137,104,0.1)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
                   <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.85rem", flexShrink: 0 }}><i className="fas fa-clock" /></div>
-                  <div><div style={{ fontSize: "0.78rem", color: "#8A7565" }}>Duracion aprox.</div><div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#3A2A1A" }}>{proc.duracion_min} min</div></div>
+                  <div><div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>{t("approxDuration")}</div><div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>{proc.duracion_min} {t("minutes")}</div></div>
                 </div>
               )}
-              <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem", borderRadius: 14, background: "#FFFBF7", border: "1px solid rgba(176,137,104,0.1)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
                 <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.85rem", flexShrink: 0 }}><i className="fas fa-shield-alt" /></div>
-                <div><div style={{ fontSize: "0.78rem", color: "#8A7565" }}>Seguridad</div><div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#3A2A1A" }}>Procedimiento certificado</div></div>
+                <div><div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>{t("safety")}</div><div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>{t("certified")}</div></div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem", borderRadius: 14, background: "#FFFBF7", border: "1px solid rgba(176,137,104,0.1)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
                 <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.85rem", flexShrink: 0 }}><i className="fas fa-user-md" /></div>
-                <div><div style={{ fontSize: "0.78rem", color: "#8A7565" }}>Atencion</div><div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#3A2A1A" }}>Personalizada</div></div>
+                <div><div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>{t("care")}</div><div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>{t("personalized")}</div></div>
               </div>
             </div>
           </div>
@@ -131,12 +133,12 @@ export default function ProcedimientoPage() {
 
         {galeria.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.6 }} style={{ marginTop: "2.5rem" }}>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.5rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "1.5rem", textAlign: "center" }}>Galeria de resultados</h2>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.5rem", fontWeight: 700, color: "var(--text)", marginBottom: "1.5rem", textAlign: "center" }}>{t("galleryTitle")}</h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "1rem" }}>
               {galeria.map((m, i) => (
                 <motion.div key={m.id || i} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.5 + i * 0.08 }}
                   onClick={() => setModalIndex(i)}
-                  style={{ borderRadius: 16, overflow: "hidden", cursor: "pointer", position: "relative", boxShadow: "0 4px 14px rgba(78,59,43,0.08)", transition: "transform 0.3s, box-shadow 0.3s", background: "#E9DED2" }}
+                  style={{ borderRadius: 16, overflow: "hidden", cursor: "pointer", position: "relative", boxShadow: "0 4px 14px rgba(78,59,43,0.08)", transition: "transform 0.3s, box-shadow 0.3s", background: "var(--surface-soft)" }}
                   onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 10px 28px rgba(78,59,43,0.14)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 4px 14px rgba(78,59,43,0.08)"; }}>
                   {m.tipo === "imagen" ? (

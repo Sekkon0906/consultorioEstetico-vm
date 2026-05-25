@@ -1,26 +1,126 @@
 @import "tailwindcss";
 
 /* ==========================
-   PALETA GLOBAL
+   TOKENS DE TEMA — CLARO / OSCURO
+   El modo se controla con [data-theme="light|dark"] en <html>.
+   El switcher (ThemeToggle) lo ajusta; un script anti-flash en <head>
+   lo aplica antes del primer paint para evitar parpadeo.
 ========================== */
-:root {
-  --background: #b14c1e;
-  --foreground: #a34711;
-  --text-color: #3a2a1a;
-  --text-soft: #6e5a49;
-  --surface: #f9f5f1;
-  --border: #e5d8c8;
+
+/* === PALETA CLARA (por defecto) === */
+:root,
+:root[data-theme="light"] {
+  --bg:            #FAF9F7;   /* fondo de página */
+  --bg-elevated:   #FFFFFF;   /* tarjetas elevadas */
+  --surface:       #FFFDF9;   /* superficies suaves (cards) */
+  --surface-soft:  #F5EEE6;   /* secundario / hover */
+  --text:          #3A2A1A;   /* texto principal */
+  --text-soft:     #6C584C;   /* texto secundario */
+  --text-muted:    #8A7565;   /* meta, captions */
+  --border:        #E9DED2;   /* bordes y separadores */
+  --border-strong: #D9C3B0;
+  --brand:         #B08968;   /* marca principal */
+  --brand-soft:    #C9AD8D;   /* marca suave */
+  --brand-deep:    #8B6A4B;   /* marca profunda (hover/accent) */
+  --accent:        #E0B892;   /* acento cálido */
+  --topbar-bg:     #E8E1D4;
+  --topbar-text:   #4E3B2B;
+  --footer-bg:     #5A4A3A;
+  --footer-text:   #E9DED2;
+  --danger:        #b02e2e;
+  --success:       #2D6A4F;
+  --shadow-sm:     0 2px 8px rgba(78,59,43,0.06);
+  --shadow-md:     0 8px 24px rgba(78,59,43,0.10);
+  --overlay-bg:    rgba(0,0,0,0.45);
+
+  /* Decoración Galería 3D — adaptativa */
+  --galeria-halo:  conic-gradient(from 0deg, rgba(176,137,104,0.22), rgba(201,173,141,0.16), rgba(139,106,75,0.20), rgba(176,137,104,0.22));
+  --galeria-particle-1: rgba(176,137,104,0.45);
+  --galeria-particle-2: rgba(139,106,75,0.30);
+
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #2b1b14;
-    --foreground: #e8a676;
-    --text-color: #f6ede6;
-    --text-soft: #c9b5a6;
-    --surface: #3c2b20;
-    --border: #5a4637;
-  }
+/* === PALETA OSCURA (café con leche pastel) ===
+   Inspirada en taupe / mushroom / café con leche — tonos pastel cálidos,
+   baja saturación, transiciones tonales suaves. Cozy, premium, sin la
+   pesadez del "espresso oscuro". Toda la escala parte de la misma familia
+   HSL (~30°, ~18% saturación) y solo varía la luminosidad. */
+:root[data-theme="dark"] {
+  /* Paleta taupe pastel solicitada por el cliente:
+     #7a695d (base), #ae9c8f, #e5d2c4, #f2e8e1, #ffffff.
+     Regla: TODO el texto en blanco/#fff. Los tonos más oscuros (#7a695d
+     y derivados) son los fondos. Los medios‑claros (#ae9c8f, #e5d2c4,
+     #f2e8e1) se reservan para bordes, acentos y la marca — NO para
+     fondos de tarjetas con texto encima (perderían contraste con white).
+     Las superficies de cards usan tonos *ligeramente más oscuros* que
+     el fondo (#6b5a4f, #5d4d43) para que blanco siempre contraste 4.5+. */
+  --bg:            #7a695d;   /* fondo principal — el más oscuro de la paleta */
+  --bg-elevated:   #6b5a4f;   /* secciones elevadas (un escalón más oscuro) */
+  --surface:       #6b5a4f;   /* cards — más oscuro que el bg, white text contrasta */
+  --surface-soft:  #5d4d43;   /* hover / secundario, todavía más profundo */
+  --text:          #ffffff;   /* TODAS las letras en blanco */
+  --text-soft:     #f2e8e1;   /* texto secundario — beige clarísimo */
+  --text-muted:    #e5d2c4;   /* captions / metadata — beige cálido */
+  --border:        #ae9c8f;   /* bordes visibles, marca el contorno de cards */
+  --border-strong: #c4b3a4;
+  --brand:         #e5d2c4;   /* champán claro como acento principal */
+  --brand-soft:    #f2e8e1;
+  --brand-deep:    #ffffff;
+  --accent:        #f2e8e1;
+  --topbar-bg:     #5d4d43;   /* navbar/topbar más oscuro, como el costado del hero */
+  --topbar-text:   #ffffff;
+  --footer-bg:     #4f4138;   /* el más profundo, anclaje visual */
+  --footer-text:   #f2e8e1;
+  --danger:        #f4b8b8;
+  --success:       #b8e0c2;
+  --shadow-sm:     0 2px 8px rgba(0,0,0,0.28);
+  --shadow-md:     0 8px 24px rgba(0,0,0,0.36);
+  --overlay-bg:    rgba(40,30,22,0.65);
+
+  /* Decoración Galería 3D — tonos cream sobre taupe oscuro */
+  --galeria-halo:  conic-gradient(from 0deg, rgba(229,210,196,0.28), rgba(174,156,143,0.22), rgba(242,232,225,0.28), rgba(229,210,196,0.28));
+  --galeria-particle-1: rgba(229,210,196,0.55);
+  --galeria-particle-2: rgba(242,232,225,0.40);
+
+  color-scheme: dark;
+}
+
+/* === LOGO EN MODO OSCURO ===
+   Invierte la imagen del logo (que es oscura) a blanco — funciona porque
+   el logo JM es texto/líneas sobre fondo claro. */
+:root[data-theme="dark"] .navbar-logo img {
+  filter: brightness(0) invert(1);
+}
+
+/* === NAVBAR EN MODO OSCURO ===
+   Reglas con !important para asegurar el contraste blanco sobre el
+   fondo oscuro del navbar, independiente de inline styles o cache. */
+:root[data-theme="dark"] .navbar-menu a,
+:root[data-theme="dark"] .navbar-menu a:visited,
+:root[data-theme="dark"] .navbar-menu li a {
+  color: #FFFFFF !important;
+}
+:root[data-theme="dark"] .navbar-menu a.navbar-link-active {
+  color: var(--brand) !important;
+}
+:root[data-theme="dark"] .navbar-indicator {
+  background: #FFFFFF !important;
+  box-shadow: 0 0 8px rgba(255,255,255,0.5);
+}
+
+/* Aplicación a body por defecto. Las páginas/componentes que
+   actualmente usan colores en estilos inline NO cambian (se migran
+   por fases). El body se vuelve oscuro inmediatamente. */
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* Transición suave en chrome común */
+.topbar, .navbar, footer {
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 /* ==========================
    ESCALA GLOBAL (legibilidad)
@@ -181,13 +281,56 @@ body {
 .hero-fs-btn-ghost {
   background: rgba(255, 255, 255, 0.08);
   color: #FFFDF9;
-  border: 1px solid rgba(255, 253, 249, 0.5);
+  border: 1px solid rgba(255, 253, 249, 0.6);
   backdrop-filter: blur(6px);
 }
 .hero-fs-btn-ghost:hover {
-  background: rgba(255, 253, 249, 0.95);
-  color: #4E3B2B;
+  /* Se "rellena" con la marca y mantiene texto blanco —
+     siempre alto contraste, sin parpadeo en la transición. */
+  background: linear-gradient(135deg, #B08968, #C9AD8D);
+  color: #FFFFFF;
+  border-color: transparent;
   transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(176, 137, 104, 0.45);
+}
+
+/* ===========================================================
+   .btn-ghost-app — variante del botón ghost del hero, reusable
+   en banners, modales, secciones (cookies, ubicación, galería,
+   etc). Mismo gesto visual: contorno claro, hover se rellena
+   con el gradiente de marca. Mantiene la identidad del sitio. */
+.btn-ghost-app {
+  background: transparent;
+  color: var(--brand-deep);
+  /* Borde con color de marca → siempre visible (sobre claro u oscuro). */
+  border: 1.5px solid var(--brand);
+  border-radius: 100px;
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-ghost-app:hover {
+  background: linear-gradient(135deg, #B08968, #C9AD8D);
+  color: #FFFFFF;
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(176, 137, 104, 0.35);
+}
+
+/* En modo oscuro el texto pasa a cream (más legible sobre el fondo
+   taupe) y el borde se intensifica para que la píldora destaque. */
+:root[data-theme="dark"] .btn-ghost-app {
+  color: var(--text);
+  border-color: var(--brand);
 }
 
 /* ===== Responsive ===== */
@@ -650,11 +793,14 @@ footer a:hover i {
 ========================== */
 
 .navbar-container {
-  background-color: #faf9f7;
+  background-color: var(--topbar-bg);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   position: sticky;
   top: 0;
   z-index: 50;
+}
+:root:not([data-theme="dark"]) .navbar-container {
+  background-color: #faf9f7;
 }
 
 .navbar-inner {
@@ -1056,15 +1202,15 @@ footer a:hover i {
   min-height: 100dvh;
   position: relative;
   overflow: hidden;
-  background: #faf9f7;
+  background: var(--bg);
 }
 
 /* Izquierda: texto */
 .doc-hero-left {
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #faf9f7 0%, #e9ded2 100%);
-  color: #4e3b2b;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--surface-soft) 100%);
+  color: var(--text);
   padding: 4rem;
 }
 
@@ -1076,13 +1222,13 @@ footer a:hover i {
   font-family: "Playfair Display", serif;
   font-weight: 700;
   line-height: 1.2;
-  color: #4e3b2b;
+  color: var(--text);
   font-size: clamp(1.8rem, 1.1rem + 2.8vw, 2.6rem);
   margin: 0 0 1.25rem 0;
 }
 
 .doc-hero-paragraph {
-  color: #6c584c;
+  color: var(--text-soft);
   font-size: 1.05rem;
   line-height: 1.7;
   text-align: justify;
@@ -1090,7 +1236,7 @@ footer a:hover i {
 }
 
 .doc-hero-quote {
-  color: #6c584c;
+  color: var(--text-soft);
   line-height: 1.7;
   text-align: justify;
   margin: 0.75rem 0 1.25rem 0;
@@ -1221,12 +1367,13 @@ footer a:hover i {
 }
 /* Apariencia base */
 .topbar{
-  background:#E8E1D4;
-  color:#4E3B2B;
+  background: var(--topbar-bg);
+  color: var(--topbar-text);
   font-size:.9rem;
-  border-bottom:1px solid #d9c3b0;
+  border-bottom:1px solid var(--border-strong);
   padding:6px 0;
 }
+.topbar-item i { color: var(--topbar-text) !important; }
 
 /* Ventana (oculta lo que sale) — con desvanecido en los bordes
    para que entre/salga suave y NO se corte en seco */

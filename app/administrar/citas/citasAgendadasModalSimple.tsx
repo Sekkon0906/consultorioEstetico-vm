@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
@@ -66,7 +66,7 @@ export default function CitasAgendadasModalSimple({
   const colorAccionMap: Record<Exclude<PromptTipo, null>, string> = {
     confirmar: "#6FB2E3",
     cancelar: "#E57373",
-    reagendar: "#E5D8C8",
+    reagendar: "var(--border)",
   };
 
   const colorAccion =
@@ -85,18 +85,18 @@ export default function CitasAgendadasModalSimple({
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         exit={{ scale: 0.9 }}
-        className="bg-[#FBF7F2] p-6 rounded-2xl shadow-2xl w-[95%] max-w-md border border-[#E5D8C8]"
+        className="[background:var(--surface)] p-6 rounded-2xl shadow-2xl w-[95%] max-w-md border [border-color:var(--border)]"
       >
         {/* HEADER */}
         <div className="flex items-center gap-3 mb-5">
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-[#F1E6DA] transition"
+            className="p-2 rounded-full hover:[background:var(--surface-soft)] transition"
           >
-            <ArrowLeft size={20} className="text-[#6E5A49]" />
+            <ArrowLeft size={20} className="[color:var(--text-soft)]" />
           </button>
-          <h3 className="text-xl font-semibold text-[#8B6A4B] tracking-wide">
+          <h3 className="text-xl font-semibold [color:var(--brand)] tracking-wide">
             Detalle de cita #{cita.id}
           </h3>
         </div>
@@ -128,7 +128,7 @@ export default function CitasAgendadasModalSimple({
                 >
                   {i + 1}
                 </div>
-                <span className="text-xs mt-2 text-[#6E5A49] font-medium">
+                <span className="text-xs mt-2 [color:var(--text-soft)] font-medium">
                   {e.label}
                 </span>
               </div>
@@ -175,7 +175,7 @@ export default function CitasAgendadasModalSimple({
             <button
               type="button"
               onClick={() => setConfirmPrompt("reagendar")}
-              className="px-4 py-2 bg-[#E9E0D1] text-[#4E3B2B] rounded-md hover:bg-[#E0D2BA] transition font-medium shadow-sm"
+              className="px-4 py-2 bg-[#E9E0D1] [color:var(--text)] rounded-md hover:bg-[#E0D2BA] transition font-medium shadow-sm"
             >
               Reagendar
             </button>
@@ -190,7 +190,7 @@ export default function CitasAgendadasModalSimple({
         ) : (
           <div className="text-center mt-8 space-y-4">
             <CheckCircle2 size={48} className="text-[#78B66D] mx-auto" />
-            <p className="text-[#4E3B2B] font-medium">
+            <p className="[color:var(--text)] font-medium">
               Cita concluida, fue correctamente registrada en ingresos.
             </p>
             <button
@@ -216,9 +216,9 @@ export default function CitasAgendadasModalSimple({
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.8 }}
-                className="bg-white p-6 rounded-xl shadow-2xl text-center max-w-sm w-[90%] border border-[#E5D8C8]"
+                className="bg-white p-6 rounded-xl shadow-2xl text-center max-w-sm w-[90%] border [border-color:var(--border)]"
               >
-                <p className="text-[#4E3B2B] mb-4 font-medium">
+                <p className="[color:var(--text)] mb-4 font-medium">
                   {confirmPrompt ? mensajes[confirmPrompt] : ""}
                 </p>
                 <div className="flex justify-center gap-3">
@@ -240,7 +240,7 @@ export default function CitasAgendadasModalSimple({
                   <button
                     type="button"
                     onClick={() => setConfirmPrompt(null)}
-                    className="px-4 py-2 bg-gray-200 text-[#4E3B2B] rounded-md hover:bg-gray-300"
+                    className="px-4 py-2 bg-gray-200 [color:var(--text)] rounded-md hover:bg-gray-300"
                   >
                     No
                   </button>

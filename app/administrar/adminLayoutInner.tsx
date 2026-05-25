@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -44,8 +44,8 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
     { id: "citas",          label: "Citas Agendadas" },
     { id: "procedimientos", label: "Procedimientos" },
     { id: "testimonios",    label: "Testimonios" },
-    { id: "charlas",        label: "Formación" },
-    { id: "ingresos",       label: "Analítica" },
+    { id: "charlas",        label: "FormaciÃ³n" },
+    { id: "ingresos",       label: "AnalÃ­tica" },
   ];
 
   const NavLinks = () => (
@@ -61,7 +61,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
               className={`block text-center px-4 py-2 rounded-lg font-medium transition-all duration-300 no-underline ${
                 isActive
                   ? "bg-[#8B6A4B] text-white shadow-sm"
-                  : "bg-[#FBF7F2] text-[#5A4230] hover:bg-[#DCC7AC] hover:text-[#3A2A1A]"
+                  : "[background:var(--surface)] [color:var(--text)] hover:bg-[#DCC7AC] hover:[color:var(--text)]"
               }`}
             >
               {label}
@@ -73,16 +73,16 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#FAF8F4] text-[#32261C]">
+    <div className="flex min-h-screen bg-[#FAF8F4] [color:var(--text)]">
 
       {/* SIDEBAR DESKTOP */}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:bg-[#E9E0D1] lg:py-6 lg:px-4 lg:shadow-lg">
-        <h1 className="text-2xl font-bold mb-2 text-center tracking-wide text-[#8B6A4B]">
+        <h1 className="text-2xl font-bold mb-2 text-center tracking-wide [color:var(--brand)]">
           Panel Admin
         </h1>
         {user && (
-          <p className="text-sm text-center mb-6 text-[#5A4230]">
-            Sesión: <b>{user.nombres}</b>
+          <p className="text-sm text-center mb-6 [color:var(--text)]">
+            SesiÃ³n: <b>{user.nombres}</b>
           </p>
         )}
         <NavLinks />
@@ -90,11 +90,11 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
           onClick={handleLogout}
           className="mt-auto px-4 py-2 rounded-lg bg-[#C87A7A] text-white font-semibold shadow hover:bg-[#B56666] transition"
         >
-          Cerrar sesión
+          Cerrar sesiÃ³n
         </button>
       </aside>
 
-      {/* SIDEBAR MÓVIL */}
+      {/* SIDEBAR MÃ“VIL */}
       <AnimatePresence>
         {!isDesktop && sidebarOpen && (
           <>
@@ -111,14 +111,14 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
               style={{ top: TOP_OFFSET, height: `calc(100vh - ${TOP_OFFSET}px)` }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h1 className="text-xl font-bold text-[#8B6A4B]">Panel Admin</h1>
+                <h1 className="text-xl font-bold [color:var(--brand)]">Panel Admin</h1>
                 <button onClick={() => setSidebarOpen(false)} className="p-1 rounded-md hover:bg-[#DCC7AC]">
-                  <X size={20} className="text-[#5A4230]" />
+                  <X size={20} className="[color:var(--text)]" />
                 </button>
               </div>
               {user && (
-                <p className="text-sm text-center mb-4 text-[#5A4230]">
-                  Sesión: <b>{user.nombres}</b>
+                <p className="text-sm text-center mb-4 [color:var(--text)]">
+                  SesiÃ³n: <b>{user.nombres}</b>
                 </p>
               )}
               <NavLinks />
@@ -126,7 +126,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
                 onClick={handleLogout}
                 className="mt-auto px-4 py-2 rounded-lg bg-[#C87A7A] text-white font-semibold shadow hover:bg-[#B56666] transition"
               >
-                Cerrar sesión
+                Cerrar sesiÃ³n
               </button>
             </motion.aside>
           </>
@@ -135,19 +135,19 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
 
       {/* CONTENIDO */}
       <div className="flex-1 flex flex-col">
-        <header className="w-full flex items-center justify-between px-6 py-4 bg-[#FBF7F2] border-b border-[#E5D8C8] shadow-sm sticky top-0 z-30">
+        <header className="w-full flex items-center justify-between px-6 py-4 [background:var(--surface)] border-b [border-color:var(--border)] shadow-sm sticky top-0 z-30">
           <button
             className="lg:hidden bg-[#8B6A4B] text-white p-2 rounded-lg shadow flex items-center gap-1"
             onClick={() => setSidebarOpen((p) => !p)}
           >
             <Menu size={20} />
-            <span className="text-sm font-medium">Menú</span>
+            <span className="text-sm font-medium">MenÃº</span>
           </button>
-          <h2 className="text-xl font-semibold text-[#8B6A4B] ml-auto lg:ml-0">
-            Administración
+          <h2 className="text-xl font-semibold [color:var(--brand)] ml-auto lg:ml-0">
+            AdministraciÃ³n
           </h2>
         </header>
-        <main className="flex-1 p-4 sm:p-6 overflow-y-auto bg-[#FBF7F2]">
+        <main className="flex-1 p-4 sm:p-6 overflow-y-auto [background:var(--surface)]">
           <motion.div
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }} className="max-w-6xl mx-auto"

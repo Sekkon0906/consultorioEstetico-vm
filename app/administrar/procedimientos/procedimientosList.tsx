@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -144,12 +144,12 @@ export default function ProcedimientosList() {
     loadGal(p.id);
   };
 
-  var IS = { width: "100%", padding: "0.75rem 1rem", borderRadius: 14, border: "1px solid #E9DED2", fontSize: "0.98rem", background: "#FFFDF9" } as React.CSSProperties;
+  var IS = { width: "100%", padding: "0.75rem 1rem", borderRadius: 14, border: "1px solid var(--border)", fontSize: "0.98rem", background: "var(--surface)" } as React.CSSProperties;
 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-        <h2 style={{ fontWeight: 700, color: "#3A2A1A" }}>Procedimientos</h2>
+        <h2 style={{ fontWeight: 700, color: "var(--text)" }}>Procedimientos</h2>
         {modo === "lista" && <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 7, padding: "0.7rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(176,137,104,0.28)" }}><Plus size={17} /> Nuevo</motion.button>}
       </div>
 
@@ -159,8 +159,8 @@ export default function ProcedimientosList() {
       <AnimatePresence>
         {modo === "form" && (
           <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
-            style={{ background: "#FFFDF9", borderRadius: 20, border: "1px solid #E9DED2", padding: "1.8rem", marginBottom: "1.5rem" }}>
-            <h4 style={{ fontWeight: 700, color: "#3A2A1A", marginBottom: "1.2rem" }}>{actual ? "Editar" : "Nuevo"} procedimiento</h4>
+            style={{ background: "var(--surface)", borderRadius: 20, border: "1px solid var(--border)", padding: "1.8rem", marginBottom: "1.5rem" }}>
+            <h4 style={{ fontWeight: 700, color: "var(--text)", marginBottom: "1.2rem" }}>{actual ? "Editar" : "Nuevo"} procedimiento</h4>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", marginBottom: "1rem" }}>
               <div style={{ gridColumn: "1 / -1" }}><Lbl>Nombre *</Lbl><input style={IS} value={form.nombre} onChange={function(e) { setForm({ ...form, nombre: e.target.value }); }} placeholder="Acido Hialuronico" /></div>
@@ -169,8 +169,8 @@ export default function ProcedimientosList() {
               <div><Lbl>Categoria</Lbl><select value={form.categoria} onChange={function(e) { setForm({ ...form, categoria: e.target.value as Cat }); }} style={IS}><option>Facial</option><option>Corporal</option><option>Capilar</option></select></div>
               <div style={{ display: "flex", alignItems: "end", paddingBottom: 4 }}>
                 <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                  <input type="checkbox" checked={form.destacado} onChange={function(e) { setForm({ ...form, destacado: e.target.checked }); }} style={{ width: 17, height: 17, accentColor: "#B08968" }} />
-                  <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#4E3B2B" }}>Destacado</span>
+                  <input type="checkbox" checked={form.destacado} onChange={function(e) { setForm({ ...form, destacado: e.target.checked }); }} style={{ width: 17, height: 17, accentColor: "var(--brand)" }} />
+                  <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text)" }}>Destacado</span>
                 </label>
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function ProcedimientosList() {
             <div style={{ marginBottom: "1.2rem" }}><Lbl>Descripcion completa</Lbl><textarea style={{ ...IS, resize: "vertical" as const }} value={form.descCompleta} onChange={function(e) { setForm({ ...form, descCompleta: e.target.value }); }} rows={4} placeholder="Se muestra en la pagina de detalle..." /></div>
 
             {/* MAIN IMAGE - only 1, upload replaces */}
-            <div style={{ background: "#F5EEE6", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}>
+            <div style={{ background: "var(--surface-soft)", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}>
               <Lbl>Foto principal</Lbl>
               <div style={{ display: "flex", gap: "0.8rem", alignItems: "center", flexWrap: "wrap", marginTop: 6 }}>
                 {form.imagen && (
@@ -188,7 +188,7 @@ export default function ProcedimientosList() {
                     <button onClick={function() { setForm({ ...form, imagen: "" }); }} style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#C62828", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={10} /></button>
                   </div>
                 )}
-                <label style={{ padding: "0.5rem 1.2rem", borderRadius: 12, border: "1px dashed #B08968", cursor: uploading ? "wait" : "pointer", fontSize: "0.82rem", color: "#B08968", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: uploading ? 0.6 : 1 }}>
+                <label style={{ padding: "0.5rem 1.2rem", borderRadius: 12, border: "1px dashed #B08968", cursor: uploading ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: uploading ? 0.6 : 1 }}>
                   <Upload size={14} /> {uploading ? "Subiendo..." : form.imagen ? "Cambiar foto" : "Subir foto"}
                   <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleMainImg} disabled={uploading} />
                 </label>
@@ -199,11 +199,11 @@ export default function ProcedimientosList() {
             {actual && (
               <div style={{ background: "#EEF7EE", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}>
                 <Lbl>Galeria de resultados</Lbl>
-                <p style={{ fontSize: "0.72rem", color: "#6C584C", marginBottom: "0.6rem" }}>Sube fotos de antes/despues. Usa las flechas para ordenar.</p>
+                <p style={{ fontSize: "0.72rem", color: "var(--text-soft)", marginBottom: "0.6rem" }}>Sube fotos de antes/despues. Usa las flechas para ordenar.</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.6rem" }}>
                   {gal.filter(function(g) { return g.tipo === "imagen"; }).map(function(g, i) {
                     return (
-                      <div key={g.id || i} style={{ position: "relative", borderRadius: 10, overflow: "hidden", border: "1px solid #E9DED2" }}>
+                      <div key={g.id || i} style={{ position: "relative", borderRadius: 10, overflow: "hidden", border: "1px solid var(--border)" }}>
                         <img src={g.url} alt="" style={{ width: 90, height: 70, objectFit: "cover", display: "block" }} />
                         <button onClick={function() { galRemove(g); }} style={{ position: "absolute", top: 0, right: 0, width: 18, height: 18, background: "rgba(198,40,40,0.85)", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} /></button>
                         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "center", gap: 2, background: "rgba(0,0,0,0.4)", padding: 1 }}>
@@ -223,12 +223,12 @@ export default function ProcedimientosList() {
                 {/* Videos en galeria */}
                 <div style={{ marginTop: "0.8rem", borderTop: "1px solid #C8E6C9", paddingTop: "0.8rem" }}>
                   <Lbl>Videos (YouTube / Instagram)</Lbl>
-                  <p style={{ fontSize: "0.72rem", color: "#6C584C", marginBottom: "0.5rem" }}>Agrega links de videos del procedimiento</p>
+                  <p style={{ fontSize: "0.72rem", color: "var(--text-soft)", marginBottom: "0.5rem" }}>Agrega links de videos del procedimiento</p>
                   {gal.filter(function(g) { return g.tipo === "video"; }).map(function(g, i) {
                     return (
                       <div key={g.id || "v" + i} style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.4rem" }}>
-                        <Play size={14} color="#B08968" />
-                        <span style={{ flex: 1, fontSize: "0.78rem", color: "#4E3B2B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.url}</span>
+                        <Play size={14} color="var(--brand)" />
+                        <span style={{ flex: 1, fontSize: "0.78rem", color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.url}</span>
                         <button onClick={function() { galRemove(g); }} style={{ width: 20, height: 20, borderRadius: "50%", background: "#FDE8D8", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} color="#C62828" /></button>
                       </div>
                     );
@@ -247,7 +247,7 @@ export default function ProcedimientosList() {
                         input.value = "";
                         showToast("Video agregado");
                       } catch (e: any) { setErr(e.message); }
-                    }} style={{ padding: "0.45rem 1rem", borderRadius: 10, background: "#B08968", color: "white", border: "none", fontWeight: 600, fontSize: "0.78rem", cursor: "pointer", whiteSpace: "nowrap" }}>+ Agregar</button>
+                    }} style={{ padding: "0.45rem 1rem", borderRadius: 10, background: "var(--brand)", color: "white", border: "none", fontWeight: 600, fontSize: "0.78rem", cursor: "pointer", whiteSpace: "nowrap" }}>+ Agregar</button>
                   </div>
                 </div>
               </div>
@@ -258,13 +258,13 @@ export default function ProcedimientosList() {
                 style={{ flex: 1, padding: "0.65rem", borderRadius: 100, background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", fontWeight: 600, cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Guardando..." : "Guardar"}
               </motion.button>
-              <button onClick={reset} style={{ padding: "0.65rem 1.5rem", borderRadius: 100, background: "#F5EEE6", color: "#4E3B2B", border: "none", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
+              <button onClick={reset} style={{ padding: "0.65rem 1.5rem", borderRadius: 100, background: "var(--surface-soft)", color: "var(--text)", border: "none", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {procs.length === 0 ? <p style={{ textAlign: "center", color: "#8B7060", padding: "2rem 0" }}>No hay procedimientos</p> : (() => {
+      {procs.length === 0 ? <p style={{ textAlign: "center", color: "var(--text-soft)", padding: "2rem 0" }}>No hay procedimientos</p> : (() => {
         const ORDEN = ["Facial", "Corporal", "Capilar"];
         const grupos: Record<string, typeof procs> = {};
         procs.forEach(function(p) {
@@ -286,28 +286,28 @@ export default function ProcedimientosList() {
                 <div key={cat}>
                   {/* Encabezado de categoria */}
                   <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.9rem" }}>
-                    <h3 style={{ margin: 0, fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", fontWeight: 700, color: "#3A2A1A" }}>{cat}</h3>
-                    <span style={{ background: "#E9DED2", color: "#8B6A4B", padding: "0.15rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 700 }}>{items.length}</span>
-                    <div style={{ flex: 1, height: 1, background: "#E9DED2" }} />
+                    <h3 style={{ margin: 0, fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", fontWeight: 700, color: "var(--text)" }}>{cat}</h3>
+                    <span style={{ background: "var(--border)", color: "var(--brand)", padding: "0.15rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 700 }}>{items.length}</span>
+                    <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
                     {items.map(function(p, i) {
                       return (
                         <motion.div key={p.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }}
-                          style={{ background: "#FFFDF9", borderRadius: 18, border: "1px solid #E9DED2", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}>
-                          {p.imagen ? <img src={p.imagen} alt="" style={{ width: 76, height: 76, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 76, height: 76, borderRadius: 14, background: "#E9DED2", flexShrink: 0 }} />}
+                          style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}>
+                          {p.imagen ? <img src={p.imagen} alt="" style={{ width: 76, height: 76, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 76, height: 76, borderRadius: 14, background: "var(--border)", flexShrink: 0 }} />}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                              <span style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "1.08rem" }}>{p.nombre}</span>
-                              {p.destacado && <span style={{ background: "#FFF3E6", color: "#B08968", padding: "0.2rem 0.6rem", borderRadius: 100, fontSize: "0.78rem" }}>★</span>}
+                              <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }}>{p.nombre}</span>
+                              {p.destacado && <span style={{ background: "#FFF3E6", color: "var(--brand)", padding: "0.2rem 0.6rem", borderRadius: 100, fontSize: "0.78rem" }}>â˜…</span>}
                             </div>
-                            <p style={{ fontSize: "0.92rem", color: "#6C584C", margin: "0.25rem 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.desc}</p>
+                            <p style={{ fontSize: "0.92rem", color: "var(--text-soft)", margin: "0.25rem 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.desc}</p>
                           </div>
-                          <span style={{ fontSize: "1.1rem", color: "#B08968", fontWeight: 700, whiteSpace: "nowrap" }}>${Number(p.precio).toLocaleString("es-CO")}</span>
+                          <span style={{ fontSize: "1.1rem", color: "var(--brand)", fontWeight: 700, whiteSpace: "nowrap" }}>${Number(p.precio).toLocaleString("es-CO")}</span>
                           <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                            <motion.button whileTap={{ scale: 0.95 }} onClick={function() { startEdit(p); }} style={{ width: 42, height: 42, borderRadius: 12, background: "#F5EEE6", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Edit3 size={18} color="#4E3B2B" /></motion.button>
+                            <motion.button whileTap={{ scale: 0.95 }} onClick={function() { startEdit(p); }} style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Edit3 size={18} color="var(--text)" /></motion.button>
                             {delId === p.id ? (
-                              <><button onClick={function() { handleDel(p.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#C62828", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>Sí</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#E9DED2", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
+                              <><button onClick={function() { handleDel(p.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#C62828", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>SÃ­</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--border)", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
                             ) : (
                               <motion.button whileTap={{ scale: 0.95 }} onClick={function() { setDelId(p.id); }} style={{ width: 42, height: 42, borderRadius: 12, background: "#fff3ef", border: "1px solid #e4bfbf", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={18} color="#b02e2e" /></motion.button>
                             )}
@@ -326,4 +326,4 @@ export default function ProcedimientosList() {
   );
 }
 
-function Lbl(props: { children: string }) { return <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 3 }}>{props.children}</label>; }
+function Lbl(props: { children: string }) { return <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-soft)", display: "block", marginBottom: 3 }}>{props.children}</label>; }

@@ -21,7 +21,7 @@ export default function FondoAnimado({ tipo }: { tipo: string | null }) {
       : "";
 
   // Si no hay tipo activo, fondo neutro
-  const fallbackBackground = "linear-gradient(180deg, #FAF9F7 0%, #FFFFFF 100%)";
+  const fallbackBackground = "linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%)";
 
   return (
     <motion.div

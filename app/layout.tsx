@@ -8,11 +8,27 @@ import NavbarClient from "@/components/NavbarClient";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import { AuthProvider } from "@/context/AuthContext";
+import { IMG } from "@/lib/imagenes";
 
 export const metadata: Metadata = {
-  title: "Clínica Estética Dra. Julieth Medina",
+  title: {
+    default: "Clínica Estética Dra. Julieth Medina",
+    template: "%s · Dra. Julieth Medina",
+  },
   description:
     "Especialista en Medicina Estética, Nutrición y Antiedad en Ibagué",
+  icons: {
+    icon: IMG.logo,
+    shortcut: IMG.logo,
+    apple: IMG.logo,
+  },
+  openGraph: {
+    title: "Clínica Estética Dra. Julieth Medina",
+    description: "Medicina estética y antienvejecimiento en Ibagué — Tolima.",
+    images: [IMG.logo],
+    type: "website",
+    locale: "es_CO",
+  },
 };
 
 export default async function RootLayout({
@@ -24,8 +40,15 @@ export default async function RootLayout({
   const messages = await getMessages();
   const tTop = await getTranslations("topbar");
 
+  // Script anti-flash: aplica data-theme ANTES del paint, según preferencia
+  // guardada o sistema. Evita el parpadeo claro→oscuro al cargar.
+  const themeInit = `(function(){try{var t=localStorage.getItem('THEME');var eff=t==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',eff);}catch(e){}})();`;
+
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+      </head>
       <body
         style={{
           backgroundColor: "#F6F4EF",
