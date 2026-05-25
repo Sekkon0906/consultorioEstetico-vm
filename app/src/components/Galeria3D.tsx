@@ -49,12 +49,14 @@ export default function Galeria3D() {
   const radius = 290;
   const angle = tratamientos.length > 0 ? 360 / tratamientos.length : 0;
 
-  // Rotación continua suave hacia la derecha
+  // Rotación continua suave: la rueda gira de modo que las cards
+  // visualmente se desplazan hacia la DERECHA (vienen de la izquierda).
+  // En rotateY de CSS eso equivale a decremento.
   useEffect(() => {
     if (isPaused || selected !== null) return;
     let frame: number;
     const animate = () => {
-      setRotation((prev) => prev + 0.04);
+      setRotation((prev) => prev - 0.04);
       frame = requestAnimationFrame(animate);
     };
     frame = requestAnimationFrame(animate);
@@ -110,15 +112,18 @@ export default function Galeria3D() {
     return { scale, brightness, zIndex, isFront };
   };
 
+  /* Con rotation negativa decreciendo, la card al frente cumple
+     i ≡ rotation / angle (mod n). Tomamos módulo positivo. */
   const frontIndex =
     tratamientos.length > 0
-      ? ((Math.round(-rotation / angle) % tratamientos.length) +
+      ? ((Math.round(rotation / angle) % tratamientos.length) +
           tratamientos.length) %
         tratamientos.length
       : -1;
 
   const goToCard = (i: number) => {
-    const target = -i * angle;
+    /* La card i queda al frente cuando rotation = i * angle. */
+    const target = i * angle;
     setRotation(target);
     setIsPaused(true);
     setTimeout(() => setIsPaused(false), 1800);
@@ -140,7 +145,9 @@ export default function Galeria3D() {
         overflow: "hidden",
         backgroundImage: `url(${IMG.galeria3dBg})`,
         backgroundSize: "cover",
-        backgroundPosition: "center",
+        /* "center top" para que el encuadre muestre la cabeza completa
+           de la doctora (antes con "center" se cortaba). */
+        backgroundPosition: "center top",
         backgroundRepeat: "no-repeat",
       }}
     >
@@ -491,18 +498,18 @@ export default function Galeria3D() {
         </div>
       )}
 
-      {/* Detalle del tratamiento seleccionado — anclado a la derecha */}
+      {/* Detalle del tratamiento seleccionado — centrado en la pantalla */}
       {selected !== null && (
         <div
           className="g3d-detail"
           style={{
             position: "absolute",
             top: "50%",
-            right: "5%",
-            transform: "translateY(-50%)",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
             backgroundColor: "#FFFDF9",
-            width: 620,
-            maxWidth: "60%",
+            width: 720,
+            maxWidth: "90%",
             border: "1px solid rgba(201,173,141,0.4)",
             borderRadius: 24,
             boxShadow:
@@ -672,33 +679,10 @@ export default function Galeria3D() {
                   "/procedimientos/" +
                   (tratamientos.find((tr) => tr.id === selected)?.id || "")
                 }
-                className="fw-semibold"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                  background: "linear-gradient(135deg, #B08968, #C9AD8D)",
-                  color: "#FFF",
-                  borderRadius: 100,
-                  padding: "0.7rem 1.6rem",
-                  textDecoration: "none",
-                  boxShadow: "0 6px 18px rgba(176,137,104,0.32)",
-                  transition: "transform 0.2s, box-shadow 0.2s",
-                  fontSize: "0.92rem",
-                  width: "fit-content",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 10px 24px rgba(176,137,104,0.4)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "";
-                  e.currentTarget.style.boxShadow =
-                    "0 6px 18px rgba(176,137,104,0.32)";
-                }}
+                className="btn-ghost-app"
+                style={{ width: "fit-content" }}
               >
+                <i className="fas fa-info-circle" />
                 {t("viewMore")}
                 <span style={{ fontSize: "1.05rem", lineHeight: 1 }}>→</span>
               </Link>
@@ -718,8 +702,8 @@ export default function Galeria3D() {
           100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
         @keyframes g3d-detail-in {
-          0%   { opacity: 0; transform: translateY(-50%) translateX(30px) scale(0.96); }
-          100% { opacity: 1; transform: translateY(-50%) translateX(0) scale(1); }
+          0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.94); }
+          100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
         .g3d-card {
           box-shadow:
