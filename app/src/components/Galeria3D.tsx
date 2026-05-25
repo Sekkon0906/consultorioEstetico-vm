@@ -176,7 +176,7 @@ export default function Galeria3D() {
         style={{
           position: "absolute",
           top: "5%",
-          right: "22%",
+          right: "16%",
           transform: "translateX(50%)",
           /* Ancho ajustado al espacio horizontal que ocupan las cards
              visibles (~ ±290px del eje). Antes 880px lo hacía verse
@@ -769,7 +769,7 @@ export default function Galeria3D() {
           /* Solo el título va más a la derecha que el resto, para que
              se sienta alineado con el centro visual de las cards (que
              por la perspectiva 3D se ven ligeramente desplazadas). */
-          .g3d-title-wrap     { right: 16% !important; width: min(560px, 46%) !important; }
+          .g3d-title-wrap     { right: 10% !important; width: min(540px, 44%) !important; }
           .g3d-wheel-anchor   { right: 22% !important; transform: translate(50%, -50%) !important; }
           .g3d-dots-wrap      { right: 22% !important; }
           .g3d-cta-wrap       { right: 22% !important; }
@@ -779,7 +779,7 @@ export default function Galeria3D() {
           }
         }
         @media (max-width: 980px) {
-          .g3d-title-wrap     { right: 10% !important; width: min(500px, 55%) !important; }
+          .g3d-title-wrap     { right: 5% !important; width: min(460px, 52%) !important; }
           .g3d-wheel-anchor   { right: 15% !important; transform: translate(50%, -50%) !important; }
           .g3d-dots-wrap      { right: 15% !important; }
           .g3d-cta-wrap       { right: 15% !important; }
