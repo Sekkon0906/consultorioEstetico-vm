@@ -144,7 +144,7 @@ export default function HomePage() {
         <Galeria3D />
       </section>
 
-      {/* UBICACIÓN */}
+      {/* UBICACIÓN — mapa + foto del consultorio + 2 CTAs */}
       <section
         className="py-5 text-center"
         style={{
@@ -158,47 +158,123 @@ export default function HomePage() {
         >
           {th("location.title")}
         </h2>
-        <p className="mb-4" style={{ color: "#6C584C" }}>
+        <p className="mb-5" style={{ color: "#6C584C" }}>
           {th("location.subtitle")}
         </p>
 
+        {/* Grid mapa + foto */}
         <div
+          className="home-loc-grid"
           style={{
-            width: "90%",
-            maxWidth: "900px",
-            height: "450px",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1.5rem",
+            width: "92%",
+            maxWidth: 1180,
             margin: "0 auto",
-            borderRadius: "20px",
-            overflow: "hidden",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
           }}
         >
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d994.454304702495!2d-75.24131428635316!3d4.445089870529062!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e38c4845c124d1d%3A0x4c5542efc906b982!2sEdificio%20Torre%20Empresarial!5e0!3m2!1ses-419!2sco!4v1763922944777!5m2!1ses-419!2sco"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="w-full h-full border-0"
-            allowFullScreen
-          />
+          {/* Mapa */}
+          <div
+            style={{
+              height: 420,
+              borderRadius: 20,
+              overflow: "hidden",
+              boxShadow: "0 8px 24px rgba(78, 59, 43, 0.15)",
+              border: "1px solid rgba(176, 137, 104, 0.18)",
+            }}
+          >
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d994.454304702495!2d-75.24131428635316!3d4.445089870529062!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e38c4845c124d1d%3A0x4c5542efc906b982!2sEdificio%20Torre%20Empresarial!5e0!3m2!1ses-419!2sco!4v1763922944777!5m2!1ses-419!2sco"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full h-full border-0"
+              allowFullScreen
+              title="Google Maps"
+            />
+          </div>
+
+          {/* Foto del consultorio */}
+          <div
+            style={{
+              position: "relative",
+              height: 420,
+              borderRadius: 20,
+              overflow: "hidden",
+              boxShadow: "0 8px 24px rgba(78, 59, 43, 0.15)",
+              border: "1px solid rgba(176, 137, 104, 0.18)",
+            }}
+          >
+            <img
+              src={IMG.consultorioPrincipal}
+              alt={th("location.photoAlt")}
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
+            {/* Caption sobre la foto */}
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                padding: "1.4rem 1.6rem",
+                background:
+                  "linear-gradient(0deg, rgba(30,20,10,0.78) 0%, rgba(30,20,10,0) 100%)",
+                color: "#FFFDF9",
+                textAlign: "left",
+              }}
+            >
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "0.95rem",
+                  fontWeight: 500,
+                  lineHeight: 1.45,
+                  textShadow: "0 2px 8px rgba(0,0,0,0.45)",
+                }}
+              >
+                {th("location.photoCaption")}
+              </p>
+            </div>
+          </div>
         </div>
 
-        <a
-          href="https://www.google.com/maps?q=Carrera+5ta+%2311-24,+Torre+Empresarial,+Consultorio+502,+Ibagué,+Tolima"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-lg fw-semibold mt-4"
+        {/* CTAs */}
+        <div
           style={{
-            backgroundColor: "#B08968",
-            color: "white",
-            border: "none",
-            borderRadius: "50px",
-            padding: "0.8rem 2rem",
-            boxShadow: "0 4px 12px rgba(176, 137, 104, 0.25)",
-            transition: "all 0.3s ease",
+            display: "flex",
+            gap: "1rem",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            marginTop: "2.5rem",
           }}
         >
-          <i className="fas fa-map-marker-alt me-2"></i> {th("location.viewMaps")}
-        </a>
+          <a
+            href="https://www.google.com/maps?q=Carrera+5ta+%2311-24,+Torre+Empresarial,+Consultorio+502,+Ibagué,+Tolima"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-ghost-app"
+          >
+            <i className="fas fa-map-marker-alt" /> {th("location.viewMaps")}
+          </a>
+          <Link href="/consultorio" className="btn-ghost-app">
+            <i className="fas fa-clinic-medical" /> {th("location.viewClinic")}
+          </Link>
+        </div>
+
+        <style>{`
+          @media (max-width: 820px) {
+            .home-loc-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
       </section>
     </>
   );

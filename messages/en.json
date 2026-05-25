@@ -42,40 +42,46 @@
   "home": {
     "gallery": {
       "title": "Most requested treatments",
-      "subtitle": "Interactively explore some of our most praised treatments",
+      "subtitle": "Interactively explore some of my most requested treatments",
       "back": "← Back",
-      "viewMore": "Learn more"
+      "viewMore": "Learn more",
+      "viewAll": "See all treatments"
     },
     "location": {
-      "title": "Find us",
-      "subtitle": "We're in the heart of Ibagué, inside Torre Empresarial.",
-      "viewMaps": "Open in Google Maps"
+      "title": "Find me",
+      "subtitle": "Find me in the heart of Ibagué, inside Torre Empresarial.",
+      "photoCaption": "I welcome you in a space cared for in every detail — designed for your wellbeing and calm.",
+      "viewMaps": "Open in Google Maps",
+      "viewClinic": "More about the clinic",
+      "photoAlt": "Main clinic room"
     },
     "gallery_a11y": {
       "close": "Close",
       "goToCard": "Go to treatment {n}"
     },
     "video": {
-      "kicker": "Our clinic",
-      "title": "Why book your consultations and treatments with us",
+      "kicker": "About my practice",
+      "title": "Why trust me with your consultations and treatments",
       "divider": "",
-      "subtitle": "Quality, experience and results that speak for themselves",
-      "distinguishTitle": "What sets us apart",
+      "subtitle": "Close attention, safe techniques and results that honor your essence.",
+      "distinguishTitle": "What makes me different",
       "features": [
-        { "title": "HydraFacial technology", "desc": "International certification" },
+        { "title": "HydraFacial technology", "desc": "Internationally certified" },
         { "title": "Premium products", "desc": "Advanced medical grade" },
-        { "title": "Pain-free", "desc": "Minimal downtime" },
-        { "title": "Personalized care", "desc": "A plan made for you" }
+        { "title": "Minimal pain", "desc": "Quick recovery" },
+        { "title": "Personalized care", "desc": "A plan made just for you" }
       ],
       "iframeTitle": "Presentation",
       "watchVideo": "Watch presentation",
-      "experienceTitle": "Experience speaks",
+      "experienceTitle": "My experience speaks",
       "counters": {
         "patients": "Happy patients",
         "treatments": "Treatments",
         "years": "Years of experience",
         "rating": "Rating"
-      }
+      },
+      "ctaAboutDr": "About the doctor",
+      "ctaTestimonials": "See testimonials"
     }
   },
   "testimonios": {

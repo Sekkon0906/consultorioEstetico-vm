@@ -7,6 +7,13 @@ import { getProcedimientosApi } from "../../services/procedimientosApi";
 import { IMG } from "../lib/imagenes";
 import type { Procedimiento } from "../../types/domain";
 
+/** Helper: redondeo determinista para evitar hydration mismatches por
+ *  precisión IEEE-754 entre server y client. */
+const r = (n: number, decimals = 3) => {
+  const k = Math.pow(10, decimals);
+  return Math.round(n * k) / k;
+};
+
 export default function Galeria3D() {
   const t = useTranslations("home.gallery");
   const ta = useTranslations("home.gallery_a11y");
@@ -15,6 +22,14 @@ export default function Galeria3D() {
   const [isPaused, setIsPaused] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
+  const [mounted, setMounted] = useState(false);
+
+  // Marca que estamos en cliente — usado para gates de elementos puramente
+  // visuales (partículas) que pueden divergir en hidratación si calculamos
+  // floats con muchas cifras.
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -31,7 +46,7 @@ export default function Galeria3D() {
   const radius = 380;
   const angle = tratamientos.length > 0 ? 360 / tratamientos.length : 0;
 
-  // Rotación continua suave hacia la derecha (sentido horario visto desde arriba)
+  // Rotación continua suave hacia la derecha
   useEffect(() => {
     if (isPaused || selected !== null) return;
     let frame: number;
@@ -43,7 +58,7 @@ export default function Galeria3D() {
     return () => cancelAnimationFrame(frame);
   }, [isPaused, selected]);
 
-  // Parallax discreto con el mouse
+  // Parallax discreto
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       const x = (e.clientX / window.innerWidth - 0.5) * 18;
@@ -54,7 +69,7 @@ export default function Galeria3D() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // PRNG determinista para partículas
+  // PRNG determinista, valores redondeados.
   function mulberry32(seed: number) {
     return function () {
       let t = (seed += 0x6d2b79f5);
@@ -69,15 +84,16 @@ export default function Galeria3D() {
     const rng = mulberry32(98765);
     return Array.from({ length: particleCount }, (_, i) => {
       const theta = (i / particleCount) * 2 * Math.PI;
-      const distance = 28 + rng() * 22;
-      const size = 5 + rng() * 14;
-      const dur = 3.5 + rng() * 3;
-      const opacity = 0.22 + rng() * 0.25;
+      const x = r(50 + (28 + rng() * 22) * Math.cos(theta), 2);
+      const y = r(50 + (28 + rng() * 22) * Math.sin(theta), 2);
+      const size = r(5 + rng() * 14, 2);
+      const dur = r(3.5 + rng() * 3, 2);
+      const opacity = r(0.22 + rng() * 0.25, 2);
       const color =
         i % 3 === 0
           ? `rgba(255, 240, 220, ${opacity})`
           : `rgba(218, 188, 152, ${opacity})`;
-      return { theta, distance, size, dur, color };
+      return { x, y, size, dur, color };
     });
   }, []);
 
@@ -111,7 +127,7 @@ export default function Galeria3D() {
       style={{
         perspective: "1700px",
         width: "100%",
-        height: selected ? "780px" : "680px",
+        height: selected ? "920px" : "860px",
         overflow: "hidden",
         transition: "height 0.45s cubic-bezier(0.16,1,0.3,1)",
         backgroundImage: `url(${IMG.galeria3dBg})`,
@@ -120,7 +136,7 @@ export default function Galeria3D() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      {/* Overlay sutil para legibilidad del contenido a la derecha */}
+      {/* Overlay vertical sutil arriba+abajo y leve oscurecimiento a la derecha */}
       <div
         aria-hidden="true"
         className="g3d-overlay"
@@ -128,17 +144,17 @@ export default function Galeria3D() {
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(90deg, rgba(58,42,26,0) 0%, rgba(58,42,26,0) 40%, rgba(58,42,26,0.25) 70%, rgba(58,42,26,0.45) 100%)",
+            "linear-gradient(180deg, rgba(58,42,26,0.32) 0%, rgba(58,42,26,0) 18%, rgba(58,42,26,0) 78%, rgba(58,42,26,0.35) 100%), linear-gradient(90deg, rgba(58,42,26,0) 0%, rgba(58,42,26,0) 45%, rgba(58,42,26,0.18) 70%, rgba(58,42,26,0.35) 100%)",
           zIndex: 1,
         }}
       />
 
-      {/* Título arriba-derecha (sobre la imagen) */}
+      {/* Título arriba-derecha */}
       <div
         className="g3d-title-wrap"
         style={{
           position: "absolute",
-          top: "5%",
+          top: "6%",
           right: 0,
           width: "55%",
           textAlign: "center",
@@ -151,7 +167,7 @@ export default function Galeria3D() {
             fontFamily: "'Playfair Display', serif",
             color: "#FFFDF9",
             fontWeight: 700,
-            fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
+            fontSize: "clamp(1.7rem, 3vw, 2.4rem)",
             margin: 0,
             textShadow: "0 4px 18px rgba(0,0,0,0.55)",
             letterSpacing: "0.01em",
@@ -161,7 +177,7 @@ export default function Galeria3D() {
         </h2>
         <p
           style={{
-            color: "rgba(255, 253, 249, 0.85)",
+            color: "rgba(255, 253, 249, 0.88)",
             fontSize: "0.95rem",
             marginTop: "0.55rem",
             marginBottom: 0,
@@ -182,18 +198,19 @@ export default function Galeria3D() {
         />
       </div>
 
-      {/* Contenedor principal: rueda 3D posicionada a la derecha */}
+      {/* Rueda 3D anclada a la derecha, con margen vertical generoso
+          para no chocar con título ni con dots. */}
       <div
         className="g3d-wheel-anchor"
         style={{
           position: "absolute",
-          top: "55%",
+          top: "58%",
           right: "20%",
           transform: "translateY(-50%)",
           zIndex: 3,
         }}
       >
-        {/* Halo sutil detrás de la rueda */}
+        {/* Halo */}
         <div
           aria-hidden="true"
           style={{
@@ -202,7 +219,7 @@ export default function Galeria3D() {
             left: "50%",
             width: 520,
             height: 520,
-            transform: `translate(-50%, -50%) rotateX(${mouseTilt.y * 0.2}deg) rotateY(${mouseTilt.x * 0.2}deg)`,
+            transform: `translate(-50%, -50%) rotateX(${r(mouseTilt.y * 0.2, 2)}deg) rotateY(${r(mouseTilt.x * 0.2, 2)}deg)`,
             borderRadius: "50%",
             background:
               "radial-gradient(circle, rgba(255, 230, 200, 0.18) 0%, rgba(176,137,104,0.10) 45%, transparent 70%)",
@@ -215,32 +232,30 @@ export default function Galeria3D() {
           }}
         />
 
-        {/* Partículas */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            width: 600,
-            height: 600,
-            transform: `translate(-50%, -50%) rotate(${-(rotation * 0.4)}deg)`,
-            transition: "transform 0.25s linear",
-            zIndex: 1,
-            pointerEvents: "none",
-            opacity: selected ? 0.3 : 1,
-          }}
-        >
-          {particles.map((p, i) => {
-            const x = 50 + p.distance * Math.cos(p.theta);
-            const y = 50 + p.distance * Math.sin(p.theta);
-            return (
+        {/* Partículas — solo después de montar para evitar hydration mismatch */}
+        {mounted && (
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              width: 600,
+              height: 600,
+              transform: `translate(-50%, -50%) rotate(${r(-(rotation * 0.4), 2)}deg)`,
+              transition: "transform 0.25s linear",
+              zIndex: 1,
+              pointerEvents: "none",
+              opacity: selected ? 0.3 : 1,
+            }}
+          >
+            {particles.map((p, i) => (
               <div
                 key={i}
                 style={{
                   position: "absolute",
-                  top: `${y}%`,
-                  left: `${x}%`,
+                  top: `${p.y}%`,
+                  left: `${p.x}%`,
                   width: `${p.size}px`,
                   height: `${p.size}px`,
                   background: p.color,
@@ -249,9 +264,9 @@ export default function Galeria3D() {
                   animation: `g3d-pulse ${p.dur}s ease-in-out infinite`,
                 }}
               />
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Estado: cargando */}
         {selected === null && tratamientos.length === 0 && (
@@ -277,7 +292,7 @@ export default function Galeria3D() {
               width: 260,
               height: 340,
               transformStyle: "preserve-3d",
-              transform: `rotateX(${5 + mouseTilt.y * 0.18}deg) rotateY(${rotation + mouseTilt.x * 0.25}deg)`,
+              transform: `rotateX(${r(5 + mouseTilt.y * 0.18, 2)}deg) rotateY(${r(rotation + mouseTilt.x * 0.25, 2)}deg)`,
               transition: "transform 0.35s cubic-bezier(0.16,1,0.3,1)",
               zIndex: 3,
             }}
@@ -295,10 +310,10 @@ export default function Galeria3D() {
                     left: 0,
                     width: "100%",
                     height: "100%",
-                    transform: `rotateY(${i * angle}deg) translateZ(${radius}px) scale(${scale})`,
+                    transform: `rotateY(${r(i * angle, 2)}deg) translateZ(${radius}px) scale(${r(scale, 3)})`,
                     backfaceVisibility: "hidden",
                     zIndex,
-                    filter: `brightness(${brightness})`,
+                    filter: `brightness(${r(brightness, 3)})`,
                     transition: "filter 0.45s ease",
                   }}
                 >
@@ -337,7 +352,7 @@ export default function Galeria3D() {
                         bottom: 0,
                         height: "45%",
                         background:
-                          "linear-gradient(180deg, transparent 0%, rgba(30,20,10,0.0) 30%, rgba(30,20,10,0.55) 100%)",
+                          "linear-gradient(180deg, transparent 0%, rgba(30,20,10,0) 30%, rgba(30,20,10,0.55) 100%)",
                         pointerEvents: "none",
                       }}
                     />
@@ -382,19 +397,20 @@ export default function Galeria3D() {
         )}
       </div>
 
-      {/* Dots indicadores abajo-derecha */}
+      {/* Dots indicadores — anclados al centro de la rueda (right: 20%) */}
       {selected === null && tratamientos.length > 0 && (
         <div
+          className="g3d-dots"
           style={{
             position: "absolute",
-            bottom: 34,
+            bottom: "13%",
             right: "20%",
             transform: "translateX(50%)",
             display: "flex",
             gap: 8,
             zIndex: 5,
             padding: "0.45rem 0.85rem",
-            background: "rgba(255, 253, 249, 0.85)",
+            background: "rgba(255, 253, 249, 0.9)",
             backdropFilter: "blur(10px)",
             border: "1px solid rgba(255, 235, 215, 0.5)",
             borderRadius: 100,
@@ -425,32 +441,73 @@ export default function Galeria3D() {
         </div>
       )}
 
-      {/* Detalle del tratamiento seleccionado */}
+      {/* CTA "Ver todos los procedimientos" — abajo centrado */}
+      {selected === null && (
+        <div
+          className="g3d-cta-wrap"
+          style={{
+            position: "absolute",
+            bottom: "4%",
+            left: 0,
+            right: 0,
+            display: "flex",
+            justifyContent: "center",
+            zIndex: 5,
+          }}
+        >
+          <Link
+            href="/procedimientos"
+            className="g3d-cta-pill"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "0.75rem 1.8rem",
+              borderRadius: 100,
+              background: "transparent",
+              color: "#FFFDF9",
+              border: "1.5px solid rgba(255, 253, 249, 0.7)",
+              fontWeight: 600,
+              fontSize: "0.95rem",
+              textDecoration: "none",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              transition:
+                "background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease",
+            }}
+          >
+            <i className="fas fa-th-large" />
+            {t("viewAll")}
+            <span style={{ fontSize: "1.05rem", lineHeight: 1 }}>→</span>
+          </Link>
+        </div>
+      )}
+
+      {/* Detalle del tratamiento seleccionado — anclado a la derecha */}
       {selected !== null && (
         <div
           className="g3d-detail"
           style={{
             position: "absolute",
             top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
+            right: "5%",
+            transform: "translateY(-50%)",
             backgroundColor: "#FFFDF9",
-            width: "85%",
-            maxWidth: 1000,
-            display: "flex",
-            flexDirection: "row",
-            gap: "2.5rem",
-            alignItems: "center",
-            justifyContent: "center",
+            width: 620,
+            maxWidth: "60%",
             border: "1px solid rgba(201,173,141,0.4)",
             borderRadius: 24,
             boxShadow:
-              "0 28px 70px rgba(0,0,0,0.45), 0 0 0 1px rgba(176,137,104,0.08)",
-            padding: "3rem 2.5rem 2.5rem",
+              "0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(176,137,104,0.08)",
+            padding: "2.5rem 2.2rem 2.2rem",
             zIndex: 6,
             animation: "g3d-detail-in 0.5s cubic-bezier(0.16,1,0.3,1)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1.4rem",
           }}
         >
+          {/* Acento dorado superior */}
           <div
             style={{
               position: "absolute",
@@ -469,13 +526,13 @@ export default function Galeria3D() {
             onClick={() => setSelected(null)}
             style={{
               position: "absolute",
-              top: 18,
-              left: 22,
+              top: 16,
+              left: 18,
               background: "rgba(176,137,104,0.08)",
               border: "1px solid rgba(176,137,104,0.18)",
               color: "#5A4635",
               fontWeight: 600,
-              fontSize: "0.85rem",
+              fontSize: "0.82rem",
               cursor: "pointer",
               padding: "0.4rem 0.9rem",
               borderRadius: 100,
@@ -498,16 +555,16 @@ export default function Galeria3D() {
             aria-label={ta("close")}
             style={{
               position: "absolute",
-              top: 16,
-              right: 18,
-              width: 34,
-              height: 34,
+              top: 14,
+              right: 16,
+              width: 32,
+              height: 32,
               borderRadius: "50%",
               background: "rgba(176,137,104,0.08)",
               border: "1px solid rgba(176,137,104,0.18)",
               color: "#5A4635",
               fontWeight: 600,
-              fontSize: "1.1rem",
+              fontSize: "1.05rem",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
@@ -526,96 +583,118 @@ export default function Galeria3D() {
             ×
           </button>
 
-          <div
-            style={{
-              flex: "0 0 45%",
-              borderRadius: 18,
-              overflow: "hidden",
-              boxShadow:
-                "0 12px 36px rgba(176,137,104,0.28), 0 0 0 1px rgba(176,137,104,0.12)",
-              aspectRatio: "3 / 4",
-              background: "#F5EEE5",
-            }}
-          >
-            <img
-              src={
-                tratamientos.find((tr) => tr.id === selected)?.imagen ||
-                "/placeholder.png"
-              }
-              alt={tratamientos.find((tr) => tr.id === selected)?.nombre || ""}
-              style={{
-                objectFit: "cover",
-                objectPosition: "center top",
-                width: "100%",
-                height: "100%",
-              }}
-            />
-          </div>
-
-          <div style={{ flex: "0 0 45%", color: "#3A2A1A" }}>
-            <h3
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontWeight: 700,
-                marginBottom: "0.8rem",
-                fontSize: "1.7rem",
-                lineHeight: 1.2,
-              }}
-            >
-              {tratamientos.find((tr) => tr.id === selected)?.nombre}
-            </h3>
+          <div style={{ display: "flex", gap: "1.6rem", marginTop: "1.8rem" }}>
+            {/* Imagen */}
             <div
               style={{
-                width: 40,
-                height: 3,
-                background: "linear-gradient(90deg, #B08968, #C9AD8D)",
-                borderRadius: 2,
-                marginBottom: "1.2rem",
-              }}
-            />
-            <p
-              style={{
-                color: "#6C584C",
-                lineHeight: "1.7",
-                fontSize: "1rem",
-                marginBottom: "2rem",
+                flex: "0 0 220px",
+                aspectRatio: "3 / 4",
+                borderRadius: 16,
+                overflow: "hidden",
+                boxShadow:
+                  "0 12px 32px rgba(176,137,104,0.28), 0 0 0 1px rgba(176,137,104,0.12)",
+                background: "#F5EEE5",
               }}
             >
-              {tratamientos.find((tr) => tr.id === selected)?.desc}
-            </p>
-            <Link
-              href={
-                "/procedimientos/" +
-                (tratamientos.find((tr) => tr.id === selected)?.id || "")
-              }
-              className="fw-semibold"
+              <img
+                src={
+                  tratamientos.find((tr) => tr.id === selected)?.imagen ||
+                  "/placeholder.png"
+                }
+                alt={
+                  tratamientos.find((tr) => tr.id === selected)?.nombre || ""
+                }
+                style={{
+                  objectFit: "cover",
+                  objectPosition: "center top",
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            </div>
+
+            {/* Texto */}
+            <div
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                background: "linear-gradient(135deg, #B08968, #C9AD8D)",
-                color: "#FFF",
-                borderRadius: 100,
-                padding: "0.8rem 2rem",
-                textDecoration: "none",
-                boxShadow: "0 6px 18px rgba(176,137,104,0.32)",
-                transition: "transform 0.2s, box-shadow 0.2s",
-                fontSize: "0.95rem",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow =
-                  "0 10px 24px rgba(176,137,104,0.4)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "";
-                e.currentTarget.style.boxShadow =
-                  "0 6px 18px rgba(176,137,104,0.32)";
+                flex: 1,
+                color: "#3A2A1A",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
               }}
             >
-              {t("viewMore")}
-              <span style={{ fontSize: "1.1rem", lineHeight: 1 }}>→</span>
-            </Link>
+              <div>
+                <h3
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontWeight: 700,
+                    marginBottom: "0.6rem",
+                    fontSize: "1.5rem",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {tratamientos.find((tr) => tr.id === selected)?.nombre}
+                </h3>
+                <div
+                  style={{
+                    width: 36,
+                    height: 3,
+                    background: "linear-gradient(90deg, #B08968, #C9AD8D)",
+                    borderRadius: 2,
+                    marginBottom: "0.9rem",
+                  }}
+                />
+                <p
+                  style={{
+                    color: "#6C584C",
+                    lineHeight: 1.65,
+                    fontSize: "0.94rem",
+                    marginBottom: "1.4rem",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 5,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                >
+                  {tratamientos.find((tr) => tr.id === selected)?.desc}
+                </p>
+              </div>
+              <Link
+                href={
+                  "/procedimientos/" +
+                  (tratamientos.find((tr) => tr.id === selected)?.id || "")
+                }
+                className="fw-semibold"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  background: "linear-gradient(135deg, #B08968, #C9AD8D)",
+                  color: "#FFF",
+                  borderRadius: 100,
+                  padding: "0.7rem 1.6rem",
+                  textDecoration: "none",
+                  boxShadow: "0 6px 18px rgba(176,137,104,0.32)",
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                  fontSize: "0.92rem",
+                  width: "fit-content",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 10px 24px rgba(176,137,104,0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "";
+                  e.currentTarget.style.boxShadow =
+                    "0 6px 18px rgba(176,137,104,0.32)";
+                }}
+              >
+                {t("viewMore")}
+                <span style={{ fontSize: "1.05rem", lineHeight: 1 }}>→</span>
+              </Link>
+            </div>
           </div>
         </div>
       )}
@@ -631,8 +710,8 @@ export default function Galeria3D() {
           100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
         @keyframes g3d-detail-in {
-          0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.94); }
-          100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          0%   { opacity: 0; transform: translateY(-50%) translateX(30px) scale(0.96); }
+          100% { opacity: 1; transform: translateY(-50%) translateX(0) scale(1); }
         }
         .g3d-card {
           box-shadow:
@@ -650,14 +729,27 @@ export default function Galeria3D() {
           transform: translateY(-3px);
         }
 
-        /* Responsive: en pantallas medianas y pequeñas la imagen se ve menos
-           y la rueda se centra para no chocar con la figura. */
+        /* CTA "Ver todos los procedimientos" — hover se rellena con marca */
+        .g3d-cta-pill:hover {
+          background: linear-gradient(135deg, #B08968, #C9AD8D) !important;
+          color: #FFFFFF !important;
+          border-color: transparent !important;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 22px rgba(176, 137, 104, 0.45);
+        }
+
         @media (max-width: 1100px) {
           .g3d-wheel-anchor { right: 8% !important; }
           .g3d-title-wrap   { width: 70% !important; }
+          .g3d-dots         { right: 8% !important; }
+          .g3d-detail       {
+            right: 4% !important;
+            max-width: 70% !important;
+            width: auto !important;
+          }
         }
         @media (max-width: 820px) {
-          .g3d-stage        { background-position: 25% center !important; }
+          .g3d-stage        { background-position: 30% center !important; height: 1050px !important; }
           .g3d-overlay      {
             background:
               linear-gradient(180deg, rgba(58,42,26,0.55) 0%, rgba(58,42,26,0.35) 35%, rgba(58,42,26,0.55) 100%) !important;
@@ -667,7 +759,7 @@ export default function Galeria3D() {
             top: auto !important;
             right: auto !important;
             transform: none !important;
-            margin: 9rem auto 0 !important;
+            margin: 10rem auto 0 !important;
             display: flex;
             justify-content: center;
           }
@@ -677,16 +769,32 @@ export default function Galeria3D() {
             top: auto !important;
             padding-top: 2.5rem !important;
           }
+          .g3d-dots {
+            position: relative !important;
+            right: auto !important;
+            bottom: auto !important;
+            margin: 2rem auto 0 !important;
+            transform: none !important;
+          }
         }
         @media (max-width: 768px) {
           .g3d-detail {
-            flex-direction: column !important;
-            gap: 1.5rem !important;
-            padding: 3rem 1.5rem 2rem !important;
+            position: fixed !important;
+            top: 50% !important;
+            right: 50% !important;
+            transform: translate(50%, -50%) !important;
             width: 92% !important;
+            max-width: 92% !important;
+            padding: 2.5rem 1.5rem 1.5rem !important;
           }
-          .g3d-detail > div {
-            flex: 1 1 100% !important;
+          .g3d-detail > div:last-child {
+            flex-direction: column !important;
+            gap: 1.2rem !important;
+          }
+          .g3d-detail > div:last-child > div:first-child {
+            flex: 1 1 auto !important;
+            max-width: 220px !important;
+            margin: 0 auto;
           }
         }
       `}</style>

@@ -42,40 +42,46 @@
   "home": {
     "gallery": {
       "title": "Tratamientos más demandados",
-      "subtitle": "Explora de forma interactiva algunos de nuestros procedimientos más aclamados",
+      "subtitle": "Explora de forma interactiva algunos de mis procedimientos más solicitados",
       "back": "← Volver",
-      "viewMore": "Ver más"
+      "viewMore": "Ver más",
+      "viewAll": "Ver todos los procedimientos"
     },
     "location": {
       "title": "Nuestra ubicación",
-      "subtitle": "Encuéntranos en el corazón de Ibagué, dentro de la Torre Empresarial.",
-      "viewMaps": "Ver en Google Maps"
+      "subtitle": "Encuéntrame en el corazón de Ibagué, dentro de la Torre Empresarial.",
+      "photoCaption": "Te recibo en un espacio cuidado al detalle, pensado para tu bienestar y tu calma.",
+      "viewMaps": "Ver en Google Maps",
+      "viewClinic": "Conocer más sobre el consultorio",
+      "photoAlt": "Consultorio principal"
     },
     "gallery_a11y": {
       "close": "Cerrar",
       "goToCard": "Ir al tratamiento {n}"
     },
     "video": {
-      "kicker": "Nuestro consultorio",
-      "title": "Por qué realizar tus consultas y procedimientos con nosotros",
+      "kicker": "Sobre mi práctica",
+      "title": "Por qué confiarme tus consultas y procedimientos",
       "divider": "",
-      "subtitle": "Calidad, experiencia y resultados que hablan por sí solos",
-      "distinguishTitle": "Lo que nos distingue",
+      "subtitle": "Atención cercana, técnicas seguras y resultados que cuidan tu esencia.",
+      "distinguishTitle": "Lo que me distingue",
       "features": [
-        { "title": "Tecnología HydraFacial", "desc": "Certificación internacional" },
+        { "title": "Tecnología HydraFacial", "desc": "Con certificación internacional" },
         { "title": "Productos premium", "desc": "Grado médico avanzado" },
-        { "title": "Sin dolor", "desc": "Mínima recuperación" },
-        { "title": "Atención personalizada", "desc": "Plan a tu medida" }
+        { "title": "Mínimo dolor", "desc": "Rápida recuperación" },
+        { "title": "Atención personalizada", "desc": "Un plan hecho para ti" }
       ],
       "iframeTitle": "Presentación",
       "watchVideo": "Ver presentación",
-      "experienceTitle": "La experiencia habla",
+      "experienceTitle": "Mi experiencia habla",
       "counters": {
         "patients": "Pacientes satisfechos",
         "treatments": "Tratamientos",
         "years": "Años de experiencia",
         "rating": "Calificación"
-      }
+      },
+      "ctaAboutDr": "Saber más sobre la doctora",
+      "ctaTestimonials": "Ver testimonios"
     }
   },
   "testimonios": {

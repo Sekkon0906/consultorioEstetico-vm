@@ -130,7 +130,7 @@ export default function Navbar() {
   return (
     <nav
       className="navbar navbar-container shadow-sm py-3"
-      style={{ backgroundColor: "var(--topbar-bg)", position: "sticky", top: 0, zIndex: 1000 }}
+      style={{ backgroundColor: "#FFFFFF", position: "sticky", top: 0, zIndex: 1000 }}
     >
       <div
         className="container-fluid d-flex align-items-center justify-content-between"

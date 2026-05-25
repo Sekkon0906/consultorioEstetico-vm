@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { IMG } from "@/lib/imagenes";
 
@@ -201,6 +202,27 @@ export default function VideoAnim() {
               <Counter value={5} label={t("counters.rating")} suffix="/5" icon="fas fa-star" delay={450} />
             </div>
           </div>
+        </div>
+
+        {/* CTAs hacia /doctora y /testimonios — píldoras ghost reusables */}
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+            display: "flex",
+            gap: "1rem",
+            justifyContent: "center",
+            flexWrap: "wrap",
+            marginTop: "3rem",
+            padding: "0 1.5rem",
+          }}
+        >
+          <Link href="/doctora" className="btn-ghost-app">
+            <i className="fas fa-user-md" /> {t("ctaAboutDr")}
+          </Link>
+          <Link href="/testimonios" className="btn-ghost-app">
+            <i className="fas fa-comments" /> {t("ctaTestimonials")}
+          </Link>
         </div>
       </section>
     </>
