@@ -165,27 +165,32 @@ export default function Galeria3D() {
         }}
       />
 
-      {/* Título sobre el eje de la rueda — ancho ajustado al espacio
-          visual de las cards para que no se sienta "centrado en toda
-          la sección" sino realmente anclado a la columna derecha. */}
-      <motion.div
+      {/* Wrapper EXTERNO con position/right/translateX — necesario porque
+          framer-motion sobrescribe el transform del style con su propio
+          translate animado (y eso anulaba el translateX(50%) que centraba
+          el título sobre el eje de la rueda). El motion.div interno se
+          queda con la animación de entrada únicamente. */}
+      <div
         className="g3d-title-wrap"
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
         style={{
           position: "absolute",
           top: "5%",
-          right: "16%",
+          right: "30%",
+          /* fit-content + maxWidth hace que el wrap ocupe únicamente el
+             ancho del texto, y translateX(50%) lo centra exactamente
+             sobre el mismo eje que la rueda, dots y CTA. */
+          width: "fit-content",
+          maxWidth: "min(560px, 42%)",
           transform: "translateX(50%)",
-          /* Ancho ajustado al espacio horizontal que ocupan las cards
-             visibles (~ ±290px del eje). Antes 880px lo hacía verse
-             centrado en toda la sección. */
-          width: "min(640px, 44%)",
           textAlign: "center",
           zIndex: 4,
           padding: "0 0.5rem",
         }}
+      >
+      <motion.div
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
       >
         <h2
           style={{
@@ -202,11 +207,13 @@ export default function Galeria3D() {
           {t.rich("title", {
             c: (chunks) => (
               <span
+                className="g3d-title-accent"
                 style={{
                   /* Dorado vibrante con glow para máximo contraste
                      sobre la imagen oscura de fondo. */
                   color: "#F7D9A6",
                   fontWeight: 800,
+                  display: "inline-block",
                   textShadow:
                     "0 0 18px rgba(247, 217, 166, 0.45), 0 4px 18px rgba(0,0,0,0.7)",
                 }}
@@ -239,13 +246,14 @@ export default function Galeria3D() {
           {t("subtitle")}
         </p>
       </motion.div>
+      </div>
 
       {/* Rueda 3D — centrada vertical entre el título y la base inferior */}
       <div
         className="g3d-wheel-anchor"
         style={{
           position: "absolute",
-          top: "55%",
+          top: "58%",
           right: "30%",
           transform: "translate(50%, -50%)",
           zIndex: 3,
@@ -334,7 +342,10 @@ export default function Galeria3D() {
               height: 340,
               transformStyle: "preserve-3d",
               transform: `rotateX(${r(5 + mouseTilt.y * 0.18, 2)}deg) rotateY(${r(rotation + mouseTilt.x * 0.25, 2)}deg)`,
-              transition: "transform 0.35s cubic-bezier(0.16,1,0.3,1)",
+              /* Transición más suave para el parallax del mouse —
+                 la rotación continua va a 60fps via rAF así que
+                 estamos solo suavizando los cambios bruscos. */
+              transition: "transform 0.6s cubic-bezier(0.22,1,0.36,1)",
               zIndex: 3,
             }}
             onMouseEnter={() => setIsPaused(true)}
@@ -355,7 +366,11 @@ export default function Galeria3D() {
                     backfaceVisibility: "hidden",
                     zIndex,
                     filter: `brightness(${r(brightness, 3)})`,
-                    transition: "filter 0.45s ease",
+                    /* Transiciones suaves cubic-bezier para que el cambio
+                       de brillo y profundidad de las cards al rotar se
+                       sienta orgánico, no abrupto. */
+                    transition:
+                      "filter 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1)",
                   }}
                 >
                   <div
@@ -531,18 +546,20 @@ export default function Galeria3D() {
         </div>
       )}
 
-      {/* Detalle del tratamiento seleccionado — centrado en la pantalla */}
+      {/* Detalle del tratamiento seleccionado — centrado en el eje
+          de la sección (right: 30%), mismo margen que la rueda/dots/CTA,
+          no en el centro del viewport. */}
       {selected !== null && (
         <div
           className="g3d-detail"
           style={{
             position: "absolute",
             top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
+            right: "30%",
+            transform: "translate(50%, -50%)",
             backgroundColor: "#FFFDF9",
-            width: 720,
-            maxWidth: "90%",
+            width: 680,
+            maxWidth: "55%",
             border: "1px solid rgba(201,173,141,0.4)",
             borderRadius: 24,
             boxShadow:
@@ -730,13 +747,39 @@ export default function Galeria3D() {
           0%, 100% { transform: scale(1); opacity: 0.4; }
           50%      { transform: scale(1.35); opacity: 0.85; }
         }
+        /* Respiración sutil para las palabras destacadas del título —
+           escala y glow leves para dar viveza sin distraer. */
+        @keyframes g3d-breathe {
+          0%, 100% {
+            transform: scale(1);
+            text-shadow:
+              0 0 18px rgba(247, 217, 166, 0.45),
+              0 4px 18px rgba(0,0,0,0.7);
+          }
+          50% {
+            transform: scale(1.035);
+            text-shadow:
+              0 0 26px rgba(247, 217, 166, 0.7),
+              0 4px 18px rgba(0,0,0,0.7);
+          }
+        }
+        .g3d-title-accent {
+          animation: g3d-breathe 3.2s ease-in-out infinite;
+          transform-origin: center;
+        }
+        /* Decalado de fase entre las dos palabras destacadas para que
+           respiren alternadamente y se sienta orgánico, no robótico. */
+        .g3d-title-accent + .g3d-title-accent,
+        .g3d-title-accent:nth-of-type(2) {
+          animation-delay: 1.6s;
+        }
         @keyframes g3d-halo {
           0%   { transform: translate(-50%, -50%) rotate(0deg); }
           100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
         @keyframes g3d-detail-in {
-          0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.94); }
-          100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          0%   { opacity: 0; transform: translate(50%, -50%) scale(0.94); }
+          100% { opacity: 1; transform: translate(50%, -50%) scale(1); }
         }
         .g3d-card {
           box-shadow:
@@ -769,7 +812,7 @@ export default function Galeria3D() {
           /* Solo el título va más a la derecha que el resto, para que
              se sienta alineado con el centro visual de las cards (que
              por la perspectiva 3D se ven ligeramente desplazadas). */
-          .g3d-title-wrap     { right: 10% !important; width: min(540px, 44%) !important; }
+          .g3d-title-wrap     { right: 22% !important; max-width: min(500px, 46%) !important; }
           .g3d-wheel-anchor   { right: 22% !important; transform: translate(50%, -50%) !important; }
           .g3d-dots-wrap      { right: 22% !important; }
           .g3d-cta-wrap       { right: 22% !important; }
@@ -779,7 +822,7 @@ export default function Galeria3D() {
           }
         }
         @media (max-width: 980px) {
-          .g3d-title-wrap     { right: 5% !important; width: min(460px, 52%) !important; }
+          .g3d-title-wrap     { right: 15% !important; max-width: min(460px, 52%) !important; }
           .g3d-wheel-anchor   { right: 15% !important; transform: translate(50%, -50%) !important; }
           .g3d-dots-wrap      { right: 15% !important; }
           .g3d-cta-wrap       { right: 15% !important; }
@@ -835,6 +878,11 @@ export default function Galeria3D() {
             width: 92% !important;
             max-width: 92% !important;
             padding: 2.5rem 1.5rem 1.5rem !important;
+            animation: g3d-detail-in-mobile 0.5s cubic-bezier(0.16,1,0.3,1) !important;
+          }
+          @keyframes g3d-detail-in-mobile {
+            0%   { opacity: 0; transform: translate(50%, -50%) scale(0.94); }
+            100% { opacity: 1; transform: translate(50%, -50%) scale(1); }
           }
           .g3d-detail > div:last-child {
             flex-direction: column !important;
