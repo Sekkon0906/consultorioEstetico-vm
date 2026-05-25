@@ -215,7 +215,7 @@
   },
   "footer": {
     "contactBadge": "Contact",
-    "contactTitle": "Got a question?",
+    "contactTitle": "Got a question about a treatment?",
     "contactSub": "Reach me directly on WhatsApp",
     "form": {
       "name": "Full name",
@@ -225,7 +225,8 @@
       "message": "Your message",
       "acceptIntro": "I accept the",
       "acceptTerms": "terms & conditions",
-      "submit": "Send via WhatsApp",
+      "submit": "Send question via WhatsApp",
+      "incompleteWarning": "Please fill in the form with your question",
       "whatsappTitle": "*New message from the website*",
       "whatsappName": "Name:",
       "whatsappEmail": "Email:",

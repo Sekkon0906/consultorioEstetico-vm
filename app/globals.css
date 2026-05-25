@@ -342,6 +342,20 @@ body {
   border-color: var(--brand) !important;
 }
 
+/* Variante "clara" del ghost-app, pensada para fondos oscuros como
+   el footer o overlays sobre imágenes. Texto blanco, borde blanco;
+   el hover sigue siendo el gradiente brand para coherencia. */
+.btn-ghost-app.footer-cta-ghost {
+  color: #FFFDF9 !important;
+  border-color: rgba(255, 253, 249, 0.85) !important;
+}
+.btn-ghost-app.footer-cta-ghost:hover,
+.btn-ghost-app.footer-cta-ghost:focus-visible {
+  color: #FFFFFF !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, #B08968, #C9AD8D) !important;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
   .hero-fs-bg img,

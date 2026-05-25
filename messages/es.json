@@ -215,7 +215,7 @@
   },
   "footer": {
     "contactBadge": "Contacto",
-    "contactTitle": "¿Tienes alguna pregunta?",
+    "contactTitle": "¿Tienes alguna pregunta relacionada con un procedimiento?",
     "contactSub": "Contáctame directamente por WhatsApp",
     "form": {
       "name": "Nombre completo",
@@ -225,7 +225,8 @@
       "message": "Tu mensaje",
       "acceptIntro": "Acepto los",
       "acceptTerms": "términos y condiciones",
-      "submit": "Enviar por WhatsApp",
+      "submit": "Enviar pregunta por WhatsApp",
+      "incompleteWarning": "Llena el formulario con tu pregunta",
       "whatsappTitle": "*Nuevo mensaje desde la web*",
       "whatsappName": "Nombre:",
       "whatsappEmail": "Correo:",

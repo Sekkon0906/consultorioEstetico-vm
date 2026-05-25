@@ -180,7 +180,7 @@ export default function Galeria3D() {
              ancho del texto, y translateX(50%) lo centra exactamente
              sobre el mismo eje que la rueda, dots y CTA. */
           width: "fit-content",
-          maxWidth: "min(560px, 42%)",
+          maxWidth: "min(720px, 52%)",
           transform: "translateX(50%)",
           textAlign: "center",
           zIndex: 4,
@@ -197,11 +197,12 @@ export default function Galeria3D() {
             fontFamily: "'Playfair Display', serif",
             color: "#FFFDF9",
             fontWeight: 700,
-            fontSize: "clamp(1.3rem, 2vw, 1.8rem)",
+            /* Título mucho más grande para tomar más presencia visual. */
+            fontSize: "clamp(1.7rem, 2.8vw, 2.5rem)",
             margin: 0,
-            textShadow: "0 4px 18px rgba(0,0,0,0.7)",
+            textShadow: "0 4px 20px rgba(0,0,0,0.75)",
             letterSpacing: "0.01em",
-            lineHeight: 1.25,
+            lineHeight: 1.2,
           }}
         >
           {t.rich("title", {
@@ -209,13 +210,13 @@ export default function Galeria3D() {
               <span
                 className="g3d-title-accent"
                 style={{
-                  /* Dorado vibrante con glow para máximo contraste
-                     sobre la imagen oscura de fondo. */
-                  color: "#F7D9A6",
-                  fontWeight: 800,
-                  display: "inline-block",
+                  /* Dorado intenso, peso máximo, glow estático fuerte
+                     para que las palabras clave dominen el título. */
+                  color: "#FFD78A",
+                  fontWeight: 900,
+                  fontStyle: "italic",
                   textShadow:
-                    "0 0 18px rgba(247, 217, 166, 0.45), 0 4px 18px rgba(0,0,0,0.7)",
+                    "0 0 22px rgba(255, 215, 138, 0.7), 0 0 38px rgba(255, 215, 138, 0.35), 0 4px 18px rgba(0,0,0,0.7)",
                 }}
               >
                 {chunks}
@@ -746,32 +747,6 @@ export default function Galeria3D() {
         @keyframes g3d-pulse {
           0%, 100% { transform: scale(1); opacity: 0.4; }
           50%      { transform: scale(1.35); opacity: 0.85; }
-        }
-        /* Respiración sutil para las palabras destacadas del título —
-           escala y glow leves para dar viveza sin distraer. */
-        @keyframes g3d-breathe {
-          0%, 100% {
-            transform: scale(1);
-            text-shadow:
-              0 0 18px rgba(247, 217, 166, 0.45),
-              0 4px 18px rgba(0,0,0,0.7);
-          }
-          50% {
-            transform: scale(1.035);
-            text-shadow:
-              0 0 26px rgba(247, 217, 166, 0.7),
-              0 4px 18px rgba(0,0,0,0.7);
-          }
-        }
-        .g3d-title-accent {
-          animation: g3d-breathe 3.2s ease-in-out infinite;
-          transform-origin: center;
-        }
-        /* Decalado de fase entre las dos palabras destacadas para que
-           respiren alternadamente y se sienta orgánico, no robótico. */
-        .g3d-title-accent + .g3d-title-accent,
-        .g3d-title-accent:nth-of-type(2) {
-          animation-delay: 1.6s;
         }
         @keyframes g3d-halo {
           0%   { transform: translate(-50%, -50%) rotate(0deg); }

@@ -13,6 +13,7 @@ export default function Footer() {
   const [procs, setProcs] = useState<ProcItem[]>([]);
   const [showProcs, setShowProcs] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", procedure: "", phone: "", message: "", terms: false });
+  const [warning, setWarning] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("procedimientos").select("nombre, categoria").order("categoria").order("nombre")
@@ -29,10 +30,24 @@ export default function Footer() {
     const { name, value, type } = e.target;
     const checked = type === "checkbox" ? (e.target as HTMLInputElement).checked : undefined;
     setFormData(prev => ({ ...prev, [name]: type === "checkbox" ? checked ?? false : value }));
+    // Si el usuario empieza a llenar tras un warning, lo limpiamos.
+    if (warning) setWarning(null);
   };
+
+  // Form completo = nombre, email y mensaje obligatorios + términos aceptados.
+  const isFormComplete = !!(
+    formData.name.trim() &&
+    formData.email.trim() &&
+    formData.message.trim() &&
+    formData.terms
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFormComplete) {
+      setWarning(t("form.incompleteWarning"));
+      return;
+    }
     const { name, email, phone, procedure, message } = formData;
     const lineas = [
       t("form.whatsappTitle"),
@@ -45,6 +60,7 @@ export default function Footer() {
     ];
     window.open(`https://wa.me/573155445748?text=${encodeURIComponent(lineas.join("\n"))}`, "_blank");
     setFormData({ name: "", email: "", procedure: "", phone: "", message: "", terms: false });
+    setWarning(null);
   };
 
   const inputStyle: React.CSSProperties = {
@@ -69,13 +85,13 @@ export default function Footer() {
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1000, margin: "0 auto", padding: "4rem 1.5rem 2rem" }}>
 
-        {/* Form section */}
+        {/* Form section — contrastes mejorados */}
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-          <span style={{ display: "inline-block", fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#C9AD8D", background: "rgba(176,137,104,0.1)", border: "1px solid rgba(176,137,104,0.2)", borderRadius: 100, padding: "0.35rem 1.2rem", marginBottom: "1rem" }}>{t("contactBadge")}</span>
-          <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.3rem, 3vw, 1.8rem)", fontWeight: 600, color: "#E9DED2", marginBottom: "0.5rem" }}>
+          <span style={{ display: "inline-block", fontSize: "0.74rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#F0D8B0", background: "rgba(240,216,176,0.14)", border: "1px solid rgba(240,216,176,0.35)", borderRadius: 100, padding: "0.4rem 1.2rem", marginBottom: "1rem" }}>{t("contactBadge")}</span>
+          <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.35rem, 2.8vw, 1.9rem)", fontWeight: 700, color: "#FFFDF9", marginBottom: "0.5rem", lineHeight: 1.25 }}>
             {t("contactTitle")}
           </h3>
-          <p style={{ fontSize: "0.9rem", color: "rgba(233,222,210,0.7)", marginBottom: "2rem" }}>{t("contactSub")}</p>
+          <p style={{ fontSize: "0.95rem", color: "rgba(245, 235, 220, 0.92)", marginBottom: "2rem" }}>{t("contactSub")}</p>
 
           <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", maxWidth: 650, margin: "0 auto" }}>
             <input name="name" value={formData.name} onChange={handleChange} placeholder={t("form.name")} required style={inputStyle}
@@ -120,20 +136,53 @@ export default function Footer() {
               onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
 
             <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-              <input name="terms" type="checkbox" checked={formData.terms} onChange={handleChange} required style={{ accentColor: "#B08968" }} />
-              <small style={{ color: "rgba(233,222,210,0.7)", fontSize: "0.78rem" }}>
+              <input name="terms" type="checkbox" checked={formData.terms} onChange={handleChange} style={{ accentColor: "#B08968" }} />
+              <small style={{ color: "rgba(245, 235, 220, 0.9)", fontSize: "0.82rem" }}>
                 {t("form.acceptIntro")}{" "}
-                <Link href="/legal/terminos" style={{ color: "#E6CCB2", textDecoration: "underline" }}>
+                <Link
+                  href="/legal/terminos"
+                  className="footer-terms-link"
+                  style={{
+                    color: "#FFD78A",
+                    textDecoration: "underline",
+                    textUnderlineOffset: 3,
+                    fontWeight: 600,
+                  }}
+                >
                   {t("form.acceptTerms")}
                 </Link>
               </small>
             </div>
 
+            {/* Warning si el form está vacío al intentar enviar */}
+            {warning && (
+              <div
+                role="alert"
+                style={{
+                  gridColumn: "1 / -1",
+                  textAlign: "center",
+                  background: "rgba(255, 180, 130, 0.14)",
+                  border: "1px solid rgba(255, 180, 130, 0.45)",
+                  color: "#FFD8B0",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  padding: "0.55rem 1rem",
+                  borderRadius: 100,
+                  marginTop: "0.3rem",
+                }}
+              >
+                <i className="fas fa-exclamation-circle" style={{ marginRight: 6 }} />
+                {warning}
+              </div>
+            )}
+
             <div style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "0.5rem" }}>
-              <button type="submit" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", borderRadius: 100, padding: "0.8rem 2.2rem", fontWeight: 600, fontSize: "0.92rem", cursor: "pointer", boxShadow: "0 4px 16px rgba(176,137,104,0.3)", transition: "all 0.3s" }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(176,137,104,0.4)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 4px 16px rgba(176,137,104,0.3)"; }}>
-                <i className="fab fa-whatsapp" style={{ fontSize: "1.1rem" }} /> {t("form.submit")}
+              <button
+                type="submit"
+                className="btn-ghost-app footer-cta-ghost"
+              >
+                <i className="fab fa-whatsapp" style={{ fontSize: "1.05rem" }} />
+                {t("form.submit")}
               </button>
             </div>
           </form>
@@ -143,11 +192,11 @@ export default function Footer() {
         <div style={{ borderTop: "1px solid rgba(176,137,104,0.2)", paddingTop: "2rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "2rem", marginBottom: "2rem" }}>
           <div>
             <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("clinic")}</h4>
-            <p style={{ fontSize: "0.82rem", color: "rgba(233,222,210,0.65)", lineHeight: 1.6 }}>{t("clinicDesc")}</p>
+            <p style={{ fontSize: "0.82rem", color: "rgba(245, 235, 220, 0.88)", lineHeight: 1.6 }}>{t("clinicDesc")}</p>
           </div>
           <div>
             <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("address")}</h4>
-            <p style={{ fontSize: "0.82rem", color: "rgba(233,222,210,0.65)", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "0.82rem", color: "rgba(245, 235, 220, 0.88)", lineHeight: 1.6 }}>
               {addressLines.map((line, i) => (
                 <span key={i}>
                   {line}
@@ -158,7 +207,7 @@ export default function Footer() {
           </div>
           <div>
             <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("contact")}</h4>
-            <p style={{ fontSize: "0.82rem", color: "rgba(233,222,210,0.65)", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "0.82rem", color: "rgba(245, 235, 220, 0.88)", lineHeight: 1.6 }}>
               {contactLines.map((line, i) => (
                 <span key={i}>
                   {line}
@@ -187,17 +236,17 @@ export default function Footer() {
           </div>
           {/* Enlaces legales */}
           <div style={{ display: "flex", justifyContent: "center", gap: "1.2rem", flexWrap: "wrap", marginBottom: "0.8rem", alignItems: "center" }}>
-            <Link href="/legal/privacidad" style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", textDecoration: "none" }}>{t("legalLinks.privacy")}</Link>
-            <Link href="/legal/terminos" style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", textDecoration: "none" }}>{t("legalLinks.terms")}</Link>
-            <Link href="/legal/cookies" style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", textDecoration: "none" }}>{t("legalLinks.cookies")}</Link>
-            <Link href="/legal/aviso" style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", textDecoration: "none" }}>{t("legalLinks.notice")}</Link>
-            <button type="button" onClick={resetCookies} style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", background: "none", border: "none", padding: 0, cursor: "pointer", textDecoration: "underline" }}>
+            <Link href="/legal/privacidad" style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.92)", textDecoration: "none" }}>{t("legalLinks.privacy")}</Link>
+            <Link href="/legal/terminos" style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.92)", textDecoration: "none" }}>{t("legalLinks.terms")}</Link>
+            <Link href="/legal/cookies" style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.92)", textDecoration: "none" }}>{t("legalLinks.cookies")}</Link>
+            <Link href="/legal/aviso" style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.92)", textDecoration: "none" }}>{t("legalLinks.notice")}</Link>
+            <button type="button" onClick={resetCookies} style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.92)", background: "none", border: "none", padding: 0, cursor: "pointer", textDecoration: "underline" }}>
               {t("cookiePrefs")}
             </button>
           </div>
 
-          <p style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.5)" }}>{t("rights")}</p>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.5)", marginTop: "0.2rem" }}>
+          <p style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.75)" }}>{t("rights")}</p>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.75)", marginTop: "0.2rem" }}>
             {t("designedBy")}{" "}
             <a href="https://portafoliojmo.vercel.app" target="_blank" rel="noopener noreferrer" className="designer-credit">
               <span className="designer-text">Juan Medina O.</span>
