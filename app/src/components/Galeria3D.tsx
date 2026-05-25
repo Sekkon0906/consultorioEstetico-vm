@@ -43,7 +43,10 @@ export default function Galeria3D() {
     load();
   }, []);
 
-  const radius = 380;
+  /* Radio reducido (de 380 a 290) para que las cards visibles a los
+     lados queden más cerca del eje central de la rueda y, por tanto,
+     mejor alineadas visualmente con el título y los dots. */
+  const radius = 290;
   const angle = tratamientos.length > 0 ? 360 / tratamientos.length : 0;
 
   // Rotación continua suave hacia la derecha
@@ -128,6 +131,12 @@ export default function Galeria3D() {
         perspective: "1700px",
         width: "100%",
         aspectRatio: "16 / 9",
+        /* Cap a 95vh para que TODO el contenido (título + rueda + dots + CTA)
+           se vea en una sola pantalla sin scroll, incluso en monitores 21:9
+           donde 16:9 cabría holgado pero el usuario quiere ver el conjunto.
+           min-height evita que se aplaste en pantallas muy pequeñas. */
+        maxHeight: "95vh",
+        minHeight: 600,
         overflow: "hidden",
         backgroundImage: `url(${IMG.galeria3dBg})`,
         backgroundSize: "cover",
@@ -148,15 +157,15 @@ export default function Galeria3D() {
         }}
       />
 
-      {/* Título centrado sobre el eje de la rueda (right: 20%, translateX 50%) */}
+      {/* Título centrado sobre el eje de la rueda */}
       <div
         className="g3d-title-wrap"
         style={{
           position: "absolute",
-          top: "8%",
+          top: "6%",
           right: "30%",
           transform: "translateX(50%)",
-          width: "min(720px, 50%)",
+          width: "min(640px, 50%)",
           textAlign: "center",
           zIndex: 4,
           padding: "0 1rem",
@@ -198,13 +207,13 @@ export default function Galeria3D() {
         />
       </div>
 
-      {/* Rueda 3D centrada verticalmente, anclada al eje right: 20% */}
+      {/* Rueda 3D centrada verticalmente, anclada al mismo eje del título */}
       <div
         className="g3d-wheel-anchor"
         style={{
           position: "absolute",
-          top: "52%",
-          right: "20%",
+          top: "48%",
+          right: "30%",
           transform: "translate(50%, -50%)",
           zIndex: 3,
         }}
@@ -403,14 +412,14 @@ export default function Galeria3D() {
           className="g3d-bottom-stack"
           style={{
             position: "absolute",
-            bottom: "8%",
-            right: "20%",
+            bottom: "6%",
+            right: "30%",
             transform: "translateX(50%)",
             zIndex: 5,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "1rem",
+            gap: "0.7rem",
           }}
         >
           {/* Dots */}

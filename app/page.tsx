@@ -194,7 +194,7 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Foto del consultorio */}
+          {/* Foto del consultorio — sin caption sobre la imagen */}
           <div
             style={{
               position: "relative",
@@ -216,62 +216,48 @@ export default function HomePage() {
                 objectFit: "cover",
               }}
             />
-            {/* Caption sobre la foto */}
-            <div
-              style={{
-                position: "absolute",
-                left: 0,
-                right: 0,
-                bottom: 0,
-                padding: "1.4rem 1.6rem",
-                background:
-                  "linear-gradient(0deg, rgba(30,20,10,0.78) 0%, rgba(30,20,10,0) 100%)",
-                color: "#FFFDF9",
-                textAlign: "left",
-              }}
-            >
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "0.95rem",
-                  fontWeight: 500,
-                  lineHeight: 1.45,
-                  textShadow: "0 2px 8px rgba(0,0,0,0.45)",
-                }}
-              >
-                {th("location.photoCaption")}
-              </p>
-            </div>
           </div>
         </div>
 
-        {/* CTAs */}
+        {/* CTAs en grid 2 col: izquierda (debajo del mapa) = consultorio,
+            derecha (debajo de la foto) = google maps. Cada uno alineado
+            a su esquina exterior para sentirse anclado a su columna. */}
         <div
+          className="home-loc-grid home-loc-ctas"
           style={{
-            display: "flex",
-            gap: "1rem",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            marginTop: "2.5rem",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1.5rem",
+            width: "92%",
+            maxWidth: 1180,
+            margin: "1.5rem auto 0",
           }}
         >
-          <a
-            href="https://www.google.com/maps?q=Carrera+5ta+%2311-24,+Torre+Empresarial,+Consultorio+502,+Ibagué,+Tolima"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-ghost-app"
-          >
-            <i className="fas fa-map-marker-alt" /> {th("location.viewMaps")}
-          </a>
-          <Link href="/consultorio" className="btn-ghost-app">
-            <i className="fas fa-clinic-medical" /> {th("location.viewClinic")}
-          </Link>
+          <div style={{ display: "flex", justifyContent: "flex-start" }}>
+            <Link href="/consultorio" className="btn-ghost-app">
+              <i className="fas fa-clinic-medical" /> {th("location.viewClinic")}
+            </Link>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <a
+              href="https://www.google.com/maps?q=Carrera+5ta+%2311-24,+Torre+Empresarial,+Consultorio+502,+Ibagué,+Tolima"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-ghost-app"
+            >
+              <i className="fas fa-map-marker-alt" /> {th("location.viewMaps")}
+            </a>
+          </div>
         </div>
 
         <style>{`
           @media (max-width: 820px) {
             .home-loc-grid {
               grid-template-columns: 1fr !important;
+            }
+            /* En móvil los CTAs vuelven a centrarse cada uno en su fila */
+            .home-loc-ctas > div {
+              justify-content: center !important;
             }
           }
         `}</style>
