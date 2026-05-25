@@ -166,8 +166,8 @@ export default function Galeria3D() {
       />
 
       {/* Título centrado sobre el eje de la rueda — fijo, con dos
-          palabras destacadas en champán para más jerarquía visual.
-          Subtítulo más grande para mejor legibilidad. */}
+          palabras destacadas en dorado vibrante para alto contraste
+          sobre la imagen oscura. */}
       <motion.div
         className="g3d-title-wrap"
         initial={{ opacity: 0, y: -12 }}
@@ -175,10 +175,12 @@ export default function Galeria3D() {
         transition={{ duration: 0.7, ease: "easeOut" }}
         style={{
           position: "absolute",
-          top: "6%",
+          top: "5%",
           right: "30%",
           transform: "translateX(50%)",
-          width: "min(720px, 55%)",
+          /* Ancho mayor para que el título quepa en una sola línea
+             y quede visualmente alineado con la rueda. */
+          width: "min(880px, 62%)",
           textAlign: "center",
           zIndex: 4,
           padding: "0 1rem",
@@ -189,20 +191,23 @@ export default function Galeria3D() {
             fontFamily: "'Playfair Display', serif",
             color: "#FFFDF9",
             fontWeight: 700,
-            fontSize: "clamp(1.8rem, 3.2vw, 2.6rem)",
+            fontSize: "clamp(1.5rem, 2.6vw, 2.15rem)",
             margin: 0,
-            textShadow: "0 4px 18px rgba(0,0,0,0.6)",
+            textShadow: "0 4px 18px rgba(0,0,0,0.7)",
             letterSpacing: "0.01em",
-            lineHeight: 1.2,
+            lineHeight: 1.25,
           }}
         >
           {t.rich("title", {
             c: (chunks) => (
               <span
                 style={{
-                  color: "#E5D2C4",
-                  fontStyle: "italic",
-                  fontWeight: 700,
+                  /* Dorado vibrante con glow para máximo contraste
+                     sobre la imagen oscura de fondo. */
+                  color: "#F7D9A6",
+                  fontWeight: 800,
+                  textShadow:
+                    "0 0 18px rgba(247, 217, 166, 0.45), 0 4px 18px rgba(0,0,0,0.7)",
                 }}
               >
                 {chunks}
@@ -212,21 +217,21 @@ export default function Galeria3D() {
         </h2>
         <div
           style={{
-            width: 50,
+            width: 60,
             height: 3,
             background:
-              "linear-gradient(90deg, transparent, #E5D2C4, transparent)",
+              "linear-gradient(90deg, transparent, #F7D9A6, transparent)",
             borderRadius: 2,
-            margin: "1rem auto 0.9rem",
+            margin: "0.8rem auto 0.7rem",
           }}
         />
         <p
           style={{
             color: "rgba(255, 253, 249, 0.95)",
-            fontSize: "clamp(1rem, 1.15vw, 1.15rem)",
+            fontSize: "clamp(0.95rem, 1.05vw, 1.05rem)",
             margin: 0,
-            textShadow: "0 2px 10px rgba(0,0,0,0.6)",
-            lineHeight: 1.6,
+            textShadow: "0 2px 10px rgba(0,0,0,0.7)",
+            lineHeight: 1.55,
             fontWeight: 400,
           }}
         >
@@ -239,7 +244,7 @@ export default function Galeria3D() {
         className="g3d-wheel-anchor"
         style={{
           position: "absolute",
-          top: "52%",
+          top: "55%",
           right: "30%",
           transform: "translate(50%, -50%)",
           zIndex: 3,
