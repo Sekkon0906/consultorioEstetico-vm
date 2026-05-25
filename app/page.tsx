@@ -219,9 +219,13 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* CTAs en grid 2 col: izquierda (debajo del mapa) = consultorio,
-            derecha (debajo de la foto) = google maps. Cada uno alineado
-            a su esquina exterior para sentirse anclado a su columna. */}
+        {/* CTAs en grid 2 col, alineados desde el centro hacia afuera:
+            - Izq (bajo el mapa): "Ver en Google Maps", justify flex-end
+              → la píldora queda junto al gap central.
+            - Der (bajo la foto): "Conocer más sobre el consultorio",
+              justify flex-start → también junto al gap central.
+            Mismo gap horizontal que las imágenes para que se respete
+            el ritmo visual. */}
         <div
           className="home-loc-grid home-loc-ctas"
           style={{
@@ -233,11 +237,6 @@ export default function HomePage() {
             margin: "1.5rem auto 0",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "flex-start" }}>
-            <Link href="/consultorio" className="btn-ghost-app">
-              <i className="fas fa-clinic-medical" /> {th("location.viewClinic")}
-            </Link>
-          </div>
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <a
               href="https://www.google.com/maps?q=Carrera+5ta+%2311-24,+Torre+Empresarial,+Consultorio+502,+Ibagué,+Tolima"
@@ -247,6 +246,11 @@ export default function HomePage() {
             >
               <i className="fas fa-map-marker-alt" /> {th("location.viewMaps")}
             </a>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-start" }}>
+            <Link href="/consultorio" className="btn-ghost-app">
+              <i className="fas fa-clinic-medical" /> {th("location.viewClinic")}
+            </Link>
           </div>
         </div>
 

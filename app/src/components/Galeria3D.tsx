@@ -112,18 +112,20 @@ export default function Galeria3D() {
     return { scale, brightness, zIndex, isFront };
   };
 
-  /* Con rotation negativa decreciendo, la card al frente cumple
-     i ≡ rotation / angle (mod n). Tomamos módulo positivo. */
+  /* Rotation decrece (rueda gira a la derecha visualmente).
+     Queremos que el dot activo avance de izquierda a derecha
+     (0 → 1 → 2 → ... → n-1), por lo tanto frontIndex = -rotation/angle. */
   const frontIndex =
     tratamientos.length > 0
-      ? ((Math.round(rotation / angle) % tratamientos.length) +
+      ? ((Math.round(-rotation / angle) % tratamientos.length) +
           tratamientos.length) %
         tratamientos.length
       : -1;
 
   const goToCard = (i: number) => {
-    /* La card i queda al frente cuando rotation = i * angle. */
-    const target = i * angle;
+    /* Inverso de la fórmula anterior: para que dot i quede al frente,
+       rotation = -i * angle. */
+    const target = -i * angle;
     setRotation(target);
     setIsPaused(true);
     setTimeout(() => setIsPaused(false), 1800);
@@ -214,12 +216,13 @@ export default function Galeria3D() {
         />
       </div>
 
-      {/* Rueda 3D centrada verticalmente, anclada al mismo eje del título */}
+      {/* Rueda 3D — movida un poco más arriba para que los dots y el
+          CTA queden visualmente cerca de la base de la rueda. */}
       <div
         className="g3d-wheel-anchor"
         style={{
           position: "absolute",
-          top: "48%",
+          top: "44%",
           right: "30%",
           transform: "translate(50%, -50%)",
           zIndex: 3,
@@ -419,14 +422,16 @@ export default function Galeria3D() {
           className="g3d-bottom-stack"
           style={{
             position: "absolute",
-            bottom: "6%",
+            /* Sube el stack para que quede pegado al borde inferior
+               de la rueda, no abajo de la sección. */
+            bottom: "16%",
             right: "30%",
             transform: "translateX(50%)",
             zIndex: 5,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "0.7rem",
+            gap: "0.55rem",
           }}
         >
           {/* Dots */}
