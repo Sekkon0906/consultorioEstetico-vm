@@ -80,8 +80,8 @@ export default function Footer() {
   const contactLines = t("contactLines").split("\n");
 
   return (
-    <footer style={{ background: "#5A4A3A", color: "white", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 20% 0%, rgba(176,137,104,0.08) 0%, transparent 50%)", pointerEvents: "none" }} />
+    <footer style={{ background: "#3E2E22", color: "#FFFFFF", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 20% 0%, rgba(201,173,141,0.12) 0%, transparent 50%)", pointerEvents: "none" }} />
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1000, margin: "0 auto", padding: "4rem 1.5rem 2rem" }}>
 
@@ -91,7 +91,7 @@ export default function Footer() {
           <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.35rem, 2.8vw, 1.9rem)", fontWeight: 700, color: "#FFFDF9", marginBottom: "0.5rem", lineHeight: 1.25 }}>
             {t("contactTitle")}
           </h3>
-          <p style={{ fontSize: "0.95rem", color: "rgba(245, 235, 220, 0.92)", marginBottom: "2rem" }}>{t("contactSub")}</p>
+          <p style={{ fontSize: "0.95rem", color: "#FFFFFF", marginBottom: "2rem" }}>{t("contactSub")}</p>
 
           <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", maxWidth: 650, margin: "0 auto" }}>
             <input name="name" value={formData.name} onChange={handleChange} placeholder={t("form.name")} required style={inputStyle}
@@ -186,11 +186,11 @@ export default function Footer() {
         <div style={{ borderTop: "1px solid rgba(176,137,104,0.2)", paddingTop: "2rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "2rem", marginBottom: "2rem" }}>
           <div>
             <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("clinic")}</h4>
-            <p style={{ fontSize: "0.82rem", color: "rgba(245, 235, 220, 0.88)", lineHeight: 1.6 }}>{t("clinicDesc")}</p>
+            <p style={{ fontSize: "0.82rem", color: "#FFFFFF", lineHeight: 1.6 }}>{t("clinicDesc")}</p>
           </div>
           <div>
             <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("address")}</h4>
-            <p style={{ fontSize: "0.82rem", color: "rgba(245, 235, 220, 0.88)", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "0.82rem", color: "#FFFFFF", lineHeight: 1.6 }}>
               {addressLines.map((line, i) => (
                 <span key={i}>
                   {line}
@@ -201,7 +201,7 @@ export default function Footer() {
           </div>
           <div>
             <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("contact")}</h4>
-            <p style={{ fontSize: "0.82rem", color: "rgba(245, 235, 220, 0.88)", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "0.82rem", color: "#FFFFFF", lineHeight: 1.6 }}>
               {contactLines.map((line, i) => (
                 <span key={i}>
                   {line}
@@ -230,17 +230,17 @@ export default function Footer() {
           </div>
           {/* Enlaces legales */}
           <div style={{ display: "flex", justifyContent: "center", gap: "1.2rem", flexWrap: "wrap", marginBottom: "0.8rem", alignItems: "center" }}>
-            <Link href="/legal/privacidad" style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.92)", textDecoration: "none" }}>{t("legalLinks.privacy")}</Link>
-            <Link href="/legal/terminos" style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.92)", textDecoration: "none" }}>{t("legalLinks.terms")}</Link>
-            <Link href="/legal/cookies" style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.92)", textDecoration: "none" }}>{t("legalLinks.cookies")}</Link>
-            <Link href="/legal/aviso" style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.92)", textDecoration: "none" }}>{t("legalLinks.notice")}</Link>
-            <button type="button" onClick={resetCookies} style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.92)", background: "none", border: "none", padding: 0, cursor: "pointer", textDecoration: "underline" }}>
+            <Link href="/legal/privacidad" style={{ fontSize: "0.78rem", color: "#FFFFFF", textDecoration: "none" }}>{t("legalLinks.privacy")}</Link>
+            <Link href="/legal/terminos" style={{ fontSize: "0.78rem", color: "#FFFFFF", textDecoration: "none" }}>{t("legalLinks.terms")}</Link>
+            <Link href="/legal/cookies" style={{ fontSize: "0.78rem", color: "#FFFFFF", textDecoration: "none" }}>{t("legalLinks.cookies")}</Link>
+            <Link href="/legal/aviso" style={{ fontSize: "0.78rem", color: "#FFFFFF", textDecoration: "none" }}>{t("legalLinks.notice")}</Link>
+            <button type="button" onClick={resetCookies} style={{ fontSize: "0.78rem", color: "#FFFFFF", background: "none", border: "none", padding: 0, cursor: "pointer", textDecoration: "underline" }}>
               {t("cookiePrefs")}
             </button>
           </div>
 
-          <p style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.75)" }}>{t("rights")}</p>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} style={{ fontSize: "0.78rem", color: "rgba(245, 235, 220, 0.75)", marginTop: "0.2rem" }}>
+          <p style={{ fontSize: "0.78rem", color: "rgba(255, 255, 255, 0.85)" }}>{t("rights")}</p>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} style={{ fontSize: "0.78rem", color: "rgba(255, 255, 255, 0.85)", marginTop: "0.2rem" }}>
             {t("designedBy")}{" "}
             <a href="https://portafoliojmo.vercel.app" target="_blank" rel="noopener noreferrer" className="designer-credit">
               <span className="designer-text">Juan Medina O.</span>
@@ -256,25 +256,44 @@ export default function Footer() {
         .designer-credit {
           position: relative;
           display: inline-block;
-          color: #C9AD8D;
           text-decoration: none;
-          font-weight: 600;
-          padding: 0 2px;
-          transition: color 0.3s, text-shadow 0.3s;
+          font-weight: 700;
+          font-size: 0.86rem;
+          padding: 0.15rem 0.65rem;
+          margin-left: 0.15rem;
+          border-radius: 100px;
+          /* Borde dorado siempre visible — píldora sutil que enmarca */
+          border: 1px solid rgba(232, 201, 160, 0.4);
+          background: rgba(232, 201, 160, 0.06);
+          transition: background 0.3s ease, border-color 0.3s ease,
+            text-shadow 0.3s ease, transform 0.25s ease;
         }
         .designer-credit:hover {
-          color: #F0D8B0;
-          text-shadow: 0 0 12px rgba(176,137,104,0.6), 0 0 30px rgba(176,137,104,0.3);
+          background: rgba(232, 201, 160, 0.14);
+          border-color: rgba(255, 230, 179, 0.7);
+          transform: translateY(-1px);
+          text-shadow: 0 0 14px rgba(232, 201, 160, 0.55),
+            0 0 32px rgba(232, 201, 160, 0.28);
         }
         .designer-text {
           position: relative;
           z-index: 1;
-          background: linear-gradient(90deg, #C9AD8D, #E0C9A8, #C9AD8D);
+          /* Cream/champán brillante con shimmer suave para resaltar
+             sobre el café oscuro del footer. */
+          background: linear-gradient(
+            90deg,
+            #F5E1B8 0%,
+            #FFF1C8 30%,
+            #FFE6B3 50%,
+            #FFF1C8 70%,
+            #F5E1B8 100%
+          );
           background-size: 200% 100%;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
-          animation: designer-shimmer 3s ease-in-out infinite;
+          animation: designer-shimmer 4s ease-in-out infinite;
+          letter-spacing: 0.01em;
         }
         @keyframes designer-shimmer {
           0%, 100% { background-position: 0% 50%; }
@@ -283,24 +302,31 @@ export default function Footer() {
         .designer-credit::after {
           content: '';
           position: absolute;
-          bottom: -2px;
-          left: 0;
+          bottom: -1px;
+          left: 50%;
+          transform: translateX(-50%);
           width: 0%;
           height: 1.5px;
-          background: linear-gradient(90deg, transparent, #C9AD8D, transparent);
-          transition: width 0.5s ease;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            #FFE6B3,
+            transparent
+          );
+          transition: width 0.45s ease;
         }
         .designer-credit:hover::after {
-          width: 100%;
+          width: 80%;
         }
         .designer-sparkle {
           position: absolute;
-          width: 4px;
-          height: 4px;
+          width: 5px;
+          height: 5px;
           border-radius: 50%;
-          background: #E0C9A8;
+          background: #FFE6B3;
           opacity: 0;
           pointer-events: none;
+          box-shadow: 0 0 6px rgba(255, 230, 179, 0.7);
         }
         .designer-credit:hover .designer-sparkle {
           animation: sparkle-burst 0.8s ease-out forwards;

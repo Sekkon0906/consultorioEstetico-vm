@@ -217,7 +217,8 @@
   },
   "procedimientos": {
     "title": "Medical & Aesthetic Treatments",
-    "subtitle": "Discover facial, body and hair treatments performed with safe, personalized techniques.",
+    "subtitle": "Discover the treatments I offer — facial, body and hair — along with the seasonal promotions I run. All prices are in Colombian pesos (COP) and may adjust based on your medical assessment. Every treatment starts with a consultation so we can design your personalized plan.",
+    "currency": "COP",
     "loading": "Loading treatments...",
     "errorLoad": "Couldn't load the treatments. Please try again later.",
     "featured": {

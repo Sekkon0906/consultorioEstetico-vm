@@ -217,7 +217,8 @@
   },
   "procedimientos": {
     "title": "Procedimientos Médicos y Estéticos",
-    "subtitle": "Descubre tratamientos faciales, corporales y capilares realizados con técnicas seguras y personalizadas.",
+    "subtitle": "Descubre los tratamientos que implemento — faciales, corporales y capilares — junto a los descuentos que voy sacando por temporadas. Todos los precios están en pesos colombianos (COP) y pueden ajustarse según tu valoración médica. Recuerda que cada procedimiento inicia con una valoración para diseñar tu plan personalizado.",
+    "currency": "COP",
     "loading": "Cargando procedimientos...",
     "errorLoad": "No se pudieron cargar los procedimientos. Intenta de nuevo más tarde.",
     "featured": {

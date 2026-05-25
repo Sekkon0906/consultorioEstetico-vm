@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo, useDeferredValue } from "react";
+import { useState, useEffect, useMemo, useDeferredValue, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
-import { Search, X, ArrowRight, Sparkles, Calendar, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { Search, X, ArrowRight, Sparkles, Calendar, ChevronLeft, ChevronRight, Star, ChevronDown, Check, ArrowUpDown } from "lucide-react";
 
 import type { Procedimiento } from "../types/domain";
 import { getProcedimientosApi } from "../services/procedimientosApi";
@@ -291,23 +291,8 @@ export default function ProcedimientosPage() {
                   </div>
                 )}
 
-                {/* Sort select */}
-                <div className="proc-sort">
-                  <label htmlFor="proc-sort-select" className="proc-sort-label">
-                    {t("filters.sortBy")}
-                  </label>
-                  <select
-                    id="proc-sort-select"
-                    value={sortMode}
-                    onChange={(e) => setSortMode(e.target.value as SortMode)}
-                    className="proc-sort-select"
-                  >
-                    <option value="featured">{t("filters.sortFeatured")}</option>
-                    <option value="priceAsc">{t("filters.sortPriceAsc")}</option>
-                    <option value="priceDesc">{t("filters.sortPriceDesc")}</option>
-                    <option value="name">{t("filters.sortName")}</option>
-                  </select>
-                </div>
+                {/* Sort dropdown custom — estilo de la página */}
+                <SortDropdown sortMode={sortMode} setSortMode={setSortMode} t={t} />
               </div>
             </motion.div>
           )}
@@ -576,7 +561,10 @@ export default function ProcedimientosPage() {
           border-color: transparent;
           font-weight: 600;
         }
+        /* Dropdown custom de orden — reemplaza el <select> nativo
+           para que respete la estética de la página. */
         .proc-sort {
+          position: relative;
           display: flex;
           align-items: center;
           gap: 0.55rem;
@@ -586,26 +574,84 @@ export default function ProcedimientosPage() {
           font-size: 0.78rem;
           font-weight: 600;
           color: #6C584C;
+          white-space: nowrap;
         }
-        .proc-sort-select {
-          padding: 0.4rem 2rem 0.4rem 0.9rem;
+        .proc-sort-trigger {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.55rem;
+          padding: 0.45rem 0.85rem 0.45rem 1rem;
           border-radius: 100px;
-          border: 1px solid rgba(176, 137, 104, 0.25);
-          background: #FFFDF9
-            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%235A4635' d='M0 0l5 6 5-6z'/></svg>")
-            no-repeat right 0.85rem center;
+          border: 1px solid rgba(176, 137, 104, 0.28);
+          background: #FFFDF9;
           color: #3A2A1A;
-          font-size: 0.82rem;
+          font-size: 0.84rem;
           font-weight: 600;
           cursor: pointer;
-          -webkit-appearance: none;
-          appearance: none;
           outline: none;
-          transition: border-color 0.25s ease, box-shadow 0.25s ease;
+          transition: border-color 0.25s ease, box-shadow 0.25s ease,
+            background 0.25s ease;
+          font-family: inherit;
         }
-        .proc-sort-select:focus {
+        .proc-sort-trigger:hover {
           border-color: #B08968;
-          box-shadow: 0 0 0 4px rgba(176, 137, 104, 0.12);
+          background: #FFF9F1;
+        }
+        .proc-sort-trigger.is-open,
+        .proc-sort-trigger:focus-visible {
+          border-color: #B08968;
+          box-shadow: 0 0 0 4px rgba(176, 137, 104, 0.14);
+        }
+        .proc-sort-caret {
+          color: #8B7060;
+          transition: transform 0.25s ease;
+          flex-shrink: 0;
+        }
+        .proc-sort-menu {
+          position: absolute;
+          top: calc(100% + 6px);
+          right: 0;
+          min-width: 240px;
+          padding: 0.35rem;
+          background: #FFFDF9;
+          border: 1px solid rgba(176, 137, 104, 0.2);
+          border-radius: 14px;
+          box-shadow:
+            0 14px 36px rgba(58, 42, 26, 0.18),
+            0 0 0 1px rgba(176, 137, 104, 0.05);
+          list-style: none;
+          margin: 0;
+          z-index: 30;
+          backdrop-filter: blur(12px);
+        }
+        .proc-sort-option {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.55rem 0.85rem;
+          border: none;
+          background: transparent;
+          color: #3A2A1A;
+          font-size: 0.85rem;
+          font-weight: 500;
+          text-align: left;
+          border-radius: 9px;
+          cursor: pointer;
+          transition: background 0.18s ease, color 0.18s ease;
+          font-family: inherit;
+        }
+        .proc-sort-option:hover {
+          background: rgba(176, 137, 104, 0.1);
+          color: #3A2A1A;
+        }
+        .proc-sort-option.is-selected {
+          background: linear-gradient(135deg, #B08968, #C9AD8D);
+          color: #FFFDF9;
+          font-weight: 600;
+        }
+        .proc-sort-option.is-selected:hover {
+          background: linear-gradient(135deg, #A0724E, #B89A7C);
         }
         @media (max-width: 640px) {
           .proc-subbar { padding-top: 0.6rem; }
@@ -758,6 +804,12 @@ export default function ProcedimientosPage() {
           font-size: 0.85rem;
           font-weight: 700;
           color: #B08968;
+        }
+        .proc-card-price-unit {
+          font-size: 0.7rem;
+          font-weight: 600;
+          color: #8B7060;
+          letter-spacing: 0.04em;
         }
         .proc-card-arrow {
           width: 32px;
@@ -993,7 +1045,7 @@ function FeaturedCarousel({
                     margin: "0.2rem 0 0",
                   }}
                 >
-                  {t("standardPrice")} {formatPrecio(item.precio, intlLocale)}
+                  {t("standardPrice")} {formatPrecio(item.precio, intlLocale)} {t("currency")}
                 </p>
               )}
               <div
@@ -1218,7 +1270,8 @@ function ProcCard({
           <div className="proc-card-footer">
             {procedimiento.precio ? (
               <span className="proc-card-price">
-                {formatPrecio(procedimiento.precio, intlLocale)}
+                {formatPrecio(procedimiento.precio, intlLocale)}{" "}
+                <span className="proc-card-price-unit">{t("currency")}</span>
               </span>
             ) : (
               <span />
@@ -1285,5 +1338,110 @@ function EmptyState({
         {t("filters.clearSearch")}
       </button>
     </motion.div>
+  );
+}
+
+/* ──────────────────────────────────────────────
+   Dropdown custom de ordenamiento — reemplaza el
+   <select> nativo (que tomaba el estilo del SO)
+   por uno con la estética de la página.
+────────────────────────────────────────────── */
+function SortDropdown({
+  sortMode,
+  setSortMode,
+  t,
+}: {
+  sortMode: SortMode;
+  setSortMode: (m: SortMode) => void;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Cierra al click fuera
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  // Cierra con Escape
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [open]);
+
+  const options: { value: SortMode; label: string }[] = [
+    { value: "featured", label: t("filters.sortFeatured") },
+    { value: "priceAsc", label: t("filters.sortPriceAsc") },
+    { value: "priceDesc", label: t("filters.sortPriceDesc") },
+    { value: "name", label: t("filters.sortName") },
+  ];
+  const current = options.find((o) => o.value === sortMode) ?? options[0];
+
+  return (
+    <div className="proc-sort" ref={wrapRef}>
+      <span className="proc-sort-label">
+        <ArrowUpDown size={13} style={{ marginRight: 4, verticalAlign: "-2px" }} />
+        {t("filters.sortBy")}
+      </span>
+      <button
+        type="button"
+        className={`proc-sort-trigger ${open ? "is-open" : ""}`}
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span>{current.label}</span>
+        <ChevronDown
+          size={14}
+          className="proc-sort-caret"
+          style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+        />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            role="listbox"
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="proc-sort-menu"
+          >
+            {options.map((o) => {
+              const selected = o.value === sortMode;
+              return (
+                <li key={o.value}>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={selected}
+                    onClick={() => {
+                      setSortMode(o.value);
+                      setOpen(false);
+                    }}
+                    className={`proc-sort-option ${selected ? "is-selected" : ""}`}
+                  >
+                    <span>{o.label}</span>
+                    {selected && <Check size={14} />}
+                  </button>
+                </li>
+              );
+            })}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
