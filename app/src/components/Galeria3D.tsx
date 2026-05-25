@@ -127,8 +127,7 @@ export default function Galeria3D() {
       style={{
         perspective: "1700px",
         width: "100%",
-        height: "100vh",
-        minHeight: 720,
+        aspectRatio: "16 / 9",
         overflow: "hidden",
         backgroundImage: `url(${IMG.galeria3dBg})`,
         backgroundSize: "cover",
@@ -155,7 +154,7 @@ export default function Galeria3D() {
         style={{
           position: "absolute",
           top: "8%",
-          right: "20%",
+          right: "30%",
           transform: "translateX(50%)",
           width: "min(720px, 50%)",
           textAlign: "center",
@@ -451,7 +450,8 @@ export default function Galeria3D() {
             ))}
           </div>
 
-          {/* CTA — pill ghost translúcido sobre la imagen oscura */}
+          {/* CTA — pill cream con borde brand, contraste alto sobre la
+              imagen oscura del fondo. */}
           <Link
             href="/procedimientos"
             className="g3d-cta-pill"
@@ -461,12 +461,13 @@ export default function Galeria3D() {
               gap: 8,
               padding: "0.7rem 1.6rem",
               borderRadius: 100,
-              background: "rgba(30, 18, 8, 0.35)",
-              color: "#FFFDF9",
-              border: "1.5px solid rgba(255, 253, 249, 0.78)",
+              background: "rgba(255, 253, 249, 0.95)",
+              color: "#5A4635",
+              border: "1.5px solid rgba(176, 137, 104, 0.55)",
               fontWeight: 600,
               fontSize: "0.92rem",
               textDecoration: "none",
+              boxShadow: "0 6px 18px rgba(0, 0, 0, 0.22)",
               backdropFilter: "blur(8px)",
               WebkitBackdropFilter: "blur(8px)",
               transition:
@@ -738,18 +739,23 @@ export default function Galeria3D() {
           box-shadow: 0 8px 22px rgba(176, 137, 104, 0.45);
         }
 
-        @media (max-width: 1100px) {
-          .g3d-wheel-anchor   { right: 12% !important; transform: translate(50%, -50%) !important; }
-          .g3d-title-wrap     { right: 12% !important; width: min(640px, 60%) !important; }
-          .g3d-bottom-stack   { right: 12% !important; }
+        @media (max-width: 1280px) {
+          .g3d-wheel-anchor   { right: 22% !important; transform: translate(50%, -50%) !important; }
+          .g3d-title-wrap     { right: 22% !important; width: min(620px, 55%) !important; }
+          .g3d-bottom-stack   { right: 22% !important; }
           .g3d-detail         {
             right: 4% !important;
             max-width: 70% !important;
             width: auto !important;
           }
         }
+        @media (max-width: 980px) {
+          .g3d-wheel-anchor   { right: 15% !important; transform: translate(50%, -50%) !important; }
+          .g3d-title-wrap     { right: 15% !important; width: min(560px, 60%) !important; }
+          .g3d-bottom-stack   { right: 15% !important; }
+        }
         @media (max-width: 820px) {
-          .g3d-stage          { background-position: 30% center !important; height: auto !important; min-height: 100vh !important; padding: 6rem 0 4rem !important; }
+          .g3d-stage          { background-position: 30% center !important; aspect-ratio: auto !important; height: auto !important; min-height: 100vh !important; padding: 6rem 0 4rem !important; }
           .g3d-overlay        {
             background:
               linear-gradient(180deg, rgba(58,42,26,0.55) 0%, rgba(58,42,26,0.35) 35%, rgba(58,42,26,0.55) 100%) !important;

@@ -203,7 +203,9 @@ export default function VideoAnim() {
           </div>
         </div>
 
-        {/* CTAs hacia /doctora y /testimonios — píldoras ghost reusables */}
+        {/* CTAs hacia /doctora y /testimonios — píldoras ghost reusables.
+            width:100% + margin auto + maxWidth iguala el grid de arriba
+            para que las píldoras queden centradas en el viewport. */}
         <div
           style={{
             position: "relative",
@@ -211,9 +213,16 @@ export default function VideoAnim() {
             display: "flex",
             gap: "0.9rem",
             justifyContent: "center",
+            alignItems: "center",
             flexWrap: "wrap",
             marginTop: "1.4rem",
             padding: "0 1.5rem",
+            width: "100%",
+            maxWidth: 1560,
+            marginLeft: "auto",
+            marginRight: "auto",
+            boxSizing: "border-box",
+            textAlign: "center",
           }}
         >
           <Link href="/doctora" className="btn-ghost-app">
