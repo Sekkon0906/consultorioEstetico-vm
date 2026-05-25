@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { TypeAnimation } from "react-type-animation";
 import { useTranslations } from "next-intl";
 import { getProcedimientosApi } from "../../services/procedimientosApi";
 import { IMG } from "../lib/imagenes";
@@ -51,14 +50,13 @@ export default function Galeria3D() {
   const radius = 290;
   const angle = tratamientos.length > 0 ? 360 / tratamientos.length : 0;
 
-  // Rotación continua suave: la rueda gira de modo que las cards
-  // visualmente se desplazan hacia la DERECHA (vienen de la izquierda).
-  // En rotateY de CSS eso equivale a decremento.
+  // Rotación continua: la rueda gira en sentido contrario al anterior
+  // (cards entran por la derecha y se desplazan hacia la izquierda).
   useEffect(() => {
     if (isPaused || selected !== null) return;
     let frame: number;
     const animate = () => {
-      setRotation((prev) => prev - 0.04);
+      setRotation((prev) => prev + 0.04);
       frame = requestAnimationFrame(animate);
     };
     frame = requestAnimationFrame(animate);
@@ -114,20 +112,19 @@ export default function Galeria3D() {
     return { scale, brightness, zIndex, isFront };
   };
 
-  /* Rotation decrece (rueda gira a la derecha visualmente).
-     Queremos que el dot activo avance de izquierda a derecha
-     (0 → 1 → 2 → ... → n-1), por lo tanto frontIndex = -rotation/angle. */
+  /* Rotation crece (rueda gira al revés del anterior).
+     Para que los dots sigan avanzando de izquierda a derecha
+     (0 → 1 → 2 → ...), frontIndex = rotation / angle. */
   const frontIndex =
     tratamientos.length > 0
-      ? ((Math.round(-rotation / angle) % tratamientos.length) +
+      ? ((Math.round(rotation / angle) % tratamientos.length) +
           tratamientos.length) %
         tratamientos.length
       : -1;
 
   const goToCard = (i: number) => {
-    /* Inverso de la fórmula anterior: para que dot i quede al frente,
-       rotation = -i * angle. */
-    const target = -i * angle;
+    /* Para que dot i quede al frente, rotation = i * angle. */
+    const target = i * angle;
     setRotation(target);
     setIsPaused(true);
     setTimeout(() => setIsPaused(false), 1800);
@@ -168,8 +165,9 @@ export default function Galeria3D() {
         }}
       />
 
-      {/* Título centrado sobre el eje de la rueda — con tipado rotativo
-          al estilo del hero, fade-in y subtítulo informativo. */}
+      {/* Título centrado sobre el eje de la rueda — fijo, con dos
+          palabras destacadas en champán para más jerarquía visual.
+          Subtítulo más grande para mejor legibilidad. */}
       <motion.div
         className="g3d-title-wrap"
         initial={{ opacity: 0, y: -12 }}
@@ -180,7 +178,7 @@ export default function Galeria3D() {
           top: "6%",
           right: "30%",
           transform: "translateX(50%)",
-          width: "min(660px, 52%)",
+          width: "min(720px, 55%)",
           textAlign: "center",
           zIndex: 4,
           padding: "0 1rem",
@@ -191,47 +189,45 @@ export default function Galeria3D() {
             fontFamily: "'Playfair Display', serif",
             color: "#FFFDF9",
             fontWeight: 700,
-            fontSize: "clamp(1.7rem, 3vw, 2.4rem)",
+            fontSize: "clamp(1.8rem, 3.2vw, 2.6rem)",
             margin: 0,
             textShadow: "0 4px 18px rgba(0,0,0,0.6)",
             letterSpacing: "0.01em",
-            minHeight: "1.3em",
+            lineHeight: 1.2,
           }}
         >
-          {/* Tipado rotativo entre 4 variantes */}
-          {mounted && (
-            <TypeAnimation
-              sequence={(() => {
-                const list = t.raw("titleRotator") as string[];
-                return list.flatMap((w) => [w, 2400]);
-              })()}
-              wrapper="span"
-              speed={55}
-              deletionSpeed={70}
-              repeat={Infinity}
-              cursor={true}
-            />
-          )}
-          {/* Fallback estático mientras hidrata (SEO + sin flash) */}
-          {!mounted && t("title")}
+          {t.rich("title", {
+            c: (chunks) => (
+              <span
+                style={{
+                  color: "#E5D2C4",
+                  fontStyle: "italic",
+                  fontWeight: 700,
+                }}
+              >
+                {chunks}
+              </span>
+            ),
+          })}
         </h2>
         <div
           style={{
-            width: 44,
+            width: 50,
             height: 3,
             background:
               "linear-gradient(90deg, transparent, #E5D2C4, transparent)",
             borderRadius: 2,
-            margin: "0.9rem auto 0.7rem",
+            margin: "1rem auto 0.9rem",
           }}
         />
         <p
           style={{
-            color: "rgba(255, 253, 249, 0.92)",
-            fontSize: "0.95rem",
+            color: "rgba(255, 253, 249, 0.95)",
+            fontSize: "clamp(1rem, 1.15vw, 1.15rem)",
             margin: 0,
-            textShadow: "0 2px 10px rgba(0,0,0,0.55)",
-            lineHeight: 1.55,
+            textShadow: "0 2px 10px rgba(0,0,0,0.6)",
+            lineHeight: 1.6,
+            fontWeight: 400,
           }}
         >
           {t("subtitle")}
@@ -486,20 +482,17 @@ export default function Galeria3D() {
         </div>
       )}
 
-      {/* CTA "Ver todos los procedimientos" — al fondo de la sección,
-          despegado de los dots para crear una pausa visual. Centrado
-          horizontalmente respecto al viewport (no al eje de la rueda)
-          para que se sienta como el cierre natural de la sección. */}
+      {/* CTA "Ver todos los procedimientos" — anclado al mismo eje
+          vertical del título y la rueda, al fondo de la sección y
+          despegado de los dots. Sin flecha para una píldora más limpia. */}
       {selected === null && (
         <div
           className="g3d-cta-wrap"
           style={{
             position: "absolute",
             bottom: "5%",
-            left: 0,
-            right: 0,
-            display: "flex",
-            justifyContent: "center",
+            right: "30%",
+            transform: "translateX(50%)",
             zIndex: 5,
           }}
         >
@@ -528,7 +521,6 @@ export default function Galeria3D() {
           >
             <i className="fas fa-th-large" />
             {t("viewAll")}
-            <span style={{ fontSize: "1.05rem", lineHeight: 1 }}>→</span>
           </Link>
         </div>
       )}
@@ -771,6 +763,7 @@ export default function Galeria3D() {
           .g3d-wheel-anchor   { right: 22% !important; transform: translate(50%, -50%) !important; }
           .g3d-title-wrap     { right: 22% !important; width: min(620px, 55%) !important; }
           .g3d-dots-wrap      { right: 22% !important; }
+          .g3d-cta-wrap       { right: 22% !important; }
           .g3d-detail         {
             max-width: 70% !important;
             width: auto !important;
@@ -780,6 +773,7 @@ export default function Galeria3D() {
           .g3d-wheel-anchor   { right: 15% !important; transform: translate(50%, -50%) !important; }
           .g3d-title-wrap     { right: 15% !important; width: min(560px, 60%) !important; }
           .g3d-dots-wrap      { right: 15% !important; }
+          .g3d-cta-wrap       { right: 15% !important; }
         }
         @media (max-width: 820px) {
           .g3d-stage          { background-position: 30% top !important; aspect-ratio: auto !important; height: auto !important; min-height: 100vh !important; padding: 6rem 0 4rem !important; }
@@ -815,8 +809,12 @@ export default function Galeria3D() {
           }
           .g3d-cta-wrap       {
             position: relative !important;
+            right: auto !important;
             bottom: auto !important;
+            transform: none !important;
             margin: 2rem auto 0 !important;
+            display: flex;
+            justify-content: center;
           }
         }
         @media (max-width: 768px) {

@@ -41,8 +41,7 @@
   },
   "home": {
     "gallery": {
-      "titleRotator": ["Most requested treatments", "Results you can feel", "Beauty that's truly yours", "What my patients love most"],
-      "title": "Most requested treatments",
+      "title": "Our most <c>requested</c> <c>treatments</c>",
       "subtitle": "Interactively explore some of my most requested treatments. Tap one to see the full details and book your appointment in seconds.",
       "back": "← Back",
       "viewMore": "Learn more about this treatment",

@@ -41,8 +41,7 @@
   },
   "home": {
     "gallery": {
-      "titleRotator": ["Tratamientos más demandados", "Resultados que se sienten", "Belleza que te representa", "Lo que más eligen mis pacientes"],
-      "title": "Tratamientos más demandados",
+      "title": "Nuestros <c>procedimientos</c> más <c>demandados</c>",
       "subtitle": "Explora de forma interactiva algunos de mis procedimientos más solicitados. Selecciona alguno para ver toda su información y agendar tu cita en segundos.",
       "back": "← Volver",
       "viewMore": "Saber más sobre el procedimiento",
