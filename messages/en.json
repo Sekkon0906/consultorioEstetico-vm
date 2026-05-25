@@ -237,7 +237,13 @@
       "capilar": "Hair",
       "resultsCount": "{count, plural, =0 {No results} =1 {1 treatment} other {# treatments}}",
       "noResults": "We couldn't find any treatments matching your search.",
-      "clearSearch": "Clear search"
+      "clearSearch": "Clear search",
+      "allSubcats": "All subcategories",
+      "sortBy": "Sort:",
+      "sortFeatured": "Featured first",
+      "sortPriceAsc": "Price: low to high",
+      "sortPriceDesc": "Price: high to low",
+      "sortName": "Name A-Z"
     },
     "categories": {
       "facial": "Explore facial treatments",

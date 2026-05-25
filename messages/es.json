@@ -237,7 +237,13 @@
       "capilar": "Capilar",
       "resultsCount": "{count, plural, =0 {Sin resultados} =1 {1 procedimiento} other {# procedimientos}}",
       "noResults": "No encontramos procedimientos que coincidan con tu búsqueda.",
-      "clearSearch": "Limpiar búsqueda"
+      "clearSearch": "Limpiar búsqueda",
+      "allSubcats": "Todas las subcategorías",
+      "sortBy": "Ordenar:",
+      "sortFeatured": "Destacados primero",
+      "sortPriceAsc": "Precio: menor a mayor",
+      "sortPriceDesc": "Precio: mayor a menor",
+      "sortName": "Nombre A-Z"
     },
     "categories": {
       "facial": "Explora los procedimientos faciales",

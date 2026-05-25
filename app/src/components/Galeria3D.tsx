@@ -142,7 +142,7 @@ export default function Galeria3D() {
            donde 16:9 cabría holgado pero el usuario quiere ver el conjunto.
            min-height evita que se aplaste en pantallas muy pequeñas. */
         maxHeight: "95vh",
-        minHeight: 600,
+        minHeight: "600px",
         overflow: "hidden",
         backgroundImage: `url(${IMG.galeria3dBg})`,
         backgroundSize: "cover",
@@ -210,13 +210,14 @@ export default function Galeria3D() {
               <span
                 className="g3d-title-accent"
                 style={{
-                  /* Dorado intenso, peso máximo, glow estático fuerte
-                     para que las palabras clave dominen el título. */
-                  color: "#FFD78A",
+                  /* Café pastel cálido — ahora que la imagen de fondo es
+                     más oscura, un crema cálido destaca sin chillar.
+                     Se mantiene el peso 900 + italic para jerarquía. */
+                  color: "#E8C9A0",
                   fontWeight: 900,
                   fontStyle: "italic",
                   textShadow:
-                    "0 0 22px rgba(255, 215, 138, 0.7), 0 0 38px rgba(255, 215, 138, 0.35), 0 4px 18px rgba(0,0,0,0.7)",
+                    "0 2px 14px rgba(0, 0, 0, 0.55), 0 0 22px rgba(232, 201, 160, 0.18)",
                 }}
               >
                 {chunks}
@@ -229,7 +230,7 @@ export default function Galeria3D() {
             width: 60,
             height: 3,
             background:
-              "linear-gradient(90deg, transparent, #F7D9A6, transparent)",
+              "linear-gradient(90deg, transparent, #E8C9A0, transparent)",
             borderRadius: 2,
             margin: "0.8rem auto 0.7rem",
           }}

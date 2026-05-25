@@ -13,7 +13,7 @@ const BURL = "https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/
 
 interface GalItem { id?: string; url: string; titulo: string; orden: number; tipo: string; }
 
-const emptyForm = { nombre: "", desc: "", descCompleta: "", precio: "", imagen: "", categoria: "Facial" as Cat, duracionMin: "", destacado: false, video: "" };
+const emptyForm = { nombre: "", desc: "", descCompleta: "", precio: "", imagen: "", categoria: "Facial" as Cat, subcategoria: "", duracionMin: "", destacado: false, video: "" };
 
 export default function ProcedimientosList() {
   const [procs, setProcs] = useState<Procedimiento[]>([]);
@@ -105,6 +105,7 @@ export default function ProcedimientosList() {
         precio: form.precio || "0",
         imagen: form.imagen,
         categoria: form.categoria,
+        subcategoria: form.subcategoria?.trim() || null,
         duracion_min: Number(form.duracionMin) || null,
         destacado: form.destacado,
         actualizado_en: new Date().toISOString(),
@@ -138,6 +139,7 @@ export default function ProcedimientosList() {
     setForm({
       nombre: p.nombre, desc: p.desc, descCompleta: (p as any).descCompleta || "",
       precio: String(p.precio), imagen: p.imagen, categoria: p.categoria,
+      subcategoria: p.subcategoria || "",
       duracionMin: p.duracionMin ? String(p.duracionMin) : "", destacado: p.destacado || false, video: "",
     });
     setModo("form");
@@ -167,6 +169,26 @@ export default function ProcedimientosList() {
               <div><Lbl>Precio (COP)</Lbl><input type="number" style={IS} value={form.precio} onChange={function(e) { setForm({ ...form, precio: e.target.value }); }} placeholder="350000" /></div>
               <div><Lbl>Duracion (min)</Lbl><input type="number" style={IS} value={form.duracionMin} onChange={function(e) { setForm({ ...form, duracionMin: e.target.value }); }} placeholder="60" /></div>
               <div><Lbl>Categoria</Lbl><select value={form.categoria} onChange={function(e) { setForm({ ...form, categoria: e.target.value as Cat }); }} style={IS}><option>Facial</option><option>Corporal</option><option>Capilar</option></select></div>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <Lbl>Subcategoria (opcional)</Lbl>
+                <input
+                  style={IS}
+                  value={form.subcategoria}
+                  onChange={function(e) { setForm({ ...form, subcategoria: e.target.value }); }}
+                  placeholder="Ej: Labios, Arrugas, Perfilamiento, Cicatrices..."
+                  list="subcategoria-sugerencias"
+                />
+                {/* Sugerencias derivadas de subcategorías ya usadas en
+                    procedimientos existentes — datalist nativo del browser */}
+                <datalist id="subcategoria-sugerencias">
+                  {Array.from(new Set(procs.map(function(p) { return p.subcategoria || ""; }).filter(function(s) { return !!s; }))).map(function(s) {
+                    return <option key={s} value={s} />;
+                  })}
+                </datalist>
+                <small style={{ fontSize: "0.78rem", color: "var(--text-muted)", display: "block", marginTop: 4 }}>
+                  Agrupa procedimientos dentro de su categoria (ej: dentro de Facial → Labios, Arrugas, Perfilamiento). Se puede repetir entre varios.
+                </small>
+              </div>
               <div style={{ display: "flex", alignItems: "end", paddingBottom: 4 }}>
                 <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
                   <input type="checkbox" checked={form.destacado} onChange={function(e) { setForm({ ...form, destacado: e.target.checked }); }} style={{ width: 17, height: 17, accentColor: "var(--brand)" }} />

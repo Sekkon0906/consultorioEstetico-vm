@@ -11,6 +11,16 @@ import { getProcedimientosApi } from "../services/procedimientosApi";
 import { IMG } from "../src/lib/imagenes";
 
 type Categoria = "todos" | "Facial" | "Corporal" | "Capilar";
+type SortMode = "featured" | "priceAsc" | "priceDesc" | "name";
+
+/** Extrae el primer número significativo de un string de precio
+ *  para poder ordenarlo numéricamente. "180.000" → 180000. */
+function precioNum(precio: string | number | undefined): number {
+  if (precio == null) return Number.POSITIVE_INFINITY;
+  if (typeof precio === "number") return precio;
+  const m = String(precio).replace(/[.\s]/g, "").match(/\d+/);
+  return m ? parseInt(m[0], 10) : Number.POSITIVE_INFINITY;
+}
 
 /**
  * Formatea valores de precio (número o string) usando el locale activo.
@@ -43,8 +53,30 @@ export default function ProcedimientosPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [categoria, setCategoria] = useState<Categoria>("todos");
+  const [subcategoria, setSubcategoria] = useState<string | null>(null);
+  const [sortMode, setSortMode] = useState<SortMode>("featured");
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
+
+  // Reset subcategoría al cambiar de categoría — evita estados inválidos.
+  useEffect(() => {
+    setSubcategoria(null);
+  }, [categoria]);
+
+  /* Subcategorías únicas detectadas dentro de la categoría seleccionada.
+     Las extraemos de los procedimientos existentes (no de una tabla
+     aparte), así la doctora solo debe asignarlas en el admin. */
+  const subcategorias = useMemo(() => {
+    if (categoria === "todos") return [];
+    const set = new Set<string>();
+    procedimientos
+      .filter((p) => p.categoria === categoria)
+      .forEach((p) => {
+        const s = p.subcategoria?.trim();
+        if (s) set.add(s);
+      });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [procedimientos, categoria]);
 
   useEffect(() => {
     let mounted = true;
@@ -73,19 +105,39 @@ export default function ProcedimientosPage() {
     [procedimientos]
   );
 
-  /* Filtrado por categoría + búsqueda (debounced via useDeferredValue).
-     Importante: NO excluimos los destacados del grid; deben aparecer
-     también ahí con su glow especial. */
+  /* Filtrado por categoría + subcategoría + búsqueda + sort dinámico. */
   const filtered = useMemo(() => {
     const query = deferredSearch.trim().toLowerCase();
-    return procedimientos
+    const list = procedimientos
       .filter((p) => categoria === "todos" || p.categoria === categoria)
+      .filter((p) => !subcategoria || p.subcategoria === subcategoria)
       .filter((p) => {
         if (!query) return true;
-        const haystack = `${p.nombre} ${p.desc ?? ""} ${p.categoria ?? ""}`.toLowerCase();
+        const haystack = `${p.nombre} ${p.desc ?? ""} ${p.categoria ?? ""} ${p.subcategoria ?? ""}`.toLowerCase();
         return haystack.includes(query);
       });
-  }, [procedimientos, deferredSearch, categoria]);
+
+    const sorted = [...list];
+    switch (sortMode) {
+      case "priceAsc":
+        sorted.sort((a, b) => precioNum(a.precio) - precioNum(b.precio));
+        break;
+      case "priceDesc":
+        sorted.sort((a, b) => precioNum(b.precio) - precioNum(a.precio));
+        break;
+      case "name":
+        sorted.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        break;
+      case "featured":
+      default:
+        sorted.sort((a, b) => {
+          if (a.destacado === b.destacado) return a.nombre.localeCompare(b.nombre);
+          return a.destacado ? -1 : 1;
+        });
+        break;
+    }
+    return sorted;
+  }, [procedimientos, deferredSearch, categoria, subcategoria, sortMode]);
 
   const chips: { key: Categoria; label: string }[] = [
     { key: "todos", label: t("filters.all") },
@@ -200,6 +252,66 @@ export default function ProcedimientosPage() {
             })}
           </div>
         </div>
+
+        {/* Barra dinámica de subcategorías + sort — se desliza desde arriba
+            cuando se selecciona una categoría específica (no "todos"). */}
+        <AnimatePresence initial={false}>
+          {categoria !== "todos" && (
+            <motion.div
+              key={categoria}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              style={{ overflow: "hidden" }}
+            >
+              <div className="proc-subbar">
+                {/* Subcategorías como chips secundarios */}
+                {subcategorias.length > 0 && (
+                  <div className="proc-subchips" role="tablist">
+                    <button
+                      role="tab"
+                      aria-selected={subcategoria === null}
+                      onClick={() => setSubcategoria(null)}
+                      className={`proc-subchip ${subcategoria === null ? "is-active" : ""}`}
+                    >
+                      {t("filters.allSubcats")}
+                    </button>
+                    {subcategorias.map((s) => (
+                      <button
+                        key={s}
+                        role="tab"
+                        aria-selected={subcategoria === s}
+                        onClick={() => setSubcategoria(s)}
+                        className={`proc-subchip ${subcategoria === s ? "is-active" : ""}`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Sort select */}
+                <div className="proc-sort">
+                  <label htmlFor="proc-sort-select" className="proc-sort-label">
+                    {t("filters.sortBy")}
+                  </label>
+                  <select
+                    id="proc-sort-select"
+                    value={sortMode}
+                    onChange={(e) => setSortMode(e.target.value as SortMode)}
+                    className="proc-sort-select"
+                  >
+                    <option value="featured">{t("filters.sortFeatured")}</option>
+                    <option value="priceAsc">{t("filters.sortPriceAsc")}</option>
+                    <option value="priceDesc">{t("filters.sortPriceDesc")}</option>
+                    <option value="name">{t("filters.sortName")}</option>
+                  </select>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* === Resultados === */}
@@ -420,6 +532,86 @@ export default function ProcedimientosPage() {
           color: #FFFDF9;
           border-color: transparent;
           box-shadow: 0 6px 16px rgba(176, 137, 104, 0.28);
+        }
+
+        /* Barra secundaria de subcategorías + sort — aparece animada
+           cuando hay categoría seleccionada. */
+        .proc-subbar {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0.75rem 0 0;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+          border-top: 1px solid rgba(176, 137, 104, 0.1);
+          margin-top: 0.75rem;
+        }
+        .proc-subchips {
+          display: flex;
+          gap: 0.4rem;
+          flex-wrap: wrap;
+          flex: 1;
+        }
+        .proc-subchip {
+          padding: 0.38rem 0.85rem;
+          border-radius: 100px;
+          border: 1px solid rgba(176, 137, 104, 0.18);
+          background: rgba(255, 253, 249, 0.55);
+          color: #5A4635;
+          font-size: 0.78rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background 0.25s ease, color 0.25s ease,
+            border-color 0.25s ease, transform 0.2s ease;
+        }
+        .proc-subchip:hover {
+          background: rgba(255, 253, 249, 0.9);
+          border-color: rgba(176, 137, 104, 0.4);
+          color: #3A2A1A;
+        }
+        .proc-subchip.is-active {
+          background: #3A2A1A;
+          color: #FFFDF9;
+          border-color: transparent;
+          font-weight: 600;
+        }
+        .proc-sort {
+          display: flex;
+          align-items: center;
+          gap: 0.55rem;
+          flex-shrink: 0;
+        }
+        .proc-sort-label {
+          font-size: 0.78rem;
+          font-weight: 600;
+          color: #6C584C;
+        }
+        .proc-sort-select {
+          padding: 0.4rem 2rem 0.4rem 0.9rem;
+          border-radius: 100px;
+          border: 1px solid rgba(176, 137, 104, 0.25);
+          background: #FFFDF9
+            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%235A4635' d='M0 0l5 6 5-6z'/></svg>")
+            no-repeat right 0.85rem center;
+          color: #3A2A1A;
+          font-size: 0.82rem;
+          font-weight: 600;
+          cursor: pointer;
+          -webkit-appearance: none;
+          appearance: none;
+          outline: none;
+          transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .proc-sort-select:focus {
+          border-color: #B08968;
+          box-shadow: 0 0 0 4px rgba(176, 137, 104, 0.12);
+        }
+        @media (max-width: 640px) {
+          .proc-subbar { padding-top: 0.6rem; }
+          .proc-subchips { width: 100%; overflow-x: auto; flex-wrap: nowrap; }
+          .proc-subchip { flex-shrink: 0; }
+          .proc-sort { width: 100%; justify-content: space-between; }
         }
 
         /* Grid de cards */
@@ -697,12 +889,12 @@ function FeaturedCarousel({
             aria-roledescription="slide"
             aria-label={t("featured.slideAria", { n: index + 1, total })}
           >
-            {/* Imagen */}
+            {/* Imagen — compacta para que se vea la toolbar al scroll */}
             <div
               style={{
                 position: "relative",
-                minHeight: 380,
-                aspectRatio: "4 / 5",
+                minHeight: 260,
+                aspectRatio: "5 / 4",
                 background: "#F5EEE5",
                 overflow: "hidden",
               }}
@@ -734,14 +926,14 @@ function FeaturedCarousel({
               />
             </div>
 
-            {/* Texto */}
+            {/* Texto — padding más compacto */}
             <div
               style={{
-                padding: "2.5rem 2.4rem",
+                padding: "1.6rem 1.8rem",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
-                gap: "1rem",
+                gap: "0.65rem",
               }}
             >
               <span
@@ -767,7 +959,7 @@ function FeaturedCarousel({
               <h2
                 style={{
                   fontFamily: "'Playfair Display', serif",
-                  fontSize: "clamp(1.6rem, 2.6vw, 2.4rem)",
+                  fontSize: "clamp(1.35rem, 2vw, 1.8rem)",
                   fontWeight: 700,
                   color: "#3A2A1A",
                   margin: 0,
@@ -780,9 +972,13 @@ function FeaturedCarousel({
                 <p
                   style={{
                     color: "#6C584C",
-                    fontSize: "1rem",
-                    lineHeight: 1.65,
+                    fontSize: "0.92rem",
+                    lineHeight: 1.55,
                     margin: 0,
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
                   }}
                 >
                   {item.desc}
@@ -793,8 +989,8 @@ function FeaturedCarousel({
                   style={{
                     color: "#B08968",
                     fontWeight: 700,
-                    fontSize: "1.05rem",
-                    margin: "0.3rem 0 0",
+                    fontSize: "0.95rem",
+                    margin: "0.2rem 0 0",
                   }}
                 >
                   {t("standardPrice")} {formatPrecio(item.precio, intlLocale)}
@@ -803,9 +999,9 @@ function FeaturedCarousel({
               <div
                 style={{
                   display: "flex",
-                  gap: "0.8rem",
+                  gap: "0.6rem",
                   flexWrap: "wrap",
-                  marginTop: "0.6rem",
+                  marginTop: "0.4rem",
                 }}
               >
                 <Link
@@ -813,32 +1009,36 @@ function FeaturedCarousel({
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: 8,
-                    padding: "0.8rem 1.6rem",
+                    gap: 6,
+                    padding: "0.6rem 1.2rem",
                     borderRadius: 100,
                     background: "linear-gradient(135deg, #B08968, #C9AD8D)",
                     color: "#FFF",
                     fontWeight: 600,
                     textDecoration: "none",
-                    boxShadow: "0 8px 22px rgba(176, 137, 104, 0.3)",
+                    boxShadow: "0 6px 18px rgba(176, 137, 104, 0.28)",
                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                    fontSize: "0.94rem",
+                    fontSize: "0.86rem",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow = "0 12px 28px rgba(176, 137, 104, 0.4)";
+                    e.currentTarget.style.boxShadow = "0 10px 22px rgba(176, 137, 104, 0.38)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = "";
-                    e.currentTarget.style.boxShadow = "0 8px 22px rgba(176, 137, 104, 0.3)";
+                    e.currentTarget.style.boxShadow = "0 6px 18px rgba(176, 137, 104, 0.28)";
                   }}
                 >
-                  <Calendar size={16} />
+                  <Calendar size={14} />
                   {t("featured.ctaBook")}
                 </Link>
-                <Link href={`/procedimientos/${item.id}`} className="btn-ghost-app">
+                <Link
+                  href={`/procedimientos/${item.id}`}
+                  className="btn-ghost-app"
+                  style={{ padding: "0.55rem 1.2rem", fontSize: "0.84rem" }}
+                >
                   {t("featured.ctaInfo")}
-                  <ArrowRight size={15} />
+                  <ArrowRight size={14} />
                 </Link>
               </div>
             </div>

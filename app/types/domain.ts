@@ -122,6 +122,10 @@ export interface Procedimiento {
   precio: string;
   imagen: string;
   categoria: CategoriaProcedimiento;
+  /** Subcategoría libre opcional (ej. "Labios", "Arrugas", "Perfilamiento").
+   *  La doctora la define en el admin; el frontend la usa para filtros
+   *  dinámicos dentro de cada categoría. */
+  subcategoria?: string | null;
   duracionMin?: number | null;
   destacado: boolean;
   galeria?: MediaItem[]; // solo para UI, no está en la tabla actual
