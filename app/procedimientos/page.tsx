@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Collapse } from "react-collapse";
 import { motion } from "framer-motion";
 import { Fade } from "react-awesome-reveal";
+import { useLocale, useTranslations } from "next-intl";
 import {
   FaChevronDown,
   FaChevronUp,
@@ -25,19 +26,18 @@ import { getProcedimientosApi } from "../services/procedimientosApi";
 // Formateador universal de precios
 // Aplica puntos de miles a cualquier número en el texto
 // =======================================================
-function formatPrecioUniversal(precio: string | number): string {
+function formatPrecioUniversal(precio: string | number, intlLocale: string): string {
   if (typeof precio === "number") {
-    return precio.toLocaleString("es-CO", {
+    return precio.toLocaleString(intlLocale, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     });
   }
 
-  // Buscar todos los números y aplicar formato
   return precio.replace(/\d{1,3}(?:\d{3})*(?:\.\d+)?/g, (match) => {
     const num = parseFloat(match.replace(/\./g, "").replace(/,/g, "."));
     if (isNaN(num)) return match;
-    return num.toLocaleString("es-CO", {
+    return num.toLocaleString(intlLocale, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     });
@@ -45,6 +45,9 @@ function formatPrecioUniversal(precio: string | number): string {
 }
 
 export default function ProcedimientosPage() {
+  const t = useTranslations("procedimientos");
+  const locale = useLocale();
+  const intlLocale = locale === "en" ? "en-US" : "es-CO";
   const [openSection, setOpenSection] = useState<string | null>(null);
 
   const [procedimientos, setProcedimientos] = useState<Procedimiento[]>([]);
@@ -69,7 +72,7 @@ export default function ProcedimientosPage() {
       } catch (err) {
         console.error("Error cargando procedimientos:", err);
         if (mounted) {
-          setError("No se pudieron cargar los procedimientos. Intenta de nuevo más tarde.");
+          setError(t("errorLoad"));
         }
       } finally {
         if (mounted) setLoading(false);
@@ -80,17 +83,18 @@ export default function ProcedimientosPage() {
     return () => {
       mounted = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Agrupamos por categoría (si vienen vacíos, simplemente no muestra tarjetas)
   const procedimientosPorCategoria: Record<string, Procedimiento[]> = {
-    "Explora los procedimientos faciales": procedimientos.filter(
+    [t("categories.facial")]: procedimientos.filter(
       (p) => p.categoria === "Facial"
     ),
-    "Explora los procedimientos corporales": procedimientos.filter(
+    [t("categories.corporal")]: procedimientos.filter(
       (p) => p.categoria === "Corporal"
     ),
-    "Explora los procedimientos capilares": procedimientos.filter(
+    [t("categories.capilar")]: procedimientos.filter(
       (p) => p.categoria === "Capilar"
     ),
   };
@@ -123,20 +127,19 @@ export default function ProcedimientosPage() {
             className="text-4xl font-bold mb-4"
             style={{ color: "#4E3B2B", fontFamily: "'Playfair Display', serif" }}
           >
-            Procedimientos Médicos y Estéticos
+            {t("title")}
           </h1>
           <p
             className="text-[#6C584C] max-w-3xl mx-auto text-lg"
             style={{ lineHeight: 1.6 }}
           >
-            Descubre tratamientos faciales, corporales y capilares realizados
-            con técnicas seguras y personalizadas.
+            {t("subtitle")}
           </p>
 
           {/* Mensajes de estado */}
           {loading && (
             <p className="mt-4 text-sm text-[#6C584C]">
-              Cargando procedimientos...
+              {t("loading")}
             </p>
           )}
           {error && !loading && (
@@ -172,7 +175,7 @@ export default function ProcedimientosPage() {
                   <div className="p-6 bg-[#FAF9F7]/70 backdrop-blur-md transition-all duration-700">
                     {items.length === 0 ? (
                       <p className="text-center text-[#6C584C] py-4">
-                        No hay procedimientos registrados en esta categoría por el momento.
+                        {t("emptyCategory")}
                       </p>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -214,11 +217,10 @@ export default function ProcedimientosPage() {
                                   {p.desc}
                                 </p>
                                 <p className="text-[#B08968] font-semibold">
-                                  Precio estándar: {formatPrecioUniversal(p.precio)}
+                                  {t("standardPrice")} {formatPrecioUniversal(p.precio, intlLocale)}
                                 </p>
                                 <small className="text-[#6C584C]/70 block mb-4">
-                                  *Los precios están en pesos colombianos, y el costo puede
-                                  cambiar según la valoración médica.*
+                                  {t("priceDisclaimer")}
                                 </small>
                               </div>
 
@@ -246,7 +248,7 @@ export default function ProcedimientosPage() {
                                   }}
                                 >
                                   <FaCalendarCheck className="text-base" />
-                                  Agendar cita
+                                  {t("book")}
                                 </Link>
 
                                 {/* Ver más */}
@@ -269,7 +271,7 @@ export default function ProcedimientosPage() {
                                   }}
                                 >
                                   <FaEye className="text-base" />
-                                  Ver resultados
+                                  {t("viewResults")}
                                 </Link>
                               </div>
                             </div>

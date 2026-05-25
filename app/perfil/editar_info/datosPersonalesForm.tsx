@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 // Nota: asegúrate de tener instalado react-datepicker:
 //   npm install react-datepicker @types/react-datepicker
 // El CSS se importa globalmente en globals.css para evitar el error de módulo:
@@ -46,9 +47,9 @@ export default function DatosPersonalesForm({
   setEdad,
   canEdit,
 }: Props) {
+  const t = useTranslations("perfil.edit.personal");
   const border = PALETTE.border ?? "#D4A97A";
   const text   = PALETTE.text  ?? "#4E3B2B";
-  const main   = PALETTE.main  ?? "#5C3D2E";
 
   const labelStyle: React.CSSProperties = {
     display: "block",
@@ -69,7 +70,7 @@ export default function DatosPersonalesForm({
     >
 
       <div className={fieldClass}>
-        <label style={labelStyle}>Nombres</label>
+        <label style={labelStyle}>{t("names")}</label>
         <input
           value={nombres}
           onChange={(e) => setNombres(e.target.value)}
@@ -79,7 +80,7 @@ export default function DatosPersonalesForm({
       </div>
 
       <div className={fieldClass}>
-        <label style={labelStyle}>Apellidos</label>
+        <label style={labelStyle}>{t("lastNames")}</label>
         <input
           value={apellidos}
           onChange={(e) => setApellidos(e.target.value)}
@@ -89,7 +90,7 @@ export default function DatosPersonalesForm({
       </div>
 
       <div className={fieldClass}>
-        <label style={labelStyle}>Teléfono</label>
+        <label style={labelStyle}>{t("phone")}</label>
         <input
           value={telefono}
           onChange={(e) => setTelefono(e.target.value)}
@@ -99,19 +100,19 @@ export default function DatosPersonalesForm({
       </div>
 
       <div className={fieldClass}>
-        <label style={labelStyle}>Edad</label>
+        <label style={labelStyle}>{t("age")}</label>
         <input
           type="number"
           value={edad || ""}
           onChange={(e) => setEdad(Number(e.target.value) || 0)}
-          placeholder="Ej: 28"
+          placeholder={t("agePlaceholder")}
           disabled={!canEdit}
           style={inputStyle(border)}
         />
       </div>
 
       <div className={fieldClass}>
-        <label style={labelStyle}>Género</label>
+        <label style={labelStyle}>{t("gender")}</label>
         <select
           value={genero}
           onChange={(e) =>
@@ -120,9 +121,9 @@ export default function DatosPersonalesForm({
           disabled={!canEdit}
           style={inputStyle(border)}
         >
-          <option value="Masculino">Masculino</option>
-          <option value="Femenino">Femenino</option>
-          <option value="Otro">Otro</option>
+          <option value="Masculino">{t("genderMale")}</option>
+          <option value="Femenino">{t("genderFemale")}</option>
+          <option value="Otro">{t("genderOther")}</option>
         </select>
       </div>
     </motion.div>

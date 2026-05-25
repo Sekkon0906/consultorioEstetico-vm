@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
 
@@ -24,20 +25,22 @@ interface AgendarConfirmacionProps {
   usuario?: SessionUser | null;
 }
 
-// ==============================
-// Formateador de moneda (COP)
-// ==============================
-const formatCurrency = (valor: number): string =>
-  valor.toLocaleString("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  });
-
 export default function AgendarConfirmacion({
   cita,
 }: AgendarConfirmacionProps) {
   const router = useRouter();
+  const t = useTranslations("agendar.confirmacion");
+  const locale = useLocale();
+  const intlLocale = locale === "en" ? "en-US" : "es-CO";
+  const currencyLocale = locale === "en" ? "en-US" : "es-CO";
+
+  const formatCurrency = (valor: number): string =>
+    valor.toLocaleString(currencyLocale, {
+      style: "currency",
+      currency: "COP",
+      maximumFractionDigits: 0,
+    });
+
   const [qrURL, setQrURL] = useState<string>("");
   const [estado, setEstado] = useState<Cita["estado"]>(
     cita.estado ?? "pendiente"
@@ -51,7 +54,7 @@ export default function AgendarConfirmacion({
 
   async function generarQR(): Promise<void> {
     try {
-      const data = `Cita #${cita.id} - ${cita.nombres} ${cita.apellidos}\n${cita.procedimiento}\n${cita.fecha} ${cita.hora}`;
+      const data = `${t("pdf.filename")} #${cita.id} - ${cita.nombres} ${cita.apellidos}\n${cita.procedimiento}\n${cita.fecha} ${cita.hora}`;
       const url = await QRCode.toDataURL(data);
       setQrURL(url);
     } catch (err) {
@@ -64,21 +67,22 @@ export default function AgendarConfirmacion({
     const doc = new jsPDF();
 
     doc.setFont("helvetica", "bold");
-    doc.text("Confirmación de Cita", 20, 20);
+    doc.text(t("pdf.title"), 20, 20);
 
     doc.setFont("helvetica", "normal");
-    doc.text(`Paciente: ${cita.nombres} ${cita.apellidos}`, 20, 35);
-    doc.text(`Procedimiento: ${cita.procedimiento}`, 20, 45);
-    doc.text(`Fecha: ${cita.fecha}`, 20, 55);
-    doc.text(`Hora: ${cita.hora}`, 20, 65);
-    doc.text(`Correo: ${cita.correo}`, 20, 75);
-    doc.text(`Estado: ${estado}`, 20, 85);
+    doc.text(`${t("pdf.patient")} ${cita.nombres} ${cita.apellidos}`, 20, 35);
+    doc.text(`${t("pdf.procedure")} ${cita.procedimiento}`, 20, 45);
+    doc.text(`${t("pdf.date")} ${cita.fecha}`, 20, 55);
+    doc.text(`${t("pdf.time")} ${cita.hora}`, 20, 65);
+    doc.text(`${t("pdf.email")} ${cita.correo}`, 20, 75);
+    const estadoLabel = t(`steps.${estado}` as any);
+    doc.text(`${t("pdf.status")} ${estadoLabel}`, 20, 85);
 
     if (qrURL) {
       doc.addImage(qrURL, "PNG", 140, 30, 50, 50);
     }
 
-    doc.save(`Cita_${cita.id}.pdf`);
+    doc.save(`${t("pdf.filename")}_${cita.id}.pdf`);
   };
 
   // === Barra de progreso ===
@@ -97,9 +101,22 @@ export default function AgendarConfirmacion({
       }
     } catch (err) {
       console.error("Error actualizando estado de la cita:", err);
-      setErrorEstado("Ocurrió un error al actualizar el estado de la cita.");
+      setErrorEstado(t("errorUpdate"));
     }
   };
+
+  const fechaFmt = (() => {
+    try {
+      return new Date(cita.fecha + "T12:00:00").toLocaleDateString(intlLocale, {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch {
+      return cita.fecha;
+    }
+  })();
 
   return (
     <motion.div
@@ -109,11 +126,10 @@ export default function AgendarConfirmacion({
       className="rounded-3xl shadow-2xl bg-gradient-to-b from-[#F7EFE6] to-[#E6D2B8] p-10 text-center relative border border-[#E0CDB5]"
     >
       <h2 className="text-3xl font-serif text-[#3B2615] mb-2">
-        Confirmación de tu cita
+        {t("title")}
       </h2>
       <p className="text-[#5A4635] mb-8">
-        Tu cita ha sido registrada exitosamente. A continuación puedes ver su
-        estado y los detalles.
+        {t("subtitle")}
       </p>
 
       {/* === Línea de progreso === */}
@@ -132,7 +148,7 @@ export default function AgendarConfirmacion({
                 i <= indice ? "text-[#5A3B1E]" : "text-gray-400"
               }`}
             >
-              {p}
+              {t(`steps.${p}` as any)}
             </span>
             {i < pasos.length - 1 && (
               <div
@@ -150,45 +166,45 @@ export default function AgendarConfirmacion({
         <div className="flex items-center gap-2 text-[#4E3B2B] mb-1">
           <UserIcon size={18} className="text-[#B08968]" />
           <p>
-            <b>Paciente:</b> {cita.nombres} {cita.apellidos}
+            <b>{t("details.patient")}</b> {cita.nombres} {cita.apellidos}
           </p>
         </div>
 
         <div className="flex items-center gap-2 text-[#4E3B2B] mb-1">
           <CalendarDays size={18} className="text-[#B08968]" />
           <p>
-            <b>Fecha:</b> {cita.fecha}
+            <b>{t("details.date")}</b> {fechaFmt}
           </p>
         </div>
 
         <div className="flex items-center gap-2 text-[#4E3B2B] mb-1">
           <Clock size={18} className="text-[#B08968]" />
           <p>
-            <b>Hora:</b> {cita.hora}
+            <b>{t("details.time")}</b> {cita.hora}
           </p>
         </div>
 
         <div className="flex items-center gap-2 text-[#4E3B2B] mb-1">
           <Mail size={18} className="text-[#B08968]" />
           <p>
-            <b>Correo:</b> {cita.correo}
+            <b>{t("details.email")}</b> {cita.correo}
           </p>
         </div>
 
         <p className="text-[#4E3B2B] mb-1">
-          <b>Procedimiento:</b> {cita.procedimiento}
+          <b>{t("details.procedure")}</b> {cita.procedimiento}
         </p>
 
         <p className="text-[#4E3B2B] mb-1">
-          <b>Método de pago:</b>{" "}
+          <b>{t("details.paymentMethod")}</b>{" "}
           {cita.metodoPago === "Online"
-            ? `Pago en línea (${cita.tipoPagoOnline ?? "N/A"})`
-            : `Pago en consultorio (${cita.tipoPagoConsultorio ?? "N/A"})`}
+            ? `${t("details.paymentOnline")} (${cita.tipoPagoOnline ?? t("details.na")})`
+            : `${t("details.paymentOnsite")} (${cita.tipoPagoConsultorio ?? t("details.na")})`}
         </p>
 
         {typeof cita.monto === "number" && (
           <p className="text-[#4E3B2B]">
-            <b>Valor:</b> {formatCurrency(cita.monto)}
+            <b>{t("details.amount")}</b> {formatCurrency(cita.monto)}
           </p>
         )}
       </div>
@@ -198,11 +214,11 @@ export default function AgendarConfirmacion({
         <div className="flex flex-col items-center mt-10">
           <img
             src={qrURL}
-            alt="QR cita"
+            alt={t("qrAlt")}
             className="w-36 h-36 border border-[#E9DED2] rounded-lg bg-white shadow-sm"
           />
           <p className="mt-3 text-sm text-[#6C584C]">
-            Escanea este código para confirmar tu asistencia
+            {t("qrCaption")}
           </p>
         </div>
       )}
@@ -216,7 +232,7 @@ export default function AgendarConfirmacion({
           <button
             type="button"
             onClick={() => setErrorEstado(null)}
-            aria-label="Cerrar"
+            aria-label={t("errorClose")}
             style={{ background: "none", border: "none", color: "#922B21", cursor: "pointer", fontWeight: 700 }}
           >
             ×
@@ -235,7 +251,7 @@ export default function AgendarConfirmacion({
           }}
         >
           <Download size={18} />
-          Descargar PDF
+          {t("downloadPdf")}
         </button>
 
         {estado !== "atendida" && (
@@ -245,9 +261,7 @@ export default function AgendarConfirmacion({
             className="flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-[#4E3B2B] border border-[#D1BFA4] bg-[#FBF7F2]"
           >
             <CheckCircle2 size={18} />
-            {estado === "pendiente"
-              ? "Marcar como confirmada"
-              : "Marcar como atendida"}
+            {estado === "pendiente" ? t("markConfirmed") : t("markAttended")}
           </button>
         )}
 
@@ -257,7 +271,7 @@ export default function AgendarConfirmacion({
           className="flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold border border-[#E0CDB5] bg-[#FFFDF9] text-[#4E3B2B]"
         >
           <Home size={18} />
-          Volver al inicio
+          {t("backHome")}
         </button>
       </div>
     </motion.div>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { TypeAnimation } from "react-type-animation";
+import { useTranslations } from "next-intl";
 import Galeria3D from "./src/components/Galeria3D";
 import dynamic from "next/dynamic";
 
@@ -13,35 +14,13 @@ const VideoAnim = dynamic(() => import("./src/components/VideoAnim"), {
 
 import { IMG } from "./src/lib/imagenes";
 
-/**
- * Cinemagraph / video del hero.
- *
- * Para activarlo:
- *   1. Coloca el archivo de video en /public/imagenes/hero/  (ej. doctora-loop.mp4)
- *   2. Coloca un poster (foto estática del primer frame) en la misma carpeta
- *      para que aparezca al instante mientras carga el video.
- *   3. Reemplaza los `null` de abajo por las rutas:
- *        const HERO_VIDEO  = "/imagenes/hero/doctora-loop.mp4";
- *        const HERO_POSTER = "/imagenes/hero/doctora-poster.jpg";
- *   4. (Recomendado) El video: mute, sin audio, en loop, MP4 H.264 o WebM,
- *      vertical/cuadrado, peso < 3 MB. Idealmente 5–8s, sutil (un mechón de
- *      pelo, un giro suave del brazo, una sonrisa breve).
- *
- * Si HERO_VIDEO es null se usa el carrusel de imágenes actual (sin cambios).
- */
 const HERO_VIDEO: string | null = null;
 const HERO_POSTER: string | null = null;
-
-/**
- * Imagen de fondo del hero (cubre toda la pantalla inicial).
- * Sube la foto a Supabase Storage en:
- *    ConsultorioImagenes/imagenesPublicas/doctora-hero.jpg
- * y se carga automáticamente desde IMG.heroDoctora.
- * Si por algún motivo no existe, hace fallback al primer carrusel.
- */
 const HERO_IMAGE: string | null = IMG.heroDoctora;
 
 export default function HomePage() {
+  const t = useTranslations("hero");
+  const th = useTranslations("home");
   const imagenes = IMG.homeCarrusel;
 
   const [imagenActual, setImagenActual] = useState(0);
@@ -55,7 +34,6 @@ export default function HomePage() {
     return () => clearInterval(intervalo);
   }, [imagenes.length]);
 
-  // Activa la animación de entrada del contenido del hero (antes quedaba en opacity:0)
   useEffect(() => {
     const t = setTimeout(() => setHeroVisible(true), 80);
     return () => clearTimeout(t);
@@ -63,11 +41,13 @@ export default function HomePage() {
 
   const memoizedVideo = useMemo(() => <VideoAnim />, []);
 
+  const rotator = t.raw("rotator") as string[];
+  const rotatorSequence = rotator.flatMap((w) => [w, 1800]);
+
   return (
     <>
       {/* ===== HERO FULL-SCREEN ===== */}
       <section className="hero-fs">
-        {/* Capa de fondo: video (si HERO_VIDEO) o imagen (HERO_IMAGE / fallback) */}
         <div className="hero-fs-bg">
           {HERO_VIDEO ? (
             <video
@@ -83,13 +63,12 @@ export default function HomePage() {
           ) : (
             <img
               src={HERO_IMAGE || imagenes[imagenActual]}
-              alt="Dra. Vanessa Medina"
+              alt={t("imageAlt")}
             />
           )}
           <div className="hero-fs-overlay" aria-hidden="true" />
         </div>
 
-        {/* Contenido a la derecha con animación */}
         <div className="hero-fs-content">
           <motion.div
             className="hero-fs-text"
@@ -103,7 +82,7 @@ export default function HomePage() {
               animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 12 }}
               transition={{ duration: 0.6, delay: 0.05 }}
             >
-              Medicina estética · Ibagué
+              {t("kicker")}
             </motion.span>
 
             <motion.h1
@@ -112,20 +91,11 @@ export default function HomePage() {
               animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 18 }}
               transition={{ duration: 0.7, delay: 0.18 }}
             >
-              Tu mejor versión <br /> empieza con
+              {t("title1")} <br /> {t("title2")}
               <br />
               <span className="hero-fs-rotator">
                 <TypeAnimation
-                  sequence={[
-                    "armonía.",
-                    1800,
-                    "autenticidad.",
-                    1800,
-                    "belleza natural.",
-                    1800,
-                    "confianza.",
-                    1800,
-                  ]}
+                  sequence={rotatorSequence}
                   wrapper="span"
                   speed={55}
                   deletionSpeed={70}
@@ -141,9 +111,7 @@ export default function HomePage() {
               animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
               transition={{ duration: 0.7, delay: 0.4 }}
             >
-              Tratamientos personalizados con tecnología de última generación.
-              Resultados naturales que resaltan tu esencia, en manos de la
-              Dra. Vanessa Medina.
+              {t("subtitle")}
             </motion.p>
 
             <motion.div
@@ -153,10 +121,10 @@ export default function HomePage() {
               transition={{ duration: 0.7, delay: 0.55 }}
             >
               <Link href="/agendar" className="hero-fs-btn hero-fs-btn-primary">
-                <i className="fas fa-calendar-check me-2"></i> Agendar cita
+                <i className="fas fa-calendar-check me-2"></i> {t("ctaPrimary")}
               </Link>
               <Link href="/procedimientos" className="hero-fs-btn hero-fs-btn-ghost">
-                Conoce los procedimientos
+                {t("ctaSecondary")}
               </Link>
             </motion.div>
           </motion.div>
@@ -183,11 +151,10 @@ export default function HomePage() {
               color: "#4E3B2B",
             }}
           >
-            Tratamientos más demandados
+            {th("gallery.title")}
           </h2>
           <p className="lead" style={{ color: "#6C584C" }}>
-            Explora de forma interactiva algunos de nuestros procedimientos más
-            aclamados
+            {th("gallery.subtitle")}
           </p>
         </div>
         <Galeria3D />
@@ -205,10 +172,10 @@ export default function HomePage() {
           className="fw-bold mb-3"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          Nuestra ubicación
+          {th("location.title")}
         </h2>
         <p className="mb-4" style={{ color: "#6C584C" }}>
-          Encuéntranos en el corazón de Ibagué, dentro de la Torre Empresarial.
+          {th("location.subtitle")}
         </p>
 
         <div
@@ -246,7 +213,7 @@ export default function HomePage() {
             transition: "all 0.3s ease",
           }}
         >
-          <i className="fas fa-map-marker-alt me-2"></i> Ver en Google Maps
+          <i className="fas fa-map-marker-alt me-2"></i> {th("location.viewMaps")}
         </a>
       </section>
     </>

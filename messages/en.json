@@ -15,16 +15,19 @@
     "home": "Home",
     "doctor": "Dr. Vanessa Medina",
     "office": "Clinic",
-    "procedures": "Procedures",
+    "procedures": "Treatments",
     "testimonials": "Testimonials",
-    "book": "Book appointment",
+    "book": "Book a visit",
     "admin": "Admin",
     "login": "Sign in",
-    "editProfile": "Edit profile",
+    "editProfile": "My profile",
     "myAppointments": "My appointments",
     "logout": "Sign out",
     "logoutConfirm": "Sign out?",
-    "logoutMessage": "You'll need to sign in again to access your account."
+    "logoutMessage": "You'll need to sign in again to access your account.",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "profileAlt": "Profile"
   },
   "hero": {
     "kicker": "Aesthetic medicine · Ibagué",
@@ -32,23 +35,199 @@
     "title2": "starts with",
     "rotator": ["harmony.", "authenticity.", "natural beauty.", "confidence."],
     "subtitle": "Personalized treatments with state-of-the-art technology. Natural results that highlight your essence, in the hands of Dr. Vanessa Medina.",
-    "ctaPrimary": "Book appointment",
-    "ctaSecondary": "Explore procedures"
+    "ctaPrimary": "Book a visit",
+    "ctaSecondary": "Explore treatments",
+    "imageAlt": "Dr. Vanessa Medina"
+  },
+  "home": {
+    "gallery": {
+      "title": "Most requested treatments",
+      "subtitle": "Interactively explore some of our most praised treatments",
+      "back": "← Back",
+      "viewMore": "Learn more"
+    },
+    "location": {
+      "title": "Find us",
+      "subtitle": "We're in the heart of Ibagué, inside Torre Empresarial.",
+      "viewMaps": "Open in Google Maps"
+    },
+    "gallery_a11y": {
+      "close": "Close",
+      "goToCard": "Go to treatment {n}"
+    },
+    "video": {
+      "kicker": "Our clinic",
+      "title": "Why book your consultations and treatments with us",
+      "divider": "",
+      "subtitle": "Quality, experience and results that speak for themselves",
+      "distinguishTitle": "What sets us apart",
+      "features": [
+        { "title": "HydraFacial technology", "desc": "International certification" },
+        { "title": "Premium products", "desc": "Advanced medical grade" },
+        { "title": "Pain-free", "desc": "Minimal downtime" },
+        { "title": "Personalized care", "desc": "A plan made for you" }
+      ],
+      "iframeTitle": "Presentation",
+      "watchVideo": "Watch presentation",
+      "experienceTitle": "Experience speaks",
+      "counters": {
+        "patients": "Happy patients",
+        "treatments": "Treatments",
+        "years": "Years of experience",
+        "rating": "Rating"
+      }
+    }
+  },
+  "testimonios": {
+    "badge": "Testimonials",
+    "title": "Patient Testimonials",
+    "subtitle": "Real stories from patients who trusted Dr. Vanessa Medina",
+    "empty": "No testimonials yet.",
+    "noVideo": "No video"
+  },
+  "comentarios": {
+    "title": "Patient Reviews",
+    "subtitle": "Real experiences from those who trusted us",
+    "openForm": "Leave a review",
+    "closeForm": "Close form",
+    "alreadyCommented": "You've already shared your review. Thanks for telling your story.",
+    "form": {
+      "title": "Share your experience",
+      "yourName": "Your name",
+      "procedure": "Treatment you had",
+      "procedurePlaceholder": "Choose one...",
+      "experience": "Your experience",
+      "experiencePlaceholder": "Tell us how it went...",
+      "rating": "Rating",
+      "submit": "Send review",
+      "submitting": "Sending..."
+    },
+    "ratingLabels": ["", "Very poor", "Poor", "Fair", "Good", "Excellent"],
+    "messages": {
+      "completeFields": "Please fill in every field.",
+      "sent": "Review sent. It will be visible once the doctor approves it."
+    },
+    "loading": "Loading reviews...",
+    "emptyState": "Be the first to share your experience."
+  },
+  "doctora": {
+    "hero": {
+      "title": "Who is Dr. Julieth Vanessa Medina?",
+      "p1": "Julieth Vanessa Medina is a Colombian physician passionate about wellbeing and natural beauty. Since her early years working in hospitals, she discovered that her true calling was aesthetic medicine — where science, art and empathy meet to bring out each person's best version.",
+      "p2": "Over time she opened her own clinic, a space designed to offer trust, natural results and treatments with state-of-the-art technology.",
+      "quote": "“Authenticity, sophistication and elegance are the new era of Aesthetic Medicine. Investing in yourself should be about highlighting what makes you unique — a real beauty, without excess.” —",
+      "quoteAuthor": "Julieth Medina",
+      "cta": "Book a visit",
+      "ctaSecondary": "Get to know the doctor",
+      "imageAlt": "Doctor"
+    },
+    "vision": {
+      "title": "Mission & Vision",
+      "missionTitle": "Our Mission",
+      "missionText": "To provide integral aesthetic medical care focused on the patient's wellbeing and harmony, using advanced technology and a human approach for natural, lasting results.",
+      "visionTitle": "Our Vision",
+      "visionText": "To be a national and international reference in ethical, innovative and responsible aesthetic medicine — inspiring more professionals and patients to adopt a healthy, conscious view of beauty."
+    },
+    "filosofia": {
+      "title": "Practice Philosophy & Values",
+      "values": [
+        {
+          "title": "Personalized care",
+          "text": "Every patient is unique. We tailor plans to your aesthetic and emotional needs."
+        },
+        {
+          "title": "Safety first",
+          "text": "Treatments with certified medical protocols and approved materials."
+        },
+        {
+          "title": "Naturalness & harmony",
+          "text": "We highlight your natural beauty without losing what makes you, you."
+        },
+        {
+          "title": "Science & art",
+          "text": "Aesthetic medicine blends medical precision with artistic sensibility."
+        }
+      ]
+    },
+    "formacion": {
+      "kicker": "Professional growth",
+      "title": "Continuous Learning",
+      "subtitle": "Talks, conferences with peers, new techniques and equipment",
+      "viewGallery": "View gallery →",
+      "emptyState": "No activities recorded yet.",
+      "clickHint": "Click any event to see details and the gallery",
+      "modal": {
+        "badge": "Professional update",
+        "photos": "photos",
+        "videoTitle": "Talk video"
+      }
+    }
+  },
+  "consultorio": {
+    "hero": {
+      "kicker": "AESTHETIC MEDICAL SPACE",
+      "title": "Our Clinic",
+      "subtitle": "A space designed for your wellbeing — where aesthetics, technology and calm come together in every detail.",
+      "highlight": "Peaceful atmosphere · Modern equipment · Personalized care",
+      "imageAlt": "Main clinic room"
+    },
+    "description": {
+      "title": "Elegance, comfort and technology",
+      "text": "Every area of the clinic was designed to provide comfort, privacy and a warm, professional aesthetic experience."
+    },
+    "gallery": {
+      "title": "Clinic gallery",
+      "viewSpace": "VIEW SPACE",
+      "close": "Close",
+      "images": [
+        "Treatment room",
+        "Privacy & dividers",
+        "Work area",
+        "Entrance & natural light",
+        "Ambience detail"
+      ]
+    },
+    "map": {
+      "title": "Where to find us",
+      "address": "Carrera 5ta #11-24. Torre Empresarial Building. Office 502. Ibagué – Tolima, Colombia."
+    }
+  },
+  "procedimientos": {
+    "title": "Medical & Aesthetic Treatments",
+    "subtitle": "Discover facial, body and hair treatments performed with safe, personalized techniques.",
+    "loading": "Loading treatments...",
+    "errorLoad": "Couldn't load the treatments. Please try again later.",
+    "categories": {
+      "facial": "Explore facial treatments",
+      "corporal": "Explore body treatments",
+      "capilar": "Explore hair treatments"
+    },
+    "emptyCategory": "No treatments registered in this category yet.",
+    "standardPrice": "Standard price:",
+    "priceDisclaimer": "*Prices are in Colombian pesos and may change based on the medical assessment.*",
+    "book": "Book a visit",
+    "viewResults": "View results"
   },
   "footer": {
-    "contactTitle": "Have a question?",
-    "contactSub": "Contact me directly via WhatsApp",
+    "contactBadge": "Contact",
+    "contactTitle": "Got a question?",
+    "contactSub": "Reach me directly on WhatsApp",
     "form": {
       "name": "Full name",
       "email": "Email address",
-      "procedure": "Select a procedure",
+      "procedure": "Choose a treatment",
       "phone": "Phone",
       "message": "Your message",
       "acceptIntro": "I accept the",
-      "acceptTerms": "terms and conditions",
-      "acceptAnd": "and the",
-      "acceptPrivacy": "privacy policy",
-      "submit": "Send via WhatsApp"
+      "acceptTerms": "terms & conditions",
+      "submit": "Send via WhatsApp",
+      "whatsappTitle": "*New message from the website*",
+      "whatsappName": "Name:",
+      "whatsappEmail": "Email:",
+      "whatsappPhone": "Phone:",
+      "whatsappProcedure": "Treatment:",
+      "whatsappMessage": "Message:",
+      "notSpecified": "Not provided"
     },
     "clinic": "Aesthetic Clinic",
     "clinicDesc": "Personalized care and facial, body and hair aesthetic treatments.",
@@ -63,7 +242,8 @@
       "notice": "Privacy Notice"
     },
     "rights": "© Aesthetic Clinic Dr. Julieth Medina. All rights reserved.",
-    "designedBy": "Designed by"
+    "designedBy": "Website developed by",
+    "cookiePrefs": "Cookie preferences"
   },
   "cookies": {
     "title": "Your privacy matters",
@@ -79,5 +259,255 @@
     "rejectOptional": "Reject optional",
     "customize": "Customize",
     "savePreferences": "Save preferences"
+  },
+  "firma": {
+    "addSignature": "Add signature",
+    "title": "Informed consent",
+    "intro": "You're about to add your signature to the informed consent document. Only the doctor keeps this document and it's required to authorize the treatment. If you have a question, please talk to her directly.",
+    "cancel": "Cancel",
+    "drawTitle": "Draw your signature",
+    "drawHint": "Use your finger or mouse to sign",
+    "clear": "Clear",
+    "back": "Back",
+    "confirm": "Confirm signature",
+    "savingMessage": "Generating document and saving signature...",
+    "doneTitle": "Signature recorded",
+    "doneMessage": "Your signature and the consent document have been saved. The doctor will have access to the signed PDF.",
+    "close": "Close",
+    "saveError": "Couldn't save the signature:",
+    "downloadPdf": "Consent PDF"
+  },
+  "agendar": {
+    "loading": "Loading scheduler...",
+    "ctaContinue": "Continue",
+    "warningSelectDayHour": "Pick a day and a time before continuing.",
+    "warningLoginRequired": "You need to sign in to book an appointment.",
+    "closeWarning": "Dismiss",
+    "calendar": {
+      "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+      "weekdaysShort": ["M", "T", "W", "T", "F", "S", "S"],
+      "hoursAvailable": "Available times",
+      "pickDay": "Pick a day",
+      "pickDayHint": "Choose a day on the calendar",
+      "noHoursToday": "No more times available today. Pick another day.",
+      "noHoursForDay": "No times available for this day."
+    },
+    "form": {
+      "back": "Back",
+      "title": "Tell us about you",
+      "firstAppointmentNote": "Your <b>first appointment</b> is a <b>consultation</b>, and <b>depending on the assessment</b>, we may <b>perform the treatment</b> in the <b>same visit</b>.",
+      "selectedDateTime": "Selected date and time",
+      "changeSchedule": "Change time slot",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "e.g. Laura Gómez",
+      "phone": "Phone",
+      "phonePlaceholder": "Numbers only",
+      "email": "Email address",
+      "emailPlaceholder": "name@example.com",
+      "appointmentType": "Visit type",
+      "appointmentTypeValue": "Consultation / Treatment",
+      "procedure": "Treatment",
+      "procedurePlaceholder": "Choose a treatment",
+      "groupFacial": "Facial",
+      "groupCorporal": "Body",
+      "groupCapilar": "Hair",
+      "noteLabel": "Note (optional)",
+      "notePlaceholder": "e.g. I'm nervous about needles — it's my first time",
+      "continue": "Continue"
+    },
+    "pago": {
+      "back": "Back",
+      "title": "Confirm appointment",
+      "summary": {
+        "patient": "Patient:",
+        "procedure": "Treatment:",
+        "date": "Date:",
+        "time": "Time:",
+        "phone": "Phone:",
+        "notSpecified": "Not provided",
+        "noteLabel": "Note: "
+      },
+      "paymentMethodLabel": "Payment method at the clinic",
+      "cash": "Cash",
+      "card": "Card",
+      "cashHint": "You'll pay in cash when you arrive at the clinic",
+      "cardHint": "You'll pay by card when you arrive at the clinic",
+      "footerInfo": "When you confirm, your appointment details will be sent to the doctor on WhatsApp",
+      "submit": "Confirm and send via WhatsApp",
+      "submitting": "Confirming...",
+      "errorCreate": "Couldn't create the appointment",
+      "whatsapp": {
+        "title": "*New appointment booked*",
+        "patient": "*Patient:*",
+        "phone": "*Phone:*",
+        "email": "*Email:*",
+        "procedure": "*Treatment:*",
+        "date": "*Date:*",
+        "time": "*Time:*",
+        "payment": "*Payment:*",
+        "paymentValue": "At the clinic",
+        "note": "*Note:*",
+        "appointmentNumber": "*Appointment #"
+      }
+    },
+    "confirmacion": {
+      "title": "Appointment confirmed",
+      "subtitle": "Your appointment was registered successfully. Here are the details and current status.",
+      "steps": {
+        "pendiente": "Pending",
+        "confirmada": "Confirmed",
+        "atendida": "Completed"
+      },
+      "details": {
+        "patient": "Patient:",
+        "date": "Date:",
+        "time": "Time:",
+        "email": "Email:",
+        "procedure": "Treatment:",
+        "paymentMethod": "Payment method:",
+        "paymentOnline": "Online payment",
+        "paymentOnsite": "At the clinic",
+        "amount": "Amount:",
+        "na": "N/A"
+      },
+      "qrCaption": "Scan this code to check in at your visit",
+      "qrAlt": "Appointment QR",
+      "errorUpdate": "We couldn't update the appointment status.",
+      "errorClose": "Close",
+      "downloadPdf": "Download PDF",
+      "markConfirmed": "Mark as confirmed",
+      "markAttended": "Mark as completed",
+      "backHome": "Back to home",
+      "goToMyAppointments": "Go to my appointments",
+      "pdf": {
+        "title": "Appointment Confirmation",
+        "patient": "Patient:",
+        "procedure": "Treatment:",
+        "date": "Date:",
+        "time": "Time:",
+        "email": "Email:",
+        "status": "Status:",
+        "filename": "Appointment"
+      }
+    },
+    "tarjeta": {
+      "titleConfirm": "Appointment booked",
+      "titleList": "Appointment details",
+      "subtitle": "Your request was registered successfully",
+      "steps": {
+        "pendiente": "Pending",
+        "confirmada": "Confirmed",
+        "atendida": "Completed"
+      },
+      "rows": {
+        "date": "Date",
+        "time": "Time",
+        "patient": "Patient",
+        "procedure": "Treatment",
+        "phone": "Phone",
+        "email": "Email",
+        "payment": "Payment",
+        "note": "Note",
+        "paymentOnsite": "At the clinic",
+        "paymentOnline": "Online payment"
+      },
+      "footerInfo": "Payment is made when you arrive at the clinic. Your details were sent to the doctor on WhatsApp.",
+      "appointmentNumber": "Appointment #"
+    }
+  },
+  "perfil": {
+    "edit": {
+      "title": "My profile",
+      "personalSection": "Personal details",
+      "medicalSection": "Medical history",
+      "saving": "Saving...",
+      "save": "Save changes",
+      "canEditHint": "You can update your information anytime.",
+      "cantEditHint": "Come back in {days} day(s) to edit your information.",
+      "personal": {
+        "names": "First name(s)",
+        "lastNames": "Last name(s)",
+        "phone": "Phone",
+        "age": "Age",
+        "agePlaceholder": "e.g. 28",
+        "gender": "Gender",
+        "genderMale": "Male",
+        "genderFemale": "Female",
+        "genderOther": "Other"
+      },
+      "medical": {
+        "background": "Medical conditions",
+        "allergies": "Allergies",
+        "medications": "Current medications",
+        "selectPrefix": "Select",
+        "descriptionPlaceholder": "Add any relevant details...",
+        "options": {
+          "hipertension": "Hypertension",
+          "diabetes": "Diabetes",
+          "asma": "Asthma",
+          "cirugias": "Previous surgeries",
+          "otraCondicion": "Other condition",
+          "noTengo": "None",
+          "penicilina": "Penicillin",
+          "polen": "Pollen",
+          "lacteos": "Dairy",
+          "otraAlergia": "Other allergy",
+          "ibuprofeno": "Ibuprofen",
+          "insulina": "Insulin",
+          "otroMedicamento": "Other medication"
+        }
+      },
+      "photo": {
+        "alt": "Profile photo",
+        "hint": "Your photo is pulled from your Google account"
+      },
+      "messages": {
+        "personalSaved": "Personal details updated.",
+        "medicalSaved": "Medical information updated.",
+        "personalError": "Error: Couldn't save personal details.",
+        "medicalError": "Error: Couldn't save medical information.",
+        "saveError": "Couldn't save changes."
+      }
+    },
+    "citas": {
+      "title": "My Appointments",
+      "loading": "Loading appointments...",
+      "errorLoad": "We couldn't load your appointments.",
+      "retry": "Try again",
+      "sortByDate": "Sort by date",
+      "filters": {
+        "all": "All",
+        "pendiente": "Pending",
+        "confirmada": "Confirmed",
+        "atendida": "Completed",
+        "cancelada": "Cancelled"
+      },
+      "emptyAll": "No appointments yet",
+      "emptyFiltered": "No \"{estado}\" appointments",
+      "labels": {
+        "valoracion": "Consultation",
+        "implementacion": "Treatment",
+        "amount": "Amount:",
+        "paid": "Paid:",
+        "remaining": "Remaining:",
+        "cancelReason": "Reason:"
+      },
+      "estadoChip": {
+        "cancelada": "Cancelled"
+      },
+      "reagenda": {
+        "title": "The clinic suggests rescheduling your appointment",
+        "newProposal": "New proposal:",
+        "reason": "Reason:",
+        "accept": "Accept new date",
+        "applying": "Applying...",
+        "reject": "Reject",
+        "errorApply": "Couldn't apply the new schedule. Try again.",
+        "errorReject": "Couldn't reject the request. Try again."
+      },
+      "consent": {
+        "signed": "Consent signed"
+      }
+    }
   }
 }

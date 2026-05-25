@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 
 interface ProcItem { nombre: string; categoria: string; }
 
 export default function Footer() {
+  const t = useTranslations("footer");
   const [procs, setProcs] = useState<ProcItem[]>([]);
   const [showProcs, setShowProcs] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", procedure: "", phone: "", message: "", terms: false });
@@ -32,8 +34,16 @@ export default function Footer() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const { name, email, phone, procedure, message } = formData;
-    const texto = `*Nuevo mensaje desde la web*\n\nNombre: ${name}\nCorreo: ${email}\nTelefono: ${phone || "No especificado"}\nProcedimiento: ${procedure || "No especificado"}\nMensaje: ${message}`;
-    window.open(`https://wa.me/573155445748?text=${encodeURIComponent(texto)}`, "_blank");
+    const lineas = [
+      t("form.whatsappTitle"),
+      "",
+      `${t("form.whatsappName")} ${name}`,
+      `${t("form.whatsappEmail")} ${email}`,
+      `${t("form.whatsappPhone")} ${phone || t("form.notSpecified")}`,
+      `${t("form.whatsappProcedure")} ${procedure || t("form.notSpecified")}`,
+      `${t("form.whatsappMessage")} ${message}`,
+    ];
+    window.open(`https://wa.me/573155445748?text=${encodeURIComponent(lineas.join("\n"))}`, "_blank");
     setFormData({ name: "", email: "", procedure: "", phone: "", message: "", terms: false });
   };
 
@@ -43,6 +53,16 @@ export default function Footer() {
     outline: "none", width: "100%", transition: "border-color 0.3s",
   };
 
+  const resetCookies = () => {
+    try {
+      window.dispatchEvent(new CustomEvent("open-cookie-preferences"));
+    } catch {}
+  };
+
+  // Direcciones y contacto vienen como líneas separadas con \n.
+  const addressLines = t("addressLines").split("\n");
+  const contactLines = t("contactLines").split("\n");
+
   return (
     <footer style={{ background: "#5A4A3A", color: "white", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 20% 0%, rgba(176,137,104,0.08) 0%, transparent 50%)", pointerEvents: "none" }} />
@@ -51,17 +71,17 @@ export default function Footer() {
 
         {/* Form section */}
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-          <span style={{ display: "inline-block", fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#C9AD8D", background: "rgba(176,137,104,0.1)", border: "1px solid rgba(176,137,104,0.2)", borderRadius: 100, padding: "0.35rem 1.2rem", marginBottom: "1rem" }}>Contacto</span>
+          <span style={{ display: "inline-block", fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "#C9AD8D", background: "rgba(176,137,104,0.1)", border: "1px solid rgba(176,137,104,0.2)", borderRadius: 100, padding: "0.35rem 1.2rem", marginBottom: "1rem" }}>{t("contactBadge")}</span>
           <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.3rem, 3vw, 1.8rem)", fontWeight: 600, color: "#E9DED2", marginBottom: "0.5rem" }}>
-            Tienes alguna pregunta?
+            {t("contactTitle")}
           </h3>
-          <p style={{ fontSize: "0.9rem", color: "rgba(233,222,210,0.7)", marginBottom: "2rem" }}>Contactame directamente por WhatsApp</p>
+          <p style={{ fontSize: "0.9rem", color: "rgba(233,222,210,0.7)", marginBottom: "2rem" }}>{t("contactSub")}</p>
 
           <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", maxWidth: 650, margin: "0 auto" }}>
-            <input name="name" value={formData.name} onChange={handleChange} placeholder="Nombre completo" required style={inputStyle}
+            <input name="name" value={formData.name} onChange={handleChange} placeholder={t("form.name")} required style={inputStyle}
               onFocus={e => { e.currentTarget.style.borderColor = "#B08968"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
-            <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder="Correo electronico" required style={inputStyle}
+            <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder={t("form.email")} required style={inputStyle}
               onFocus={e => { e.currentTarget.style.borderColor = "#B08968"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
 
@@ -69,7 +89,7 @@ export default function Footer() {
             <div style={{ gridColumn: "1 / -1", position: "relative" }}>
               <button type="button" onClick={() => setShowProcs(!showProcs)}
                 style={{ ...inputStyle, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", textAlign: "left", color: formData.procedure ? "#FAF9F7" : "rgba(250,249,247,0.5)" }}>
-                {formData.procedure || "Selecciona un procedimiento"}
+                {formData.procedure || t("form.procedure")}
                 <i className={`fas fa-chevron-${showProcs ? "up" : "down"}`} style={{ fontSize: "0.7rem", color: "#B08968" }} />
               </button>
               {showProcs && (
@@ -91,10 +111,10 @@ export default function Footer() {
               )}
             </div>
 
-            <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Telefono" style={inputStyle}
+            <input name="phone" value={formData.phone} onChange={handleChange} placeholder={t("form.phone")} style={inputStyle}
               onFocus={e => { e.currentTarget.style.borderColor = "#B08968"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
-            <textarea name="message" value={formData.message} onChange={handleChange} rows={3} placeholder="Tu mensaje" required
+            <textarea name="message" value={formData.message} onChange={handleChange} rows={3} placeholder={t("form.message")} required
               style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
               onFocus={e => { e.currentTarget.style.borderColor = "#B08968"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
@@ -102,13 +122,9 @@ export default function Footer() {
             <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
               <input name="terms" type="checkbox" checked={formData.terms} onChange={handleChange} required style={{ accentColor: "#B08968" }} />
               <small style={{ color: "rgba(233,222,210,0.7)", fontSize: "0.78rem" }}>
-                Acepto los{" "}
+                {t("form.acceptIntro")}{" "}
                 <Link href="/legal/terminos" style={{ color: "#E6CCB2", textDecoration: "underline" }}>
-                  términos y condiciones
-                </Link>
-                {" "}y la{" "}
-                <Link href="/legal/privacidad" style={{ color: "#E6CCB2", textDecoration: "underline" }}>
-                  política de privacidad
+                  {t("form.acceptTerms")}
                 </Link>
               </small>
             </div>
@@ -117,7 +133,7 @@ export default function Footer() {
               <button type="submit" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", borderRadius: 100, padding: "0.8rem 2.2rem", fontWeight: 600, fontSize: "0.92rem", cursor: "pointer", boxShadow: "0 4px 16px rgba(176,137,104,0.3)", transition: "all 0.3s" }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(176,137,104,0.4)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 4px 16px rgba(176,137,104,0.3)"; }}>
-                <i className="fab fa-whatsapp" style={{ fontSize: "1.1rem" }} /> Enviar por WhatsApp
+                <i className="fab fa-whatsapp" style={{ fontSize: "1.1rem" }} /> {t("form.submit")}
               </button>
             </div>
           </form>
@@ -126,16 +142,30 @@ export default function Footer() {
         {/* Info */}
         <div style={{ borderTop: "1px solid rgba(176,137,104,0.2)", paddingTop: "2rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "2rem", marginBottom: "2rem" }}>
           <div>
-            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>Clinica Estetica</h4>
-            <p style={{ fontSize: "0.82rem", color: "rgba(233,222,210,0.65)", lineHeight: 1.6 }}>Atencion personalizada y tratamientos de estetica facial, corporal y capilar.</p>
+            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("clinic")}</h4>
+            <p style={{ fontSize: "0.82rem", color: "rgba(233,222,210,0.65)", lineHeight: 1.6 }}>{t("clinicDesc")}</p>
           </div>
           <div>
-            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>Direccion</h4>
-            <p style={{ fontSize: "0.82rem", color: "rgba(233,222,210,0.65)", lineHeight: 1.6 }}>Carrera 5ta #11-24. Torre Empresarial. Consultorio 502. Ibague - Tolima.<br />Lunes a Sabado, 9:00 a.m. - 6:00 p.m.</p>
+            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("address")}</h4>
+            <p style={{ fontSize: "0.82rem", color: "rgba(233,222,210,0.65)", lineHeight: 1.6 }}>
+              {addressLines.map((line, i) => (
+                <span key={i}>
+                  {line}
+                  {i < addressLines.length - 1 && <br />}
+                </span>
+              ))}
+            </p>
           </div>
           <div>
-            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>Contacto</h4>
-            <p style={{ fontSize: "0.82rem", color: "rgba(233,222,210,0.65)", lineHeight: 1.6 }}>WhatsApp: +57 315 544 5748<br />Email: dra.vanessamedinao@gmail.com</p>
+            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("contact")}</h4>
+            <p style={{ fontSize: "0.82rem", color: "rgba(233,222,210,0.65)", lineHeight: 1.6 }}>
+              {contactLines.map((line, i) => (
+                <span key={i}>
+                  {line}
+                  {i < contactLines.length - 1 && <br />}
+                </span>
+              ))}
+            </p>
           </div>
         </div>
 
@@ -156,26 +186,19 @@ export default function Footer() {
             ))}
           </div>
           {/* Enlaces legales */}
-          <div style={{ display: "flex", justifyContent: "center", gap: "1.2rem", flexWrap: "wrap", marginBottom: "0.8rem" }}>
-            {[
-              { href: "/legal/privacidad", label: "Política de Privacidad" },
-              { href: "/legal/terminos", label: "Términos y Condiciones" },
-              { href: "/legal/cookies", label: "Cookies" },
-              { href: "/legal/aviso", label: "Aviso de Privacidad" },
-            ].map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", textDecoration: "none" }}
-              >
-                {l.label}
-              </Link>
-            ))}
+          <div style={{ display: "flex", justifyContent: "center", gap: "1.2rem", flexWrap: "wrap", marginBottom: "0.8rem", alignItems: "center" }}>
+            <Link href="/legal/privacidad" style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", textDecoration: "none" }}>{t("legalLinks.privacy")}</Link>
+            <Link href="/legal/terminos" style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", textDecoration: "none" }}>{t("legalLinks.terms")}</Link>
+            <Link href="/legal/cookies" style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", textDecoration: "none" }}>{t("legalLinks.cookies")}</Link>
+            <Link href="/legal/aviso" style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", textDecoration: "none" }}>{t("legalLinks.notice")}</Link>
+            <button type="button" onClick={resetCookies} style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.75)", background: "none", border: "none", padding: 0, cursor: "pointer", textDecoration: "underline" }}>
+              {t("cookiePrefs")}
+            </button>
           </div>
 
-          <p style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.5)" }}>2023 Clinica Estetica Dra. Julieth Medina. Todos los derechos reservados.</p>
+          <p style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.5)" }}>{t("rights")}</p>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} style={{ fontSize: "0.78rem", color: "rgba(233,222,210,0.5)", marginTop: "0.2rem" }}>
-            Diseñada por{" "}
+            {t("designedBy")}{" "}
             <a href="https://portafoliojmo.vercel.app" target="_blank" rel="noopener noreferrer" className="designer-credit">
               <span className="designer-text">Juan Medina O.</span>
               <span className="designer-sparkle" />

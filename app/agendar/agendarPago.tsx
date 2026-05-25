@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
 import type { Cita, MetodoPago, TipoPagoConsultorio, TipoPagoOnline } from "../types/domain";
 import { createCitaApi } from "../services/citasApi";
@@ -23,11 +24,14 @@ interface AgendarPagoProps {
 }
 
 export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPago, setTipoPagoConsultorio }: AgendarPagoProps) {
+  const t = useTranslations("agendar.pago");
+  const locale = useLocale();
   const [tipoPago, setTipoPago] = useState<"Efectivo" | "Tarjeta">("Efectivo");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isEfectivo = tipoPago === "Efectivo";
+  const intlLocale = locale === "en" ? "en-US" : "es-CO";
 
   const handleConfirmar = async () => {
     setLoading(true);
@@ -45,36 +49,50 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
       };
       const nuevaCita = await createCitaApi(payload);
 
-      const fechaH = new Date(citaData.fecha + "T12:00:00").toLocaleDateString("es-CO", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-      const texto = `*Nueva cita agendada*\n\n*Paciente:* ${citaData.nombres} ${citaData.apellidos || ""}\n*Telefono:* ${citaData.telefono || "No especificado"}\n*Correo:* ${citaData.correo || "No especificado"}\n*Procedimiento:* ${citaData.procedimiento}\n*Fecha:* ${fechaH}\n*Hora:* ${citaData.hora}\n*Pago:* En consultorio (${tipoPago})\n${citaData.nota ? `*Nota:* ${citaData.nota}` : ""}\n*Cita #${nuevaCita.id}*`;
+      const fechaH = new Date(citaData.fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      const tipoPagoLocalizado = isEfectivo ? t("cash") : t("card");
+      const lineas = [
+        t("whatsapp.title"),
+        "",
+        `${t("whatsapp.patient")} ${citaData.nombres} ${citaData.apellidos || ""}`,
+        `${t("whatsapp.phone")} ${citaData.telefono || t("summary.notSpecified")}`,
+        `${t("whatsapp.email")} ${citaData.correo || t("summary.notSpecified")}`,
+        `${t("whatsapp.procedure")} ${citaData.procedimiento}`,
+        `${t("whatsapp.date")} ${fechaH}`,
+        `${t("whatsapp.time")} ${citaData.hora}`,
+        `${t("whatsapp.payment")} ${t("whatsapp.paymentValue")} (${tipoPagoLocalizado})`,
+      ];
+      if (citaData.nota) lineas.push(`${t("whatsapp.note")} ${citaData.nota}`);
+      lineas.push(`${t("whatsapp.appointmentNumber")}${nuevaCita.id}*`);
+      const texto = lineas.join("\n");
       window.open(`https://wa.me/573155445748?text=${encodeURIComponent(texto)}`, "_blank");
 
       onConfirmar(nuevaCita);
-    } catch (err: any) { setError(err.message || "Error al crear la cita"); }
+    } catch (err: any) { setError(err.message || t("errorCreate")); }
     finally { setLoading(false); }
   };
 
   return (
     <motion.div key="pago" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.5 }} style={{ maxWidth: 600, margin: "0 auto" }}>
       <div style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", padding: "2.5rem 2rem", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.5rem" }}>Confirmar cita</h2>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.5rem" }}>{t("title")}</h2>
         <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, margin: "0 auto 1.5rem" }} />
 
         {/* Resumen */}
         <div style={{ textAlign: "left", background: "linear-gradient(145deg, #FFFBF7, #F0E5D8)", borderRadius: 16, padding: "1.5rem", border: "1px solid rgba(176,137,104,0.12)", marginBottom: "1.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "0.5rem 1rem", fontSize: "0.9rem", color: "#5A4A3A" }}>
-            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>Paciente:</span><span>{citaData.nombres} {citaData.apellidos || ""}</span>
-            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>Procedimiento:</span><span>{citaData.procedimiento}</span>
-            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>Fecha:</span><span>{new Date(citaData.fecha + "T12:00:00").toLocaleDateString("es-CO", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
-            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>Hora:</span><span>{citaData.hora}</span>
-            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>Telefono:</span><span>{citaData.telefono || "No especificado"}</span>
+            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>{t("summary.patient")}</span><span>{citaData.nombres} {citaData.apellidos || ""}</span>
+            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>{t("summary.procedure")}</span><span>{citaData.procedimiento}</span>
+            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>{t("summary.date")}</span><span>{new Date(citaData.fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
+            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>{t("summary.time")}</span><span>{citaData.hora}</span>
+            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>{t("summary.phone")}</span><span>{citaData.telefono || t("summary.notSpecified")}</span>
           </div>
-          {citaData.nota && <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "1px solid rgba(176,137,104,0.15)" }}><span style={{ fontWeight: 600, color: "#3A2A1A", fontSize: "0.9rem" }}>Nota: </span><span style={{ fontSize: "0.9rem", color: "#5A4A3A" }}>{citaData.nota}</span></div>}
+          {citaData.nota && <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "1px solid rgba(176,137,104,0.15)" }}><span style={{ fontWeight: 600, color: "#3A2A1A", fontSize: "0.9rem" }}>{t("summary.noteLabel")}</span><span style={{ fontSize: "0.9rem", color: "#5A4A3A" }}>{citaData.nota}</span></div>}
         </div>
 
         {/* Toggle Efectivo / Tarjeta */}
         <div style={{ marginBottom: "1.5rem" }}>
-          <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "#3A2A1A", marginBottom: "0.8rem" }}>Forma de pago en consultorio</p>
+          <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "#3A2A1A", marginBottom: "0.8rem" }}>{t("paymentMethodLabel")}</p>
           <div
             onClick={() => setTipoPago(isEfectivo ? "Tarjeta" : "Efectivo")}
             style={{
@@ -93,14 +111,14 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
               opacity: isEfectivo ? 0 : 1, transition: "opacity 0.3s",
               display: "flex", alignItems: "center", gap: 5,
             }}>
-              <i className="fas fa-money-bill-wave" style={{ fontSize: "0.7rem" }} /> Efectivo
+              <i className="fas fa-money-bill-wave" style={{ fontSize: "0.7rem" }} /> {t("cash")}
             </span>
             <span style={{
               position: "absolute", right: 20, fontSize: "0.78rem", fontWeight: 700, color: "rgba(255,255,255,0.9)",
               opacity: isEfectivo ? 1 : 0, transition: "opacity 0.3s",
               display: "flex", alignItems: "center", gap: 5,
             }}>
-              Tarjeta <i className="fas fa-credit-card" style={{ fontSize: "0.7rem" }} />
+              {t("card")} <i className="fas fa-credit-card" style={{ fontSize: "0.7rem" }} />
             </span>
 
             {/* Knob */}
@@ -129,23 +147,23 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
           </div>
 
           <p style={{ fontSize: "0.82rem", color: "#8A7565", marginTop: "0.6rem" }}>
-            {isEfectivo ? "Pagaras en efectivo al llegar al consultorio" : "Pagaras con tarjeta al llegar al consultorio"}
+            {isEfectivo ? t("cashHint") : t("cardHint")}
           </p>
         </div>
 
         <p style={{ fontSize: "0.78rem", color: "#8A7565", marginBottom: "1.5rem", fontStyle: "italic" }}>
-          Al confirmar, se enviara la informacion de tu cita por WhatsApp a la doctora
+          {t("footerInfo")}
         </p>
 
         {error && <div style={{ background: "#FDE8D8", color: "#922B21", padding: "0.7rem 1rem", borderRadius: 12, marginBottom: "1rem", fontSize: "0.85rem" }}>{error}</div>}
 
         <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center", flexWrap: "wrap" }}>
           <button onClick={goBack} style={{ display: "flex", alignItems: "center", gap: 6, padding: "0.75rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer" }}>
-            <ArrowLeft size={16} /> Volver
+            <ArrowLeft size={16} /> {t("back")}
           </button>
           <button onClick={handleConfirmar} disabled={loading}
             style={{ display: "flex", alignItems: "center", gap: 8, padding: "0.75rem 2rem", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 16px rgba(176,137,104,0.25)", opacity: loading ? 0.7 : 1 }}>
-            <i className="fab fa-whatsapp" style={{ fontSize: "1.1rem" }} /> {loading ? "Confirmando..." : "Confirmar y enviar por WhatsApp"}
+            <i className="fab fa-whatsapp" style={{ fontSize: "1.1rem" }} /> {loading ? t("submitting") : t("submit")}
           </button>
         </div>
       </div>

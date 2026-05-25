@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { IMG } from "@/lib/imagenes";
 
 function useReveal(t = 0.15) {
@@ -69,6 +70,7 @@ function ParticleCanvas() {
 }
 
 export default function VideoAnim() {
+  const t = useTranslations("home.video");
   const [videoActivo, setVideoActivo] = useState(false);
   const [startCount, setStartCount] = useState(false);
   const countersRef = useRef<HTMLDivElement | null>(null);
@@ -84,12 +86,12 @@ export default function VideoAnim() {
     const [count, setCount] = useState(0);
     useEffect(() => {
       if (!startCount) return;
-      const t = setTimeout(() => {
+      const tmr = setTimeout(() => {
         let s: number | null = null;
         const a = (ts: number) => { if (!s) s = ts; const p = Math.min((ts - s) / 1800, 1); setCount(Math.floor((1 - Math.pow(1 - p, 3)) * value)); if (p < 1) requestAnimationFrame(a); };
         requestAnimationFrame(a);
       }, delay);
-      return () => clearTimeout(t);
+      return () => clearTimeout(tmr);
     }, [startCount, value, delay]);
     return (
       <div style={{ textAlign: "center", padding: "1rem 0.6rem", borderRadius: 14, background: "linear-gradient(145deg, #FFFBF7, #F0E5D8)", border: "1px solid rgba(176,137,104,0.14)", transition: "transform 0.35s, box-shadow 0.35s", position: "relative", overflow: "hidden", cursor: "default" }}
@@ -103,12 +105,11 @@ export default function VideoAnim() {
     );
   };
 
-  const features = [
-    { icon: "fas fa-microchip", title: "Tecnologia HydraFacial", desc: "Certificacion internacional" },
-    { icon: "fas fa-flask", title: "Productos premium", desc: "Grado medico avanzado" },
-    { icon: "fas fa-heart", title: "Sin dolor", desc: "Minima recuperacion" },
-    { icon: "fas fa-hands-helping", title: "Atencion personalizada", desc: "Plan a tu medida" },
-  ];
+  const featureIcons = ["fas fa-microchip", "fas fa-flask", "fas fa-heart", "fas fa-hands-helping"];
+  const features = (t.raw("features") as Array<{ title: string; desc: string }>).map((f, i) => ({
+    ...f,
+    icon: featureIcons[i] || featureIcons[0],
+  }));
 
   const rs = (vis: boolean, d = 0): React.CSSProperties => ({
     opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(35px)",
@@ -135,10 +136,10 @@ export default function VideoAnim() {
 
         {/* Header */}
         <div ref={hdr.ref} style={{ ...rs(hdr.v), textAlign: "center", marginBottom: "2.5rem", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
-          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B08968", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>Nuestro consultorio</span>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "#3A2A1A", maxWidth: 660, margin: "0 auto 1rem", lineHeight: 1.2 }}>Por que realizar consultas y procedimientos con nosotros</h2>
+          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B08968", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("kicker")}</span>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.5rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "#3A2A1A", maxWidth: 660, margin: "0 auto 1rem", lineHeight: 1.2 }}>{t("title")}</h2>
           <div style={{ width: 50, height: 3, background: "linear-gradient(90deg,#C9AD8D,#B08968)", borderRadius: 2, margin: "0 auto 0.8rem" }} />
-          <p style={{ fontSize: "1.05rem", color: "#7A6554", margin: 0 }}>Calidad, experiencia y resultados que hablan por si solos</p>
+          <p style={{ fontSize: "1.05rem", color: "#7A6554", margin: 0 }}>{t("subtitle")}</p>
         </div>
 
         {/* 3 COLUMN LAYOUT */}
@@ -146,7 +147,7 @@ export default function VideoAnim() {
 
           {/* LEFT - Features */}
           <div ref={lft.ref} style={{ ...rs(lft.v, 0.15), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.8rem 1.2rem" }}>
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "1.2rem", textAlign: "center" }}>Lo que nos distingue</h3>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "1.2rem", textAlign: "center" }}>{t("distinguishTitle")}</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               {features.map((f, i) => (
                 <div key={i} style={{
@@ -174,16 +175,16 @@ export default function VideoAnim() {
             onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 28px 65px rgba(58,42,26,0.22)"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 20px 55px rgba(58,42,26,0.18)"; }}>
               {videoActivo ? (
-                <iframe src="https://www.youtube.com/embed/pBkwUM0IpTE?autoplay=1&modestbranding=1&rel=0" title="Presentacion" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 20 }} />
+                <iframe src="https://www.youtube.com/embed/pBkwUM0IpTE?autoplay=1&modestbranding=1&rel=0" title={t("iframeTitle")} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 20 }} />
               ) : (
                 <>
-                  <img src={IMG.previewVideo} alt="Video" style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={IMG.previewVideo} alt={t("iframeTitle")} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }} />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.32) 100%)" }} />
                   <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 2 }}>
                     <div style={{ position: "absolute", top: "50%", left: "50%", width: 90, height: 90, borderRadius: "50%", background: "rgba(176,137,104,0.2)", animation: "va-pulse 2.2s ease-out infinite", transform: "translate(-50%,-50%)" }} />
                     <div style={{ position: "relative", width: 68, height: 68, borderRadius: "50%", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", border: "2px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "1.4rem", transition: "all 0.3s" }}><i className="fas fa-play" style={{ marginLeft: 3 }} /></div>
                   </div>
-                  <div style={{ position: "absolute", bottom: 18, left: "50%", transform: "translateX(-50%)", fontSize: "0.75rem", fontWeight: 600, color: "white", background: "rgba(0,0,0,0.35)", backdropFilter: "blur(6px)", padding: "0.3rem 1rem", borderRadius: 100, zIndex: 2 }}>Ver presentacion</div>
+                  <div style={{ position: "absolute", bottom: 18, left: "50%", transform: "translateX(-50%)", fontSize: "0.75rem", fontWeight: 600, color: "white", background: "rgba(0,0,0,0.35)", backdropFilter: "blur(6px)", padding: "0.3rem 1rem", borderRadius: 100, zIndex: 2 }}>{t("watchVideo")}</div>
                 </>
               )}
             </div>
@@ -192,12 +193,12 @@ export default function VideoAnim() {
           {/* RIGHT - Counters */}
           <div ref={el => { rgt.ref.current = el; countersRef.current = el; }}
             style={{ ...rs(rgt.v, 0.2), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.8rem 1.2rem" }}>
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "1.2rem", textAlign: "center" }}>La experiencia habla</h3>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "1.2rem", textAlign: "center" }}>{t("experienceTitle")}</h3>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.7rem" }}>
-              <Counter value={680} label="Pacientes satisfechos" suffix="+" icon="fas fa-users" delay={0} />
-              <Counter value={15} label="Tratamientos" suffix="+" icon="fas fa-syringe" delay={150} />
-              <Counter value={4} label="Anios experiencia" suffix="+" icon="fas fa-award" delay={300} />
-              <Counter value={5} label="Calificacion" suffix="/5" icon="fas fa-star" delay={450} />
+              <Counter value={680} label={t("counters.patients")} suffix="+" icon="fas fa-users" delay={0} />
+              <Counter value={15} label={t("counters.treatments")} suffix="+" icon="fas fa-syringe" delay={150} />
+              <Counter value={4} label={t("counters.years")} suffix="+" icon="fas fa-award" delay={300} />
+              <Counter value={5} label={t("counters.rating")} suffix="/5" icon="fas fa-star" delay={450} />
             </div>
           </div>
         </div>

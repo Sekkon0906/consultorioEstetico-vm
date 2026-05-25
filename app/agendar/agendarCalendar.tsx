@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
 import { supabase } from "@/lib/supabaseClient";
 
-const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const HORAS_BASE = ["08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","01:00 PM","01:30 PM","02:00 PM","02:30 PM","03:00 PM","03:30 PM","04:00 PM","04:30 PM","05:00 PM","05:30 PM","06:00 PM"];
 
 function BgCanvas() {
@@ -44,6 +44,12 @@ function BgCanvas() {
 export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSelect, usuario }: {
   fecha: Date | null; hora: string; onFechaSelect: (v: Date) => void; onHoraSelect: (v: string) => void; usuario?: any;
 }) {
+  const t = useTranslations("agendar.calendar");
+  const locale = useLocale();
+  const intlLocale = locale === "en" ? "en-US" : "es-CO";
+  const MESES = t.raw("months") as string[];
+  const WEEKDAYS = t.raw("weekdaysShort") as string[];
+
   const hoy = new Date();
   const [anio, setAnio] = useState(hoy.getFullYear());
   const [mes, setMes] = useState(hoy.getMonth());
@@ -172,7 +178,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", textAlign: "center", marginBottom: "0.5rem" }}>
-              {["L","M","X","J","V","S","D"].map(d => <div key={d} style={{ fontSize: "0.95rem", fontWeight: 700, color: "#8A7565", paddingBottom: 10 }}>{d}</div>)}
+              {WEEKDAYS.map((d, i) => <div key={`wd-${i}`} style={{ fontSize: "0.95rem", fontWeight: 700, color: "#8A7565", paddingBottom: 10 }}>{d}</div>)}
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 7 }}>
@@ -211,12 +217,12 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
             style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)" }}>
 
             <h3 className="cal-hours-title" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.3rem", textAlign: "center" }}>
-              {selectedDate ? "Horas disponibles" : "Selecciona un dia"}
+              {selectedDate ? t("hoursAvailable") : t("pickDay")}
             </h3>
 
             {selectedDate && (
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: "center", fontSize: "0.85rem", color: "#8A7565", marginBottom: "1.2rem" }}>
-                {new Date(selectedDate + "T12:00:00").toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" })}
+                {new Date(selectedDate + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", day: "numeric", month: "long" })}
               </motion.p>
             )}
 
@@ -225,7 +231,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
                 <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, #E9DED2, #F5EEE6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
                   <i className="fas fa-calendar-day" style={{ color: "#B08968", fontSize: "1.4rem" }} />
                 </div>
-                <p style={{ color: "#8A7565", fontSize: "0.92rem" }}>Elige un dia en el calendario</p>
+                <p style={{ color: "#8A7565", fontSize: "0.92rem" }}>{t("pickDayHint")}</p>
               </motion.div>
             )}
 
@@ -239,9 +245,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
                   <i className="fas fa-clock" style={{ color: "#B08968", fontSize: "1.3rem" }} />
                 </div>
                 <p style={{ color: "#8A7565", fontSize: "0.95rem", margin: 0 }}>
-                  {esHoySeleccionado
-                    ? "Ya no hay horas disponibles para hoy. Elige otro día."
-                    : "No hay horas disponibles para este día."}
+                  {esHoySeleccionado ? t("noHoursToday") : t("noHoursForDay")}
                 </p>
               </motion.div>
             )}

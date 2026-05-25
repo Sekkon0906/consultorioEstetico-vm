@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { X, ChevronLeft, ChevronRight, Calendar, ImageIcon, Stethoscope } from "lucide-react";
 
@@ -27,6 +28,7 @@ function CardItem({
   onClick: () => void;
   fechaFmt: string | null;
 }) {
+  const t = useTranslations("doctora.formacion");
   return (
     <motion.div
       initial={{ opacity: 0, x: fromLeft ? -40 : 40 }}
@@ -75,7 +77,7 @@ function CardItem({
             borderRadius: 20, padding: "3px 8px",
             fontSize: "0.62rem", color: "#8B6A4B", fontWeight: 700,
           }}>
-            <ImageIcon size={9} /> {charla.galeria.length} fotos
+            <ImageIcon size={9} /> {charla.galeria.length} {t("modal.photos")}
           </div>
         )}
       </div>
@@ -100,7 +102,7 @@ function CardItem({
           marginTop: "0.6rem", fontSize: "0.68rem",
           color: "#B08968", fontWeight: 600,
         }}>
-          Ver galería →
+          {t("viewGallery")}
         </div>
       </div>
     </motion.div>
@@ -117,12 +119,14 @@ function TimelineNode({
   index: number;
   onClick: () => void;
 }) {
+  const locale = useLocale();
+  const intlLocale = locale === "en" ? "en-US" : "es-CO";
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const isLeft = index % 2 === 0;
 
   const fechaFmt = charla.fecha
-    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString("es-CO", {
+    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString(intlLocale, {
         year: "numeric", month: "long", day: "numeric",
       })
     : null;
@@ -170,7 +174,7 @@ function TimelineNode({
           transition={{ delay: 0.08, type: "spring", stiffness: 320, damping: 22 }}
           whileHover={{ scale: 1.4 }}
           onClick={onClick}
-          aria-label={`Ver ${charla.titulo}`}
+          aria-label={charla.titulo}
           style={{
             width: 20, height: 20, borderRadius: "50%",
             background: "linear-gradient(135deg, #B08968, #8B6A4B)",
@@ -209,6 +213,9 @@ function TimelineNode({
    MODAL
 ────────────────────────────────────────────── */
 function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void }) {
+  const t = useTranslations("doctora.formacion");
+  const locale = useLocale();
+  const intlLocale = locale === "en" ? "en-US" : "es-CO";
   const [idx, setIdx] = useState(0);
   const media = charla.galeria && charla.galeria.length > 0 ? charla.galeria : [charla.imagen];
   const total = media.length;
@@ -223,7 +230,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
   const next = () => setIdx(i => (i + 1) % total);
 
   const fechaFmt = charla.fecha
-    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString("es-CO", {
+    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString(intlLocale, {
         year: "numeric", month: "long", day: "numeric",
       })
     : null;
@@ -277,7 +284,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                 fontSize: "0.65rem", color: "#8B6A4B", fontWeight: 700,
                 marginBottom: "0.45rem", textTransform: "uppercase", letterSpacing: "0.05em",
               }}>
-                <Stethoscope size={10} /> Actualización profesional
+                <Stethoscope size={10} /> {t("modal.badge")}
               </div>
               <h3 style={{
                 fontFamily: "'Playfair Display', serif",
@@ -333,7 +340,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                 {isYoutube ? (
                   <iframe
                     src={current.replace("watch?v=", "embed/")}
-                    title="Video charla"
+                    title={t("modal.videoTitle")}
                     style={{ width: "100%", height: "100%", border: "none" }}
                     allowFullScreen
                   />
@@ -427,6 +434,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
    COMPONENTE PRINCIPAL
 ────────────────────────────────────────────── */
 export default function FormacionContinua() {
+  const t = useTranslations("doctora.formacion");
   const [charlas, setCharlas] = useState<Charla[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Charla | null>(null);
@@ -492,7 +500,7 @@ export default function FormacionContinua() {
         justifyContent: "center", background: "#FBF8F4",
       }}>
         <p style={{ color: "#8B7060", fontStyle: "italic", fontSize: "0.88rem" }}>
-          Sin actividades registradas aún.
+          {t("emptyState")}
         </p>
       </section>
     );
@@ -528,20 +536,20 @@ export default function FormacionContinua() {
             textTransform: "uppercase", color: "#B08968",
             fontWeight: 700, marginBottom: "0.45rem",
           }}>
-            Crecimiento profesional
+            {t("kicker")}
           </p>
           <h2 style={{
             fontFamily: "'Playfair Display', serif",
             fontSize: "clamp(1.9rem, 4vw, 2.6rem)",
             fontWeight: 700, color: "#3A2A1A", margin: 0,
           }}>
-            Formación Continua
+            {t("title")}
           </h2>
           <p style={{
             fontSize: "0.82rem", color: "#8B7060",
             maxWidth: 430, margin: "0.7rem auto 0", lineHeight: 1.65,
           }}>
-            Charlas, congresos con colegas, nuevas técnicas y equipos
+            {t("subtitle")}
           </p>
           <div style={{
             width: 42, height: 3,
@@ -587,7 +595,7 @@ export default function FormacionContinua() {
             fontSize: "0.7rem", color: "#C9AD8D", fontStyle: "italic",
           }}
         >
-          Haz clic en cualquier evento para ver detalles y galería
+          {t("clickHint")}
         </motion.p>
       </section>
 

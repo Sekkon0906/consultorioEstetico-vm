@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 export default function VisionMision() {
+  const t = useTranslations("doctora.vision");
   return (
     <section
       style={{
@@ -22,7 +24,7 @@ export default function VisionMision() {
             fontFamily: "'Playfair Display', serif",
           }}
         >
-          Misión y Visión
+          {t("title")}
         </motion.h3>
 
         <div className="row justify-content-center g-4">
@@ -46,7 +48,7 @@ export default function VisionMision() {
                   fontFamily: "'Playfair Display', serif",
                 }}
               >
-                Nuestra Misión
+                {t("missionTitle")}
               </h4>
               <p
                 style={{
@@ -55,9 +57,7 @@ export default function VisionMision() {
                   lineHeight: "1.7",
                 }}
               >
-                Brindar atención médica estética integral centrada en el bienestar
-                y la armonía del paciente, utilizando tecnología avanzada y un
-                enfoque humano para resultados naturales y duraderos.
+                {t("missionText")}
               </p>
             </motion.div>
           </div>
@@ -82,7 +82,7 @@ export default function VisionMision() {
                   fontFamily: "'Playfair Display', serif",
                 }}
               >
-                Nuestra Visión
+                {t("visionTitle")}
               </h4>
               <p
                 style={{
@@ -91,10 +91,7 @@ export default function VisionMision() {
                   lineHeight: "1.7",
                 }}
               >
-                Ser un referente nacional e internacional en medicina estética
-                ética, innovadora y responsable, inspirando a más profesionales y
-                pacientes a adoptar una visión saludable y consciente de la
-                belleza.
+                {t("visionText")}
               </p>
             </motion.div>
           </div>

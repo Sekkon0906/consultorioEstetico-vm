@@ -1,23 +1,27 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { setLocale } from "../../actions/locale";
 
 /**
  * Toggle ES / EN. Llama a un server action que actualiza la cookie LOCALE
- * y revalida la ruta actual. El switch es accesible vía teclado.
+ * y luego fuerza un refresh real para que TODOS los client components
+ * vuelvan a montarse con los nuevos mensajes (revalidatePath solo no basta
+ * para que algunos useTranslations() vean el cambio sin recargar).
  */
 export default function LanguageSwitcher() {
   const locale = useLocale();
   const pathname = usePathname() || "/";
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
 
   const switchTo = (next: "es" | "en") => {
     if (next === locale || pending) return;
     startTransition(async () => {
       await setLocale(next, pathname);
+      router.refresh();
     });
   };
 

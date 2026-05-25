@@ -229,7 +229,7 @@ export default function Navbar() {
           <button
             className={`hamburger-btn d-md-none ${mobileOpen ? "active" : ""}`}
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Abrir menú"
+            aria-label={mobileOpen ? t("closeMenu") : t("openMenu")}
           >
             <motion.div
               initial={{ rotate: 0 }}
@@ -264,7 +264,7 @@ export default function Navbar() {
               >
                 <img
                   src={userPhoto}
-                  alt="Perfil"
+                  alt={t("profileAlt")}
                   style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", border: "2px solid #FFDDBF" }}
                 />
               </motion.button>
@@ -294,7 +294,7 @@ export default function Navbar() {
                     <div className="text-center mb-3" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                       <img
                         src={userPhoto}
-                        alt="Perfil"
+                        alt={t("profileAlt")}
                         style={{ width: 70, height: 70, borderRadius: "50%", objectFit: "cover", border: "2px solid #FFDDBF", marginBottom: "0.4rem" }}
                       />
                       <div style={{ fontWeight: 700, color: "#6B4E3D" }}>
@@ -338,15 +338,15 @@ export default function Navbar() {
       <div className={`mobile-sidebar ${mobileOpen ? "open" : ""}`} style={{ transition: "transform 0.4s ease, opacity 0.4s ease" }}>
         {user ? (
           <div className="mobile-sidebar-header" style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <img src={userPhoto} alt="Perfil" className="user-avatar" style={{ marginBottom: "0.8rem" }} />
+            <img src={userPhoto} alt={t("profileAlt")} className="user-avatar" style={{ marginBottom: "0.8rem" }} />
             <div className="user-name">{user.nombres}</div>
             <div className="user-email">{user.email}</div>
             <div className="user-actions">
               <button className="user-action-btn" onClick={() => { setMobileOpen(false); router.push("/perfil/editar_info"); }}>
-                Editar perfil
+                {t("editProfile")}
               </button>
               <button className="user-action-btn" onClick={() => { setMobileOpen(false); router.push("/perfil/citas_agendadas"); }}>
-                Citas agendadas
+                {t("myAppointments")}
               </button>
               <button className="user-action-btn" onClick={requestLogout} style={{ color: "#b02e2e" }}>
                 {t("logout")}
@@ -356,7 +356,7 @@ export default function Navbar() {
         ) : (
           <div className="mobile-sidebar-header">
             <button onClick={() => router.push("/login")} className="user-action-btn">
-              Iniciar sesión
+              {t("login")}
             </button>
           </div>
         )}
@@ -415,7 +415,7 @@ export default function Navbar() {
                   style={{ background: "#b02e2e", color: "#fff", fontWeight: 600, border: "none", borderRadius: "10px" }}
                   onClick={handleLogout}
                 >
-                  Cerrar sesión
+                  {t("logout")}
                 </button>
               </div>
             </motion.div>

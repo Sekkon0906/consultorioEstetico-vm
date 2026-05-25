@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Cookie } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   hasDecided,
   getConsent,
@@ -17,8 +18,11 @@ import {
  * acciones: Aceptar todas · Rechazar opcionales · Personalizar.
  *
  * Solo aparece la primera vez (mientras no haya una decisión guardada).
+ * Se puede reabrir disparando el evento `open-cookie-preferences`
+ * (lo emite el botón "Preferencias de cookies" del Footer).
  */
 export default function CookieBanner() {
+  const t = useTranslations("cookies");
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -34,6 +38,17 @@ export default function CookieBanner() {
     const c = getConsent();
     setAnalytics(c.analytics);
     setMarketing(c.marketing);
+
+    // Listener para reabrir desde el footer.
+    const handler = () => {
+      const cur = getConsent();
+      setAnalytics(cur.analytics);
+      setMarketing(cur.marketing);
+      setExpanded(true);
+      setVisible(true);
+    };
+    window.addEventListener("open-cookie-preferences", handler);
+    return () => window.removeEventListener("open-cookie-preferences", handler);
   }, []);
 
   if (!mounted) return null;
@@ -61,7 +76,7 @@ export default function CookieBanner() {
       {visible && (
         <motion.div
           role="dialog"
-          aria-label="Aviso de cookies"
+          aria-label={t("title")}
           initial={{ opacity: 0, y: 30, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.98 }}
@@ -71,7 +86,7 @@ export default function CookieBanner() {
             bottom: 18,
             left: 18,
             right: 18,
-            maxWidth: 460,
+            maxWidth: 580,
             zIndex: 9000,
             background: "#FFFDF9",
             border: "1px solid rgba(176,137,104,0.2)",
@@ -107,7 +122,7 @@ export default function CookieBanner() {
                   margin: 0,
                 }}
               >
-                Tu privacidad importa
+                {t("title")}
               </h3>
             </div>
 
@@ -119,14 +134,12 @@ export default function CookieBanner() {
                 margin: "0 0 0.9rem",
               }}
             >
-              Usamos cookies esenciales para que el sitio funcione. Con tu
-              permiso también podemos usar cookies analíticas o de marketing
-              para mejorar tu experiencia.{" "}
+              {t("message")}{" "}
               <Link
                 href="/legal/cookies"
                 style={{ color: "#B08968", textDecoration: "underline" }}
               >
-                Más información
+                {t("moreInfo")}
               </Link>
               .
             </p>
@@ -150,20 +163,20 @@ export default function CookieBanner() {
                     }}
                   >
                     <Pref
-                      label="Esenciales"
-                      desc="Necesarias para sesión y agendamiento. Siempre activas."
+                      label={t("essential")}
+                      desc={t("essentialDesc")}
                       locked
                       checked
                     />
                     <Pref
-                      label="Analíticas"
-                      desc="Nos ayudan a entender cómo usas el sitio (anónimo)."
+                      label={t("analytics")}
+                      desc={t("analyticsDesc")}
                       checked={analytics}
                       onChange={setAnalytics}
                     />
                     <Pref
-                      label="Marketing"
-                      desc="Permiten personalizar contenido y medir campañas."
+                      label={t("marketing")}
+                      desc={t("marketingDesc")}
                       checked={marketing}
                       onChange={setMarketing}
                     />
@@ -180,7 +193,7 @@ export default function CookieBanner() {
                   onClick={handleSave}
                   style={primaryBtn}
                 >
-                  Guardar preferencias
+                  {t("savePreferences")}
                 </motion.button>
               ) : (
                 <motion.button
@@ -189,15 +202,15 @@ export default function CookieBanner() {
                   onClick={handleAcceptAll}
                   style={primaryBtn}
                 >
-                  Aceptar todas
+                  {t("acceptAll")}
                 </motion.button>
               )}
-              <button onClick={handleRejectOptional} style={ghostBtn}>
-                Rechazar opcionales
+              <button onClick={handleRejectOptional} className="btn-ghost-app" style={ghostBtn}>
+                {t("rejectOptional")}
               </button>
               {!expanded && (
-                <button onClick={() => setExpanded(true)} style={ghostBtn}>
-                  Personalizar
+                <button onClick={() => setExpanded(true)} className="btn-ghost-app" style={ghostBtn}>
+                  {t("customize")}
                 </button>
               )}
             </div>

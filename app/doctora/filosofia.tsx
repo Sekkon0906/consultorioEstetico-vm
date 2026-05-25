@@ -1,30 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 export default function Filosofia() {
-  const valores = [
-    {
-      icon: "fa-heart",
-      title: "Cuidado Personalizado",
-      text: "Cada paciente es único. Ofrecemos planes adaptados a sus necesidades estéticas y emocionales.",
-    },
-    {
-      icon: "fa-hand-holding-medical",
-      title: "Seguridad ante todo",
-      text: "Procedimientos con protocolos médicos certificados y materiales aprobados.",
-    },
-    {
-      icon: "fa-leaf",
-      title: "Naturalidad y Armonía",
-      text: "Buscamos resaltar tu belleza natural sin perder autenticidad.",
-    },
-    {
-      icon: "fa-user-md",
-      title: "Ciencia y Arte",
-      text: "La medicina estética combina precisión médica con sensibilidad artística.",
-    },
-  ];
+  const t = useTranslations("doctora.filosofia");
+  const icons = ["fa-heart", "fa-hand-holding-medical", "fa-leaf", "fa-user-md"];
+  const values = t.raw("values") as Array<{ title: string; text: string }>;
 
   return (
     <section
@@ -41,11 +23,11 @@ export default function Filosofia() {
             fontFamily: "'Playfair Display',serif",
           }}
         >
-          Filosofía y Valores de la Práctica
+          {t("title")}
         </h3>
 
         <div className="row justify-content-center g-4">
-          {valores.map((v, i) => (
+          {values.map((v, i) => (
             <div key={i} className="col-md-3">
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -53,7 +35,7 @@ export default function Filosofia() {
                 style={{ background: "#fff", border: "1px solid #E9DED2" }}
               >
                 <div style={{ fontSize: "2rem", color: "#B08968" }}>
-                  <i className={`fas ${v.icon}`} />
+                  <i className={`fas ${icons[i]}`} />
                 </div>
                 <h5
                   className="fw-bold mt-3 mb-2"
