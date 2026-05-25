@@ -23,6 +23,7 @@ export const IMG = {
 
   previewVideo: `${B}/imagenesPublicas/preview_video.jpg`,
   heroDoctora: `${B}/imagenesPublicas/doctora-hero.jpg`,
+  galeria3dBg: `${B}/imagenesPublicas/Galeria3D.jpg`,
 
   inspiracion: `${B}/personas/inspiracion_dr.jpg`,
   doctora: `${B}/personas/doctora.jpg`,

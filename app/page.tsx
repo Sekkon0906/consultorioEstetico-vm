@@ -134,29 +134,13 @@ export default function HomePage() {
       {/* VIDEO CENTRAL */}
       {memoizedVideo}
 
-      {/* GALERÍA 3D */}
+      {/* GALERÍA 3D — el componente trae su propia imagen de fondo y título */}
       <section
-        className="py-5"
         style={{
-          backgroundColor: "#FAF9F7",
           borderTop: "1px solid #E8E1D4",
           borderBottom: "1px solid #E8E1D4",
         }}
       >
-        <div className="text-center mb-5">
-          <h2
-            className="fw-bold"
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              color: "#4E3B2B",
-            }}
-          >
-            {th("gallery.title")}
-          </h2>
-          <p className="lead" style={{ color: "#6C584C" }}>
-            {th("gallery.subtitle")}
-          </p>
-        </div>
         <Galeria3D />
       </section>
 
