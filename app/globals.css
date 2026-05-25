@@ -356,6 +356,30 @@ body {
   background: linear-gradient(135deg, #B08968, #C9AD8D) !important;
 }
 
+/* Link "términos y condiciones" del checkbox del Footer.
+   - Subrayado real con grosor 2px y separación.
+   - Una línea de "highlight" justo debajo del subrayado para que
+     el link tome más fuerza y se note inmediatamente que es
+     clickeable. La línea es un box-shadow interno inferior. */
+.footer-terms-link {
+  color: #FFD78A !important;
+  font-weight: 600 !important;
+  text-decoration: underline !important;
+  text-decoration-color: #FFD78A !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 3px !important;
+  padding-bottom: 4px;
+  border-bottom: 2px solid rgba(255, 215, 138, 0.55);
+  transition: color 0.25s ease, border-color 0.25s ease, text-shadow 0.25s ease;
+}
+.footer-terms-link:hover,
+.footer-terms-link:focus-visible {
+  color: #FFE6B3 !important;
+  border-bottom-color: #FFE6B3;
+  text-decoration-color: #FFE6B3 !important;
+  text-shadow: 0 0 12px rgba(255, 230, 179, 0.4);
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
   .hero-fs-bg img,

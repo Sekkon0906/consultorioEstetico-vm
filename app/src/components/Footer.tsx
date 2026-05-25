@@ -142,12 +142,6 @@ export default function Footer() {
                 <Link
                   href="/legal/terminos"
                   className="footer-terms-link"
-                  style={{
-                    color: "#FFD78A",
-                    textDecoration: "underline",
-                    textUnderlineOffset: 3,
-                    fontWeight: 600,
-                  }}
                 >
                   {t("form.acceptTerms")}
                 </Link>

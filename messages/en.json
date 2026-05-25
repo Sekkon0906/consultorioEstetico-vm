@@ -202,6 +202,21 @@
     "subtitle": "Discover facial, body and hair treatments performed with safe, personalized techniques.",
     "loading": "Loading treatments...",
     "errorLoad": "Couldn't load the treatments. Please try again later.",
+    "featured": {
+      "kicker": "Featured this month",
+      "ctaBook": "Book this treatment",
+      "ctaInfo": "Learn more"
+    },
+    "filters": {
+      "searchPlaceholder": "Search a treatment...",
+      "all": "All",
+      "facial": "Facial",
+      "corporal": "Body",
+      "capilar": "Hair",
+      "resultsCount": "{count, plural, =0 {No results} =1 {1 treatment} other {# treatments}}",
+      "noResults": "We couldn't find any treatments matching your search.",
+      "clearSearch": "Clear search"
+    },
     "categories": {
       "facial": "Explore facial treatments",
       "corporal": "Explore body treatments",
@@ -211,7 +226,8 @@
     "standardPrice": "Standard price:",
     "priceDisclaimer": "*Prices are in Colombian pesos and may change based on the medical assessment.*",
     "book": "Book a visit",
-    "viewResults": "View results"
+    "viewResults": "View results",
+    "viewMore": "Learn more"
   },
   "footer": {
     "contactBadge": "Contact",

@@ -202,6 +202,21 @@
     "subtitle": "Descubre tratamientos faciales, corporales y capilares realizados con técnicas seguras y personalizadas.",
     "loading": "Cargando procedimientos...",
     "errorLoad": "No se pudieron cargar los procedimientos. Intenta de nuevo más tarde.",
+    "featured": {
+      "kicker": "Destacado del mes",
+      "ctaBook": "Agendar este procedimiento",
+      "ctaInfo": "Conocer más"
+    },
+    "filters": {
+      "searchPlaceholder": "Busca un procedimiento...",
+      "all": "Todos",
+      "facial": "Facial",
+      "corporal": "Corporal",
+      "capilar": "Capilar",
+      "resultsCount": "{count, plural, =0 {Sin resultados} =1 {1 procedimiento} other {# procedimientos}}",
+      "noResults": "No encontramos procedimientos que coincidan con tu búsqueda.",
+      "clearSearch": "Limpiar búsqueda"
+    },
     "categories": {
       "facial": "Explora los procedimientos faciales",
       "corporal": "Explora los procedimientos corporales",
@@ -211,7 +226,8 @@
     "standardPrice": "Precio estándar:",
     "priceDisclaimer": "*Los precios están en pesos colombianos, y el costo puede cambiar según la valoración médica.*",
     "book": "Agendar cita",
-    "viewResults": "Ver resultados"
+    "viewResults": "Ver resultados",
+    "viewMore": "Ver más"
   },
   "footer": {
     "contactBadge": "Contacto",
