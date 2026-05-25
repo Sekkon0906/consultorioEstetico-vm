@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useDeferredValue } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
-import { Search, X, ArrowRight, Sparkles, Calendar } from "lucide-react";
+import { Search, X, ArrowRight, Sparkles, Calendar, ChevronLeft, ChevronRight, Star } from "lucide-react";
 
 import type { Procedimiento } from "../types/domain";
 import { getProcedimientosApi } from "../services/procedimientosApi";
@@ -66,25 +66,26 @@ export default function ProcedimientosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* Procedimiento destacado: el primero marcado como `destacado` en BD;
-     si no hay ninguno destacado, el primero de la lista. */
-  const featured = useMemo(() => {
-    if (procedimientos.length === 0) return null;
-    return procedimientos.find((p) => p.destacado) ?? procedimientos[0];
-  }, [procedimientos]);
+  /* Destacados y promociones: todos los procedimientos con `destacado: true`.
+     Si no hay ninguno marcado, el carrusel no se renderiza. */
+  const destacados = useMemo(
+    () => procedimientos.filter((p) => p.destacado),
+    [procedimientos]
+  );
 
-  /* Filtrado por categoría + búsqueda (debounced via useDeferredValue). */
+  /* Filtrado por categoría + búsqueda (debounced via useDeferredValue).
+     Importante: NO excluimos los destacados del grid; deben aparecer
+     también ahí con su glow especial. */
   const filtered = useMemo(() => {
     const query = deferredSearch.trim().toLowerCase();
     return procedimientos
-      .filter((p) => (featured ? p.id !== featured.id : true))
       .filter((p) => categoria === "todos" || p.categoria === categoria)
       .filter((p) => {
         if (!query) return true;
         const haystack = `${p.nombre} ${p.desc ?? ""} ${p.categoria ?? ""}`.toLowerCase();
         return haystack.includes(query);
       });
-  }, [procedimientos, deferredSearch, categoria, featured]);
+  }, [procedimientos, deferredSearch, categoria]);
 
   const chips: { key: Categoria; label: string }[] = [
     { key: "todos", label: t("filters.all") },
@@ -146,10 +147,10 @@ export default function ProcedimientosPage() {
         </motion.p>
       </section>
 
-      {/* === Hero featured === */}
-      {!loading && featured && (
-        <FeaturedHero
-          procedimiento={featured}
+      {/* === Carrusel de destacados y promociones === */}
+      {!loading && destacados.length > 0 && (
+        <FeaturedCarousel
+          items={destacados}
           intlLocale={intlLocale}
           t={t}
         />
@@ -447,6 +448,56 @@ export default function ProcedimientosPage() {
           border-color: rgba(176, 137, 104, 0.3);
           transform: translateY(-4px);
         }
+        /* Card destacada/promoción — glow dorado, borde resaltado y
+           pulse muy sutil para llamar la atención sin marear. */
+        .proc-card.is-featured {
+          border-color: rgba(255, 200, 100, 0.55);
+          box-shadow:
+            0 10px 28px rgba(58, 42, 26, 0.1),
+            0 0 0 1px rgba(255, 200, 100, 0.3),
+            0 0 30px rgba(255, 200, 100, 0.22);
+          animation: proc-card-glow 3.6s ease-in-out infinite;
+        }
+        .proc-card.is-featured:hover {
+          box-shadow:
+            0 20px 42px rgba(58, 42, 26, 0.18),
+            0 0 0 1.5px rgba(255, 200, 100, 0.7),
+            0 0 48px rgba(255, 200, 100, 0.35);
+          border-color: rgba(255, 200, 100, 0.85);
+        }
+        @keyframes proc-card-glow {
+          0%, 100% {
+            box-shadow:
+              0 10px 28px rgba(58, 42, 26, 0.1),
+              0 0 0 1px rgba(255, 200, 100, 0.3),
+              0 0 24px rgba(255, 200, 100, 0.18);
+          }
+          50% {
+            box-shadow:
+              0 10px 28px rgba(58, 42, 26, 0.1),
+              0 0 0 1px rgba(255, 200, 100, 0.45),
+              0 0 38px rgba(255, 200, 100, 0.32);
+          }
+        }
+        /* Badge "Destacado" / "Promoción" en la card */
+        .proc-card-promo-badge {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 0.3rem 0.75rem;
+          background: linear-gradient(135deg, #F7D680, #FFE6B3);
+          color: #6B4419;
+          font-size: 0.68rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          border-radius: 100px;
+          box-shadow: 0 4px 12px rgba(255, 200, 100, 0.4);
+          z-index: 2;
+        }
         .proc-card-img-wrap {
           position: relative;
           aspect-ratio: 4 / 5;
@@ -543,22 +594,64 @@ export default function ProcedimientosPage() {
 }
 
 /* ──────────────────────────────────────────────
-   Hero featured — destacado del mes
+   Carrusel de destacados y promociones del mes
+   - Acepta N items
+   - Navegación con flechas + dots
+   - Auto-rotate cada 7s pausable al hover
+   - Animaciones suaves entre slides
 ────────────────────────────────────────────── */
-function FeaturedHero({
-  procedimiento,
+function FeaturedCarousel({
+  items,
   intlLocale,
   t,
 }: {
-  procedimiento: Procedimiento;
+  items: Procedimiento[];
   intlLocale: string;
   t: ReturnType<typeof useTranslations>;
 }) {
+  const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const total = items.length;
+
+  const goTo = (newIndex: number) => {
+    const next = ((newIndex % total) + total) % total;
+    setDirection(next > index ? 1 : -1);
+    setIndex(next);
+  };
+  const next = () => goTo(index + 1);
+  const prev = () => goTo(index - 1);
+
+  // Auto-rotate
+  useEffect(() => {
+    if (paused || total <= 1) return;
+    const id = setTimeout(() => {
+      setDirection(1);
+      setIndex((i) => (i + 1) % total);
+    }, 7000);
+    return () => clearTimeout(id);
+  }, [index, paused, total]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") prev();
+      else if (e.key === "ArrowRight") next();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index, total]);
+
+  const item = items[index];
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
       style={{
         position: "relative",
         zIndex: 1,
@@ -566,171 +659,306 @@ function FeaturedHero({
         margin: "0 auto 3rem",
         padding: "0 1.5rem",
       }}
+      aria-roledescription="carousel"
+      aria-label={t("featured.kicker")}
     >
       <div
+        className="featured-grid featured-card"
         style={{
           display: "grid",
           gridTemplateColumns: "1.05fr 1fr",
-          gap: "2rem",
+          gap: 0,
           alignItems: "stretch",
           background: "linear-gradient(135deg, #FFFDF9 0%, #F7EFE3 100%)",
           borderRadius: 28,
-          border: "1px solid rgba(176, 137, 104, 0.15)",
-          boxShadow: "0 18px 50px rgba(58, 42, 26, 0.1)",
+          border: "1px solid rgba(255, 215, 138, 0.55)",
+          boxShadow:
+            "0 18px 50px rgba(58, 42, 26, 0.12), 0 0 0 1px rgba(255, 215, 138, 0.25), 0 0 60px rgba(255, 215, 138, 0.18)",
           overflow: "hidden",
+          position: "relative",
         }}
-        className="featured-grid"
       >
-        {/* Imagen */}
-        <div
-          style={{
-            position: "relative",
-            minHeight: 360,
-            aspectRatio: "4 / 5",
-            background: "#F5EEE5",
-            overflow: "hidden",
-          }}
-        >
-          {procedimiento.imagen && (
-            <motion.img
-              src={procedimiento.imagen}
-              alt={procedimiento.nombre}
-              initial={{ scale: 1.05 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-          )}
-          <div
-            aria-hidden="true"
+        <AnimatePresence mode="wait" initial={false} custom={direction}>
+          <motion.div
+            key={item.id}
+            custom={direction}
+            initial={{ opacity: 0, x: direction === 0 ? 0 : direction * 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction * -40 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            className="featured-grid"
             style={{
-              position: "absolute",
-              inset: 0,
-              background: "linear-gradient(180deg, transparent 60%, rgba(58, 42, 26, 0.3) 100%)",
+              display: "grid",
+              gridTemplateColumns: "1.05fr 1fr",
+              alignItems: "stretch",
+              gridColumn: "1 / -1",
+              gridRow: 1,
             }}
-          />
-        </div>
+            aria-roledescription="slide"
+            aria-label={t("featured.slideAria", { n: index + 1, total })}
+          >
+            {/* Imagen */}
+            <div
+              style={{
+                position: "relative",
+                minHeight: 380,
+                aspectRatio: "4 / 5",
+                background: "#F5EEE5",
+                overflow: "hidden",
+              }}
+            >
+              {item.imagen && (
+                <motion.img
+                  src={item.imagen}
+                  alt={item.nombre}
+                  initial={{ scale: 1.05 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 1.2, ease: "easeOut" }}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              )}
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(180deg, transparent 60%, rgba(58, 42, 26, 0.3) 100%)",
+                }}
+              />
+            </div>
 
-        {/* Texto */}
-        <div
-          style={{
-            padding: "2.5rem 2.4rem",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            gap: "1rem",
-          }}
-        >
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              fontSize: "0.72rem",
-              fontWeight: 700,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              color: "#B08968",
-              background: "rgba(176, 137, 104, 0.1)",
-              border: "1px solid rgba(176, 137, 104, 0.25)",
-              padding: "0.4rem 0.9rem",
-              borderRadius: 100,
-              width: "fit-content",
-            }}
-          >
-            <Sparkles size={12} /> {t("featured.kicker")}
-          </span>
-          <h2
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: "clamp(1.6rem, 2.6vw, 2.4rem)",
-              fontWeight: 700,
-              color: "#3A2A1A",
-              margin: 0,
-              lineHeight: 1.2,
-            }}
-          >
-            {procedimiento.nombre}
-          </h2>
-          {procedimiento.desc && (
-            <p
+            {/* Texto */}
+            <div
               style={{
-                color: "#6C584C",
-                fontSize: "1rem",
-                lineHeight: 1.65,
-                margin: 0,
+                padding: "2.5rem 2.4rem",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                gap: "1rem",
               }}
             >
-              {procedimiento.desc}
-            </p>
-          )}
-          {procedimiento.precio && (
-            <p
-              style={{
-                color: "#B08968",
-                fontWeight: 700,
-                fontSize: "1.05rem",
-                margin: "0.3rem 0 0",
-              }}
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: "#8B5A12",
+                  background: "linear-gradient(135deg, rgba(255, 215, 138, 0.35), rgba(255, 230, 179, 0.25))",
+                  border: "1px solid rgba(255, 200, 100, 0.55)",
+                  padding: "0.4rem 0.9rem",
+                  borderRadius: 100,
+                  width: "fit-content",
+                  boxShadow: "0 2px 10px rgba(255, 200, 100, 0.18)",
+                }}
+              >
+                <Sparkles size={12} /> {t("featured.kicker")}
+              </span>
+              <h2
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: "clamp(1.6rem, 2.6vw, 2.4rem)",
+                  fontWeight: 700,
+                  color: "#3A2A1A",
+                  margin: 0,
+                  lineHeight: 1.2,
+                }}
+              >
+                {item.nombre}
+              </h2>
+              {item.desc && (
+                <p
+                  style={{
+                    color: "#6C584C",
+                    fontSize: "1rem",
+                    lineHeight: 1.65,
+                    margin: 0,
+                  }}
+                >
+                  {item.desc}
+                </p>
+              )}
+              {item.precio && (
+                <p
+                  style={{
+                    color: "#B08968",
+                    fontWeight: 700,
+                    fontSize: "1.05rem",
+                    margin: "0.3rem 0 0",
+                  }}
+                >
+                  {t("standardPrice")} {formatPrecio(item.precio, intlLocale)}
+                </p>
+              )}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.8rem",
+                  flexWrap: "wrap",
+                  marginTop: "0.6rem",
+                }}
+              >
+                <Link
+                  href={`/agendar?proc=${encodeURIComponent(item.nombre)}`}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "0.8rem 1.6rem",
+                    borderRadius: 100,
+                    background: "linear-gradient(135deg, #B08968, #C9AD8D)",
+                    color: "#FFF",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                    boxShadow: "0 8px 22px rgba(176, 137, 104, 0.3)",
+                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                    fontSize: "0.94rem",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = "0 12px 28px rgba(176, 137, 104, 0.4)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "";
+                    e.currentTarget.style.boxShadow = "0 8px 22px rgba(176, 137, 104, 0.3)";
+                  }}
+                >
+                  <Calendar size={16} />
+                  {t("featured.ctaBook")}
+                </Link>
+                <Link href={`/procedimientos/${item.id}`} className="btn-ghost-app">
+                  {t("featured.ctaInfo")}
+                  <ArrowRight size={15} />
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Controles: flechas y dots solo si hay 2+ destacados */}
+        {total > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={prev}
+              aria-label={t("featured.prevSlide")}
+              className="featured-arrow featured-arrow-left"
             >
-              {t("standardPrice")} {formatPrecio(procedimiento.precio, intlLocale)}
-            </p>
-          )}
-          <div
-            style={{
-              display: "flex",
-              gap: "0.8rem",
-              flexWrap: "wrap",
-              marginTop: "0.6rem",
-            }}
-          >
-            <Link
-              href={`/agendar?proc=${encodeURIComponent(procedimiento.nombre)}`}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "0.8rem 1.6rem",
-                borderRadius: 100,
-                background: "linear-gradient(135deg, #B08968, #C9AD8D)",
-                color: "#FFF",
-                fontWeight: 600,
-                textDecoration: "none",
-                boxShadow: "0 8px 22px rgba(176, 137, 104, 0.3)",
-                transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                fontSize: "0.94rem",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow = "0 12px 28px rgba(176, 137, 104, 0.4)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "";
-                e.currentTarget.style.boxShadow = "0 8px 22px rgba(176, 137, 104, 0.3)";
-              }}
+              <ChevronLeft size={22} />
+            </button>
+            <button
+              type="button"
+              onClick={next}
+              aria-label={t("featured.nextSlide")}
+              className="featured-arrow featured-arrow-right"
             >
-              <Calendar size={16} />
-              {t("featured.ctaBook")}
-            </Link>
-            <Link href={`/procedimientos/${procedimiento.id}`} className="btn-ghost-app">
-              {t("featured.ctaInfo")}
-              <ArrowRight size={15} />
-            </Link>
-          </div>
-        </div>
+              <ChevronRight size={22} />
+            </button>
+
+            {/* Dots */}
+            <div className="featured-dots" role="tablist">
+              {items.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === index}
+                  aria-label={t("featured.slideAria", { n: i + 1, total })}
+                  onClick={() => {
+                    setDirection(i > index ? 1 : -1);
+                    setIndex(i);
+                  }}
+                  className={`featured-dot ${i === index ? "is-active" : ""}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <style jsx>{`
+        .featured-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: rgba(255, 253, 249, 0.92);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(176, 137, 104, 0.3);
+          color: #5A4635;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 6px 18px rgba(58, 42, 26, 0.18);
+          transition: background 0.25s ease, transform 0.25s ease,
+            box-shadow 0.25s ease;
+          z-index: 3;
+        }
+        .featured-arrow:hover {
+          background: linear-gradient(135deg, #B08968, #C9AD8D);
+          color: #FFF;
+          transform: translateY(-50%) scale(1.08);
+          box-shadow: 0 10px 24px rgba(176, 137, 104, 0.35);
+        }
+        .featured-arrow-left {
+          left: 14px;
+        }
+        .featured-arrow-right {
+          right: 14px;
+        }
+        .featured-dots {
+          position: absolute;
+          bottom: 18px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 8px;
+          padding: 0.4rem 0.7rem;
+          background: rgba(255, 253, 249, 0.85);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(176, 137, 104, 0.18);
+          border-radius: 100px;
+          box-shadow: 0 4px 14px rgba(58, 42, 26, 0.12);
+          z-index: 3;
+        }
+        .featured-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 100px;
+          background: rgba(176, 137, 104, 0.35);
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+            background 0.25s ease;
+        }
+        .featured-dot.is-active {
+          width: 26px;
+          background: linear-gradient(90deg, #B08968, #C9AD8D);
+        }
         @media (max-width: 820px) {
           .featured-grid {
             grid-template-columns: 1fr !important;
           }
+          .featured-arrow {
+            width: 38px;
+            height: 38px;
+          }
+          .featured-arrow-left { left: 8px; }
+          .featured-arrow-right { right: 8px; }
         }
       `}</style>
     </motion.section>
@@ -762,7 +990,7 @@ function ProcCard({
         ease: [0.22, 1, 0.36, 1],
         delay: Math.min(index * 0.04, 0.4),
       }}
-      className="proc-card"
+      className={`proc-card ${procedimiento.destacado ? "is-featured" : ""}`}
     >
       <Link
         href={`/procedimientos/${procedimiento.id}`}
@@ -774,6 +1002,12 @@ function ProcCard({
           )}
           {procedimiento.categoria && (
             <span className="proc-card-cat-chip">{procedimiento.categoria}</span>
+          )}
+          {procedimiento.destacado && (
+            <span className="proc-card-promo-badge" aria-label={t("featured.promoBadge")}>
+              <Star size={11} fill="currentColor" />
+              {t("featured.promoBadge")}
+            </span>
           )}
         </div>
         <div className="proc-card-body">

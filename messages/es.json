@@ -41,7 +41,7 @@
   },
   "home": {
     "gallery": {
-      "title": "Conoce los <c>procedimientos</c> más <c>demandados</c>",
+      "title": "Conoce los <c>procedimientos</c> más demandados y <c>promociones</c>",
       "subtitle": "Explora de forma interactiva algunos de mis procedimientos más solicitados. Selecciona alguno para ver toda su información y agendar tu cita en segundos.",
       "back": "← Volver",
       "viewMore": "Saber más sobre el procedimiento",
@@ -197,15 +197,37 @@
       "address": "Carrera 5ta #11-24. Edificio Torre Empresarial. Consultorio 502. Ibagué – Tolima."
     }
   },
+  "procedures": {
+    "detail": {
+      "back": "Volver a procedimientos",
+      "back2": "Volver",
+      "notFound": "No encontramos este procedimiento",
+      "descriptionTitle": "Sobre este procedimiento",
+      "standardPrice": "Precio estándar",
+      "priceNote": "El precio puede variar según la valoración médica.",
+      "bookCta": "Agendar este procedimiento",
+      "approxDuration": "Duración aproximada",
+      "minutes": "minutos",
+      "safety": "Seguridad",
+      "certified": "Protocolos certificados",
+      "care": "Atención",
+      "personalized": "Personalizada",
+      "galleryTitle": "Galería del procedimiento"
+    }
+  },
   "procedimientos": {
     "title": "Procedimientos Médicos y Estéticos",
     "subtitle": "Descubre tratamientos faciales, corporales y capilares realizados con técnicas seguras y personalizadas.",
     "loading": "Cargando procedimientos...",
     "errorLoad": "No se pudieron cargar los procedimientos. Intenta de nuevo más tarde.",
     "featured": {
-      "kicker": "Destacado del mes",
+      "kicker": "Destacados y promociones del mes",
       "ctaBook": "Agendar este procedimiento",
-      "ctaInfo": "Conocer más"
+      "ctaInfo": "Conocer más",
+      "prevSlide": "Anterior",
+      "nextSlide": "Siguiente",
+      "slideAria": "Destacado {n} de {total}",
+      "promoBadge": "Destacado"
     },
     "filters": {
       "searchPlaceholder": "Busca un procedimiento...",

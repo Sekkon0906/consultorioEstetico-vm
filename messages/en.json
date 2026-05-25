@@ -41,7 +41,7 @@
   },
   "home": {
     "gallery": {
-      "title": "Discover the most <c>requested</c> <c>treatments</c>",
+      "title": "Discover the most <c>requested</c> treatments and <c>promotions</c>",
       "subtitle": "Interactively explore some of my most requested treatments. Tap one to see the full details and book your appointment in seconds.",
       "back": "← Back",
       "viewMore": "Learn more about this treatment",
@@ -197,15 +197,37 @@
       "address": "Carrera 5ta #11-24. Torre Empresarial Building. Office 502. Ibagué – Tolima, Colombia."
     }
   },
+  "procedures": {
+    "detail": {
+      "back": "Back to treatments",
+      "back2": "Back",
+      "notFound": "We couldn't find this treatment",
+      "descriptionTitle": "About this treatment",
+      "standardPrice": "Standard price",
+      "priceNote": "Price may vary based on the medical assessment.",
+      "bookCta": "Book this treatment",
+      "approxDuration": "Approx. duration",
+      "minutes": "minutes",
+      "safety": "Safety",
+      "certified": "Certified protocols",
+      "care": "Care",
+      "personalized": "Personalized",
+      "galleryTitle": "Treatment gallery"
+    }
+  },
   "procedimientos": {
     "title": "Medical & Aesthetic Treatments",
     "subtitle": "Discover facial, body and hair treatments performed with safe, personalized techniques.",
     "loading": "Loading treatments...",
     "errorLoad": "Couldn't load the treatments. Please try again later.",
     "featured": {
-      "kicker": "Featured this month",
+      "kicker": "Featured & promotions this month",
       "ctaBook": "Book this treatment",
-      "ctaInfo": "Learn more"
+      "ctaInfo": "Learn more",
+      "prevSlide": "Previous",
+      "nextSlide": "Next",
+      "slideAria": "Featured {n} of {total}",
+      "promoBadge": "Featured"
     },
     "filters": {
       "searchPlaceholder": "Search a treatment...",
