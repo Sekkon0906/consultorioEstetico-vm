@@ -36,7 +36,12 @@ export default function Galeria3D() {
     async function load() {
       try {
         const all = await getProcedimientosApi();
-        setTratamientos(all.filter((p) => p.destacado));
+        // Mostramos solo los procedimientos marcados para la Galería 3D
+        // por la doctora desde el admin. Fallback: si nadie tiene
+        // mostrarGaleriaHome marcado, caemos a los destacados clásicos
+        // para no dejar la rueda vacía.
+        const filtered = all.filter((p) => p.mostrarGaleriaHome);
+        setTratamientos(filtered.length > 0 ? filtered : all.filter((p) => p.destacado));
       } catch (err) {
         console.error("Error cargando procedimientos para galería:", err);
       }

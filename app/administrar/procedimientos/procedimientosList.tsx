@@ -13,7 +13,23 @@ const BURL = "https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/
 
 interface GalItem { id?: string; url: string; titulo: string; orden: number; tipo: string; }
 
-const emptyForm = { nombre: "", desc: "", descCompleta: "", precio: "", imagen: "", categoria: "Facial" as Cat, subcategoria: "", duracionMin: "", destacado: false, video: "" };
+const emptyForm = {
+  nombre: "",
+  desc: "",
+  descCompleta: "",
+  precio: "",
+  imagen: "",
+  categoria: "Facial" as Cat,
+  subcategoria: "",
+  duracionMin: "",
+  destacado: false,
+  enPromocion: false,
+  precioPromocional: "",
+  promocionHasta: "",
+  mostrarGaleriaHome: false,
+  mostrarGaleriaProcedimientos: true,
+  video: "",
+};
 
 export default function ProcedimientosList() {
   const [procs, setProcs] = useState<Procedimiento[]>([]);
@@ -108,6 +124,11 @@ export default function ProcedimientosList() {
         subcategoria: form.subcategoria?.trim() || null,
         duracion_min: Number(form.duracionMin) || null,
         destacado: form.destacado,
+        en_promocion: form.enPromocion,
+        precio_promocional: form.enPromocion ? (form.precioPromocional?.trim() || null) : null,
+        promocion_hasta: form.enPromocion ? (form.promocionHasta || null) : null,
+        mostrar_galeria_home: form.mostrarGaleriaHome,
+        mostrar_galeria_procedimientos: form.mostrarGaleriaProcedimientos,
         actualizado_en: new Date().toISOString(),
       };
 
@@ -137,10 +158,22 @@ export default function ProcedimientosList() {
   var startEdit = function(p: Procedimiento) {
     setActual(p);
     setForm({
-      nombre: p.nombre, desc: p.desc, descCompleta: (p as any).descCompleta || "",
-      precio: String(p.precio), imagen: p.imagen, categoria: p.categoria,
+      nombre: p.nombre,
+      desc: p.desc,
+      descCompleta: (p as any).descCompleta || "",
+      precio: String(p.precio),
+      imagen: p.imagen,
+      categoria: p.categoria,
       subcategoria: p.subcategoria || "",
-      duracionMin: p.duracionMin ? String(p.duracionMin) : "", destacado: p.destacado || false, video: "",
+      duracionMin: p.duracionMin ? String(p.duracionMin) : "",
+      destacado: p.destacado || false,
+      enPromocion: p.enPromocion || false,
+      precioPromocional: p.precioPromocional || "",
+      promocionHasta: p.promocionHasta || "",
+      mostrarGaleriaHome: p.mostrarGaleriaHome || false,
+      mostrarGaleriaProcedimientos:
+        p.mostrarGaleriaProcedimientos == null ? true : p.mostrarGaleriaProcedimientos,
+      video: "",
     });
     setModo("form");
     loadGal(p.id);
@@ -197,8 +230,144 @@ export default function ProcedimientosList() {
               </div>
             </div>
 
-            <div style={{ marginBottom: "0.8rem" }}><Lbl>Descripcion breve</Lbl><textarea style={{ ...IS, resize: "vertical" as const }} value={form.desc} onChange={function(e) { setForm({ ...form, desc: e.target.value }); }} rows={2} placeholder="Se muestra en las cards..." /></div>
-            <div style={{ marginBottom: "1.2rem" }}><Lbl>Descripcion completa</Lbl><textarea style={{ ...IS, resize: "vertical" as const }} value={form.descCompleta} onChange={function(e) { setForm({ ...form, descCompleta: e.target.value }); }} rows={4} placeholder="Se muestra en la pagina de detalle..." /></div>
+            <div style={{ marginBottom: "0.8rem" }}><Lbl>Descripción breve</Lbl><textarea style={{ ...IS, resize: "vertical" as const }} value={form.desc} onChange={function(e) { setForm({ ...form, desc: e.target.value }); }} rows={2} placeholder="Se muestra en las cards..." /></div>
+            <div style={{ marginBottom: "1.2rem" }}><Lbl>Descripción completa</Lbl><textarea style={{ ...IS, resize: "vertical" as const }} value={form.descCompleta} onChange={function(e) { setForm({ ...form, descCompleta: e.target.value }); }} rows={4} placeholder="Se muestra en la página de detalle..." /></div>
+
+            {/* === PROMOCIÓN === */}
+            <div style={{
+              marginBottom: "1.2rem",
+              padding: "1.2rem 1.3rem",
+              background: form.enPromocion
+                ? "linear-gradient(135deg, rgba(247,214,128,0.18), rgba(255,230,179,0.1))"
+                : "var(--surface-soft)",
+              borderRadius: 16,
+              border: form.enPromocion
+                ? "1.5px solid rgba(247,214,128,0.6)"
+                : "1px solid var(--border)",
+              transition: "background 0.3s, border-color 0.3s",
+            }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", marginBottom: form.enPromocion ? "1rem" : 0 }}>
+                <input
+                  type="checkbox"
+                  checked={form.enPromocion}
+                  onChange={function(e) { setForm({ ...form, enPromocion: e.target.checked }); }}
+                  style={{ width: 18, height: 18, accentColor: "#D4A437" }}
+                />
+                <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", display: "flex", alignItems: "center", gap: 6 }}>
+                  🏷️ En promoción
+                </span>
+                <small style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginLeft: "auto" }}>
+                  Se muestra con descuento y badge especial.
+                </small>
+              </label>
+
+              <AnimatePresence>
+                {form.enPromocion && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ overflow: "hidden" }}
+                  >
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginTop: "0.5rem" }}>
+                      <div>
+                        <Lbl>Precio promocional (COP)</Lbl>
+                        <input
+                          type="text"
+                          style={IS}
+                          value={form.precioPromocional}
+                          onChange={function(e) { setForm({ ...form, precioPromocional: e.target.value }); }}
+                          placeholder={form.precio ? `Menor a ${form.precio}` : "250000"}
+                        />
+                        <small style={{ fontSize: "0.74rem", color: "var(--text-muted)", display: "block", marginTop: 4 }}>
+                          El precio normal aparecerá tachado al lado.
+                        </small>
+                      </div>
+                      <div>
+                        <Lbl>Disponible hasta (opcional)</Lbl>
+                        <input
+                          type="date"
+                          style={IS}
+                          value={form.promocionHasta}
+                          onChange={function(e) { setForm({ ...form, promocionHasta: e.target.value }); }}
+                        />
+                        <small style={{ fontSize: "0.74rem", color: "var(--text-muted)", display: "block", marginTop: 4 }}>
+                          Si lo dejas vacío, no expira automáticamente.
+                        </small>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* === VISIBILIDAD EN GALERÍAS === */}
+            <div style={{
+              marginBottom: "1.2rem",
+              padding: "1.2rem 1.3rem",
+              background: "var(--surface-soft)",
+              borderRadius: 16,
+              border: "1px solid var(--border)",
+            }}>
+              <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: 6 }}>
+                👁️ ¿Dónde mostrar este procedimiento?
+              </div>
+              <small style={{ fontSize: "0.78rem", color: "var(--text-muted)", display: "block", marginBottom: "0.9rem" }}>
+                Puedes elegir uno, ambos o ninguno. Si no marcas ninguna, el procedimiento queda oculto al público.
+              </small>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem" }}>
+                <label style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 10,
+                  padding: "0.85rem 1rem",
+                  borderRadius: 12,
+                  background: form.mostrarGaleriaHome ? "rgba(176, 137, 104, 0.12)" : "var(--surface)",
+                  border: form.mostrarGaleriaHome ? "1.5px solid var(--brand)" : "1px solid var(--border)",
+                  cursor: "pointer",
+                  transition: "background 0.25s, border-color 0.25s",
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={form.mostrarGaleriaHome}
+                    onChange={function(e) { setForm({ ...form, mostrarGaleriaHome: e.target.checked }); }}
+                    style={{ marginTop: 2, width: 17, height: 17, accentColor: "var(--brand)", flexShrink: 0 }}
+                  />
+                  <div>
+                    <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text)" }}>🏠 Galería Home</div>
+                    <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginTop: 2, lineHeight: 1.4 }}>
+                      Aparece en la rueda 3D de la página principal.
+                    </div>
+                  </div>
+                </label>
+
+                <label style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 10,
+                  padding: "0.85rem 1rem",
+                  borderRadius: 12,
+                  background: form.mostrarGaleriaProcedimientos ? "rgba(176, 137, 104, 0.12)" : "var(--surface)",
+                  border: form.mostrarGaleriaProcedimientos ? "1.5px solid var(--brand)" : "1px solid var(--border)",
+                  cursor: "pointer",
+                  transition: "background 0.25s, border-color 0.25s",
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={form.mostrarGaleriaProcedimientos}
+                    onChange={function(e) { setForm({ ...form, mostrarGaleriaProcedimientos: e.target.checked }); }}
+                    style={{ marginTop: 2, width: 17, height: 17, accentColor: "var(--brand)", flexShrink: 0 }}
+                  />
+                  <div>
+                    <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text)" }}>📋 Galería Procedimientos</div>
+                    <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginTop: 2, lineHeight: 1.4 }}>
+                      Aparece en el listado completo de /procedimientos.
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
 
             {/* MAIN IMAGE - only 1, upload replaces */}
             <div style={{ background: "var(--surface-soft)", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}>
@@ -329,7 +498,7 @@ export default function ProcedimientosList() {
                           <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                             <motion.button whileTap={{ scale: 0.95 }} onClick={function() { startEdit(p); }} style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Edit3 size={18} color="var(--text)" /></motion.button>
                             {delId === p.id ? (
-                              <><button onClick={function() { handleDel(p.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#C62828", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>SÃ­</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--border)", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
+                              <><button onClick={function() { handleDel(p.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#C62828", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>Sí</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--border)", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
                             ) : (
                               <motion.button whileTap={{ scale: 0.95 }} onClick={function() { setDelId(p.id); }} style={{ width: 42, height: 42, borderRadius: 12, background: "#fff3ef", border: "1px solid #e4bfbf", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={18} color="#b02e2e" /></motion.button>
                             )}

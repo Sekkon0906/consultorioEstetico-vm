@@ -255,7 +255,7 @@ export default function CharlasList() {
         <div className="alert alert-danger py-2 mb-3">{error}</div>
       )}
 
-      {/* CONFIRMAR ELIMINAR (pt 17/18 â€” sin confirm() nativo) */}
+      {/* CONFIRMAR ELIMINAR (pt 17/18 — sin confirm() nativo) */}
       <AnimatePresence>
         {confirmEliminarId !== null && (
           <motion.div
@@ -281,7 +281,7 @@ export default function CharlasList() {
                 Â¿Eliminar esta charla?
               </h5>
               <p className="mb-4" style={{ color: "#8d7a6a", fontSize: "0.9rem" }}>
-                Esta acciÃ³n no se puede deshacer.
+                Esta acción no se puede deshacer.
               </p>
               <div className="d-flex gap-2">
                 <button
@@ -490,7 +490,7 @@ export default function CharlasList() {
         )}
       </AnimatePresence>
 
-      {/* LISTA â€” mismo patrÃ³n que Procedimientos / Testimonios */}
+      {/* LISTA — mismo patrón que Procedimientos / Testimonios */}
       {charlas.length === 0 ? (
         <p style={{ textAlign: "center", color: "var(--text-soft)", padding: "2rem 0" }}>
           No hay charlas aun.

@@ -57,7 +57,7 @@ export default function HistorialReportes() {
   if (reportes.length === 0) {
     return (
       <div className="p-4 text-center rounded-4" style={{ backgroundColor: "var(--surface)", border: "1px solid var(--border)", color: "var(--text-soft)", fontStyle: "italic" }}>
-        No hay reportes guardados todavÃ­a.
+        No hay reportes guardados todavía.
       </div>
     );
   }
@@ -71,7 +71,7 @@ export default function HistorialReportes() {
         <table className="table table-sm mb-0" style={{ fontSize: "0.88rem" }}>
           <thead style={{ backgroundColor: "var(--surface-soft)" }}>
             <tr>
-              <th style={{ color: "var(--text)", fontWeight: 600 }}>PerÃ­odo</th>
+              <th style={{ color: "var(--text)", fontWeight: 600 }}>Período</th>
               <th style={{ color: "var(--text)", fontWeight: 600 }}>Online</th>
               <th style={{ color: "var(--text)", fontWeight: 600 }}>Consultorio</th>
               <th style={{ color: "var(--text)", fontWeight: 600 }}>Esperado</th>

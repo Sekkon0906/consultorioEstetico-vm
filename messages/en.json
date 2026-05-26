@@ -240,11 +240,12 @@
       "noResults": "We couldn't find any treatments matching your search.",
       "clearSearch": "Clear search",
       "allSubcats": "All subcategories",
-      "sortBy": "Sort:",
-      "sortFeatured": "Featured first",
+      "sortBy": "",
+      "sortName": "Name",
       "sortPriceAsc": "Price: low to high",
       "sortPriceDesc": "Price: high to low",
-      "sortName": "Name A-Z"
+      "sortFeatured": "Featured",
+      "sortDiscount": "On sale"
     },
     "categories": {
       "facial": "Explore facial treatments",

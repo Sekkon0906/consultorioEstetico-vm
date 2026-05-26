@@ -188,7 +188,7 @@ export default function TestimoniosList() {
                       <IBtn icon={<Star size={18} fill={t.destacado ? "var(--brand)" : "none"} />} bg={t.destacado ? "#FFF3E6" : "var(--surface-soft)"} onClick={function() { toggle(t, "destacado"); }} />
                       <IBtn icon={<Edit3 size={18} />} bg="var(--surface-soft)" onClick={function() { startEdit(t); }} />
                       {delId === t.id ? (
-                        <><button onClick={function() { handleDel(t.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#C62828", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>SÃ­</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--border)", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
+                        <><button onClick={function() { handleDel(t.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#C62828", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>Sí</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--border)", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
                       ) : (
                         <IBtn icon={<Trash2 size={18} color="#b02e2e" />} bg="#fff3ef" onClick={function() { setDelId(t.id); }} />
                       )}

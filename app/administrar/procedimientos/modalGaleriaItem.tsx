@@ -38,11 +38,11 @@ export default function ModalGaleriaItem({
 
   const handleGuardar = () => {
     if (!titulo.trim()) {
-      setError("Debe ingresar un tÃ­tulo.");
+      setError("Debe ingresar un título.");
       return;
     }
     if (tipo === "imagen" && !url) {
-      setError("Debe subir una imagen o URL vÃ¡lida.");
+      setError("Debe subir una imagen o URL válida.");
       return;
     }
     setError(null);
@@ -74,7 +74,7 @@ export default function ModalGaleriaItem({
           exit={{ scale: 0.9, opacity: 0 }}
         >
           <h3 className="text-lg font-semibold text-[#6E4F37] mb-4">
-            {modo === "crear" ? "AÃ±adir elemento a galerÃ­a" : "Ver elemento"}
+            {modo === "crear" ? "Añadir elemento a galería" : "Ver elemento"}
           </h3>
 
           {error && (
@@ -108,14 +108,14 @@ export default function ModalGaleriaItem({
               type="text"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
-              placeholder="TÃ­tulo del medio"
+              placeholder="Título del medio"
               className="border [border-color:var(--border)] rounded p-2"
             />
 
             <textarea
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
-              placeholder="DescripciÃ³n breve"
+              placeholder="Descripción breve"
               className="border [border-color:var(--border)] rounded p-2"
             />
 

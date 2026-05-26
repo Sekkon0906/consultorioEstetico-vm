@@ -236,7 +236,7 @@ export default function CitasAgendadas() {
               </div>
               <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.4rem" }}>Solicitud enviada</h4>
               <p style={{ fontSize: "0.88rem", color: "var(--text-soft)", margin: 0 }}>
-                La solicitud de reagenda quedÃ³ registrada. El cliente deberÃ¡ confirmarla;
+                La solicitud de reagenda quedó registrada. El cliente deberá confirmarla;
                 la cita no se mueve hasta que la apruebe.
               </p>
             </div>
@@ -244,7 +244,7 @@ export default function CitasAgendadas() {
             <>
               <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", textAlign: "center", marginBottom: "0.3rem" }}>Solicitar reagenda al cliente</h4>
               <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", textAlign: "center", marginBottom: "1rem" }}>
-                Se enviarÃ¡ una solicitud al cliente con la nueva propuesta. La cita actual NO se modifica hasta que el cliente confirme.
+                Se enviará una solicitud al cliente con la nueva propuesta. La cita actual NO se modifica hasta que el cliente confirme.
               </p>
               <InfoBlock cita={reagendarModal} />
               <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.8rem" }}>
@@ -262,7 +262,7 @@ export default function CitasAgendadas() {
                 </div>
                 <div>
                   <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text-soft)", display: "block", marginBottom: 4 }}>Motivo de la reagenda *</label>
-                  <textarea value={reagendarMotivo} onChange={(e) => { setReagendarMotivo(e.target.value); if (reagendarError) setReagendarError(null); }} rows={3} placeholder="Explica al cliente por quÃ© se propone reagendar..." style={{ ...IS, resize: "vertical" as const }} />
+                  <textarea value={reagendarMotivo} onChange={(e) => { setReagendarMotivo(e.target.value); if (reagendarError) setReagendarError(null); }} rows={3} placeholder="Explica al cliente por qué se propone reagendar..." style={{ ...IS, resize: "vertical" as const }} />
                 </div>
               </div>
               {reagendarError && <p style={{ color: "#b02e2e", fontSize: "0.82rem", marginTop: "0.6rem", textAlign: "center" }}>{reagendarError}</p>}

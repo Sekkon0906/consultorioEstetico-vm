@@ -44,8 +44,8 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
     { id: "citas",          label: "Citas Agendadas" },
     { id: "procedimientos", label: "Procedimientos" },
     { id: "testimonios",    label: "Testimonios" },
-    { id: "charlas",        label: "FormaciÃ³n" },
-    { id: "ingresos",       label: "AnalÃ­tica" },
+    { id: "charlas",        label: "Formación" },
+    { id: "ingresos",       label: "Analítica" },
   ];
 
   const NavLinks = () => (
@@ -82,7 +82,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
         </h1>
         {user && (
           <p className="text-sm text-center mb-6 [color:var(--text)]">
-            SesiÃ³n: <b>{user.nombres}</b>
+            Sesión: <b>{user.nombres}</b>
           </p>
         )}
         <NavLinks />
@@ -90,7 +90,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
           onClick={handleLogout}
           className="mt-auto px-4 py-2 rounded-lg bg-[#C87A7A] text-white font-semibold shadow hover:bg-[#B56666] transition"
         >
-          Cerrar sesiÃ³n
+          Cerrar sesión
         </button>
       </aside>
 
@@ -118,7 +118,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
               </div>
               {user && (
                 <p className="text-sm text-center mb-4 [color:var(--text)]">
-                  SesiÃ³n: <b>{user.nombres}</b>
+                  Sesión: <b>{user.nombres}</b>
                 </p>
               )}
               <NavLinks />
@@ -126,7 +126,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
                 onClick={handleLogout}
                 className="mt-auto px-4 py-2 rounded-lg bg-[#C87A7A] text-white font-semibold shadow hover:bg-[#B56666] transition"
               >
-                Cerrar sesiÃ³n
+                Cerrar sesión
               </button>
             </motion.aside>
           </>
@@ -141,10 +141,10 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
             onClick={() => setSidebarOpen((p) => !p)}
           >
             <Menu size={20} />
-            <span className="text-sm font-medium">MenÃº</span>
+            <span className="text-sm font-medium">Menú</span>
           </button>
           <h2 className="text-xl font-semibold [color:var(--brand)] ml-auto lg:ml-0">
-            AdministraciÃ³n
+            Administración
           </h2>
         </header>
         <main className="flex-1 p-4 sm:p-6 overflow-y-auto [background:var(--surface)]">

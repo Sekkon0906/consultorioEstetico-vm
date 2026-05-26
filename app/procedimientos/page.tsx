@@ -11,7 +11,7 @@ import { getProcedimientosApi } from "../services/procedimientosApi";
 import { IMG } from "../src/lib/imagenes";
 
 type Categoria = "todos" | "Facial" | "Corporal" | "Capilar";
-type SortMode = "featured" | "priceAsc" | "priceDesc" | "name";
+type SortMode = "name" | "priceAsc" | "priceDesc" | "featured" | "discount";
 
 /** Extrae el primer número significativo de un string de precio
  *  para poder ordenarlo numéricamente. "180.000" → 180000. */
@@ -54,7 +54,7 @@ export default function ProcedimientosPage() {
 
   const [categoria, setCategoria] = useState<Categoria>("todos");
   const [subcategoria, setSubcategoria] = useState<string | null>(null);
-  const [sortMode, setSortMode] = useState<SortMode>("featured");
+  const [sortMode, setSortMode] = useState<SortMode>("name");
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search);
 
@@ -62,21 +62,6 @@ export default function ProcedimientosPage() {
   useEffect(() => {
     setSubcategoria(null);
   }, [categoria]);
-
-  /* Subcategorías únicas detectadas dentro de la categoría seleccionada.
-     Las extraemos de los procedimientos existentes (no de una tabla
-     aparte), así la doctora solo debe asignarlas en el admin. */
-  const subcategorias = useMemo(() => {
-    if (categoria === "todos") return [];
-    const set = new Set<string>();
-    procedimientos
-      .filter((p) => p.categoria === categoria)
-      .forEach((p) => {
-        const s = p.subcategoria?.trim();
-        if (s) set.add(s);
-      });
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [procedimientos, categoria]);
 
   useEffect(() => {
     let mounted = true;
@@ -98,17 +83,40 @@ export default function ProcedimientosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* Destacados y promociones: todos los procedimientos con `destacado: true`.
-     Si no hay ninguno marcado, el carrusel no se renderiza. */
-  const destacados = useMemo(
-    () => procedimientos.filter((p) => p.destacado),
+  /* Procedimientos visibles en /procedimientos: la doctora decide desde
+     el admin con `mostrarGaleriaProcedimientos`. Default true para no
+     romper procedimientos existentes sin la flag tocada. */
+  const visibles = useMemo(
+    () => procedimientos.filter((p) => p.mostrarGaleriaProcedimientos !== false),
     [procedimientos]
+  );
+
+  /* Subcategorías únicas detectadas dentro de la categoría seleccionada.
+     Las extraemos de los procedimientos existentes (no de una tabla
+     aparte), así la doctora solo debe asignarlas en el admin. */
+  const subcategorias = useMemo(() => {
+    if (categoria === "todos") return [];
+    const set = new Set<string>();
+    visibles
+      .filter((p) => p.categoria === categoria)
+      .forEach((p) => {
+        const s = p.subcategoria?.trim();
+        if (s) set.add(s);
+      });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [visibles, categoria]);
+
+  /* Destacados y promociones: combina `destacado` + `enPromocion` para
+     que ambos casos alimenten el carrusel. Solo entre los visibles. */
+  const destacados = useMemo(
+    () => visibles.filter((p) => p.destacado || p.enPromocion),
+    [visibles]
   );
 
   /* Filtrado por categoría + subcategoría + búsqueda + sort dinámico. */
   const filtered = useMemo(() => {
     const query = deferredSearch.trim().toLowerCase();
-    const list = procedimientos
+    const list = visibles
       .filter((p) => categoria === "todos" || p.categoria === categoria)
       .filter((p) => !subcategoria || p.subcategoria === subcategoria)
       .filter((p) => {
@@ -125,19 +133,29 @@ export default function ProcedimientosPage() {
       case "priceDesc":
         sorted.sort((a, b) => precioNum(b.precio) - precioNum(a.precio));
         break;
-      case "name":
-        sorted.sort((a, b) => a.nombre.localeCompare(b.nombre));
-        break;
       case "featured":
-      default:
         sorted.sort((a, b) => {
           if (a.destacado === b.destacado) return a.nombre.localeCompare(b.nombre);
           return a.destacado ? -1 : 1;
         });
         break;
+      case "discount":
+        sorted.sort((a, b) => {
+          /* Promo prioriza primero (en_promocion=true).
+             Fallback al nombre si ambos están iguales. */
+          const aP = (a as any).enPromocion ? 1 : 0;
+          const bP = (b as any).enPromocion ? 1 : 0;
+          if (aP !== bP) return bP - aP;
+          return a.nombre.localeCompare(b.nombre);
+        });
+        break;
+      case "name":
+      default:
+        sorted.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        break;
     }
     return sorted;
-  }, [procedimientos, deferredSearch, categoria, subcategoria, sortMode]);
+  }, [visibles, deferredSearch, categoria, subcategoria, sortMode]);
 
   const chips: { key: Categoria; label: string }[] = [
     { key: "todos", label: t("filters.all") },
@@ -811,6 +829,32 @@ export default function ProcedimientosPage() {
           color: #8B7060;
           letter-spacing: 0.04em;
         }
+        /* Promo: precio normal tachado + nuevo destacado */
+        .proc-card-price-old {
+          font-size: 0.78rem;
+          font-weight: 500;
+          color: #A0907B;
+          text-decoration: line-through;
+          text-decoration-color: rgba(160, 144, 123, 0.7);
+          margin-right: 0.25rem;
+        }
+        .proc-card-price-new {
+          font-size: 0.95rem;
+          font-weight: 800;
+          color: #C25B1E;
+        }
+        /* Badge variante promoción (rojizo / cálido) */
+        .proc-card-promo-badge.proc-card-promo-discount {
+          background: linear-gradient(135deg, #E08A4A, #F4A671);
+          color: #FFFDF9;
+          letter-spacing: 0.08em;
+          box-shadow: 0 4px 12px rgba(224, 138, 74, 0.4);
+          animation: promo-pulse 2.2s ease-in-out infinite;
+        }
+        @keyframes promo-pulse {
+          0%, 100% { box-shadow: 0 4px 12px rgba(224, 138, 74, 0.4); }
+          50% { box-shadow: 0 6px 18px rgba(224, 138, 74, 0.65); }
+        }
         .proc-card-arrow {
           width: 32px;
           height: 32px;
@@ -1255,7 +1299,12 @@ function ProcCard({
           {procedimiento.categoria && (
             <span className="proc-card-cat-chip">{procedimiento.categoria}</span>
           )}
-          {procedimiento.destacado && (
+          {procedimiento.enPromocion && (
+            <span className="proc-card-promo-badge proc-card-promo-discount" aria-label="Promoción">
+              🏷️ PROMO
+            </span>
+          )}
+          {!procedimiento.enPromocion && procedimiento.destacado && (
             <span className="proc-card-promo-badge" aria-label={t("featured.promoBadge")}>
               <Star size={11} fill="currentColor" />
               {t("featured.promoBadge")}
@@ -1269,10 +1318,22 @@ function ProcCard({
           )}
           <div className="proc-card-footer">
             {procedimiento.precio ? (
-              <span className="proc-card-price">
-                {formatPrecio(procedimiento.precio, intlLocale)}{" "}
-                <span className="proc-card-price-unit">{t("currency")}</span>
-              </span>
+              procedimiento.enPromocion && procedimiento.precioPromocional ? (
+                <span className="proc-card-price">
+                  <span className="proc-card-price-old">
+                    {formatPrecio(procedimiento.precio, intlLocale)}
+                  </span>{" "}
+                  <span className="proc-card-price-new">
+                    {formatPrecio(procedimiento.precioPromocional, intlLocale)}{" "}
+                    <span className="proc-card-price-unit">{t("currency")}</span>
+                  </span>
+                </span>
+              ) : (
+                <span className="proc-card-price">
+                  {formatPrecio(procedimiento.precio, intlLocale)}{" "}
+                  <span className="proc-card-price-unit">{t("currency")}</span>
+                </span>
+              )
             ) : (
               <span />
             )}
@@ -1381,25 +1442,23 @@ function SortDropdown({
   }, [open]);
 
   const options: { value: SortMode; label: string }[] = [
-    { value: "featured", label: t("filters.sortFeatured") },
+    { value: "name", label: t("filters.sortName") },
     { value: "priceAsc", label: t("filters.sortPriceAsc") },
     { value: "priceDesc", label: t("filters.sortPriceDesc") },
-    { value: "name", label: t("filters.sortName") },
+    { value: "featured", label: t("filters.sortFeatured") },
+    { value: "discount", label: t("filters.sortDiscount") },
   ];
   const current = options.find((o) => o.value === sortMode) ?? options[0];
 
   return (
     <div className="proc-sort" ref={wrapRef}>
-      <span className="proc-sort-label">
-        <ArrowUpDown size={13} style={{ marginRight: 4, verticalAlign: "-2px" }} />
-        {t("filters.sortBy")}
-      </span>
       <button
         type="button"
         className={`proc-sort-trigger ${open ? "is-open" : ""}`}
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-label={t("filters.sortName")}
       >
         <span>{current.label}</span>
         <ChevronDown

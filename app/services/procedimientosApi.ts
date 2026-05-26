@@ -16,14 +16,19 @@ function mapRow(row: Record<string, unknown>): Procedimiento {
     subcategoria: (row.subcategoria as string) || null,
     duracionMin: (row.duracion_min as number) ?? null,
     destacado: !!row.destacado,
+    enPromocion: !!row.en_promocion,
+    precioPromocional: (row.precio_promocional as string) || null,
+    promocionHasta: (row.promocion_hasta as string) || null,
+    mostrarGaleriaHome: row.mostrar_galeria_home == null ? false : !!row.mostrar_galeria_home,
+    mostrarGaleriaProcedimientos:
+      row.mostrar_galeria_procedimientos == null ? true : !!row.mostrar_galeria_procedimientos,
   };
 }
 
-/* SELECT base con todos los campos. `subcategoria` es opcional en BD:
-   si la columna no existe aún (pendiente migración), Supabase devuelve
-   error → el catch en mapRow tolera el undefined. */
+/* SELECT base con todos los campos. Si alguna columna nueva no existe
+   aún en BD, hay fallback al SELECT mínimo. */
 const SELECT_FIELDS =
-  "id, nombre, descripcion, descripcion_completa, precio, imagen, categoria, subcategoria, duracion_min, destacado";
+  "id, nombre, descripcion, descripcion_completa, precio, imagen, categoria, subcategoria, duracion_min, destacado, en_promocion, precio_promocional, promocion_hasta, mostrar_galeria_home, mostrar_galeria_procedimientos";
 
 /** GET todos los procedimientos - publico */
 export async function getProcedimientosApi(): Promise<Procedimiento[]> {
@@ -110,6 +115,15 @@ export async function updateProcedimientoApi(
   if (payload.duracionMin !== undefined) updates.duracion_min = payload.duracionMin;
   if (payload.destacado !== undefined) updates.destacado = payload.destacado;
   if (payload.subcategoria !== undefined) updates.subcategoria = payload.subcategoria || null;
+  if (payload.enPromocion !== undefined) updates.en_promocion = payload.enPromocion;
+  if (payload.precioPromocional !== undefined)
+    updates.precio_promocional = payload.precioPromocional || null;
+  if (payload.promocionHasta !== undefined)
+    updates.promocion_hasta = payload.promocionHasta || null;
+  if (payload.mostrarGaleriaHome !== undefined)
+    updates.mostrar_galeria_home = payload.mostrarGaleriaHome;
+  if (payload.mostrarGaleriaProcedimientos !== undefined)
+    updates.mostrar_galeria_procedimientos = payload.mostrarGaleriaProcedimientos;
 
   const { data, error } = await supabase
     .from("procedimientos")

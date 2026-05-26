@@ -240,11 +240,12 @@
       "noResults": "No encontramos procedimientos que coincidan con tu búsqueda.",
       "clearSearch": "Limpiar búsqueda",
       "allSubcats": "Todas las subcategorías",
-      "sortBy": "Ordenar:",
-      "sortFeatured": "Destacados primero",
+      "sortBy": "",
+      "sortName": "Nombre",
       "sortPriceAsc": "Precio: menor a mayor",
       "sortPriceDesc": "Precio: mayor a menor",
-      "sortName": "Nombre A-Z"
+      "sortFeatured": "Destacados",
+      "sortDiscount": "Con descuento"
     },
     "categories": {
       "facial": "Explora los procedimientos faciales",
