@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
@@ -212,10 +213,13 @@ export default function AgendarConfirmacion({
       {/* === QR === */}
       {qrURL && (
         <div className="flex flex-col items-center mt-10">
-          <img
+          <Image
             src={qrURL}
             alt={t("qrAlt")}
-            className="w-36 h-36 border border-[#E9DED2] rounded-lg bg-white shadow-sm"
+            width={144}
+            height={144}
+            unoptimized
+            className="border border-[#E9DED2] rounded-lg bg-white shadow-sm"
           />
           <p className="mt-3 text-sm text-[#6C584C]">
             {t("qrCaption")}

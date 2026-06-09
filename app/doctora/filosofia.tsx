@@ -10,6 +10,7 @@ export default function Filosofia() {
 
   return (
     <section
+      className="dark-aware-section filo-section"
       style={{
         background: "linear-gradient(180deg,#F8F5F0 0%,#FAF9F7 100%)",
         padding: "5rem 2rem",
@@ -31,7 +32,7 @@ export default function Filosofia() {
             <div key={i} className="col-md-3">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="p-4 rounded-4 shadow-sm h-100"
+                className="dark-aware-card p-4 rounded-4 shadow-sm h-100"
                 style={{ background: "#fff", border: "1px solid #E9DED2" }}
               >
                 <div style={{ fontSize: "2rem", color: "#B08968" }}>

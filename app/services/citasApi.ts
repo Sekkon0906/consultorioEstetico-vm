@@ -1,6 +1,7 @@
 // app/services/citasApi.ts
 import type { Cita, BloqueoHora } from "../types/domain";
 import { supabase } from "@/lib/supabaseClient";
+import { notificarNuevaCita } from "./notifyApi";
 
 function mapCita(row: Record<string, unknown>): Cita {
   return {
@@ -75,6 +76,8 @@ export async function createCitaApi(payload: Omit<Cita, "id" | "fechaCreacion">)
     tipo_pago_consultorio: payload.tipoPagoConsultorio || null, tipo_pago_online: payload.tipoPagoOnline || null, creada_por: "usuario",
   }).select(CITA_COLUMNS).single();
   if (error) throw new Error(error.message);
+  // Aviso a la doctora (best-effort, no bloquea la creación de la cita)
+  void notificarNuevaCita(data.id as string);
   return mapCita(data);
 }
 

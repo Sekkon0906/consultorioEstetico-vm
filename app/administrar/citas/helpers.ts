@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { notificarCambioEstado } from "../../services/notifyApi";
 
 export type EstadoCita = "pendiente" | "confirmada" | "atendida" | "cancelada";
 
@@ -105,6 +106,7 @@ export async function confirmarCitaAPI(id: number): Promise<void> {
     .update({ estado: "confirmada", actualizado_en: new Date().toISOString() })
     .eq("id", id);
   if (error) throw new Error(error.message);
+  void notificarCambioEstado(id); // avisa al paciente (best-effort)
 }
 
 export async function cancelarCitaAPI(id: number, motivo: string): Promise<void> {
@@ -117,6 +119,7 @@ export async function cancelarCitaAPI(id: number, motivo: string): Promise<void>
     })
     .eq("id", id);
   if (error) throw new Error(error.message);
+  void notificarCambioEstado(id); // avisa al paciente (best-effort)
 }
 
 export async function updateCitaAPI(
@@ -164,16 +167,41 @@ export async function solicitarReagendaAPI(
   nuevaFecha: string,
   nuevaHora: string,
   motivo: string
-): Promise<void> {
-  const { error } = await supabase.from("reagendas").insert({
-    cita_id: citaId,
-    user_id: userId,
-    nueva_fecha: nuevaFecha,
-    nueva_hora: nuevaHora,
-    motivo: motivo || "",
-    estado: "pendiente",
-  });
+): Promise<{ id: number }> {
+  const { data, error } = await supabase
+    .from("reagendas")
+    .insert({
+      cita_id: citaId,
+      user_id: userId,
+      nueva_fecha: nuevaFecha,
+      nueva_hora: nuevaHora,
+      motivo: motivo || "",
+      estado: "pendiente",
+    })
+    .select("id")
+    .single();
   if (error) throw new Error(error.message);
+
+  // Notifica al paciente por email (best-effort, no rompe el flujo si falla).
+  try {
+    const { data: sess } = await supabase.auth.getSession();
+    const token = sess.session?.access_token;
+    if (token) {
+      await fetch("/api/reagenda/notify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ reagendaId: data.id }),
+      });
+    }
+  } catch (e) {
+    // Silenciar: el email es complementario, la reagenda ya quedó creada.
+    console.warn("[reagenda] email no enviado:", e);
+  }
+
+  return { id: data.id as number };
 }
 
 /** Confirmar pago de cita */

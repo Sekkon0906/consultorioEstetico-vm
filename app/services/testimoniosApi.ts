@@ -3,6 +3,14 @@
 
 import type { Testimonio } from "../types/domain";
 import { supabase } from "@/lib/supabaseClient";
+import { cached, invalidate } from "@/lib/cache";
+
+const TEST_TTL = 60_000; // 60s
+
+/** Invalida el caché de testimonios (llamar tras crear/editar/borrar). */
+export function bustTestimoniosCache(): void {
+  invalidate("testimonios:");
+}
 
 function mapRow(row: Record<string, unknown>): Testimonio {
   return {
@@ -17,16 +25,18 @@ function mapRow(row: Record<string, unknown>): Testimonio {
   };
 }
 
-/** GET todos los testimonios - publico */
-export async function getTestimoniosApi(): Promise<Testimonio[]> {
-  const { data, error } = await supabase
-    .from("testimonios")
-    .select("id, nombre, texto, video, thumb, activo, destacado, creado_en")
-    .order("destacado", { ascending: false })
-    .order("creado_en", { ascending: false });
+/** GET todos los testimonios - publico (cacheado) */
+export async function getTestimoniosApi(opts?: { fresh?: boolean }): Promise<Testimonio[]> {
+  return cached("testimonios:all", TEST_TTL, async () => {
+    const { data, error } = await supabase
+      .from("testimonios")
+      .select("id, nombre, texto, video, thumb, activo, destacado, creado_en")
+      .order("destacado", { ascending: false })
+      .order("creado_en", { ascending: false });
 
-  if (error) throw new Error(error.message);
-  return (data ?? []).map(mapRow);
+    if (error) throw new Error(error.message);
+    return (data ?? []).map(mapRow);
+  }, opts);
 }
 
 /** POST crear testimonio - admin */
@@ -47,6 +57,7 @@ export async function createTestimonioApi(
     .single();
 
   if (error) throw new Error(error.message);
+  bustTestimoniosCache();
   return mapRow(data);
 }
 
@@ -72,6 +83,7 @@ export async function updateTestimonioApi(
     .single();
 
   if (error) throw new Error(error.message);
+  bustTestimoniosCache();
   return mapRow(data);
 }
 
@@ -79,6 +91,7 @@ export async function updateTestimonioApi(
 export async function deleteTestimonioApi(id: number): Promise<void> {
   const { error } = await supabase.from("testimonios").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  bustTestimoniosCache();
 }
 
 export async function activarTestimonioApi(id: number): Promise<Testimonio> {

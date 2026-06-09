@@ -89,35 +89,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setSupabaseUser(session?.user ?? null);
-
-      if (session?.user) {
-        const appUser = await syncUser(session.user);
-        setUser(appUser);
-      }
-
-      setLoading(false);
-    });
+    // Solo onAuthStateChange: dispara INITIAL_SESSION al suscribirse,
+    // así evitamos la race condition con getSession() que causaba el bug
+    // "hay que dar F5 para que aparezcan los datos".
+    let cancelled = false;
+    let inflight: Promise<void> | null = null;
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      setSupabaseUser(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      // Serializamos las sincronizaciones para que no compitan entre eventos.
+      const run = async () => {
+        if (inflight) {
+          try {
+            await inflight;
+          } catch {
+            /* ignore */
+          }
+        }
+        if (cancelled) return;
 
-      if (session?.user) {
-        const appUser = await syncUser(session.user);
-        setUser(appUser);
-      } else {
-        setUser(null);
-      }
+        setSession(newSession);
+        setSupabaseUser(newSession?.user ?? null);
 
-      setLoading(false);
+        if (newSession?.user) {
+          const appUser = await syncUser(newSession.user);
+          if (!cancelled) setUser(appUser);
+        } else {
+          if (!cancelled) setUser(null);
+        }
+
+        if (!cancelled) setLoading(false);
+      };
+
+      inflight = run();
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (

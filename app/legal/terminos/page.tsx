@@ -1,16 +1,16 @@
 import LegalDoc from "../LegalDoc";
 
 export const metadata = {
-  title: "Términos y Condiciones · Dra. Vanessa Medina",
+  title: "Términos y Condiciones · Consultorio JM",
   description:
-    "Términos y condiciones de los servicios del consultorio de medicina estética y antienvejecimiento de la Dra. Julieth Vanessa Medina Orjuela.",
+    "Términos y condiciones de los servicios de Consultorio JM, medicina estética y antienvejecimiento de la Dra. Julieth Vanessa Medina Orjuela en Ibagué.",
 };
 
 export default function TerminosPage() {
   return (
     <LegalDoc
       titulo="Términos y Condiciones — Medicina Estética y Antienvejecimiento"
-      actualizado="[FECHA_ACTUALIZACION]"
+      actualizado="5 de junio de 2026"
       current="/legal/terminos"
     >
       <p>
@@ -20,7 +20,7 @@ export default function TerminosPage() {
         Medina Orjuela</strong>, centro especializado en embellecimiento facial y
         corporal, con sede principal en Carrera 5ta #11-24, Edificio Torre
         Empresarial, Consultorio 502, Ibagué — Tolima. Identificado con NIT{" "}
-        <code className="legal-placeholder">[NIT]</code>.
+        <strong>1.105.689.615-9</strong>.
       </p>
       <p>
         Al acceder a <strong>EL SITIO WEB</strong> o <strong>CONTRATAR</strong> cualquiera de los

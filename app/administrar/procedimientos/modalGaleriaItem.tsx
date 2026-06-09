@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 //  Ahora usamos el tipo de dominio
 import type { MediaItem } from "../../types/domain";
@@ -127,9 +128,13 @@ export default function ModalGaleriaItem({
                 }
               >
                 {preview ? (
-                  <img
+                  <Image
                     src={preview}
                     alt="Vista previa"
+                    width={160}
+                    height={160}
+                    quality={70}
+                    unoptimized
                     className="mx-auto rounded w-40 h-40 object-cover"
                   />
                 ) : (

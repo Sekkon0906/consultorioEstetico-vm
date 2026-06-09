@@ -151,7 +151,7 @@ export default function CitasAgendadas() {
   if (error) return <div style={{ textAlign: "center", padding: "3rem" }}><p style={{ color: "#7E1F1F" }}>{error}</p><button onClick={() => window.location.reload()} style={{ marginTop: "1rem", padding: "0.6rem 2rem", borderRadius: 100, background: "#B08968", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("retry")}</button></div>;
 
   return (
-    <div style={{ maxWidth: 1180, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
+    <div className="dark-aware-section citas-page" style={{ maxWidth: 1180, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", marginBottom: "2rem" }}>
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.5rem" }}>{t("title")}</h2>
@@ -174,16 +174,10 @@ export default function CitasAgendadas() {
             const activo = filtroEstado === key;
             return (
               <button key={key} onClick={() => setFiltroEstado(key)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "0.6rem 1rem", borderRadius: 12, fontSize: "0.86rem", fontWeight: 600, border: "none", cursor: "pointer",
-                  background: activo ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#F5EEE6",
-                  color: activo ? "white" : "#4E3B2B",
-                  boxShadow: activo ? "0 4px 14px rgba(176,137,104,0.25)" : "none",
-                  transition: "background 0.2s, box-shadow 0.2s",
-                }}>
+                className={"citas-filter-btn" + (activo ? " is-active" : "")}
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "0.6rem 1rem", borderRadius: 12, fontSize: "0.86rem", fontWeight: 600, border: "none", cursor: "pointer", transition: "background 0.2s, box-shadow 0.2s" }}>
                 {label}
-                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 22, height: 22, padding: "0 6px", borderRadius: 100, fontSize: "0.73rem", fontWeight: 700,
-                  background: activo ? "rgba(255,255,255,0.28)" : "rgba(176,137,104,0.18)",
-                  color: activo ? "white" : "#8A5A12" }}>{count}</span>
+                <span className="citas-filter-count">{count}</span>
               </button>
             );
           })}
@@ -230,7 +224,7 @@ export default function CitasAgendadas() {
                             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", fontWeight: 700, color: "#7A6554", margin: 0, textDecoration: "line-through", textDecorationColor: "rgba(122,101,84,0.4)" }}>{cita.procedimiento}</h3>
                             <span style={{ fontSize: "0.78rem", color: "#9B8575" }}>{formatFecha(cita.fecha)} · {cita.hora}</span>
                           </div>
-                          <span style={{ background: est.bg, color: est.text, padding: "0.3rem 1rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 700, whiteSpace: "nowrap" }}>{t("estadoChip.cancelada")}</span>
+                          <span className="cita-estado-pill cancelada" style={{ background: est.bg, color: est.text, padding: "0.3rem 1rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 700, whiteSpace: "nowrap" }}>{t("estadoChip.cancelada")}</span>
                         </div>
                         {cita.motivoCancelacion && (
                           <div style={{ marginTop: "0.7rem", padding: "0.55rem 0.9rem", background: "#FCE4EC", borderRadius: 10, fontSize: "0.8rem", color: "#7E1F1F", display: "flex", alignItems: "center", gap: 8 }}>

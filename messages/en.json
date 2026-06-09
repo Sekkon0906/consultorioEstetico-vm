@@ -20,6 +20,8 @@
     "book": "Book a visit",
     "admin": "Admin",
     "login": "Sign in",
+    "legalSection": "Legal information",
+    "profileSection": "My profile",
     "editProfile": "My profile",
     "myAppointments": "My appointments",
     "logout": "Sign out",
@@ -43,9 +45,12 @@
     "gallery": {
       "title": "Discover the most <c>requested</c> treatments and <c>promotions</c>",
       "subtitle": "Interactively explore some of my most requested treatments. Tap one to see the full details and book your appointment in seconds.",
-      "back": "← Back",
+      "back": "Back",
       "viewMore": "Learn more about this treatment",
-      "viewAll": "See all treatments"
+      "viewMoreShort": "Learn more",
+      "viewAll": "See all treatments",
+      "badgePromo": "Promo",
+      "badgeDestacado": "Featured"
     },
     "location": {
       "title": "Find me",
@@ -217,7 +222,7 @@
   },
   "procedimientos": {
     "title": "Medical & Aesthetic Treatments",
-    "subtitle": "Discover the treatments I offer — facial, body and hair — along with the seasonal promotions I run. All prices are in Colombian pesos (COP) and may adjust based on your medical assessment. Every treatment starts with a consultation so we can design your personalized plan.",
+    "subtitle": "Discover the facial, body and hair treatments I offer, along with the seasonal promotions I run. All prices are in Colombian pesos (COP) and may adjust based on your medical assessment. Every treatment starts with a consultation so we can design your personalized plan.",
     "currency": "COP",
     "loading": "Loading treatments...",
     "errorLoad": "Couldn't load the treatments. Please try again later.",

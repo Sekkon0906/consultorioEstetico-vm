@@ -1,12 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { TypeAnimation } from "react-type-animation";
-import { useTranslations } from "next-intl";
-import Galeria3D from "./src/components/Galeria3D";
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
+
+// Galería 3D y Video se cargan solo en cliente y bajo demanda — su bundle
+// (framer-motion + three.js indirecto + assets) no debe bloquear el LCP del hero.
+const Galeria3D = dynamic(() => import("./src/components/Galeria3D"), {
+  ssr: false,
+  loading: () => (
+    <div style={{ minHeight: 600, display: "flex", alignItems: "center", justifyContent: "center", background: "#F6F4EF" }}>
+      <div style={{ color: "#8B7060", fontSize: "0.9rem" }}>Cargando galería…</div>
+    </div>
+  ),
+});
 
 const VideoAnim = dynamic(() => import("./src/components/VideoAnim"), {
   ssr: false,
@@ -21,6 +32,7 @@ const HERO_IMAGE: string | null = IMG.heroDoctora;
 export default function HomePage() {
   const t = useTranslations("hero");
   const th = useTranslations("home");
+  const locale = useLocale();
   const imagenes = IMG.homeCarrusel;
 
   const [imagenActual, setImagenActual] = useState(0);
@@ -61,9 +73,14 @@ export default function HomePage() {
               aria-hidden="true"
             />
           ) : (
-            <img
+            <Image
               src={HERO_IMAGE || imagenes[imagenActual]}
               alt={t("imageAlt")}
+              fill
+              priority
+              sizes="100vw"
+              quality={85}
+              style={{ objectFit: "cover" }}
             />
           )}
           <div className="hero-fs-overlay" aria-hidden="true" />
@@ -94,7 +111,11 @@ export default function HomePage() {
               {t("title1")} <br /> {t("title2")}
               <br />
               <span className="hero-fs-rotator">
+                {/* key={locale} fuerza remount cuando cambia el idioma:
+                    sin esto, TypeAnimation conserva la secuencia interna
+                    inicial y nunca refleja la traducción nueva. */}
                 <TypeAnimation
+                  key={locale}
                   sequence={rotatorSequence}
                   wrapper="span"
                   speed={55}
@@ -146,7 +167,7 @@ export default function HomePage() {
 
       {/* UBICACIÓN — mapa + foto del consultorio + 2 CTAs */}
       <section
-        className="py-5 text-center"
+        className="py-5 text-center home-location-section"
         style={{
           backgroundColor: "#E9DED2",
           color: "#4E3B2B",
@@ -176,6 +197,7 @@ export default function HomePage() {
         >
           {/* Mapa */}
           <div
+            className="home-loc-card"
             style={{
               height: 420,
               borderRadius: 20,
@@ -196,6 +218,7 @@ export default function HomePage() {
 
           {/* Foto del consultorio — sin caption sobre la imagen */}
           <div
+            className="home-loc-card"
             style={{
               position: "relative",
               height: 420,
@@ -205,16 +228,13 @@ export default function HomePage() {
               border: "1px solid rgba(176, 137, 104, 0.18)",
             }}
           >
-            <img
+            <Image
               src={IMG.consultorioPrincipal}
               alt={th("location.photoAlt")}
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
+              fill
+              sizes="(max-width: 820px) 92vw, 590px"
+              quality={80}
+              style={{ objectFit: "cover" }}
             />
           </div>
         </div>
@@ -255,14 +275,23 @@ export default function HomePage() {
         </div>
 
         <style>{`
+          @media (max-width: 1024px) {
+            .home-loc-card { height: 360px !important; }
+          }
           @media (max-width: 820px) {
             .home-loc-grid {
               grid-template-columns: 1fr !important;
+              width: 94% !important;
+              gap: 1.1rem !important;
             }
+            .home-loc-card { height: 300px !important; }
             /* En móvil los CTAs vuelven a centrarse cada uno en su fila */
             .home-loc-ctas > div {
               justify-content: center !important;
             }
+          }
+          @media (max-width: 480px) {
+            .home-loc-card { height: 240px !important; border-radius: 16px !important; }
           }
         `}</style>
       </section>

@@ -1,11 +1,12 @@
 ﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
-import { getProcedimientosApi, updateProcedimientoApi, deleteProcedimientoApi } from "../../services/procedimientosApi";
+import { getProcedimientosApi, updateProcedimientoApi, deleteProcedimientoApi, bustProcedimientosCache } from "../../services/procedimientosApi";
 import type { Procedimiento } from "../../types/domain";
-import { Plus, Edit3, Trash2, X, ChevronUp, ChevronDown, Upload, Play } from "lucide-react";
+import { Plus, Edit3, Trash2, X, ChevronUp, ChevronDown, Upload, Play, Star, ArrowLeft } from "lucide-react";
 
 type Cat = "Facial" | "Corporal" | "Capilar";
 const BUCKET = "procedimientos";
@@ -47,7 +48,8 @@ export default function ProcedimientosList() {
   const showToast = function(msg: string) { setToast(msg); setTimeout(function() { setToast(null); }, 3000); };
 
   const load = useCallback(function() {
-    getProcedimientosApi().then(setProcs).catch(function(e) { setErr(e.message); });
+    // Admin siempre ve el dato más reciente (omite caché)
+    getProcedimientosApi({ fresh: true }).then(setProcs).catch(function(e) { setErr(e.message); });
   }, []);
   useEffect(function() { load(); }, [load]);
 
@@ -140,6 +142,7 @@ export default function ProcedimientosList() {
         if (inRes.error) throw new Error(inRes.error.message);
       }
       showToast(actual ? "Procedimiento actualizado" : "Procedimiento creado");
+      bustProcedimientosCache(); // refresca el caché público
       load();
       reset();
     } catch (e: any) { setErr(e.message); }
@@ -149,6 +152,7 @@ export default function ProcedimientosList() {
   var handleDel = async function(id: string | number) {
     try {
       await supabase.from("procedimientos").delete().eq("id", id);
+      bustProcedimientosCache();
       setDelId(null); load();
     } catch (e: any) { setErr(e.message); }
   };
@@ -156,6 +160,7 @@ export default function ProcedimientosList() {
   var reset = function() { setForm(emptyForm); setModo("lista"); setActual(null); setGal([]); };
 
   var startEdit = function(p: Procedimiento) {
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     setActual(p);
     setForm({
       nombre: p.nombre,
@@ -254,7 +259,7 @@ export default function ProcedimientosList() {
                   style={{ width: 18, height: 18, accentColor: "#D4A437" }}
                 />
                 <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", display: "flex", alignItems: "center", gap: 6 }}>
-                  🏷️ En promoción
+                  <Star size={14} fill="currentColor" color="var(--brand)" /> En promoción
                 </span>
                 <small style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginLeft: "auto" }}>
                   Se muestra con descuento y badge especial.
@@ -310,8 +315,8 @@ export default function ProcedimientosList() {
               borderRadius: 16,
               border: "1px solid var(--border)",
             }}>
-              <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: 6 }}>
-                👁️ ¿Dónde mostrar este procedimiento?
+              <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem" }}>
+                ¿Dónde mostrar este procedimiento?
               </div>
               <small style={{ fontSize: "0.78rem", color: "var(--text-muted)", display: "block", marginBottom: "0.9rem" }}>
                 Puedes elegir uno, ambos o ninguno. Si no marcas ninguna, el procedimiento queda oculto al público.
@@ -335,7 +340,7 @@ export default function ProcedimientosList() {
                     style={{ marginTop: 2, width: 17, height: 17, accentColor: "var(--brand)", flexShrink: 0 }}
                   />
                   <div>
-                    <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text)" }}>🏠 Galería Home</div>
+                    <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text)" }}>Galería Home</div>
                     <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginTop: 2, lineHeight: 1.4 }}>
                       Aparece en la rueda 3D de la página principal.
                     </div>
@@ -360,7 +365,7 @@ export default function ProcedimientosList() {
                     style={{ marginTop: 2, width: 17, height: 17, accentColor: "var(--brand)", flexShrink: 0 }}
                   />
                   <div>
-                    <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text)" }}>📋 Galería Procedimientos</div>
+                    <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text)" }}>Galería Procedimientos</div>
                     <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginTop: 2, lineHeight: 1.4 }}>
                       Aparece en el listado completo de /procedimientos.
                     </div>
@@ -375,7 +380,7 @@ export default function ProcedimientosList() {
               <div style={{ display: "flex", gap: "0.8rem", alignItems: "center", flexWrap: "wrap", marginTop: 6 }}>
                 {form.imagen && (
                   <div style={{ position: "relative" }}>
-                    <img src={form.imagen} alt="" style={{ height: 80, width: 120, borderRadius: 10, objectFit: "cover", border: "2px solid #B08968" }} />
+                    <Image src={form.imagen} alt="" width={120} height={80} quality={70} style={{ height: 80, width: 120, borderRadius: 10, objectFit: "cover", border: "2px solid #B08968" }} />
                     <button onClick={function() { setForm({ ...form, imagen: "" }); }} style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#C62828", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={10} /></button>
                   </div>
                 )}
@@ -388,31 +393,31 @@ export default function ProcedimientosList() {
 
             {/* GALLERY - only in edit mode */}
             {actual && (
-              <div style={{ background: "#EEF7EE", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}>
-                <Lbl>Galeria de resultados</Lbl>
-                <p style={{ fontSize: "0.72rem", color: "var(--text-soft)", marginBottom: "0.6rem" }}>Sube fotos de antes/despues. Usa las flechas para ordenar.</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.6rem" }}>
+              <div style={{ background: "var(--surface-soft)", borderRadius: 16, padding: "1.2rem", marginBottom: "1rem", border: "1px solid var(--border)" }}>
+                <h5 style={{ fontWeight: 700, color: "var(--text)", fontSize: "0.98rem", margin: 0, marginBottom: 4 }}>Galería de resultados</h5>
+                <p style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: "0.9rem", margin: 0 }}>Sube fotos de antes/después. Usa las flechas para ordenar.</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.6rem", marginTop: "0.8rem" }}>
                   {gal.filter(function(g) { return g.tipo === "imagen"; }).map(function(g, i) {
                     return (
-                      <div key={g.id || i} style={{ position: "relative", borderRadius: 10, overflow: "hidden", border: "1px solid var(--border)" }}>
-                        <img src={g.url} alt="" style={{ width: 90, height: 70, objectFit: "cover", display: "block" }} />
-                        <button onClick={function() { galRemove(g); }} style={{ position: "absolute", top: 0, right: 0, width: 18, height: 18, background: "rgba(198,40,40,0.85)", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} /></button>
-                        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "center", gap: 2, background: "rgba(0,0,0,0.4)", padding: 1 }}>
-                          <button onClick={function() { galMove(i, -1); }} disabled={i === 0} style={{ background: "none", border: "none", color: "white", cursor: "pointer", opacity: i === 0 ? 0.3 : 1, padding: 0 }}><ChevronUp size={11} /></button>
-                          <span style={{ color: "white", fontSize: "0.55rem" }}>{i + 1}</span>
-                          <button onClick={function() { galMove(i, 1); }} style={{ background: "none", border: "none", color: "white", cursor: "pointer", padding: 0 }}><ChevronDown size={11} /></button>
+                      <div key={g.id || i} style={{ position: "relative", borderRadius: 10, overflow: "hidden", border: "1px solid var(--border)", background: "var(--bg-elevated)" }}>
+                        <Image src={g.url} alt="" width={90} height={70} quality={65} style={{ width: 90, height: 70, objectFit: "cover", display: "block" }} />
+                        <button onClick={function() { galRemove(g); }} style={{ position: "absolute", top: 2, right: 2, width: 20, height: 20, borderRadius: "50%", background: "rgba(224, 120, 120, 0.92)", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }} title="Eliminar"><X size={10} /></button>
+                        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, display: "flex", justifyContent: "center", alignItems: "center", gap: 4, background: "rgba(0,0,0,0.55)", padding: "2px 0" }}>
+                          <button onClick={function() { galMove(i, -1); }} disabled={i === 0} style={{ background: "none", border: "none", color: "white", cursor: i === 0 ? "default" : "pointer", opacity: i === 0 ? 0.3 : 1, padding: 0, display: "flex", alignItems: "center" }} title="Subir"><ChevronUp size={12} /></button>
+                          <span style={{ color: "white", fontSize: "0.6rem", fontWeight: 700 }}>{i + 1}</span>
+                          <button onClick={function() { galMove(i, 1); }} style={{ background: "none", border: "none", color: "white", cursor: "pointer", padding: 0, display: "flex", alignItems: "center" }} title="Bajar"><ChevronDown size={12} /></button>
                         </div>
                       </div>
                     );
                   })}
-                  <label style={{ width: 90, height: 70, borderRadius: 10, border: "2px dashed #A0D8A8", display: "flex", alignItems: "center", justifyContent: "center", cursor: uploadingGal ? "wait" : "pointer", fontSize: "0.68rem", color: "#2D6A4F", fontWeight: 600, textAlign: "center", opacity: uploadingGal ? 0.6 : 1 }}>
+                  <label style={{ width: 90, height: 70, borderRadius: 10, border: "2px dashed var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", cursor: uploadingGal ? "wait" : "pointer", fontSize: "0.72rem", color: "var(--brand)", fontWeight: 600, textAlign: "center", opacity: uploadingGal ? 0.6 : 1, background: "transparent" }}>
                     {uploadingGal ? "..." : "+ Foto"}
                     <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleGalAdd} disabled={uploadingGal} />
                   </label>
                 </div>
 
                 {/* Videos en galeria */}
-                <div style={{ marginTop: "0.8rem", borderTop: "1px solid #C8E6C9", paddingTop: "0.8rem" }}>
+                <div style={{ marginTop: "1rem", borderTop: "1px solid var(--border)", paddingTop: "0.9rem" }}>
                   <Lbl>Videos (YouTube / Instagram)</Lbl>
                   <p style={{ fontSize: "0.72rem", color: "var(--text-soft)", marginBottom: "0.5rem" }}>Agrega links de videos del procedimiento</p>
                   {gal.filter(function(g) { return g.tipo === "video"; }).map(function(g, i) {
@@ -455,7 +460,7 @@ export default function ProcedimientosList() {
         )}
       </AnimatePresence>
 
-      {procs.length === 0 ? <p style={{ textAlign: "center", color: "var(--text-soft)", padding: "2rem 0" }}>No hay procedimientos</p> : (() => {
+      {modo === "lista" && (procs.length === 0 ? <p style={{ textAlign: "center", color: "var(--text-soft)", padding: "2rem 0" }}>No hay procedimientos</p> : (() => {
         const ORDEN = ["Facial", "Corporal", "Capilar"];
         const grupos: Record<string, typeof procs> = {};
         procs.forEach(function(p) {
@@ -484,18 +489,18 @@ export default function ProcedimientosList() {
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
                     {items.map(function(p, i) {
                       return (
-                        <motion.div key={p.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }}
+                        <motion.div key={p.id} className="admin-card" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }}
                           style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}>
-                          {p.imagen ? <img src={p.imagen} alt="" style={{ width: 76, height: 76, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 76, height: 76, borderRadius: 14, background: "var(--border)", flexShrink: 0 }} />}
-                          <div style={{ flex: 1, minWidth: 0 }}>
+                          {p.imagen ? <Image src={p.imagen} alt="" width={76} height={76} quality={70} style={{ width: 76, height: 76, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 76, height: 76, borderRadius: 14, background: "var(--border)", flexShrink: 0 }} />}
+                          <div className="admin-card-body" style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                               <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }}>{p.nombre}</span>
-                              {p.destacado && <span style={{ background: "#FFF3E6", color: "var(--brand)", padding: "0.2rem 0.6rem", borderRadius: 100, fontSize: "0.78rem" }}>â˜…</span>}
+                              {p.destacado && <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(232, 201, 160, 0.18)", color: "var(--brand)", padding: "0.2rem 0.6rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 600 }}><Star size={11} fill="currentColor" /> Destacado</span>}
                             </div>
                             <p style={{ fontSize: "0.92rem", color: "var(--text-soft)", margin: "0.25rem 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.desc}</p>
                           </div>
-                          <span style={{ fontSize: "1.1rem", color: "var(--brand)", fontWeight: 700, whiteSpace: "nowrap" }}>${Number(p.precio).toLocaleString("es-CO")}</span>
-                          <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                          <span className="admin-card-price" style={{ fontSize: "1.1rem", color: "var(--brand)", fontWeight: 700, whiteSpace: "nowrap" }}>${Number(p.precio).toLocaleString("es-CO")}</span>
+                          <div className="admin-card-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                             <motion.button whileTap={{ scale: 0.95 }} onClick={function() { startEdit(p); }} style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Edit3 size={18} color="var(--text)" /></motion.button>
                             {delId === p.id ? (
                               <><button onClick={function() { handleDel(p.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#C62828", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>Sí</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--border)", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
@@ -512,7 +517,7 @@ export default function ProcedimientosList() {
             })}
           </div>
         );
-      })()}
+      })())}
     </div>
   );
 }

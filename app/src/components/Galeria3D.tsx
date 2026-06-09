@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { getProcedimientosApi } from "../../services/procedimientosApi";
@@ -24,6 +25,23 @@ export default function Galeria3D() {
   const [selected, setSelected] = useState<number | null>(null);
   const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
+
+  // Carrusel "Stories" para móvil (una card a la vez con swipe).
+  const storiesRef = useRef<HTMLDivElement>(null);
+  const [storyIdx, setStoryIdx] = useState(0);
+  // Card volteada (flip) en el carrusel móvil — muestra la descripción atrás.
+  const [flippedId, setFlippedId] = useState<number | null>(null);
+  const onStoriesScroll = () => {
+    const el = storiesRef.current;
+    if (!el) return;
+    const idx = Math.round(el.scrollLeft / el.clientWidth);
+    setStoryIdx(idx);
+  };
+  const goToStory = (i: number) => {
+    const el = storiesRef.current;
+    if (!el) return;
+    el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
+  };
 
   // Marca que estamos en cliente — usado para gates de elementos puramente
   // visuales (partículas) que pueden divergir en hidratación si calculamos
@@ -460,6 +478,83 @@ export default function Galeria3D() {
         )}
       </div>
 
+      {/* === CARRUSEL STORIES (solo móvil) — una card grande a la vez ===
+          Reemplaza la rueda 3D en celular: foto + nombre + badge, se desliza
+          con el dedo (scroll-snap). Dots arriba. Tocar abre el detalle. */}
+      {selected === null && tratamientos.length > 0 && (
+        <div className="g3d-stories-wrap">
+          {/* Dots arriba */}
+          <div className="g3d-stories-dots" role="tablist" aria-label={t("subtitle")}>
+            {tratamientos.map((tr, i) => (
+              <button
+                key={tr.id}
+                type="button"
+                role="tab"
+                aria-selected={i === storyIdx}
+                aria-label={tr.nombre}
+                onClick={() => goToStory(i)}
+                className={`g3d-stories-dot ${i === storyIdx ? "is-active" : ""}`}
+              />
+            ))}
+          </div>
+
+          <div
+            className="g3d-stories"
+            ref={storiesRef}
+            onScroll={onStoriesScroll}
+          >
+            {tratamientos.map((tr) => {
+              const isFlipped = flippedId === tr.id;
+              return (
+                <div
+                  key={tr.id}
+                  className={`g3d-flip ${isFlipped ? "is-flipped" : ""}`}
+                >
+                  <div className="g3d-flip-inner">
+                    {/* CARA FRONTAL: foto + nombre. Al tocar, voltea. */}
+                    <button
+                      type="button"
+                      className="g3d-flip-front"
+                      onClick={() => setFlippedId(tr.id)}
+                      aria-label={tr.nombre}
+                    >
+                      <img src={tr.imagen || undefined} alt={tr.nombre} loading="lazy" />
+                      <span className="g3d-story-veil" aria-hidden="true" />
+                      {(tr.enPromocion || tr.destacado) && (
+                        <span className={`g3d-story-badge ${tr.enPromocion ? "promo" : "destacado"}`}>
+                          ★ {tr.enPromocion ? t("badgePromo") : t("badgeDestacado")}
+                        </span>
+                      )}
+                      <span className="g3d-story-name">{tr.nombre}</span>
+                    </button>
+
+                    {/* CARA TRASERA: descripción + "Saber más". */}
+                    <div className="g3d-flip-back">
+                      <button
+                        type="button"
+                        className="g3d-flip-back-close"
+                        onClick={() => setFlippedId(null)}
+                        aria-label={t("back")}
+                      >
+                        ←
+                      </button>
+                      <h4 className="g3d-flip-back-title">{tr.nombre}</h4>
+                      <p className="g3d-flip-back-desc">{tr.desc}</p>
+                      <Link
+                        href={"/procedimientos/" + tr.id}
+                        className="g3d-flip-back-cta"
+                      >
+                        {t("viewMoreShort")}
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Dots — debajo de la rueda (no encima), mismo eje horizontal */}
       {selected === null && tratamientos.length > 0 && (
         <div
@@ -533,17 +628,15 @@ export default function Galeria3D() {
               gap: 8,
               padding: "0.75rem 1.8rem",
               borderRadius: 100,
-              background: "rgba(255, 253, 249, 0.95)",
-              color: "#5A4635",
-              border: "1.5px solid rgba(176, 137, 104, 0.55)",
+              background: "linear-gradient(135deg, #B08968, #C9AD8D)",
+              color: "#FFFFFF",
+              border: "none",
               fontWeight: 600,
               fontSize: "0.95rem",
               textDecoration: "none",
-              boxShadow: "0 8px 22px rgba(0, 0, 0, 0.28)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
+              boxShadow: "0 8px 22px rgba(176, 137, 104, 0.4)",
               transition:
-                "background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease",
+                "background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease",
               whiteSpace: "nowrap",
             }}
           >
@@ -553,26 +646,30 @@ export default function Galeria3D() {
         </div>
       )}
 
-      {/* Detalle del tratamiento seleccionado — centrado en el eje
-          de la sección (right: 30%), mismo margen que la rueda/dots/CTA,
-          no en el centro del viewport. */}
-      {selected !== null && (
+      {/* Detalle del tratamiento — se renderiza vía PORTAL a document.body
+          para escapar del `perspective` + `overflow:hidden` del stage (que
+          atrapaban el modal y lo rompían). Es un modal centrado con backdrop
+          en TODAS las pantallas. */}
+      {selected !== null && typeof document !== "undefined" && createPortal(
         <div
-          className="g3d-detail"
+          className="g3d-detail-backdrop"
+          onClick={() => setSelected(null)}
+        >
+        <div
+          className="g3d-detail dark-aware-card"
+          onClick={(e) => e.stopPropagation()}
           style={{
-            position: "absolute",
-            top: "50%",
-            right: "30%",
-            transform: "translate(50%, -50%)",
             backgroundColor: "#FFFDF9",
-            width: 680,
-            maxWidth: "55%",
+            width: "min(680px, 92vw)",
+            maxWidth: "92vw",
+            maxHeight: "88vh",
+            overflowY: "auto",
             border: "1px solid rgba(201,173,141,0.4)",
             borderRadius: 24,
             boxShadow:
               "0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(176,137,104,0.08)",
             padding: "2.5rem 2.2rem 2.2rem",
-            zIndex: 6,
+            position: "relative",
             animation: "g3d-detail-in 0.5s cubic-bezier(0.16,1,0.3,1)",
             display: "flex",
             flexDirection: "column",
@@ -737,15 +834,16 @@ export default function Galeria3D() {
                   (tratamientos.find((tr) => tr.id === selected)?.id || "")
                 }
                 className="btn-ghost-app"
-                style={{ width: "fit-content" }}
+                style={{ width: "fit-content", marginTop: "0.6rem" }}
               >
                 <i className="fas fa-info-circle" />
                 {t("viewMore")}
-                <span style={{ fontSize: "1.05rem", lineHeight: 1 }}>→</span>
               </Link>
             </div>
           </div>
         </div>
+        </div>,
+        document.body
       )}
 
       {/* Estilos globales */}
@@ -778,15 +876,23 @@ export default function Galeria3D() {
           transform: translateY(-3px);
         }
 
-        /* CTA "Ver todos los procedimientos" — hover se rellena con marca.
-           Mismo gesto que el .hero-fs-btn-ghost para que se sienta familiar. */
+        /* El backdrop + posicionamiento del modal de detalle viven en
+           globals.css (el detalle se portalea a document.body). */
+
+
+        /* El reset global de enlaces (color inherit important) pisaba el
+           color del pill dejándolo invisible. El botón es sólido champagne
+           con texto BLANCO forzado para ganarle al reset. */
+        .g3d-cta-pill,
+        .g3d-cta-pill i,
+        .g3d-cta-pill span {
+          color: #FFFFFF !important;
+        }
         .g3d-cta-pill:hover,
         .g3d-cta-pill:focus-visible {
-          background: linear-gradient(135deg, #B08968, #C9AD8D) !important;
-          color: #FFFFFF !important;
-          border-color: transparent !important;
+          background: linear-gradient(135deg, #A0724E, #B89A7C) !important;
           transform: translateY(-2px);
-          box-shadow: 0 8px 22px rgba(176, 137, 104, 0.45);
+          box-shadow: 0 10px 26px rgba(176, 137, 104, 0.5);
         }
 
         @media (max-width: 1280px) {
@@ -809,62 +915,69 @@ export default function Galeria3D() {
           .g3d-cta-wrap       { right: 15% !important; }
         }
         @media (max-width: 820px) {
-          .g3d-stage          { background-position: 30% top !important; aspect-ratio: auto !important; height: auto !important; min-height: 100vh !important; padding: 6rem 0 4rem !important; }
+          /* Layout en columna: título arriba, rueda (escalada) al centro,
+             dots y CTA debajo. La rueda se escala para que las cards 3D no
+             se salgan del viewport en pantallas chicas. */
+          .g3d-stage          { background-position: 30% top !important; aspect-ratio: auto !important; height: auto !important; min-height: auto !important; padding: 4.5rem 0 3rem !important; overflow: hidden !important; }
           .g3d-overlay        {
             background:
-              linear-gradient(180deg, rgba(58,42,26,0.55) 0%, rgba(58,42,26,0.35) 35%, rgba(58,42,26,0.55) 100%) !important;
+              linear-gradient(180deg, rgba(58,42,26,0.62) 0%, rgba(58,42,26,0.42) 35%, rgba(58,42,26,0.62) 100%) !important;
           }
+          /* Título y texto a la DERECHA (sobre la zona oscura del retrato),
+             alineados a la derecha para componer con la doctora a la izq. */
           .g3d-title-wrap     {
             position: relative !important;
             top: auto !important;
             right: auto !important;
-            width: 92% !important;
+            width: 78% !important;
             transform: none !important;
-            margin: 0 auto !important;
+            margin: 0 0 0 auto !important;
+            padding-right: 4% !important;
+            text-align: right !important;
           }
+          /* Rueda 3D escalada, alineada con el bloque de texto (debajo). */
           .g3d-wheel-anchor   {
             position: relative !important;
             top: auto !important;
             right: auto !important;
-            transform: none !important;
-            margin: 3rem auto 0 !important;
-            display: flex;
-            justify-content: center;
+            margin: 0.5rem 0 0 auto !important;
+            transform: scale(0.6) !important;
+            transform-origin: center center !important;
+            height: 270px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
           }
           .g3d-dots-wrap      {
             position: relative !important;
             right: auto !important;
             bottom: auto !important;
             transform: none !important;
-            margin: 1.5rem auto 0 !important;
-            display: flex;
-            justify-content: center;
+            margin: 0 auto 0 0 !important;
+            display: flex !important;
+            justify-content: flex-end !important;
+            width: 78% !important;
+            margin-left: auto !important;
           }
+          /* CTA alineado a la derecha, bajo la rueda, coherente con el texto. */
           .g3d-cta-wrap       {
             position: relative !important;
             right: auto !important;
             bottom: auto !important;
             transform: none !important;
-            margin: 2rem auto 0 !important;
-            display: flex;
-            justify-content: center;
+            margin: 1.5rem 0 0 auto !important;
+            display: flex !important;
+            justify-content: flex-end !important;
+            width: 82% !important;
+            padding-right: 4% !important;
           }
         }
+        @media (max-width: 480px) {
+          .g3d-title-wrap h1, .g3d-title-wrap h2 { font-size: 1.3rem !important; }
+          .g3d-wheel-anchor { transform: scale(0.52) !important; height: 230px !important; }
+        }
         @media (max-width: 768px) {
-          .g3d-detail {
-            position: fixed !important;
-            top: 50% !important;
-            right: 50% !important;
-            transform: translate(50%, -50%) !important;
-            width: 92% !important;
-            max-width: 92% !important;
-            padding: 2.5rem 1.5rem 1.5rem !important;
-            animation: g3d-detail-in-mobile 0.5s cubic-bezier(0.16,1,0.3,1) !important;
-          }
-          @keyframes g3d-detail-in-mobile {
-            0%   { opacity: 0; transform: translate(50%, -50%) scale(0.94); }
-            100% { opacity: 1; transform: translate(50%, -50%) scale(1); }
-          }
+          /* El modal va por globals.css. Aquí solo apilamos imagen + texto. */
           .g3d-detail > div:last-child {
             flex-direction: column !important;
             gap: 1.2rem !important;

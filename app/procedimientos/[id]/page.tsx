@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { FaCalendarCheck, FaArrowLeft, FaPlay, FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
@@ -71,6 +72,17 @@ export default function ProcedimientoPage() {
 
   return (
     <main style={{ minHeight: "100vh", background: "linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%)" }}>
+      <style>{`
+        @media (max-width: 820px) {
+          .proc-detail-hero { height: 280px !important; }
+          .proc-detail-body { padding: 1.5rem 1.4rem 2rem !important; }
+          .proc-detail-price-row { padding: 1.2rem 1.2rem !important; gap: 1rem !important; }
+        }
+        @media (max-width: 480px) {
+          .proc-detail-hero { height: 220px !important; }
+          .proc-detail-body { padding: 1.25rem 1rem 1.75rem !important; }
+        }
+      `}</style>
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
 
         <motion.div initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
@@ -82,59 +94,59 @@ export default function ProcedimientoPage() {
         <motion.div initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
           style={{ background: "var(--surface)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid var(--border)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", overflow: "hidden" }}>
 
-          <div style={{ position: "relative", width: "100%", height: 380, overflow: "hidden" }}>
+          <div className="proc-detail-hero" style={{ position: "relative", width: "100%", height: 360, overflow: "hidden" }}>
             {proc.imagen ? (
-              <img src={proc.imagen} alt={proc.nombre} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <Image
+                src={proc.imagen}
+                alt={proc.nombre}
+                fill
+                priority
+                sizes="(max-width: 1000px) 100vw, 1000px"
+                quality={90}
+                style={{ objectFit: "cover" }}
+              />
             ) : (
               <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #E9DED2, #B08968)" }} />
             )}
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(0deg, rgba(0,0,0,0.4) 0%, transparent 40%)" }} />
-            <span style={{ position: "absolute", top: 16, right: 16, background: "rgba(0,0,0,0.35)", backdropFilter: "blur(8px)", color: "white", padding: "0.3rem 1rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em" }}>{proc.categoria}</span>
-            <h1 style={{ position: "absolute", bottom: 20, left: 24, fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "white", textShadow: "0 2px 8px rgba(0,0,0,0.3)", margin: 0 }}>{proc.nombre}</h1>
+            {/* Gradient bottom para legibilidad del título */}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 45%, transparent 70%)" }} />
+            <span style={{ position: "absolute", top: 20, right: 20, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(10px)", color: "white", padding: "0.4rem 1.2rem", borderRadius: 100, fontSize: "0.74rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em" }}>{proc.categoria}</span>
+            <div style={{ position: "absolute", bottom: 28, left: 32, right: 32 }}>
+              <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 4.5vw, 3rem)", fontWeight: 700, color: "white", textShadow: "0 4px 16px rgba(0,0,0,0.5)", margin: 0, lineHeight: 1.15 }}>{proc.nombre}</h1>
+              <div style={{ width: 64, height: 3, background: "linear-gradient(90deg, #E8C9A0, #C9AD8D)", borderRadius: 2, marginTop: "0.8rem" }} />
+            </div>
           </div>
 
-          <div style={{ padding: "2rem 2.5rem 2.5rem" }}>
-            <div style={{ marginBottom: "2rem" }}>
-              <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, marginBottom: "1rem" }} />
-              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.8rem" }}>{t("descriptionTitle")}</h2>
-              <p style={{ fontSize: "1rem", color: "var(--text-soft)", lineHeight: 1.8, whiteSpace: "pre-line" }}>{descDetalle}</p>
-            </div>
+          <div className="proc-detail-body" style={{ padding: "2.5rem 2.5rem 0" }}>
+            {/* 1. Descripción */}
+            <section style={{ marginBottom: "2.5rem" }}>
+              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.9rem" }}>{t("descriptionTitle")}</h2>
+              <p style={{ fontSize: "1.02rem", color: "var(--text-soft)", lineHeight: 1.8, whiteSpace: "pre-line", margin: 0 }}>{descDetalle}</p>
+            </section>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap", padding: "1.5rem 2rem", background: "var(--bg-elevated)", borderRadius: 18, border: "1px solid var(--border)", marginBottom: "2rem" }}>
-              <div style={{ flex: "1 1 auto" }}>
-                <p style={{ fontSize: "0.72rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600, marginBottom: "0.2rem" }}>{t("standardPrice")}</p>
-                <p style={{ fontFamily: "'Playfair Display', serif", fontSize: "2rem", fontWeight: 700, color: "var(--text)", lineHeight: 1, marginBottom: "0.2rem" }}>${formatPrecio(proc.precio)}</p>
-                <small style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{t("priceNote")}</small>
-              </div>
-              <Link href={`/agendar?proc=${encodeURIComponent(proc.nombre)}`}
-                style={{ display: "flex", alignItems: "center", gap: 8, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", padding: "0.9rem 2.2rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", textDecoration: "none", boxShadow: "0 4px 18px rgba(176,137,104,0.3)", whiteSpace: "nowrap" }}>
-                <FaCalendarCheck /> {t("bookCta")}
-              </Link>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
+            {/* 2. Info chips (duración, seguridad, cuidado) */}
+            <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2.5rem" }}>
               {proc.duracion_min && (
-                <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.85rem", flexShrink: 0 }}><i className="fas fa-clock" /></div>
-                  <div><div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>{t("approxDuration")}</div><div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>{proc.duracion_min} {t("minutes")}</div></div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem 1.1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.9rem", flexShrink: 0 }}><i className="fas fa-clock" /></div>
+                  <div><div style={{ fontSize: "0.74rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("approxDuration")}</div><div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)" }}>{proc.duracion_min} {t("minutes")}</div></div>
                 </div>
               )}
-              <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
-                <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.85rem", flexShrink: 0 }}><i className="fas fa-shield-alt" /></div>
-                <div><div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>{t("safety")}</div><div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>{t("certified")}</div></div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem 1.1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.9rem", flexShrink: 0 }}><i className="fas fa-shield-alt" /></div>
+                <div><div style={{ fontSize: "0.74rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("safety")}</div><div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)" }}>{t("certified")}</div></div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
-                <div style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.85rem", flexShrink: 0 }}><i className="fas fa-user-md" /></div>
-                <div><div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>{t("care")}</div><div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>{t("personalized")}</div></div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem 1.1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.9rem", flexShrink: 0 }}><i className="fas fa-user-md" /></div>
+                <div><div style={{ fontSize: "0.74rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("care")}</div><div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)" }}>{t("personalized")}</div></div>
               </div>
-            </div>
-          </div>
-        </motion.div>
+            </section>
 
-        {galeria.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.6 }} style={{ marginTop: "2.5rem" }}>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.5rem", fontWeight: 700, color: "var(--text)", marginBottom: "1.5rem", textAlign: "center" }}>{t("galleryTitle")}</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "1rem" }}>
+            {/* 3. Galería de resultados (si existe) */}
+            {galeria.length > 0 && (
+              <section style={{ marginBottom: "2.5rem" }}>
+                <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", fontWeight: 700, color: "var(--text)", marginBottom: "1.2rem" }}>{t("galleryTitle")}</h2>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1rem" }}>
               {galeria.map((m, i) => (
                 <motion.div key={m.id || i} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.5 + i * 0.08 }}
                   onClick={() => setModalIndex(i)}
@@ -142,19 +154,51 @@ export default function ProcedimientoPage() {
                   onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 10px 28px rgba(78,59,43,0.14)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 4px 14px rgba(78,59,43,0.08)"; }}>
                   {m.tipo === "imagen" ? (
-                    <img src={m.url} alt={m.titulo || ""} style={{ width: "100%", height: 200, objectFit: "cover", display: "block" }} />
+                    <div style={{ position: "relative", width: "100%", height: 200 }}>
+                      <Image
+                        src={m.url}
+                        alt={m.titulo || ""}
+                        fill
+                        sizes="(max-width: 640px) 92vw, 260px"
+                        quality={75}
+                        style={{ objectFit: "cover", display: "block" }}
+                      />
+                    </div>
                   ) : (
                     <div style={{ position: "relative", height: 200, background: "#000" }}>
-                      <img src={`https://img.youtube.com/vi/${(m.url.split("/embed/")[1] || "").split("?")[0]}/hqdefault.jpg`} alt="Video" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.7 }} />
+                      <Image
+                        src={`https://img.youtube.com/vi/${(m.url.split("/embed/")[1] || "").split("?")[0]}/hqdefault.jpg`}
+                        alt="Video"
+                        fill
+                        sizes="(max-width: 640px) 92vw, 260px"
+                        quality={70}
+                        style={{ objectFit: "cover", opacity: 0.7 }}
+                        unoptimized
+                      />
                       <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}><FaPlay style={{ color: "white", fontSize: "2rem" }} /></div>
                     </div>
                   )}
                   {m.titulo && <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(0deg, rgba(0,0,0,0.6), transparent)", padding: "1.5rem 0.8rem 0.6rem" }}><p style={{ color: "white", fontSize: "0.82rem", fontWeight: 600, margin: 0 }}>{m.titulo}</p></div>}
                 </motion.div>
               ))}
-            </div>
-          </motion.div>
-        )}
+                </div>
+              </section>
+            )}
+
+            {/* 4. Precio + Book CTA (siempre al fondo) */}
+            <section className="proc-detail-price-row" style={{ display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap", padding: "1.8rem 2rem", background: "var(--bg-elevated)", borderRadius: 18, border: "1px solid var(--border)", marginBottom: "2.5rem" }}>
+              <div style={{ flex: "1 1 auto", minWidth: 0 }}>
+                <p style={{ fontSize: "0.74rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 700, marginBottom: "0.3rem" }}>{t("standardPrice")}</p>
+                <p style={{ fontFamily: "'Playfair Display', serif", fontSize: "2.2rem", fontWeight: 700, color: "#FFFFFF", lineHeight: 1, marginBottom: "0.3rem" }}>${formatPrecio(proc.precio)}</p>
+                <small style={{ fontSize: "0.74rem", color: "var(--text-muted)" }}>{t("priceNote")}</small>
+              </div>
+              <Link href={`/agendar?proc=${encodeURIComponent(proc.nombre)}`}
+                style={{ display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", padding: "1rem 2.4rem", borderRadius: 100, fontWeight: 700, fontSize: "1rem", textDecoration: "none", boxShadow: "0 6px 22px rgba(176,137,104,0.35)", whiteSpace: "nowrap" }}>
+                <FaCalendarCheck /> {t("bookCta")}
+              </Link>
+            </section>
+          </div>
+        </motion.div>
       </div>
 
       <AnimatePresence>
@@ -168,7 +212,16 @@ export default function ProcedimientoPage() {
               <AnimatePresence mode="wait">
                 <motion.div key={modalIndex} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
                   {galeria[modalIndex].tipo === "imagen" ? (
-                    <img src={galeria[modalIndex].url} alt="" style={{ width: "100%", maxHeight: "75vh", objectFit: "cover", display: "block" }} />
+                    <div style={{ position: "relative", width: "100%", height: "75vh" }}>
+                      <Image
+                        src={galeria[modalIndex].url}
+                        alt=""
+                        fill
+                        sizes="(max-width: 900px) 100vw, 900px"
+                        quality={90}
+                        style={{ objectFit: "contain", display: "block" }}
+                      />
+                    </div>
                   ) : (
                     <iframe src={galeria[modalIndex].url} title="Video" allowFullScreen style={{ width: "100%", height: "60vh", border: "none" }} />
                   )}

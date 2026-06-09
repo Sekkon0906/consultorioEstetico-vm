@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, X, Download } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -263,22 +264,36 @@ export default function FirmaConsentimiento(props: Props) {
 
   var cerrar = function() { setShowModal(false); setTimeout(function() { setStep("intro"); }, 300); };
 
-  return (
-    <>
-      <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={function() { setShowModal(true); }}
-        style={{ display: "flex", alignItems: "center", gap: 8, padding: "0.65rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(176,137,104,0.2)" }}>
-        <FileText size={16} /> {t("addSignature")}
-      </motion.button>
+  // Lock scroll del body cuando el modal está abierto, y desbloquea al cerrar.
+  useEffect(function() {
+    if (showModal) {
+      var prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return function() { document.body.style.overflow = prev; };
+    }
+  }, [showModal]);
 
-      <AnimatePresence>
-        {showModal && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "1rem" }}
-            onClick={cerrar}>
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              style={{ background: "#FFFDF9", borderRadius: 24, boxShadow: "0 24px 60px rgba(0,0,0,0.2)", width: "90%", maxWidth: 500, position: "relative", overflow: "hidden" }}
-              onClick={function(e) { e.stopPropagation(); }}>
+  // Cerrar con ESC
+  useEffect(function() {
+    if (!showModal) return;
+    var onKey = function(e: KeyboardEvent) { if (e.key === "Escape") cerrar(); };
+    window.addEventListener("keydown", onKey);
+    return function() { window.removeEventListener("keydown", onKey); };
+  }, [showModal]);
+
+  // El modal se renderiza vía portal a document.body, así escapa
+  // de cualquier wrapper con overflow/transform que limite position:fixed.
+  var modalContent = (
+    <AnimatePresence>
+      {showModal && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 99999, padding: "1.5rem" }}
+          onClick={cerrar}>
+          <motion.div className="firma-modal-card dark-aware-card" initial={{ scale: 0.92, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 10 }}
+            transition={{ type: "spring", damping: 26, stiffness: 320 }}
+            style={{ background: "#FFFDF9", borderRadius: 24, boxShadow: "0 30px 80px rgba(0,0,0,0.5)", width: "100%", maxWidth: 580, maxHeight: "92vh", overflowY: "auto", position: "relative" }}
+            onClick={function(e) { e.stopPropagation(); }}>
               <div style={{ height: 4, background: "linear-gradient(90deg, #B08968, #C9AD8D)" }} />
               <button onClick={cerrar} style={{ position: "absolute", top: 14, right: 14, width: 32, height: 32, borderRadius: "50%", background: "rgba(78,59,43,0.06)", border: "none", color: "#4E3B2B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}><X size={16} /></button>
 
@@ -289,7 +304,7 @@ export default function FirmaConsentimiento(props: Props) {
                       <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem", boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}><FileText size={22} color="white" /></div>
                       <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#2A1C12", marginBottom: "0.8rem" }}>{t("title")}</h3>
                     </div>
-                    <div style={{ background: "#F4E9DC", borderRadius: 16, padding: "1.4rem", border: "1px solid rgba(176,137,104,0.3)", marginBottom: "1.5rem" }}>
+                    <div className="dark-aware-panel firma-intro-panel" style={{ background: "#F4E9DC", borderRadius: 16, padding: "1.4rem", border: "1px solid rgba(176,137,104,0.3)", marginBottom: "1.5rem" }}>
                       <p style={{ fontSize: "1.02rem", color: "#3A2A1A", lineHeight: 1.7, margin: 0 }}>{t("intro")}</p>
                     </div>
                     <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
@@ -303,7 +318,7 @@ export default function FirmaConsentimiento(props: Props) {
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.3rem", textAlign: "center" }}>{t("drawTitle")}</h3>
                     <p style={{ fontSize: "0.8rem", color: "#8A7565", textAlign: "center", marginBottom: "1rem" }}>{t("drawHint")}</p>
-                    <div style={{ border: "2px dashed rgba(176,137,104,0.3)", borderRadius: 16, overflow: "hidden", marginBottom: "1rem", background: "white" }}>
+                    <div className="firma-canvas-wrap dark-aware-keep" style={{ border: "2px dashed rgba(176,137,104,0.3)", borderRadius: 16, overflow: "hidden", marginBottom: "1rem", background: "white" }}>
                       <canvas ref={canvasRef} onMouseDown={startDraw} onMouseMove={draw} onMouseUp={endDraw} onMouseLeave={endDraw} onTouchStart={startDraw} onTouchMove={draw} onTouchEnd={endDraw}
                         style={{ width: "100%", height: 180, cursor: "crosshair", touchAction: "none", display: "block" }} />
                     </div>
@@ -342,6 +357,16 @@ export default function FirmaConsentimiento(props: Props) {
           </motion.div>
         )}
       </AnimatePresence>
+  );
+
+  return (
+    <>
+      <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={function() { setShowModal(true); }}
+        style={{ display: "flex", alignItems: "center", gap: 8, padding: "0.65rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(176,137,104,0.2)" }}>
+        <FileText size={16} /> {t("addSignature")}
+      </motion.button>
+
+      {typeof document !== "undefined" ? createPortal(modalContent, document.body) : null}
     </>
   );
 }

@@ -94,6 +94,7 @@ export default function CookieBanner() {
             boxShadow: "0 16px 48px rgba(78,59,43,0.2)",
             overflow: "hidden",
           }}
+          className="cookie-banner dark-aware-card"
         >
           <div style={{ height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)" }} />
           <div style={{ padding: "1.1rem 1.2rem 1.2rem" }}>
@@ -154,6 +155,7 @@ export default function CookieBanner() {
                   style={{ overflow: "hidden" }}
                 >
                   <div
+                    className="dark-aware-panel"
                     style={{
                       background: "#F5EEE6",
                       borderRadius: 12,

@@ -20,6 +20,8 @@
     "book": "Agendar cita",
     "admin": "Administrar",
     "login": "Iniciar sesión",
+    "legalSection": "Información legal",
+    "profileSection": "Mi perfil",
     "editProfile": "Editar perfil",
     "myAppointments": "Citas agendadas",
     "logout": "Cerrar sesión",
@@ -43,9 +45,12 @@
     "gallery": {
       "title": "Conoce los <c>procedimientos</c> más demandados y <c>promociones</c>",
       "subtitle": "Explora de forma interactiva algunos de mis procedimientos más solicitados. Selecciona alguno para ver toda su información y agendar tu cita en segundos.",
-      "back": "← Volver",
+      "back": "Volver",
       "viewMore": "Saber más sobre el procedimiento",
-      "viewAll": "Ver todos los procedimientos"
+      "viewMoreShort": "Saber más",
+      "viewAll": "Ver todos los procedimientos",
+      "badgePromo": "Promoción",
+      "badgeDestacado": "Destacado"
     },
     "location": {
       "title": "Nuestra ubicación",
@@ -217,7 +222,7 @@
   },
   "procedimientos": {
     "title": "Procedimientos Médicos y Estéticos",
-    "subtitle": "Descubre los tratamientos que implemento — faciales, corporales y capilares — junto a los descuentos que voy sacando por temporadas. Todos los precios están en pesos colombianos (COP) y pueden ajustarse según tu valoración médica. Recuerda que cada procedimiento inicia con una valoración para diseñar tu plan personalizado.",
+    "subtitle": "Descubre los tratamientos faciales, corporales y capilares que implemento, junto a los descuentos que voy sacando por temporadas. Todos los precios están en pesos colombianos (COP) y pueden ajustarse según tu valoración médica. Recuerda que cada procedimiento inicia con una valoración para diseñar tu plan personalizado.",
     "currency": "COP",
     "loading": "Cargando procedimientos...",
     "errorLoad": "No se pudieron cargar los procedimientos. Intenta de nuevo más tarde.",

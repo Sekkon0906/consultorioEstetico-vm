@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
 
@@ -51,11 +52,14 @@ export default function FotoPerfil({ photo, email }: Props) {
           backgroundColor: "#f8f9fa",
         }}
       >
-        <img
+        <Image
           src={displayPhoto}
           alt={t("alt")}
+          fill
+          sizes="140px"
+          unoptimized
           referrerPolicy="no-referrer"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          style={{ objectFit: "cover" }}
         />
       </div>
 

@@ -7,6 +7,7 @@ export default function VisionMision() {
   const t = useTranslations("doctora.vision");
   return (
     <section
+      className="dark-aware-section vm-section"
       style={{
         background: "linear-gradient(180deg,#FAF9F7 0%,#F5EDE3 100%)",
         padding: "5rem 2rem",
@@ -35,7 +36,7 @@ export default function VisionMision() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.9, ease: "easeOut" }}
               viewport={{ once: true }}
-              className="p-4 rounded-4 shadow-sm h-100"
+              className="dark-aware-card p-4 rounded-4 shadow-sm h-100"
               style={{
                 backgroundColor: "#FFFDF9",
                 border: "1px solid #E9DED2",
@@ -69,7 +70,7 @@ export default function VisionMision() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.9, ease: "easeOut" }}
               viewport={{ once: true }}
-              className="p-4 rounded-4 shadow-sm h-100"
+              className="dark-aware-card p-4 rounded-4 shadow-sm h-100"
               style={{
                 backgroundColor: "#FFFDF9",
                 border: "1px solid #E9DED2",

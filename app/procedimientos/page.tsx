@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useDeferredValue, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { Search, X, ArrowRight, Sparkles, Calendar, ChevronLeft, ChevronRight, Star, ChevronDown, Check, ArrowUpDown } from "lucide-react";
@@ -438,13 +439,18 @@ export default function ProcedimientosPage() {
         /* Toolbar sticky con buscador + chips */
         .proc-toolbar-sticky {
           position: sticky;
-          top: 0;
+          /* El navbar es sticky en top:0; la toolbar debe pegarse JUSTO debajo
+             para no quedar oculta tras él (antes ambos en top:0 = colisión). */
+          top: 72px;
           z-index: 20;
           background: rgba(251, 249, 245, 0.85);
           backdrop-filter: blur(16px) saturate(1.2);
           -webkit-backdrop-filter: blur(16px) saturate(1.2);
           border-bottom: 1px solid rgba(176, 137, 104, 0.12);
           padding: 0.9rem 1.5rem;
+        }
+        @media (max-width: 767px) {
+          .proc-toolbar-sticky { top: 58px; }
         }
         .proc-toolbar-inner {
           max-width: 1280px;
@@ -996,20 +1002,22 @@ function FeaturedCarousel({
               }}
             >
               {item.imagen && (
-                <motion.img
-                  src={item.imagen}
-                  alt={item.nombre}
+                <motion.div
                   initial={{ scale: 1.05 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 1.2, ease: "easeOut" }}
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
+                  style={{ position: "absolute", inset: 0 }}
+                >
+                  <Image
+                    src={item.imagen}
+                    alt={item.nombre}
+                    fill
+                    sizes="(max-width: 820px) 100vw, 600px"
+                    quality={80}
+                    priority={index === 0}
+                    style={{ objectFit: "cover" }}
+                  />
+                </motion.div>
               )}
               <div
                 aria-hidden="true"
@@ -1033,6 +1041,7 @@ function FeaturedCarousel({
               }}
             >
               <span
+                className="featured-kicker-pill"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -1250,11 +1259,20 @@ function FeaturedCarousel({
             grid-template-columns: 1fr !important;
           }
           .featured-arrow {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
           }
+          /* En 1 columna las flechas se centran sobre la IMAGEN (parte de
+             arriba), no a media tarjeta donde queda el texto. */
+          .featured-arrow { top: 28% !important; }
           .featured-arrow-left { left: 8px; }
           .featured-arrow-right { right: 8px; }
+          /* Los dots pasan ARRIBA, sobre la imagen (estilo stories), para no
+             solaparse con los botones "Agendar"/"Conocer más". */
+          .featured-dots {
+            bottom: auto !important;
+            top: 14px !important;
+          }
         }
       `}</style>
     </motion.section>
@@ -1294,7 +1312,15 @@ function ProcCard({
       >
         <div className="proc-card-img-wrap">
           {procedimiento.imagen && (
-            <img src={procedimiento.imagen} alt={procedimiento.nombre} />
+            <Image
+              src={procedimiento.imagen}
+              alt={procedimiento.nombre}
+              fill
+              sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 300px"
+              quality={75}
+              loading={index < 4 ? "eager" : "lazy"}
+              style={{ objectFit: "cover" }}
+            />
           )}
           {procedimiento.categoria && (
             <span className="proc-card-cat-chip">{procedimiento.categoria}</span>

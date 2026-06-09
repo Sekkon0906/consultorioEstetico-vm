@@ -69,7 +69,7 @@ export default function ComentariosClientes() {
   const ratingLabels = t.raw("ratingLabels") as string[];
 
   return (
-    <section style={{ position: "relative", zIndex: 10, padding: "4rem 1.5rem", textAlign: "center", backgroundColor: "#FAF7F2", color: "#4E3B2B", borderTop: "1px solid #E9DED2", borderBottom: "1px solid #E9DED2" }}>
+    <section className="dark-aware-section comentarios-section" style={{ position: "relative", zIndex: 10, padding: "4rem 1.5rem", textAlign: "center", backgroundColor: "#FAF7F2", color: "#4E3B2B", borderTop: "1px solid #E9DED2", borderBottom: "1px solid #E9DED2" }}>
       <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 600, marginBottom: "0.4rem" }}>{t("title")}</h2>
       <p style={{ fontSize: "0.88rem", fontStyle: "italic", color: "#6C584C", marginBottom: "1.5rem" }}>{t("subtitle")}</p>
 
@@ -88,7 +88,7 @@ export default function ComentariosClientes() {
       {mensaje && <div style={{ maxWidth: 500, margin: "0 auto 1rem", padding: "0.8rem 1.2rem", borderRadius: 12, background: "#E9DED2", color: "#4E3B2B", border: "1px solid #D4C4B0", fontSize: "0.88rem" }}>{mensaje}</div>}
 
       {showForm && (
-        <div style={{ maxWidth: 520, margin: "0 auto 2rem", padding: "1.8rem", borderRadius: 18, background: "#FFFDF9", border: "1px solid #E9DED2", textAlign: "left", boxShadow: "0 4px 16px rgba(78,59,43,0.06)" }}>
+        <div className="dark-aware-card" style={{ maxWidth: 520, margin: "0 auto 2rem", padding: "1.8rem", borderRadius: 18, background: "#FFFDF9", border: "1px solid #E9DED2", textAlign: "left", boxShadow: "0 4px 16px rgba(78,59,43,0.06)" }}>
           <h4 style={{ fontWeight: 600, color: "#4E3B2B", marginBottom: "1.2rem", textAlign: "center" }}>{t("form.title")}</h4>
 
           <div style={{ marginBottom: "0.8rem" }}>
@@ -140,12 +140,12 @@ export default function ComentariosClientes() {
         <div style={{ display: "flex", gap: "1.2rem", overflowX: "auto", padding: "0.5rem 0.5rem 1rem", scrollbarWidth: "thin" }}>
           {comentarios.map(function(c) {
             return (
-              <div key={c.id} style={{ minWidth: 270, maxWidth: 310, background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 16, padding: "1.2rem", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", transition: "transform 0.3s", flexShrink: 0 }}
+              <div key={c.id} className="dark-aware-card" style={{ minWidth: 270, maxWidth: 310, background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 16, padding: "1.2rem", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", transition: "transform 0.3s", flexShrink: 0 }}
                 onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-4px)"; }}
                 onMouseLeave={function(e) { e.currentTarget.style.transform = ""; }}>
                 <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#E9DED2", display: "flex", alignItems: "center", justifyContent: "center", color: "#4E3B2B", fontSize: "1.1rem", fontWeight: 700 }}>{c.nombre.charAt(0).toUpperCase()}</div>
                 <h4 style={{ fontWeight: 600, color: "#4E3B2B", fontSize: "0.95rem", margin: 0 }}>{c.nombre}</h4>
-                <span style={{ background: "#F5EEE6", color: "#8B6A4B", padding: "0.2rem 0.8rem", borderRadius: 100, fontSize: "0.7rem", fontWeight: 600 }}>{c.procedimiento}</span>
+                <span className="comentario-proc-pill" style={{ background: "#F5EEE6", color: "#8B6A4B", padding: "0.2rem 0.8rem", borderRadius: 100, fontSize: "0.7rem", fontWeight: 600 }}>{c.procedimiento}</span>
                 <div style={{ display: "flex", gap: 2 }}>
                   {[1,2,3,4,5].map(function(i) { return c.puntuacion >= i ? <FaStar key={i} size={14} color="#C0A080" /> : <FaRegStar key={i} size={14} color="#C0A080" />; })}
                 </div>

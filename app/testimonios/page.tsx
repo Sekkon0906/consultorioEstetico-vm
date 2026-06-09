@@ -1,8 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
-import ComentariosClientes from "../src/components/ComentariosClientes";
+import dynamic from "next/dynamic";
+
+// Lazy: solo se monta cuando el usuario llega abajo del fold
+const ComentariosClientes = dynamic(
+  () => import("../src/components/ComentariosClientes"),
+  { ssr: false }
+);
 import type { Testimonio } from "../types/domain";
 import { getTestimoniosApi } from "../services/testimoniosApi";
 
@@ -41,7 +48,7 @@ export default function TestimoniosPage() {
   var activos = testimonios.filter(function(t) { return t.activo; }).sort(function(a, b) { return new Date(b.creadoEn).getTime() - new Date(a.creadoEn).getTime(); });
 
   return (
-    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg, #FAF7F2 0%, #F5EEE5 100%)" }}>
+    <main className="dark-aware-section testimonios-page" style={{ minHeight: "100vh", background: "linear-gradient(180deg, #FAF7F2 0%, #F5EEE5 100%)" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "4rem 1.5rem 3rem" }}>
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
           <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B08968", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("badge")}</span>
@@ -58,7 +65,7 @@ export default function TestimoniosPage() {
               var videoValido = tieneVideoValido(testimonio.video);
               var ytId = getYouTubeId(testimonio.video || "");
               return (
-                <div key={testimonio.id} style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, overflow: "hidden", boxShadow: "0 4px 14px rgba(78,59,43,0.06)", transition: "transform 0.3s", animation: "fadeInUp 0.6s ease " + (i * 0.08) + "s both" }}
+                <div key={testimonio.id} className="dark-aware-card" style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, overflow: "hidden", boxShadow: "0 4px 14px rgba(78,59,43,0.06)", transition: "transform 0.3s", animation: "fadeInUp 0.6s ease " + (i * 0.08) + "s both" }}
                   onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-4px)"; }}
                   onMouseLeave={function(e) { e.currentTarget.style.transform = ""; }}>
                   <div style={{ position: "relative", width: "100%", aspectRatio: "9/16", maxHeight: 420, overflow: "hidden", background: "#000" }}>
@@ -71,9 +78,9 @@ export default function TestimoniosPage() {
                     ) : (
                       <div style={{ position: "absolute", inset: 0, cursor: videoValido ? "pointer" : "default" }} onClick={function() { if (videoValido) setVideoActivo(testimonio.id); }}>
                         {testimonio.thumb ? (
-                          <img src={testimonio.thumb} alt={testimonio.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.88)" }} />
+                          <Image src={testimonio.thumb} alt={testimonio.nombre} fill sizes="(max-width: 640px) 92vw, 380px" quality={75} style={{ objectFit: "cover", filter: "brightness(0.88)" }} />
                         ) : ytId ? (
-                          <img src={"https://img.youtube.com/vi/" + ytId + "/hqdefault.jpg"} alt={testimonio.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.85)" }} />
+                          <Image src={"https://img.youtube.com/vi/" + ytId + "/hqdefault.jpg"} alt={testimonio.nombre} fill sizes="(max-width: 640px) 92vw, 380px" quality={70} unoptimized style={{ objectFit: "cover", filter: "brightness(0.85)" }} />
                         ) : (
                           <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #4E3B2B, #B08968)" }} />
                         )}

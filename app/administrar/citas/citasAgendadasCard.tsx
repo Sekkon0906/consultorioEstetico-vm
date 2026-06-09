@@ -29,13 +29,14 @@ export default function CitasAgendadasCard({
 
   return (
     <motion.div
+      className="admin-cita-card"
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       style={{
-        background: "#fff",
+        background: "var(--surface)",
         borderRadius: 16,
-        border: "1px solid #F0E8DE",
+        border: "1px solid var(--border)",
         padding: "1.2rem 1.4rem",
         transition: "box-shadow 0.25s",
       }}
@@ -43,7 +44,7 @@ export default function CitasAgendadasCard({
     >
       {/* Top row: name + estado */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-        <h3 style={{ fontSize: "1.05rem", fontWeight: 600, color: "#2B2218", margin: 0, lineHeight: 1.3 }}>
+        <h3 style={{ fontSize: "1.05rem", fontWeight: 600, color: "var(--text)", margin: 0, lineHeight: 1.3 }}>
           {cita.nombres} {cita.apellidos}
         </h3>
         <span style={{
@@ -80,14 +81,14 @@ export default function CitasAgendadasCard({
         {cita.estado === "pendiente" && (
           <>
             <Btn label="Confirmar" icon={<CalendarCheck size={14} />} bg="var(--brand)" color="#fff" onClick={() => onConfirmar?.(cita)} />
-            <Btn label="Reagendar" icon={<Edit3 size={14} />} bg="#F0E8DE" color="var(--text)" onClick={() => onReagendar?.(cita)} />
+            <Btn label="Reagendar" icon={<Edit3 size={14} />} bg="var(--surface-soft)" color="var(--text)" onClick={() => onReagendar?.(cita)} />
             <Btn label="Cancelar" icon={<XCircle size={14} />} bg="#C62828" color="#fff" onClick={() => onCancelar?.(cita)} />
           </>
         )}
         {cita.estado === "confirmada" && (
           <>
             <Btn label="Facturar" icon={<Eye size={14} />} bg="var(--brand)" color="#fff" onClick={() => onVerDetalles?.(cita)} />
-            <Btn label="Reagendar" icon={<Edit3 size={14} />} bg="#F0E8DE" color="var(--text)" onClick={() => onReagendar?.(cita)} />
+            <Btn label="Reagendar" icon={<Edit3 size={14} />} bg="var(--surface-soft)" color="var(--text)" onClick={() => onReagendar?.(cita)} />
             <Btn label="Cancelar" icon={<XCircle size={14} />} bg="#C62828" color="#fff" onClick={() => onCancelar?.(cita)} />
           </>
         )}

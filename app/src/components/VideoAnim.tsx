@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { IMG } from "@/lib/imagenes";
 
@@ -127,7 +128,7 @@ export default function VideoAnim() {
         @media(max-width:991px){ .va-3col{grid-template-columns:1fr !important} .va-video-col{order:-1} }
       `}</style>
 
-      <section style={{ position: "relative", padding: "2.5rem 0 2rem", overflow: "hidden", background: "linear-gradient(175deg, #FDFCFA 0%, #F5EEE5 55%, #FBF8F4 100%)" }}>
+      <section className="dark-aware-section videoanim-section" style={{ position: "relative", padding: "2.5rem 0 2rem", overflow: "hidden", background: "linear-gradient(175deg, #FDFCFA 0%, #F5EEE5 55%, #FBF8F4 100%)" }}>
         <ParticleCanvas />
 
         {/* Orbs */}
@@ -146,7 +147,7 @@ export default function VideoAnim() {
         <div className="va-3col" style={{ display: "grid", gridTemplateColumns: "250px minmax(0, 1fr) 250px", gap: "1.75rem", maxWidth: 1560, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1, alignItems: "center" }}>
 
           {/* LEFT - Features */}
-          <div ref={lft.ref} style={{ ...rs(lft.v, 0.15), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.2rem 1rem" }}>
+          <div className="dark-aware-card" ref={lft.ref} style={{ ...rs(lft.v, 0.15), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.2rem 1rem" }}>
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.85rem", textAlign: "center" }}>{t("distinguishTitle")}</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               {features.map((f, i) => (
@@ -178,7 +179,7 @@ export default function VideoAnim() {
                 <iframe src="https://www.youtube.com/embed/pBkwUM0IpTE?autoplay=1&modestbranding=1&rel=0" title={t("iframeTitle")} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 20 }} />
               ) : (
                 <>
-                  <img src={IMG.previewVideo} alt={t("iframeTitle")} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+                  <Image src={IMG.previewVideo} alt={t("iframeTitle")} fill sizes="(max-width: 1024px) 100vw, 960px" quality={80} style={{ objectFit: "cover" }} />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.32) 100%)" }} />
                   <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 2 }}>
                     <div style={{ position: "absolute", top: "50%", left: "50%", width: 90, height: 90, borderRadius: "50%", background: "rgba(176,137,104,0.2)", animation: "va-pulse 2.2s ease-out infinite", transform: "translate(-50%,-50%)" }} />
@@ -191,7 +192,7 @@ export default function VideoAnim() {
           </div>
 
           {/* RIGHT - Counters */}
-          <div ref={el => { rgt.ref.current = el; countersRef.current = el; }}
+          <div className="dark-aware-card" ref={el => { rgt.ref.current = el; countersRef.current = el; }}
             style={{ ...rs(rgt.v, 0.2), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.2rem 1rem" }}>
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.85rem", textAlign: "center" }}>{t("experienceTitle")}</h3>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.7rem" }}>

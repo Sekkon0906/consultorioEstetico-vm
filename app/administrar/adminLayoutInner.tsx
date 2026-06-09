@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import React, { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
@@ -11,17 +11,16 @@ interface AdminLayoutInnerProps {
   children: React.ReactNode;
 }
 
-const TOP_OFFSET = 64;
+const TOP_OFFSET = 76;
 
 export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
 
   const params = useSearchParams();
-  const router = useRouter();
   const section = params.get("section") || "inicio";
 
-  const { user, logout } = useAuth(); //  usuario real de Supabase
+  const { user } = useAuth(); //  usuario real de Supabase
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
@@ -33,11 +32,6 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
   useEffect(() => {
     if (isDesktop) setSidebarOpen(false);
   }, [isDesktop]);
-
-  const handleLogout = async () => {
-    await logout();
-    router.push("/");
-  };
 
   const links: { id: string; label: string }[] = [
     { id: "horarios",       label: "Horarios" },
@@ -58,10 +52,8 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
               href={`/administrar?section=${id}`}
               scroll={false}
               onClick={() => setSidebarOpen(false)}
-              className={`block text-center px-4 py-2 rounded-lg font-medium transition-all duration-300 no-underline ${
-                isActive
-                  ? "bg-[#8B6A4B] text-white shadow-sm"
-                  : "[background:var(--surface)] [color:var(--text)] hover:bg-[#DCC7AC] hover:[color:var(--text)]"
+              className={`admin-nav-link block text-center px-4 py-2 rounded-lg font-medium transition-all duration-300 no-underline ${
+                isActive ? "is-active" : ""
               }`}
             >
               {label}
@@ -73,10 +65,10 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#FAF8F4] [color:var(--text)]">
+    <div className="flex min-h-screen [background:var(--bg)] [color:var(--text)]">
 
       {/* SIDEBAR DESKTOP */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:bg-[#E9E0D1] lg:py-6 lg:px-4 lg:shadow-lg">
+      <aside className="admin-sidebar hidden lg:flex lg:flex-col lg:w-64 lg:py-6 lg:px-4 lg:shadow-lg">
         <h1 className="text-2xl font-bold mb-2 text-center tracking-wide [color:var(--brand)]">
           Panel Admin
         </h1>
@@ -86,12 +78,6 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
           </p>
         )}
         <NavLinks />
-        <button
-          onClick={handleLogout}
-          className="mt-auto px-4 py-2 rounded-lg bg-[#C87A7A] text-white font-semibold shadow hover:bg-[#B56666] transition"
-        >
-          Cerrar sesión
-        </button>
       </aside>
 
       {/* SIDEBAR MÃ“VIL */}
@@ -107,12 +93,12 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
             <motion.aside
               initial={{ x: -260, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
               exit={{ x: -260, opacity: 0 }} transition={{ duration: 0.25 }}
-              className="fixed left-0 z-50 w-64 bg-[#E9E0D1] flex flex-col py-6 px-4 shadow-xl"
+              className="admin-sidebar fixed left-0 z-50 w-64 flex flex-col py-6 px-4 shadow-xl"
               style={{ top: TOP_OFFSET, height: `calc(100vh - ${TOP_OFFSET}px)` }}
             >
               <div className="flex items-center justify-between mb-4">
                 <h1 className="text-xl font-bold [color:var(--brand)]">Panel Admin</h1>
-                <button onClick={() => setSidebarOpen(false)} className="p-1 rounded-md hover:bg-[#DCC7AC]">
+                <button onClick={() => setSidebarOpen(false)} className="admin-close-btn p-1 rounded-md">
                   <X size={20} className="[color:var(--text)]" />
                 </button>
               </div>
@@ -122,22 +108,22 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
                 </p>
               )}
               <NavLinks />
-              <button
-                onClick={handleLogout}
-                className="mt-auto px-4 py-2 rounded-lg bg-[#C87A7A] text-white font-semibold shadow hover:bg-[#B56666] transition"
-              >
-                Cerrar sesión
-              </button>
             </motion.aside>
           </>
         )}
       </AnimatePresence>
 
       {/* CONTENIDO */}
-      <div className="flex-1 flex flex-col">
-        <header className="w-full flex items-center justify-between px-6 py-4 [background:var(--surface)] border-b [border-color:var(--border)] shadow-sm sticky top-0 z-30">
+      {/* min-w-0: sin esto, el flex item usa min-width:auto y NO se encoge por
+          debajo del ancho intrínseco de su contenido, dejando el panel más
+          ancho que la pantalla del móvil (se veía "extenso"/cortado). */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <header
+          className="w-full flex items-center justify-between px-6 py-4 [background:var(--surface)] border-b [border-color:var(--border)] shadow-sm sticky z-30"
+          style={{ top: 72 }}
+        >
           <button
-            className="lg:hidden bg-[#8B6A4B] text-white p-2 rounded-lg shadow flex items-center gap-1"
+            className="admin-menu-btn lg:hidden text-white p-2 rounded-lg shadow flex items-center gap-1"
             onClick={() => setSidebarOpen((p) => !p)}
           >
             <Menu size={20} />
@@ -150,7 +136,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
         <main className="flex-1 p-4 sm:p-6 overflow-y-auto [background:var(--surface)]">
           <motion.div
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }} className="max-w-6xl mx-auto"
+            transition={{ duration: 0.3 }} className="admin-responsive max-w-6xl mx-auto"
           >
             {children}
           </motion.div>

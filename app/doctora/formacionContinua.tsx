@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
@@ -36,6 +37,7 @@ function CardItem({
       transition={{ duration: 0.55, ease: "easeOut", delay: 0.15 }}
       whileHover={{ y: -5, boxShadow: "0 20px 50px rgba(78,59,43,0.14)" }}
       onClick={onClick}
+      className="formacion-card"
       style={{
         width: "100%",
         background: "#FFFDF9",
@@ -49,11 +51,16 @@ function CardItem({
     >
       {/* Imagen */}
       <div style={{ position: "relative", height: 145, overflow: "hidden" }}>
-        <img
-          src={charla.imagen || undefined}
-          alt={charla.titulo}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        />
+        {charla.imagen && (
+          <Image
+            src={charla.imagen}
+            alt={charla.titulo}
+            fill
+            sizes="(max-width: 820px) 92vw, 380px"
+            quality={75}
+            style={{ objectFit: "cover" }}
+          />
+        )}
         <div style={{
           position: "absolute", inset: 0,
           background: "linear-gradient(0deg, rgba(40,26,14,0.52) 0%, transparent 58%)",
@@ -138,6 +145,7 @@ function TimelineNode({
   return (
     <div
       ref={ref}
+      className="timeline-node"
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 60px 1fr",
@@ -146,7 +154,7 @@ function TimelineNode({
       }}
     >
       {/* Izquierda */}
-      <div style={{ paddingRight: 24, display: "flex", justifyContent: "flex-end" }}>
+      <div className="timeline-side timeline-side-left" style={{ paddingRight: 24, display: "flex", justifyContent: "flex-end" }}>
         {isLeft ? (
           <CardItem charla={charla} inView={inView} fromLeft onClick={onClick} fechaFmt={fechaFmt} />
         ) : (
@@ -167,7 +175,7 @@ function TimelineNode({
       </div>
 
       {/* Centro: dot */}
-      <div style={{ display: "flex", justifyContent: "center", position: "relative", zIndex: 2 }}>
+      <div className="timeline-dot-col" style={{ display: "flex", justifyContent: "center", position: "relative", zIndex: 2 }}>
         <motion.button
           initial={{ scale: 0, opacity: 0 }}
           animate={inView ? { scale: 1, opacity: 1 } : {}}
@@ -186,7 +194,7 @@ function TimelineNode({
       </div>
 
       {/* Derecha */}
-      <div style={{ paddingLeft: 24, display: "flex", justifyContent: "flex-start" }}>
+      <div className="timeline-side timeline-side-right" style={{ paddingLeft: 24, display: "flex", justifyContent: "flex-start" }}>
         {!isLeft ? (
           <CardItem charla={charla} inView={inView} fromLeft={false} onClick={onClick} fechaFmt={fechaFmt} />
         ) : (
@@ -347,13 +355,16 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                 ) : isVideo ? (
                   <video src={current} controls
                     style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                ) : (
-                  <img
-                    src={current || charla.imagen || undefined}
+                ) : (current || charla.imagen) ? (
+                  <Image
+                    src={current || charla.imagen}
                     alt={`Foto ${idx + 1}`}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    fill
+                    sizes="(max-width: 820px) 92vw, 780px"
+                    quality={85}
+                    style={{ objectFit: "cover" }}
                   />
-                )}
+                ) : null}
               </motion.div>
             </AnimatePresence>
 
@@ -416,10 +427,18 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: "0.8rem", color: "white",
                     }}>▶</div>
-                  ) : (
-                    <img src={src || undefined} alt=""
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  )}
+                  ) : src ? (
+                    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                      <Image
+                        src={src}
+                        alt=""
+                        fill
+                        sizes="56px"
+                        quality={60}
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                  ) : null}
                 </motion.div>
               ))}
             </div>
@@ -442,28 +461,23 @@ export default function FormacionContinua() {
   useEffect(() => {
     async function fetchCharlas() {
       try {
+        // Una sola consulta con la galería embebida (evita N+1)
         const { data, error } = await supabase
           .from("charlas")
-          .select("id, titulo, descripcion, detalle, imagen, fecha")
+          .select("id, titulo, descripcion, detalle, imagen, fecha, charla_galeria(url, orden)")
           .order("fecha", { ascending: false, nullsFirst: false })
           .order("creado_en", { ascending: false });
 
         if (error) throw new Error(error.message);
 
-        const charlasConGaleria = await Promise.all(
-          (data ?? []).map(async c => {
-            const { data: galeriaData } = await supabase
-              .from("charla_galeria")
-              .select("url")
-              .eq("charla_id", c.id)
-              .order("orden", { ascending: true });
-
-            return {
-              ...c,
-              galeria: (galeriaData ?? []).map((g: { url: string }) => g.url),
-            } as Charla;
-          })
-        );
+        const charlasConGaleria = (data ?? []).map((c: Record<string, unknown>) => {
+          const { charla_galeria, ...rest } = c as { charla_galeria?: { url: string; orden: number }[] };
+          const galeria = (charla_galeria ?? [])
+            .slice()
+            .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
+            .map((g) => g.url);
+          return { ...rest, galeria } as Charla;
+        });
 
         setCharlas(charlasConGaleria);
       } catch (err) {
@@ -508,7 +522,7 @@ export default function FormacionContinua() {
 
   return (
     <>
-      <section style={{
+      <section className="dark-aware-section formacion-section" style={{
         background: "linear-gradient(180deg, #F7EFE7 0%, #FBF8F4 100%)",
         padding: "5rem 1.5rem 6rem",
         position: "relative",
@@ -562,6 +576,7 @@ export default function FormacionContinua() {
         <div style={{ position: "relative", maxWidth: 860, margin: "0 auto" }}>
           {/* Línea vertical */}
           <motion.div
+            className="formacion-timeline-line"
             initial={{ scaleY: 0 }}
             whileInView={{ scaleY: 1 }}
             viewport={{ once: true }}

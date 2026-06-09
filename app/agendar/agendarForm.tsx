@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
@@ -9,6 +11,7 @@ import type { Procedimiento, SessionUser } from "../types/domain";
 
 import { ArrowLeft, CalendarDays, Clock, RotateCcw } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
+import TreatmentPicker from "./TreatmentPicker";
 
 export interface AgendarFormData {
   fecha?: string;
@@ -41,6 +44,7 @@ export default function AgendarForm({
 }: AgendarFormProps) {
   const t = useTranslations("agendar.form");
   const locale = useLocale();
+  const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const listaProcedimientos: Procedimiento[] = Array.isArray(procedimientos)
     ? procedimientos
     : [];
@@ -50,16 +54,6 @@ export default function AgendarForm({
     text: "#2A1C12",
     textSoft: "#4B3726",
   };
-
-  const procedimientosFaciales = listaProcedimientos.filter(
-    (p) => p.categoria === "Facial"
-  );
-  const procedimientosCorporales = listaProcedimientos.filter(
-    (p) => p.categoria === "Corporal"
-  );
-  const procedimientosCapilares = listaProcedimientos.filter(
-    (p) => p.categoria === "Capilar"
-  );
 
   const handleChange = <K extends keyof AgendarFormData>(
     key: K,
@@ -114,11 +108,13 @@ export default function AgendarForm({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -40 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
-      className="rounded-3xl shadow-2xl overflow-hidden"
+      className="agendar-form-card dark-aware-card rounded-3xl shadow-2xl overflow-hidden"
       style={{
         background: "linear-gradient(180deg, #FBF7F2 0%, #F4EBE2 100%)",
         border: `1px solid ${DARK_PALETTE.border}`,
         color: DARK_PALETTE.text,
+        maxWidth: 920,
+        margin: "0 auto",
       }}
     >
       {/* === BOTÓN VOLVER === */}
@@ -314,39 +310,12 @@ export default function AgendarForm({
           >
             {t("procedure")} *
           </label>
-          <select
+          <TreatmentPicker
             value={formData.procedimiento}
-            onChange={(e) => handleChange("procedimiento", e.target.value)}
-            required
-            className="w-full p-3 rounded-lg border bg-white focus:border-[#B08968] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
-            style={{
-              borderColor: DARK_PALETTE.border,
-              color: DARK_PALETTE.text,
-            }}
-          >
-            <option value="">{t("procedurePlaceholder")}</option>
-            <optgroup label={t("groupFacial")}>
-              {procedimientosFaciales.map((p) => (
-                <option key={p.id} value={p.nombre}>
-                  {p.nombre}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label={t("groupCorporal")}>
-              {procedimientosCorporales.map((p) => (
-                <option key={p.id} value={p.nombre}>
-                  {p.nombre}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label={t("groupCapilar")}>
-              {procedimientosCapilares.map((p) => (
-                <option key={p.id} value={p.nombre}>
-                  {p.nombre}
-                </option>
-              ))}
-            </optgroup>
-          </select>
+            onChange={(val) => handleChange("procedimiento", val)}
+            procedimientos={listaProcedimientos}
+            placeholder={t("procedurePlaceholder")}
+          />
         </div>
 
         {/* Nota */}
@@ -370,8 +339,32 @@ export default function AgendarForm({
           />
         </div>
 
+        {/* Aceptación de Términos / política de abono y cancelación */}
+        <div className="md:col-span-2">
+          <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", color: DARK_PALETTE.textSoft }}>
+            <input
+              type="checkbox"
+              checked={aceptaTerminos}
+              onChange={(e) => setAceptaTerminos(e.target.checked)}
+              style={{ width: 18, height: 18, marginTop: 3, accentColor: DARK_PALETTE.main, flexShrink: 0 }}
+            />
+            <span style={{ fontSize: "0.84rem", lineHeight: 1.5 }}>
+              He leído y acepto los{" "}
+              <Link href="/legal/terminos" target="_blank" style={{ color: DARK_PALETTE.main, fontWeight: 600 }}>
+                Términos y Condiciones
+              </Link>
+              , incluida la política de abono de reserva ($50.000) y de
+              cancelación/reagenda, y el tratamiento de mis datos según la{" "}
+              <Link href="/legal/privacidad" target="_blank" style={{ color: DARK_PALETTE.main, fontWeight: 600 }}>
+                Política de Privacidad
+              </Link>
+              .
+            </span>
+          </label>
+        </div>
+
         {/* Botón continuar */}
-        <div className="md:col-span-2 mt-8 flex justify-center">
+        <div className="md:col-span-2 mt-6 flex justify-center">
           <motion.button
             type="submit"
             whileHover={{ scale: 1.05 }}
@@ -383,7 +376,8 @@ export default function AgendarForm({
                 !formData.nombre ||
                 !formData.telefono ||
                 !formData.correo ||
-                !formData.procedimiento
+                !formData.procedimiento ||
+                !aceptaTerminos
                   ? 0.6
                   : 1,
             }}
@@ -391,7 +385,8 @@ export default function AgendarForm({
               !formData.nombre ||
               !formData.telefono ||
               !formData.correo ||
-              !formData.procedimiento
+              !formData.procedimiento ||
+              !aceptaTerminos
             }
           >
             {t("continue")}

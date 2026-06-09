@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { IMG } from "@/lib/imagenes";
 
@@ -25,23 +27,42 @@ export default function HeroDoctora() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Variantes de entrada escalonada para el contenido de texto.
+  const container = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
+  };
+  const item = {
+    hidden: { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const } },
+  };
+
   return (
     <section className="doc-hero">
       <div className="doc-hero-left">
-        <div className="doc-hero-content container">
-          <h1 className="doc-hero-title">
+        <motion.div
+          className="doc-hero-content container"
+          variants={container}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.span variants={item} className="doc-hero-kicker">
+            {t("imageAlt")}
+          </motion.span>
+
+          <motion.h1 variants={item} className="doc-hero-title">
             {t("title")}
-          </h1>
+          </motion.h1>
 
-          <p className="doc-hero-paragraph">{t("p1")}</p>
-          <p className="doc-hero-paragraph">{t("p2")}</p>
+          <motion.p variants={item} className="doc-hero-paragraph">{t("p1")}</motion.p>
+          <motion.p variants={item} className="doc-hero-paragraph">{t("p2")}</motion.p>
 
-          <p className="doc-hero-quote">
+          <motion.p variants={item} className="doc-hero-quote">
             {t("quote")}
             <b> {t("quoteAuthor")}</b>.
-          </p>
+          </motion.p>
 
-          <div className="doc-hero-cta">
+          <motion.div variants={item} className="doc-hero-cta">
             <Link href="/agendar" className="btn-doctora">
               <i className="fas fa-calendar-check me-2" /> {t("cta")}
             </Link>
@@ -54,22 +75,35 @@ export default function HeroDoctora() {
             >
               <i className="fab fa-instagram me-2" /> {t("ctaSecondary")}
             </a>
-          </div>
-
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
-      <div className="doc-hero-right">
+      <motion.div
+        className="doc-hero-right"
+        initial={{ opacity: 0, scale: 1.04 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.9, ease: "easeOut" }}
+      >
         {imagenes.map((img, i) => (
-          <img
+          <Image
             key={i}
             src={img}
             alt={`${t("imageAlt")} ${i + 1}`}
+            fill
+            priority={i === 0}
+            sizes="(max-width: 820px) 100vw, 50vw"
+            quality={82}
             className={`doc-hero-slide ${i === imagenActual ? "is-active" : ""}`}
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 18%" }}
+            style={{ objectFit: "cover", objectPosition: "center 18%" }}
           />
         ))}
-      </div>
+
+        {/* Velo sutil para fundir la imagen con el lado del texto.
+            Las fotos rotan solas (Ken Burns) — sin controles de navegación,
+            ya que explorarlas no aporta al usuario; funcionan como ambiente. */}
+        <div className="doc-hero-veil" aria-hidden="true" />
+      </motion.div>
     </section>
   );
 }

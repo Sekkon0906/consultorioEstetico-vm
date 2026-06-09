@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Edit3, Trash2, Calendar } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
@@ -36,29 +37,24 @@ export default function CharlasList() {
 
   const loadCharlas = async () => {
     try {
+      // Una sola consulta con la galería embebida (PostgREST join) en vez de
+      // N+1 (antes: 1 query de charlas + 1 query de galería por cada charla).
       const { data, error: err } = await supabase
         .from("charlas")
-        .select("id, titulo, descripcion, detalle, imagen, fecha, creado_en")
+        .select("id, titulo, descripcion, detalle, imagen, fecha, creado_en, charla_galeria(url, orden)")
         .order("fecha", { ascending: false, nullsFirst: false })
         .order("creado_en", { ascending: false });
 
       if (err) throw new Error(err.message);
 
-      // Cargar galeria para cada charla
-      const charlasConGaleria = await Promise.all(
-        (data ?? []).map(async (c) => {
-          const { data: galeriaData } = await supabase
-            .from("charla_galeria")
-            .select("url")
-            .eq("charla_id", c.id)
-            .order("orden", { ascending: true });
-
-          return {
-            ...c,
-            galeria: (galeriaData ?? []).map((g: { url: string }) => g.url),
-          } as Charla;
-        })
-      );
+      const charlasConGaleria = (data ?? []).map((c: Record<string, unknown>) => {
+        const { charla_galeria, ...rest } = c as { charla_galeria?: { url: string; orden: number }[] };
+        const galeria = (charla_galeria ?? [])
+          .slice()
+          .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
+          .map((g) => g.url);
+        return { ...rest, galeria } as Charla;
+      });
 
       setCharlas(charlasConGaleria);
     } catch (err) {
@@ -311,8 +307,8 @@ export default function CharlasList() {
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
-            className="card border-0 rounded-4 shadow-sm p-4 mb-5"
-            style={{ backgroundColor: "var(--surface)" }}
+            className="card border-0 rounded-4 shadow-sm p-4 mb-5 dark-aware-card admin-form-card"
+            style={{ backgroundColor: "var(--surface)", border: "1px solid var(--border)" }}
           >
             <h4 className="fw-semibold mb-4" style={{ color: "var(--text)" }}>
               {modo === "crear" ? "Nueva charla" : "Editar charla"}
@@ -394,11 +390,15 @@ export default function CharlasList() {
                     />
                   )}
                   {form.imagen && !uploadingImg && (
-                    <img
+                    <Image
                       src={form.imagen}
                       alt="preview"
+                      width={90}
+                      height={60}
+                      quality={70}
                       style={{
                         height: 60,
+                        width: "auto",
                         borderRadius: 8,
                         objectFit: "cover",
                         border: "1px solid var(--border)",
@@ -423,9 +423,12 @@ export default function CharlasList() {
                   <div className="d-flex gap-2 flex-wrap mt-2">
                     {form.galeria.map((url, i) => (
                       <div key={i} className="position-relative">
-                        <img
+                        <Image
                           src={url}
                           alt={`galeria ${i}`}
+                          width={52}
+                          height={52}
+                          quality={65}
                           style={{
                             height: 52,
                             width: 52,
@@ -500,17 +503,18 @@ export default function CharlasList() {
           {charlas.map((c, i) => (
             <motion.div
               key={c.id}
+              className="admin-card"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.02 }}
               style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}
             >
               {c.imagen ? (
-                <img src={c.imagen} alt={c.titulo} style={{ width: 76, height: 76, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} />
+                <Image src={c.imagen} alt={c.titulo} width={76} height={76} quality={70} style={{ width: 76, height: 76, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} />
               ) : (
                 <div style={{ width: 76, height: 76, borderRadius: 14, background: "var(--border)", flexShrink: 0 }} />
               )}
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="admin-card-body" style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }}>{c.titulo}</span>
                   {c.fecha && (
@@ -523,7 +527,7 @@ export default function CharlasList() {
                   {c.descripcion}
                 </p>
               </div>
-              <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <div className="admin-card-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                 <motion.button whileTap={{ scale: 0.95 }} onClick={() => startEditar(c)} style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Edit3 size={18} color="var(--text)" />
                 </motion.button>

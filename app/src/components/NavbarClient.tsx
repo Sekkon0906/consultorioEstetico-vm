@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -10,6 +11,41 @@ import { useAuth } from "@/context/AuthContext";
 import { IMG } from "@/lib/imagenes";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
+
+/**
+ * Avatar robusto: usa <img> nativo (no next/image) con
+ * referrerPolicy="no-referrer" — clave para que las fotos de Google
+ * (lh3.googleusercontent.com) no fallen por política de referer — y
+ * fallback automático a un avatar generado si la imagen no carga.
+ */
+function Avatar({
+  src,
+  alt,
+  fallback,
+  className,
+  style,
+}: {
+  src: string;
+  alt: string;
+  fallback: string;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  const [failed, setFailed] = useState(false);
+  const finalSrc = failed || !src ? fallback : src;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={finalSrc}
+      alt={alt}
+      referrerPolicy="no-referrer"
+      loading="lazy"
+      onError={() => setFailed(true)}
+      className={className}
+      style={{ objectFit: "cover", ...style }}
+    />
+  );
+}
 
 export default function Navbar() {
   const pathname = usePathname() || "/";
@@ -83,11 +119,12 @@ export default function Navbar() {
       .filter((i) => i.href !== "/" && pathname.startsWith(i.href))
       .sort((a, b) => b.href.length - a.href.length)[0];
     if (prefix) return prefix.label;
-    if (pathname.startsWith("/perfil")) return "Mi perfil";
+    if (pathname.startsWith("/perfil")) return t("profileSection");
+    if (pathname.startsWith("/legal")) return t("legalSection");
     if (pathname.startsWith("/login") || pathname.startsWith("/register"))
       return "Acceso";
     return "Inicio";
-  }, [pathname, menuItems]);
+  }, [pathname, menuItems, t]);
 
   /* === LOGOUT === */
   const requestLogout = () => {
@@ -119,13 +156,14 @@ export default function Navbar() {
     updateIndicatorTo(linkRefs.current[activeIndex] || null);
   };
 
-  const userPhoto =
-    user?.photo ||
-    (user
-      ? `https://ui-avatars.com/api/?name=${encodeURIComponent(
-          (user.nombres + " " + user.apellidos).trim()
-        )}&background=E6CCB2&color=7F5539`
-      : "https://cdn-icons-png.flaticon.com/512/847/847969.png");
+  // Fallback siempre disponible (avatar generado con iniciales).
+  const avatarFallback = user
+    ? `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        (user.nombres + " " + user.apellidos).trim()
+      )}&background=E6CCB2&color=7F5539`
+    : "https://ui-avatars.com/api/?name=JM&background=E6CCB2&color=7F5539";
+
+  const userPhoto = user?.photo || avatarFallback;
 
   return (
     <nav
@@ -139,12 +177,14 @@ export default function Navbar() {
         {/* LOGO + SECCIÓN ACTUAL */}
         <div className="d-flex align-items-center" style={{ gap: "0.6rem" }}>
           <Link href="/" className="navbar-logo d-flex align-items-center">
-            <img
+            <Image
               src={IMG.logo}
               alt="Logo JM"
               width={75}
               height={55}
+              priority
               className="me-2"
+              style={{ width: "auto", height: "auto" }}
             />
           </Link>
           <AnimatePresence mode="wait">
@@ -263,69 +303,81 @@ export default function Navbar() {
             <>
               <motion.button
                 onClick={() => setMenuOpen((p) => !p)}
-                className="user-button d-none d-md-flex align-items-center border-0 bg-white rounded-pill shadow-sm px-2 py-1"
+                className={`user-button d-none d-md-flex align-items-center border-0 bg-white rounded-pill shadow-sm px-2 py-1 ${pathname.startsWith("/perfil") ? "is-active-route" : ""}`}
+                style={{ position: "relative" }}
               >
-                <img
+                <Avatar
                   src={userPhoto}
                   alt={t("profileAlt")}
-                  style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", border: "2px solid #FFDDBF" }}
+                  fallback={avatarFallback}
+                  style={{ width: 52, height: 52, borderRadius: "50%", border: "2px solid #FFDDBF" }}
                 />
+                {/* Indicador inferior cuando se está en /perfil/* */}
+                {pathname.startsWith("/perfil") && (
+                  <motion.span
+                    layoutId="user-button-indicator"
+                    className="user-button-indicator"
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                  />
+                )}
               </motion.button>
 
               <AnimatePresence>
                 {menuOpen && (
                   <motion.div
                     key="perfil-menu"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 10 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="position-absolute bg-white border rounded-4 shadow-lg p-3"
+                    initial={{ opacity: 0, y: -8, scale: 0.92 }}
+                    animate={{ opacity: 1, y: 12, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.94 }}
+                    transition={{ type: "spring", damping: 22, stiffness: 320, mass: 0.6 }}
+                    className="profile-menu position-absolute rounded-4 p-3"
                     style={{
                       top: "110%", right: 0, minWidth: "260px", zIndex: 100,
                       textAlign: "center",
-                      background: "var(--surface)",
-                      border: "1px solid var(--border)",
-                      color: "var(--text)",
+                      transformOrigin: "top right",
                     }}
                   >
-                    <div
-                      style={{ position: "absolute", top: "10px", right: "10px", cursor: "pointer" }}
+                    <button
+                      type="button"
+                      className="profile-menu-close"
                       onClick={() => setMenuOpen(false)}
+                      aria-label="Cerrar"
                     >
-                      <X size={20} strokeWidth={2} color="#6b4e3d" />
-                    </div>
+                      <X size={18} strokeWidth={2.2} />
+                    </button>
 
                     <div className="text-center mb-3" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                      <img
+                      <Avatar
                         src={userPhoto}
                         alt={t("profileAlt")}
-                        style={{ width: 70, height: 70, borderRadius: "50%", objectFit: "cover", border: "2px solid #FFDDBF", marginBottom: "0.4rem" }}
+                        fallback={avatarFallback}
+                        className="profile-menu-avatar"
+                        style={{ width: 70, height: 70, borderRadius: "50%", marginBottom: "0.4rem" }}
                       />
-                      <div style={{ fontWeight: 700, color: "var(--brand-deep)" }}>
+                      <div className="profile-menu-name">
                         {user.nombres}
                       </div>
-                      <div style={{ fontSize: "0.85rem", color: "#8d7a6a" }}>{user.email}</div>
+                      <div className="profile-menu-email">{user.email}</div>
                     </div>
 
                     <div className="d-grid gap-2">
                       <button
-                        className="btn"
-                        style={{ background: "#E9E0D1", color: "#4B3A2E", fontWeight: 600, border: "none", borderRadius: "10px" }}
+                        type="button"
+                        className="profile-menu-btn profile-menu-btn-soft"
                         onClick={() => { setMenuOpen(false); router.push("/perfil/editar_info"); }}
                       >
                         {t("editProfile")}
                       </button>
                       <button
-                        className="btn"
-                        style={{ background: "#C9AD8D", color: "#fff", fontWeight: 600, border: "none", borderRadius: "10px" }}
+                        type="button"
+                        className="profile-menu-btn profile-menu-btn-primary"
                         onClick={() => { setMenuOpen(false); router.push("/perfil/citas_agendadas"); }}
                       >
                         {t("myAppointments")}
                       </button>
                       <button
-                        className="btn mt-2"
-                        style={{ background: "#fff3ef", color: "#b02e2e", fontWeight: 600, border: "1px solid #e4bfbf", borderRadius: "10px" }}
+                        type="button"
+                        className="profile-menu-btn profile-menu-btn-danger mt-2"
                         onClick={requestLogout}
                       >
                         {t("logout")}
@@ -349,7 +401,7 @@ export default function Navbar() {
       <div className={`mobile-sidebar ${mobileOpen ? "open" : ""}`} style={{ transition: "transform 0.4s ease, opacity 0.4s ease" }}>
         {user ? (
           <div className="mobile-sidebar-header" style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <img src={userPhoto} alt={t("profileAlt")} className="user-avatar" style={{ marginBottom: "0.8rem" }} />
+            <Avatar src={userPhoto} alt={t("profileAlt")} fallback={avatarFallback} className="user-avatar" style={{ marginBottom: "0.8rem", borderRadius: "50%" }} />
             <div className="user-name">{user.nombres}</div>
             <div className="user-email">{user.email}</div>
             <div className="user-actions">
@@ -358,9 +410,6 @@ export default function Navbar() {
               </button>
               <button className="user-action-btn" onClick={() => { setMobileOpen(false); router.push("/perfil/citas_agendadas"); }}>
                 {t("myAppointments")}
-              </button>
-              <button className="user-action-btn" onClick={requestLogout} style={{ color: "#b02e2e" }}>
-                {t("logout")}
               </button>
             </div>
           </div>
@@ -379,6 +428,18 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
+        </div>
+        {/* Footer del sidebar: controles + cerrar sesión al fondo */}
+        <div className="mobile-sidebar-footer">
+          <div className="mobile-sidebar-controls">
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
+          {user && (
+            <button className="mobile-sidebar-logout" onClick={requestLogout}>
+              {t("logout")}
+            </button>
+          )}
         </div>
       </div>
 

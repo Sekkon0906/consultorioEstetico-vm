@@ -113,12 +113,12 @@ function AgendarPageContent() {
 
   return (
     <main
-      className="min-h-screen w-full py-10 px-4 md:px-8 overflow-hidden"
+      className="dark-aware-section agendar-page min-h-screen w-full py-10 px-4 md:px-8 overflow-hidden"
       style={{
         background: `linear-gradient(135deg, ${PALETTE.bgGradFrom}, ${PALETTE.bgGradTo})`,
       }}
     >
-      <div className="mx-auto w-full max-w-7xl grid gap-6 items-start">
+      <div className="mx-auto w-full max-w-5xl grid gap-6 items-start">
         <AnimatePresence mode="wait">
 
           {step === 1 && (

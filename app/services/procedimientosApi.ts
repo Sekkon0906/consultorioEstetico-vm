@@ -3,6 +3,14 @@
 
 import type { Procedimiento } from "../types/domain";
 import { supabase } from "@/lib/supabaseClient";
+import { cached, invalidate } from "@/lib/cache";
+
+const PROC_TTL = 60_000; // 60s
+
+/** Invalida el caché de procedimientos (llamar tras crear/editar/borrar). */
+export function bustProcedimientosCache(): void {
+  invalidate("procedimientos:");
+}
 
 function mapRow(row: Record<string, unknown>): Procedimiento {
   return {
@@ -30,46 +38,50 @@ function mapRow(row: Record<string, unknown>): Procedimiento {
 const SELECT_FIELDS =
   "id, nombre, descripcion, descripcion_completa, precio, imagen, categoria, subcategoria, duracion_min, destacado, en_promocion, precio_promocional, promocion_hasta, mostrar_galeria_home, mostrar_galeria_procedimientos";
 
-/** GET todos los procedimientos - publico */
-export async function getProcedimientosApi(): Promise<Procedimiento[]> {
-  const { data, error } = await supabase
-    .from("procedimientos")
-    .select(SELECT_FIELDS)
-    .order("categoria", { ascending: true })
-    .order("nombre", { ascending: true });
-
-  if (error) {
-    // Fallback si la columna subcategoria aún no existe en BD
-    const { data: data2, error: err2 } = await supabase
+/** GET todos los procedimientos - publico (cacheado) */
+export async function getProcedimientosApi(opts?: { fresh?: boolean }): Promise<Procedimiento[]> {
+  return cached("procedimientos:all", PROC_TTL, async () => {
+    const { data, error } = await supabase
       .from("procedimientos")
-      .select("id, nombre, descripcion, descripcion_completa, precio, imagen, categoria, duracion_min, destacado")
+      .select(SELECT_FIELDS)
       .order("categoria", { ascending: true })
       .order("nombre", { ascending: true });
-    if (err2) throw new Error(err2.message);
-    return (data2 ?? []).map(mapRow);
-  }
-  return (data ?? []).map(mapRow);
+
+    if (error) {
+      // Fallback si la columna subcategoria aún no existe en BD
+      const { data: data2, error: err2 } = await supabase
+        .from("procedimientos")
+        .select("id, nombre, descripcion, descripcion_completa, precio, imagen, categoria, duracion_min, destacado")
+        .order("categoria", { ascending: true })
+        .order("nombre", { ascending: true });
+      if (err2) throw new Error(err2.message);
+      return (data2 ?? []).map(mapRow);
+    }
+    return (data ?? []).map(mapRow);
+  }, opts);
 }
 
-/** GET procedimiento por ID - publico */
-export async function getProcedimientoByIdApi(id: string | number): Promise<Procedimiento> {
-  const { data, error } = await supabase
-    .from("procedimientos")
-    .select(SELECT_FIELDS)
-    .eq("id", id)
-    .single();
-
-  if (error || !data) {
-    // Fallback sin subcategoria
-    const { data: data2, error: err2 } = await supabase
+/** GET procedimiento por ID - publico (cacheado) */
+export async function getProcedimientoByIdApi(id: string | number, opts?: { fresh?: boolean }): Promise<Procedimiento> {
+  return cached(`procedimientos:${id}`, PROC_TTL, async () => {
+    const { data, error } = await supabase
       .from("procedimientos")
-      .select("id, nombre, descripcion, descripcion_completa, precio, imagen, categoria, duracion_min, destacado")
+      .select(SELECT_FIELDS)
       .eq("id", id)
       .single();
-    if (err2 || !data2) throw new Error("Procedimiento no encontrado");
-    return mapRow(data2);
-  }
-  return mapRow(data);
+
+    if (error || !data) {
+      // Fallback sin subcategoria
+      const { data: data2, error: err2 } = await supabase
+        .from("procedimientos")
+        .select("id, nombre, descripcion, descripcion_completa, precio, imagen, categoria, duracion_min, destacado")
+        .eq("id", id)
+        .single();
+      if (err2 || !data2) throw new Error("Procedimiento no encontrado");
+      return mapRow(data2);
+    }
+    return mapRow(data);
+  }, opts);
 }
 
 /** POST crear procedimiento - admin */
@@ -96,6 +108,7 @@ export async function createProcedimientoApi(
     .single();
 
   if (error) throw new Error(error.message);
+  bustProcedimientosCache();
   return mapRow(data);
 }
 
@@ -133,6 +146,7 @@ export async function updateProcedimientoApi(
     .single();
 
   if (error) throw new Error(error.message);
+  bustProcedimientosCache();
   return mapRow(data);
 }
 
@@ -140,4 +154,5 @@ export async function updateProcedimientoApi(
 export async function deleteProcedimientoApi(id: string | number): Promise<void> {
   const { error } = await supabase.from("procedimientos").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  bustProcedimientosCache();
 }

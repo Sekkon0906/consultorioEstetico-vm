@@ -22,7 +22,7 @@ export default function PerfilCard() {
   const initial = (nombres || "").charAt(0).toUpperCase() + (apellidos || "").charAt(0).toUpperCase();
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+    <motion.div className="dark-aware-card" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
       style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", overflow: "hidden" }}>
 
       <div style={{ height: 4, background: "linear-gradient(90deg, #B08968, #C9AD8D)" }} />
@@ -50,7 +50,7 @@ export default function PerfilCard() {
 
         <div className="row g-4">
           <div className="col-md-6">
-            <div style={{ background: "#F5EEE6", borderRadius: 18, padding: "1.5rem" }}>
+            <div className="dark-aware-panel" style={{ background: "#F5EEE6", borderRadius: 18, padding: "1.5rem" }}>
               <h4 style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "1.05rem", marginBottom: "1rem" }}>{t("personalSection")}</h4>
               <DatosPersonalesForm
                 nombres={nombres} apellidos={apellidos} telefono={telefono} edad={edad} genero={genero}
@@ -61,7 +61,7 @@ export default function PerfilCard() {
           </div>
 
           <div className="col-md-6">
-            <div style={{ background: "#EEF7EE", borderRadius: 18, padding: "1.5rem" }}>
+            <div className="dark-aware-panel" style={{ background: "#EEF7EE", borderRadius: 18, padding: "1.5rem" }}>
               <h4 style={{ fontWeight: 700, color: "#2D6A4F", fontSize: "1.05rem", marginBottom: "1rem" }}>{t("medicalSection")}</h4>
               <DatosMedicosForm
                 antecedentes={antecedentes} alergias={alergias} medicamentos={medicamentos}
