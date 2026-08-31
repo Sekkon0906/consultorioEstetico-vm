@@ -2,8 +2,14 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import FondoAnim from "@/components/FondoAnim";
+import dynamic from "next/dynamic";
 import { supabase } from "@/lib/supabaseClient";
+
+// Fondo 3D (Three.js) diferido: esta pantalla es de tránsito (redirige sola
+// en segundos), no debe competir por ancho de banda con el flujo de sesión.
+const FondoAnim = dynamic(() => import("@/components/FondoAnim"), {
+  ssr: false,
+});
 
 /**
  * Handler de OAuth (Google). Supabase procesa el access_token del hash

@@ -1,13 +1,19 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle, AlertCircle, XCircle, Loader } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { getMisCitasApi } from "../../services/citasApi";
-import FirmaConsentimiento from "../../src/components/FirmaConsentimiento";
 import type { Cita } from "../../types/domain";
 import { supabase } from "@/lib/supabaseClient";
+
+// Trae jsPDF (pesado) consigo. Se usa solo cuando el paciente abre el
+// modal de firma, así que no debe formar parte de la carga inicial de "Mis citas".
+const FirmaConsentimiento = dynamic(() => import("../../src/components/FirmaConsentimiento"), {
+  ssr: false,
+});
 
 interface ReagendaPend {
   id: number;
