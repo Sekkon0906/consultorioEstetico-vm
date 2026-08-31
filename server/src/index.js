@@ -13,6 +13,8 @@ const charlasRoutes      = require("./routes/charlas");
 const analyticsRoutes    = require("./routes/analytics");
 const reportesRoutes     = require("./routes/reportes");
 const reagendasRoutes    = require("./routes/reagendas");
+const configuracionRoutes = require("./routes/configuracion");
+const copilotoRoutes     = require("./routes/copiloto");
 
 const app = express();
 
@@ -49,6 +51,8 @@ app.use("/bloqueos-horas", bloqueosHorasRoutes);
 app.use("/charlas",        charlasRoutes);
 app.use("/analytics",      analyticsRoutes);
 app.use("/reportes",       reportesRoutes);
+app.use("/configuracion",  configuracionRoutes);
+app.use("/copiloto",       copilotoRoutes);
 app.use("/",               reagendasRoutes);  // /citas/:id/solicitar-reagenda y /reagendas
 
 // ── MANEJO GLOBAL DE ERRORES ─────────────────────────────────

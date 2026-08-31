@@ -11,6 +11,8 @@ import TestimoniosList from "./testimonios/testimoniosList";
 import Ingresos from "./analitica/ingresos";
 import CharlasList from "./charlas/charlasList";
 import AdministrarHorarios from "./horario/horariosHabilitados";
+import ConfiguracionForm from "./configuracion/configuracionForm";
+import CopilotoChat from "./copiloto/copilotoChat";
 
 export default function AdministrarPageInner() {
   const params = useSearchParams();
@@ -50,6 +52,8 @@ export default function AdministrarPageInner() {
         {selected === "testimonios" && <TestimoniosList />}
         {selected === "charlas" && <CharlasList />}
         {selected === "ingresos" && <Ingresos />}
+        {selected === "configuracion" && <ConfiguracionForm />}
+        {selected === "copiloto" && <CopilotoChat />}
       </motion.div>
     </AnimatePresence>
   );
