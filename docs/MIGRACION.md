@@ -1,6 +1,9 @@
 # Migración de Supabase a infraestructura propia
 
-Estado: **planificación cerrada, esperando el volcado de Supabase.**
+Estado: **planificación cerrada e inventario verificado. Esperando el VPS.**
+
+> Los hallazgos de seguridad de este documento fueron **corregidos** tras verificar
+> las políticas reales. Ver `INVENTARIO-SUPABASE.md`, que manda sobre este archivo.
 
 Estudio completo y navegable: ver el artifact de la sesión (Salir de Supabase).
 Este documento es el resumen operativo versionado.
@@ -9,7 +12,7 @@ Este documento es el resumen operativo versionado.
 
 | Decisión | Elegido |
 |---|---|
-| Infraestructura | Hostinger **VPS KVM 2** (2 vCPU / 8 GB), Ubuntu 24.04. Pendiente de contratar. |
+| Infraestructura | Hostinger **VPS KVM 2** (2 vCPU / 8 GB), Ubuntu 24.04. **Pendiente de contratar — único bloqueo.** |
 | Estrategia | **Camino C** — migración por fases, sin caída del sitio |
 | Base de datos | PostgreSQL 17 en el mismo VPS |
 | Copiloto de IA | Contenido del sitio + consultas agregadas sin datos identificables |
@@ -48,43 +51,30 @@ no ofrece PostgreSQL ni un runtime de Node controlable. Solo el VPS.
 
 | # | Fase | Estimado |
 |---|---|---|
-| 00 | Volcado real de Supabase (**bloquea todo**) | — |
+| 00 | Inventario real de Supabase | **hecho** |
 | 01 | Preparar VPS: SSH, ufw, fail2ban, Postgres, Node, Nginx, **backups verificados** | ~1 d |
-| 02 | Migrar base de datos y archivos; separar público de privado | ~1-2 d |
-| 03 | Auth propia: JWT, argon2 con compatibilidad bcrypt, Google OAuth, SMTP | ~3-4 d |
+| 02 | Migrar base de datos y archivos; separar público de privado; podar tablas muertas | ~1 d |
+| 03 | Auth propia: JWT, argon2, Google OAuth, SMTP (sin compatibilidad bcrypt: no hay contraseñas) | ~2-3 d |
 | 04 | Frontend a la API propia, por dominio: consentimientos → citas → usuarios → charlas → contenido público | ~4-6 d |
 | 05 | `configuracion_sitio` + pantalla de administración | ~2 d |
 | 06 | Videos fuera de la cuenta personal de YouTube | ~1 d |
 | 07 | Copiloto de IA (tool calling, confirmar antes de escribir, auditoría) | ~3-4 d |
-| 08 | Corte a producción; Supabase en solo lectura 2 semanas | ~1 d |
+| 08 | Corte a producción; Supabase en solo lectura unas semanas | ~0.5 d |
 
-## Lo que se necesita de Supabase para arrancar
+## Estado del arranque
 
-Ejecutar en el SQL Editor del proyecto y pegar los resultados:
+La fase 00 está cerrada: el inventario real está en `INVENTARIO-SUPABASE.md`.
 
-```sql
--- 1. Políticas de seguridad vigentes
-select schemaname, tablename, policyname, cmd, roles, qual, with_check
-from pg_policies where schemaname = 'public' order by tablename;
+**El único bloqueo es el VPS.** Mientras tanto se puede avanzar sin servidor en
+el esquema de `configuracion_sitio`, las migraciones SQL, la estructura de la
+API y las herramientas del copiloto.
 
--- 2. Buckets y si son públicos
-select id, name, public, file_size_limit from storage.buckets;
+Decisiones pendientes que abrió el inventario:
 
--- 3. Peso y cantidad de archivos por bucket
-select bucket_id, count(*) archivos,
-       pg_size_pretty(sum((metadata->>'size')::bigint)) peso
-from storage.objects group by bucket_id;
-
--- 4. Cuentas por proveedor (define si migramos hashes o pedimos reset)
-select raw_app_meta_data->>'provider' proveedor, count(*)
-from auth.users group by 1;
-```
-
-Y el esquema completo, con la CLI de Supabase:
-
-```bash
-supabase db dump --db-url "$DATABASE_URL" --schema public --schema-only > docs/schema.sql
-```
+- ¿Las 22 citas de prueba se descartan en la migración? (los 15 procedimientos
+  y 3 testimonios sí parecen contenido real)
+- ¿`bloqueos_horas` o `horarios_por_fecha`? ¿`procedimiento_galeria` o
+  `procedimiento_media`? Propuesta: conservar las que el código usa.
 
 ## Después del deploy
 
