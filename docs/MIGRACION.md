@@ -12,13 +12,36 @@ Este documento es el resumen operativo versionado.
 
 | Decisión | Elegido |
 |---|---|
-| Infraestructura | Hostinger **VPS KVM 2** (2 vCPU / 8 GB), Ubuntu 24.04. **Pendiente de contratar — único bloqueo.** |
+| Infraestructura | **Servicios gestionados, no VPS** (revisado). Vercel + Railway + Neon + Cloudflare R2. ~$0-2 USD/mes. Un VPS queda como camino de escalado futuro, no como punto de partida. |
 | Estrategia | **Camino C** — migración por fases, sin caída del sitio |
 | Base de datos | PostgreSQL 17 en el mismo VPS |
 | Copiloto de IA | Contenido del sitio + consultas agregadas sin datos identificables |
 
 El hosting compartido de Hostinger (Premium / Business / Cloud) **no sirve**:
 no ofrece PostgreSQL ni un runtime de Node controlable. Solo el VPS.
+
+## Revisión de estrategia (2026-08-31)
+
+Decisión inicial: Postgres y el backend en un VPS de Hostinger propio.
+Con el costo real sobre la mesa (~$7-13 USD/mes + trabajo de sysadmin) para un
+proyecto con 1 usuario real, se revisa a **servicios gestionados**:
+
+- **Vercel** (frontend Next.js) — gratis
+- **Railway** (backend Express) — gratis o ~$5/mes según uso
+- **Neon** (Postgres) — gratis hasta 0.5 GB
+- **Cloudflare R2** (archivos) — gratis hasta 10 GB
+
+Es un camino válido de "empezar barato, crecer después" porque **la base de
+datos sigue siendo Postgres en todo momento** — a diferencia de proponer
+hosting compartido (que solo ofrece MySQL), no hay reescritura de esquema si
+más adelante se migra a VPS. Migrar sería: `pg_dump` de Neon → `pg_restore`
+en el VPS nuevo, y mover el proceso de Railway a PM2. Nada del código construido
+hasta ahora (`configuracion_sitio`, el copiloto, las rutas de Express) cambia:
+todo habla con Postgres por `DATABASE_URL`, sin importar quién la aloja.
+
+Un VPS (Hostinger KVM 1 o 2) sigue siendo la opción si el proyecto crece más
+allá de los niveles gratuitos, o si se prefiere tener todo bajo un solo techo
+propio en vez de varios proveedores gestionados.
 
 ## Inventario de acoplamiento a Supabase
 
