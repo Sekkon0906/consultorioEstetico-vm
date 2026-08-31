@@ -256,12 +256,16 @@ export default function Galeria3D() {
       </motion.div>
       </div>
 
-      {/* Rueda 3D — centrada vertical entre el título y la base inferior */}
+      {/* Rueda 3D — centrada vertical entre el título y la base inferior.
+          top subido de 58% a 63%: con subtítulo largo, el borde superior
+          de la tarjeta frontal quedaba debajo del texto "Selecciona
+          alguno para ver...". Ajuste moderado a propósito — subir más
+          arriesga que el borde inferior choque con los dots/CTA. */}
       <div
         className="g3d-wheel-anchor"
         style={{
           position: "absolute",
-          top: "58%",
+          top: "63%",
           right: "30%",
           transform: "translate(50%, -50%)",
           zIndex: 3,

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
+import Button from "@/components/ui/Button";
 import type { Cita, MetodoPago, TipoPagoConsultorio, TipoPagoOnline } from "../types/domain";
 import { createCitaApi } from "../services/citasApi";
 
@@ -158,13 +159,12 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
         {error && <div style={{ background: "#FDE8D8", color: "#922B21", padding: "0.7rem 1rem", borderRadius: 12, marginBottom: "1rem", fontSize: "0.85rem" }}>{error}</div>}
 
         <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center", flexWrap: "wrap" }}>
-          <button onClick={goBack} style={{ display: "flex", alignItems: "center", gap: 6, padding: "0.75rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer" }}>
+          <Button variant="outline" size="lg" onClick={goBack}>
             <ArrowLeft size={16} /> {t("back")}
-          </button>
-          <button onClick={handleConfirmar} disabled={loading}
-            style={{ display: "flex", alignItems: "center", gap: 8, padding: "0.75rem 2rem", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 16px rgba(176,137,104,0.25)", opacity: loading ? 0.7 : 1 }}>
+          </Button>
+          <Button variant="primary" size="lg" onClick={handleConfirmar} disabled={loading}>
             <i className="fab fa-whatsapp" style={{ fontSize: "1.1rem" }} /> {loading ? t("submitting") : t("submit")}
-          </button>
+          </Button>
         </div>
       </div>
     </motion.div>
