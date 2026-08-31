@@ -22,6 +22,7 @@
   --brand:         #B08968;   /* marca principal */
   --brand-soft:    #C9AD8D;   /* marca suave */
   --brand-deep:    #8B6A4B;   /* marca profunda (hover/accent) */
+  --brand-contrast:#FFFFFF;   /* texto sobre fondos --brand (botones) */
   --accent:        #E0B892;   /* acento cálido */
   --topbar-bg:     #E8E1D4;
   --topbar-text:   #4E3B2B;
@@ -57,6 +58,7 @@
   --brand:         #E8C9A0;   /* champagne como acento */
   --brand-soft:    #F2DDB8;
   --brand-deep:    #FBF2E5;
+  --brand-contrast:#2A2118;   /* en dark, --brand es claro (champagne): texto oscuro */
   --accent:        #E8C9A0;
   --topbar-bg:     #1F1812;
   --topbar-text:   #FBF2E5;
@@ -4460,3 +4462,61 @@ a:hover {
 .fc-button-primary:hover {
   background: #b08968;
 }
+/* ============================================================================
+   SISTEMA DE BOTONES (app/src/components/ui/Button.tsx)
+   ----------------------------------------------------------------------------
+   Único lugar donde se decide tamaño, forma y color de un botón. Usa los
+   tokens de arriba (--brand, --brand-soft, --brand-contrast...), así que
+   cambia de tema sin código adicional. Los estilos en línea que sigan
+   existiendo en el resto del código NO leen esto — es la base para migrar
+   ============================================================================ */
+
+.btn-app {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 100px;
+  border: none;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.2;
+  transition: box-shadow 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+}
+.btn-app:disabled { cursor: default; opacity: 0.55; }
+.btn-app--full { width: 100%; }
+
+/* tamaños */
+.btn-app--sm { padding: 0.45rem 1rem;   font-size: 0.78rem; }
+.btn-app--md { padding: 0.65rem 1.5rem; font-size: 0.87rem; }
+.btn-app--lg { padding: 0.85rem 2rem;   font-size: 0.95rem; }
+
+/* variantes */
+.btn-app--primary {
+  background: linear-gradient(135deg, var(--brand), var(--brand-soft));
+  color: var(--brand-contrast);
+  box-shadow: var(--shadow-sm);
+}
+.btn-app--primary:hover:not(:disabled) { box-shadow: var(--shadow-md); }
+
+.btn-app--outline {
+  background: var(--surface);
+  color: var(--brand-deep);
+  border: 1.5px solid var(--brand);
+}
+.btn-app--outline:hover:not(:disabled) { background: var(--surface-soft); }
+
+.btn-app--ghost {
+  background: transparent;
+  color: var(--text-soft);
+  border: 1px solid var(--border);
+}
+.btn-app--ghost:hover:not(:disabled) { background: var(--surface-soft); }
+
+.btn-app--danger {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-app--danger:hover:not(:disabled) { opacity: 0.9; }

@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import { Save, RotateCcw, Check, AlertCircle } from "lucide-react";
 import { api } from "@/lib/api";
+import Button from "@/components/ui/Button";
 
 // Estilo de input compartido con el resto del panel
 const IS: React.CSSProperties = {
@@ -207,30 +207,15 @@ export default function ConfiguracionForm() {
           display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
         }}
       >
-        <motion.button
-          whileHover={{ scale: nCambios ? 1.02 : 1 }}
-          whileTap={{ scale: nCambios ? 0.98 : 1 }}
-          onClick={guardar}
-          disabled={!nCambios || guardando}
-          style={{
-            display: "flex", alignItems: "center", gap: 8,
-            padding: "0.6rem 1.4rem", borderRadius: 100, border: "none",
-            background: nCambios ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#DCC7AC",
-            color: "white", fontWeight: 600, fontSize: "0.85rem",
-            cursor: nCambios && !guardando ? "pointer" : "default",
-          }}
-        >
+        <Button variant="primary" onClick={guardar} disabled={!nCambios || guardando}>
           <Save size={16} />
           {guardando ? "Guardando…" : nCambios ? `Guardar ${nCambios} cambio${nCambios > 1 ? "s" : ""}` : "Sin cambios"}
-        </motion.button>
+        </Button>
 
         {nCambios > 0 && !guardando && (
-          <button
-            onClick={() => setEditado({})}
-            style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: "#8A7461", fontSize: "0.82rem", cursor: "pointer" }}
-          >
+          <Button variant="ghost" size="sm" onClick={() => setEditado({})} style={{ border: "none" }}>
             <RotateCcw size={14} /> Descartar
-          </button>
+          </Button>
         )}
 
         {exito && (

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Check, X, Sparkles, AlertCircle } from "lucide-react";
 import { api } from "@/lib/api";
+import Button from "@/components/ui/Button";
 
 // Etiquetas legibles: la doctora no debería ver nombres de funciones.
 const ACCIONES: Record<string, string> = {
@@ -227,20 +228,12 @@ export default function CopilotoChat() {
               </p>
 
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <button
-                  onClick={confirmar}
-                  disabled={aplicando}
-                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "0.5rem 1.2rem", borderRadius: 100, border: "none", background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", fontWeight: 600, fontSize: "0.84rem", cursor: aplicando ? "default" : "pointer" }}
-                >
+                <Button variant="primary" size="sm" onClick={confirmar} disabled={aplicando}>
                   <Check size={15} /> {aplicando ? "Aplicando…" : "Confirmar"}
-                </button>
-                <button
-                  onClick={rechazar}
-                  disabled={aplicando}
-                  style={{ display: "flex", alignItems: "center", gap: 6, padding: "0.5rem 1.1rem", borderRadius: 100, border: "1px solid #DCC7AC", background: "transparent", color: "#8A7461", fontWeight: 600, fontSize: "0.84rem", cursor: aplicando ? "default" : "pointer" }}
-                >
+                </Button>
+                <Button variant="ghost" size="sm" onClick={rechazar} disabled={aplicando}>
                   <X size={15} /> Descartar
-                </button>
+                </Button>
               </div>
             </motion.div>
           )}
