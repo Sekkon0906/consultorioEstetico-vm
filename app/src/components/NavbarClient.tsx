@@ -187,6 +187,10 @@ export default function Navbar() {
               style={{ width: "auto", height: "auto" }}
             />
           </Link>
+          {/* Solo en escritorio: en móvil este texto (sin recorte y sin caso
+              para /administrar, donde siempre decía "Inicio") competía por
+              espacio con el logo y el botón de menú, y en el panel rompía
+              el navbar. */}
           <AnimatePresence mode="wait">
             <motion.span
               key={currentSection}
@@ -194,6 +198,7 @@ export default function Navbar() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 8 }}
               transition={{ duration: 0.25 }}
+              className="d-none d-md-inline-block"
               style={{
                 fontWeight: 600,
                 fontSize: "0.92rem",
@@ -389,11 +394,9 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Selector de tema + idioma — a la derecha del login/avatar */}
-          <div className="d-none d-md-inline-flex ms-2 align-items-center" style={{ gap: 8 }}>
-            <ThemeToggle />
-            <LanguageSwitcher />
-          </div>
+          {/* Tema e idioma salieron de aquí: el navbar de escritorio competía
+              por espacio con 6 enlaces + login. Ahora viven en el acceso
+              rápido flotante (QuickAccessFab, esquina inferior derecha). */}
         </div>
       </div>
 

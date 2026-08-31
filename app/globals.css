@@ -4432,3 +4432,97 @@ a:hover {
   color: #fff;
 }
 .btn-app--danger:hover:not(:disabled) { opacity: 0.9; }
+
+/* ============================================================================
+   ACCESO RÁPIDO FLOTANTE (app/src/components/QuickAccessFab.tsx)
+   ----------------------------------------------------------------------------
+   Solo escritorio — en móvil tema/idioma/contacto ya viven en el sidebar
+   (mobile-sidebar-controls). Mismo umbral de 820px que usa Galeria3D para
+   su cambio de layout, así los dos "es móvil" coinciden en todo el sitio.
+   ============================================================================ */
+
+.quick-fab {
+  display: none;
+}
+
+@media (min-width: 821px) {
+  .quick-fab {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.7rem;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1200;
+  }
+}
+
+.quick-fab-trigger {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--brand), var(--brand-soft));
+  color: var(--brand-contrast);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+}
+
+.quick-fab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 230px;
+  padding: 1rem;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.quick-fab-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.quick-fab-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+.quick-fab-contact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.quick-fab-contact:hover { color: var(--brand-deep); }
+
+.quick-fab-socials {
+  display: flex;
+  gap: 8px;
+}
+
+.quick-fab-social {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface-soft);
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  transition: background 0.2s, color 0.2s;
+}
+.quick-fab-social:hover {
+  background: var(--brand);
+  color: var(--brand-contrast);
+}

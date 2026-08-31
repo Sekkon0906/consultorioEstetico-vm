@@ -26,6 +26,7 @@ import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import NavbarClient from "@/components/NavbarClient";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
+import QuickAccessFab from "@/components/QuickAccessFab";
 import { AuthProvider } from "@/context/AuthContext";
 import { IMG } from "@/lib/imagenes";
 
@@ -214,6 +215,9 @@ export default async function RootLayout({
 
           {/* BANNER DE COOKIES (solo aparece si el usuario no ha decidido) */}
           <CookieBanner />
+
+          {/* ACCESO RÁPIDO FLOTANTE — tema, idioma y contacto, solo escritorio */}
+          <QuickAccessFab />
         </AuthProvider>
         </NextIntlClientProvider>
       </body>
