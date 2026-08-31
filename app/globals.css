@@ -132,9 +132,9 @@ html, body {
 :root[data-theme="dark"] .proc-page {
   background: linear-gradient(180deg, #14100C 0%, #1F1812 100%) !important;
 }
-/* Carrusel Stories de la Galería 3D: SOLO visible en móvil. En desktop
-   manda la rueda 3D, así que se oculta por defecto. */
-.g3d-stories-wrap { display: none; }
+/* Cuadrícula minimalista de la Galería 3D: SOLO visible en móvil. En
+   desktop manda la rueda 3D, así que se oculta por defecto. */
+.g3d-grid-wrap { display: none; }
 
 /* La toolbar sticky debe pegarse JUSTO debajo del navbar (sticky en top:0),
    no en top:0 (colisionaba). Lo ponemos aquí en globals (HMR fiable) con
@@ -1115,34 +1115,33 @@ html, body {
 
   /* 6. Galería 3D móvil — reglas con especificidad alta (.g3d-stage > hijo)
      para ganarle a los media queries internos del componente y al HMR.
-     Composición: título + texto a la derecha, rueda escalada debajo y
-     alineada con ese bloque, dots y CTA también a la derecha. */
+     Composición minimalista: título centrado con flujo normal (ya no
+     superpuesto ni alineado a la derecha sobre la foto), cuadrícula de
+     procedimientos debajo, CTA centrado al final. */
   .g3d-stage .g3d-title-wrap {
     position: relative !important;
     top: auto !important;
     left: auto !important;
     right: auto !important;
-    width: 80% !important;
-    margin: 0 0 0 auto !important;
-    padding-right: 4% !important;
-    text-align: right !important;
+    width: 90% !important;
+    max-width: 90% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    text-align: center !important;
     transform: none !important;
   }
   .g3d-stage .g3d-title-wrap h1,
   .g3d-stage .g3d-title-wrap h2,
   .g3d-stage .g3d-title-wrap p {
-    text-align: right !important;
+    text-align: center !important;
     left: auto !important;
     right: auto !important;
     transform: none !important;
     width: 100% !important;
     max-width: 100% !important;
   }
-  /* el separador (divisor) del título alineado a la derecha también */
-  .g3d-stage .g3d-title-wrap > div > div {
-    margin-left: auto !important;
-    margin-right: 0 !important;
-  }
+  /* El separador ya viene centrado por su propio margin: auto — el
+     título en móvil ahora es centrado, no hace falta ninguna corrección. */
   /* En móvil se OCULTA la rueda 3D y sus dots; manda el carrusel Stories. */
   .g3d-stage .g3d-wheel-anchor { display: none !important; }
   .g3d-stage .g3d-dots-wrap    { display: none !important; }
@@ -1161,67 +1160,32 @@ html, body {
   }
   .g3d-stage { overflow: hidden !important; }
 
-  /* ===== Grid compacto de procedimientos (móvil) =====
-     2 columnas, cards pequeñas — se ven varios de un vistazo sin que uno
-     domine la pantalla. Reemplaza la rueda 3D en celular. */
-  .g3d-stage .g3d-stories-wrap {
-    display: block !important;
+  /* ===== Cuadrícula minimalista de procedimientos (móvil) =====
+     2 columnas fijas, sin carrusel ni volteo. Cada card es solo foto +
+     nombre + insignia; toca abre el mismo modal de detalle que usa la
+     rueda de escritorio (no hay una segunda interfaz de "detalle" que
+     mantener). Reemplaza la rueda 3D en celular. */
+  .g3d-stage .g3d-grid-wrap {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.7rem;
     position: relative;
     z-index: 4;
     margin-top: 1.4rem;
     padding: 0 1rem;
   }
-  /* En grid no hacen falta los dots de Stories. */
-  .g3d-stage .g3d-stories-dots { display: none !important; }
-  /* Carrusel horizontal tipo "cinta": una sola fila que se desliza con el
-     dedo. Cards pequeñas (~42% ancho) → se ven ~2.5 a la vez. */
-  .g3d-stage .g3d-stories {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    gap: 0.6rem;
-    padding: 0 1rem 0.4rem;
-  }
-  .g3d-stage .g3d-stories::-webkit-scrollbar { display: none; }
-  /* ===== Flip card (móvil): al tocar, la card gira y muestra atrás la
-     descripción + "Saber más". Sin ventana emergente. ===== */
-  .g3d-stage .g3d-flip {
-    flex: 0 0 52%;
-    scroll-snap-align: center;
-    aspect-ratio: 3 / 4;
-    perspective: 1000px;
-  }
-  .g3d-stage .g3d-flip-inner {
+  .g3d-stage .g3d-grid-card {
     position: relative;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .g3d-stage .g3d-flip.is-flipped .g3d-flip-inner {
-    transform: rotateY(180deg);
-  }
-  .g3d-stage .g3d-flip-front,
-  .g3d-stage .g3d-flip-back {
-    position: absolute;
-    inset: 0;
+    aspect-ratio: 3 / 4;
     border-radius: 14px;
     overflow: hidden;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-  }
-  /* CARA FRONTAL */
-  .g3d-stage .g3d-flip-front {
     border: none;
     padding: 0;
     cursor: pointer;
     background: #1f1812;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
   }
-  .g3d-stage .g3d-flip-front img {
+  .g3d-stage .g3d-grid-card img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -1229,98 +1193,46 @@ html, body {
     object-fit: cover;
     object-position: center top;
   }
-  .g3d-stage .g3d-story-veil {
+  .g3d-stage .g3d-grid-veil {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, transparent 42%, rgba(20,14,9,0.82) 100%);
+    background: linear-gradient(180deg, transparent 45%, rgba(20,14,9,0.8) 100%);
     pointer-events: none;
   }
-  .g3d-stage .g3d-story-name {
+  .g3d-stage .g3d-grid-name {
     position: absolute;
-    left: 6px; right: 6px; bottom: 9px;
+    left: 8px; right: 8px; bottom: 10px;
     z-index: 2;
-    text-align: center;
+    text-align: left;
     color: #fff;
     font-family: 'Playfair Display', serif;
     font-weight: 700;
-    font-size: 0.78rem;
-    line-height: 1.15;
+    font-size: 0.82rem;
+    line-height: 1.2;
     text-shadow: 0 2px 8px rgba(0,0,0,0.8);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .g3d-stage .g3d-story-badge {
+  .g3d-stage .g3d-grid-badge {
     position: absolute;
-    top: 6px; left: 6px;
+    top: 8px; left: 8px;
     z-index: 2;
-    padding: 0.16rem 0.45rem;
+    padding: 0.18rem 0.5rem;
     border-radius: 100px;
-    font-size: 0.5rem;
+    font-size: 0.52rem;
     font-weight: 800;
     letter-spacing: 0.02em;
     text-transform: uppercase;
   }
-  .g3d-stage .g3d-story-badge.promo {
+  .g3d-stage .g3d-grid-badge.promo {
     background: linear-gradient(135deg, #E08A4A, #F4A671);
     color: #fff;
   }
-  .g3d-stage .g3d-story-badge.destacado {
+  .g3d-stage .g3d-grid-badge.destacado {
     background: linear-gradient(135deg, #F7D680, #FFE6B3);
     color: #6B4419;
-  }
-  /* CARA TRASERA */
-  .g3d-stage .g3d-flip-back {
-    transform: rotateY(180deg);
-    background: linear-gradient(160deg, #2A2018, #14100C);
-    border: 1px solid var(--brand);
-    display: flex;
-    flex-direction: column;
-    padding: 0.85rem 0.75rem;
-    text-align: center;
-  }
-  .g3d-stage .g3d-flip-back-close {
-    align-self: flex-start;
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    border: 1px solid rgba(232,201,160,0.4);
-    background: rgba(232,201,160,0.12);
-    color: #E8C9A0;
-    font-size: 1rem;
-    line-height: 1;
-    cursor: pointer;
-    margin-bottom: 0.35rem;
-  }
-  .g3d-stage .g3d-flip-back-title {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    font-size: 0.82rem;
-    color: #FBF2E5;
-    margin: 0 0 0.35rem;
-    line-height: 1.2;
-  }
-  .g3d-stage .g3d-flip-back-desc {
-    font-size: 0.66rem;
-    color: #E5D2B8;
-    line-height: 1.4;
-    margin: 0;
-    flex: 1;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 5;
-    -webkit-box-orient: vertical;
-  }
-  .g3d-stage .g3d-flip-back-cta {
-    margin-top: 0.5rem;
-    padding: 0.45rem 0.6rem;
-    border-radius: 100px;
-    background: linear-gradient(135deg, #B08968, #C9AD8D);
-    color: #fff !important;
-    font-size: 0.64rem;
-    font-weight: 700;
-    text-decoration: none;
-    white-space: nowrap;
   }
 
   /* 8. Formación Continua — timeline rota en móvil.

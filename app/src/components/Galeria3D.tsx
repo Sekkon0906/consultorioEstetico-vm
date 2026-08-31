@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -25,23 +25,6 @@ export default function Galeria3D() {
   const [selected, setSelected] = useState<number | null>(null);
   const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
-
-  // Carrusel "Stories" para móvil (una card a la vez con swipe).
-  const storiesRef = useRef<HTMLDivElement>(null);
-  const [storyIdx, setStoryIdx] = useState(0);
-  // Card volteada (flip) en el carrusel móvil — muestra la descripción atrás.
-  const [flippedId, setFlippedId] = useState<number | null>(null);
-  const onStoriesScroll = () => {
-    const el = storiesRef.current;
-    if (!el) return;
-    const idx = Math.round(el.scrollLeft / el.clientWidth);
-    setStoryIdx(idx);
-  };
-  const goToStory = (i: number) => {
-    const el = storiesRef.current;
-    if (!el) return;
-    el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
-  };
 
   // Marca que estamos en cliente — usado para gates de elementos puramente
   // visuales (partículas) que pueden divergir en hidratación si calculamos
@@ -478,80 +461,38 @@ export default function Galeria3D() {
         )}
       </div>
 
-      {/* === CARRUSEL STORIES (solo móvil) — una card grande a la vez ===
-          Reemplaza la rueda 3D en celular: foto + nombre + badge, se desliza
-          con el dedo (scroll-snap). Dots arriba. Tocar abre el detalle. */}
+      {/* === CUADRÍCULA MINIMALISTA (solo móvil) ===
+          Reemplaza el carrusel de tarjetas que se volteaban al tocar: esa
+          interacción quedaba escondida (sin indicador de que se podía tocar)
+          y a primera vista se veía plana. Aquí cada tarjeta es solo foto +
+          nombre + insignia si aplica, con una entrada suave al hacer scroll,
+          y toca directo al mismo modal de detalle que usa la rueda de
+          escritorio — una sola interfaz de detalle, no dos. */}
       {selected === null && tratamientos.length > 0 && (
-        <div className="g3d-stories-wrap">
-          {/* Dots arriba */}
-          <div className="g3d-stories-dots" role="tablist" aria-label={t("subtitle")}>
-            {tratamientos.map((tr, i) => (
-              <button
-                key={tr.id}
-                type="button"
-                role="tab"
-                aria-selected={i === storyIdx}
-                aria-label={tr.nombre}
-                onClick={() => goToStory(i)}
-                className={`g3d-stories-dot ${i === storyIdx ? "is-active" : ""}`}
-              />
-            ))}
-          </div>
-
-          <div
-            className="g3d-stories"
-            ref={storiesRef}
-            onScroll={onStoriesScroll}
-          >
-            {tratamientos.map((tr) => {
-              const isFlipped = flippedId === tr.id;
-              return (
-                <div
-                  key={tr.id}
-                  className={`g3d-flip ${isFlipped ? "is-flipped" : ""}`}
-                >
-                  <div className="g3d-flip-inner">
-                    {/* CARA FRONTAL: foto + nombre. Al tocar, voltea. */}
-                    <button
-                      type="button"
-                      className="g3d-flip-front"
-                      onClick={() => setFlippedId(tr.id)}
-                      aria-label={tr.nombre}
-                    >
-                      <img src={tr.imagen || undefined} alt={tr.nombre} loading="lazy" />
-                      <span className="g3d-story-veil" aria-hidden="true" />
-                      {(tr.enPromocion || tr.destacado) && (
-                        <span className={`g3d-story-badge ${tr.enPromocion ? "promo" : "destacado"}`}>
-                          ★ {tr.enPromocion ? t("badgePromo") : t("badgeDestacado")}
-                        </span>
-                      )}
-                      <span className="g3d-story-name">{tr.nombre}</span>
-                    </button>
-
-                    {/* CARA TRASERA: descripción + "Saber más". */}
-                    <div className="g3d-flip-back">
-                      <button
-                        type="button"
-                        className="g3d-flip-back-close"
-                        onClick={() => setFlippedId(null)}
-                        aria-label={t("back")}
-                      >
-                        ←
-                      </button>
-                      <h4 className="g3d-flip-back-title">{tr.nombre}</h4>
-                      <p className="g3d-flip-back-desc">{tr.desc}</p>
-                      <Link
-                        href={"/procedimientos/" + tr.id}
-                        className="g3d-flip-back-cta"
-                      >
-                        {t("viewMoreShort")}
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        <div className="g3d-grid-wrap">
+          {tratamientos.map((tr, i) => (
+            <motion.button
+              key={tr.id}
+              type="button"
+              className="g3d-grid-card"
+              onClick={() => setSelected(tr.id)}
+              aria-label={tr.nombre}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.45, delay: Math.min(i, 4) * 0.06, ease: "easeOut" }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <img src={tr.imagen || undefined} alt={tr.nombre} loading="lazy" />
+              <span className="g3d-grid-veil" aria-hidden="true" />
+              {(tr.enPromocion || tr.destacado) && (
+                <span className={`g3d-grid-badge ${tr.enPromocion ? "promo" : "destacado"}`}>
+                  ★ {tr.enPromocion ? t("badgePromo") : t("badgeDestacado")}
+                </span>
+              )}
+              <span className="g3d-grid-name">{tr.nombre}</span>
+            </motion.button>
+          ))}
         </div>
       )}
 
@@ -923,17 +864,20 @@ export default function Galeria3D() {
             background:
               linear-gradient(180deg, rgba(58,42,26,0.62) 0%, rgba(58,42,26,0.42) 35%, rgba(58,42,26,0.62) 100%) !important;
           }
-          /* Título y texto a la DERECHA (sobre la zona oscura del retrato),
-             alineados a la derecha para componer con la doctora a la izq. */
+          /* Título centrado con flujo normal (antes iba superpuesto a la
+             derecha sobre la foto, alineado a la derecha — se veía forzado
+             en pantallas angostas). Minimalista: solo texto, sin pelear
+             con la imagen de fondo. */
           .g3d-title-wrap     {
             position: relative !important;
             top: auto !important;
             right: auto !important;
-            width: 78% !important;
+            width: 90% !important;
+            max-width: 90% !important;
             transform: none !important;
-            margin: 0 0 0 auto !important;
-            padding-right: 4% !important;
-            text-align: right !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            text-align: center !important;
           }
           /* Rueda 3D escalada, alineada con el bloque de texto (debajo). */
           .g3d-wheel-anchor   {
