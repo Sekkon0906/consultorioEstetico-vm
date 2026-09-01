@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { TypeAnimation } from "react-type-animation";
+import PalabraPintada from "@/components/PalabraPintada";
 import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 
@@ -66,7 +66,6 @@ export default function HomePage() {
   const memoizedVideo = useMemo(() => <VideoAnim />, []);
 
   const rotator = t.raw("rotator") as string[];
-  const rotatorSequence = rotator.flatMap((w) => [w, 1800]);
 
   return (
     <>
@@ -123,18 +122,9 @@ export default function HomePage() {
               {t("title1")} <br /> {t("title2")}
               <br />
               <span className="hero-fs-rotator">
-                {/* key={locale} fuerza remount cuando cambia el idioma:
-                    sin esto, TypeAnimation conserva la secuencia interna
-                    inicial y nunca refleja la traducción nueva. */}
-                <TypeAnimation
-                  key={locale}
-                  sequence={rotatorSequence}
-                  wrapper="span"
-                  speed={55}
-                  deletionSpeed={70}
-                  repeat={Infinity}
-                  cursor={true}
-                />
+                {/* key={locale} fuerza remount al cambiar de idioma: sin eso
+                    el componente conservaría la palabra del idioma anterior. */}
+                <PalabraPintada key={locale} palabras={rotator} />
               </span>
             </motion.h1>
 

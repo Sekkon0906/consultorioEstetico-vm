@@ -153,14 +153,37 @@ export default function Galeria3D() {
     });
   }, []);
 
+  /**
+   * Posición de cada viñeta sobre el arco — "tipo libro".
+   *
+   * Antes la tarjeta llevaba `rotateY(...) translateZ(...)` dentro de un
+   * contenedor en perspectiva: eso la giraba de verdad en 3D, y por eso las
+   * laterales se veían como trapecios inclinados, con la foto deformada.
+   *
+   * Ahora el ángulo solo decide DÓNDE está la viñeta, no cómo se orienta:
+   * de él salen el desplazamiento horizontal (seno), el tamaño y el brillo
+   * (coseno). La tarjeta nunca rota, así que la foto conserva su forma
+   * exacta. El ojo sigue leyendo profundidad —lo lejano es más pequeño y
+   * más apagado— pero sin distorsión, como pasar páginas vistas de frente.
+   */
   const getDepthStyles = (i: number) => {
-    const relativeAngle = ((rotation / angle + i) % tratamientos.length) * angle;
-    const normalized = Math.cos((relativeAngle * Math.PI) / 180);
-    const scale = 0.85 + (normalized + 1) * 0.18;
-    const brightness = 0.65 + normalized * 0.35;
-    const zIndex = Math.round((normalized + 1) * 100);
-    const isFront = normalized > 0.85;
-    return { scale, brightness, zIndex, isFront };
+    const total = tratamientos.length;
+    // Pasos de distancia al frente, normalizados al rango [-total/2, total/2]
+    // para que la viñeta tome siempre el camino corto y no cruce toda la fila.
+    let offset = (((i - rotation / angle) % total) + total) % total;
+    if (offset > total / 2) offset -= total;
+
+    const radianes = (offset * angle * Math.PI) / 180;
+    const coseno = Math.cos(radianes);
+
+    const x = Math.sin(radianes) * radius;
+    const scale = 0.62 + (coseno + 1) * 0.19;   // frente 1.0, atrás 0.62
+    const brightness = 0.55 + (coseno + 1) * 0.225;
+    const opacity = coseno > -0.2 ? 1 : 0;      // las de detrás no estorban
+    const zIndex = Math.round((coseno + 1) * 100);
+    const isFront = coseno > 0.85;
+
+    return { x, scale, brightness, opacity, zIndex, isFront };
   };
 
   /* Rotation crece (rueda gira al revés del anterior).
@@ -397,11 +420,11 @@ export default function Galeria3D() {
               position: "relative",
               width: 260,
               height: 340,
-              transformStyle: "preserve-3d",
-              transform: `rotateX(${r(5 + mouseTilt.y * 0.18, 2)}deg) rotateY(${r(rotation + mouseTilt.x * 0.25, 2)}deg)`,
-              /* Transición más suave para el parallax del mouse —
-                 la rotación continua va a 60fps via rAF así que
-                 estamos solo suavizando los cambios bruscos. */
+              /* Sin preserve-3d ni rotateY: la rueda ya no gira en 3D, son
+                 las viñetas las que se reposicionan sobre el arco. El
+                 parallax del ratón queda como un desplazamiento suave del
+                 conjunto, que no deforma nada. */
+              transform: `translateX(${r(mouseTilt.x * 0.5, 2)}px) translateY(${r(mouseTilt.y * 0.3, 2)}px)`,
               transition: "transform 0.6s cubic-bezier(0.22,1,0.36,1)",
               zIndex: 3,
             }}
@@ -409,7 +432,7 @@ export default function Galeria3D() {
             onMouseLeave={() => setIsPaused(false)}
           >
             {tratamientos.map((tr, i) => {
-              const { scale, brightness, zIndex, isFront } = getDepthStyles(i);
+              const { x, scale, brightness, opacity, zIndex, isFront } = getDepthStyles(i);
               return (
                 <div
                   key={tr.id}
@@ -419,15 +442,17 @@ export default function Galeria3D() {
                     left: 0,
                     width: "100%",
                     height: "100%",
-                    transform: `rotateY(${r(i * angle, 2)}deg) translateZ(${radius}px) scale(${r(scale, 3)})`,
-                    backfaceVisibility: "hidden",
+                    /* Solo desplazamiento y tamaño. Sin rotateY, así que la
+                       viñeta se mantiene recta y la foto no se deforma. */
+                    transform: `translateX(${r(x, 2)}px) scale(${r(scale, 3)})`,
                     zIndex,
+                    opacity,
                     filter: `brightness(${r(brightness, 3)})`,
-                    /* Transiciones suaves cubic-bezier para que el cambio
-                       de brillo y profundidad de las cards al rotar se
-                       sienta orgánico, no abrupto. */
+                    /* Las de detrás no deben interceptar clics aunque estén
+                       invisibles. */
+                    pointerEvents: opacity === 0 ? "none" : "auto",
                     transition:
-                      "filter 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1)",
+                      "filter 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1), opacity 0.4s ease",
                   }}
                 >
                   <div
