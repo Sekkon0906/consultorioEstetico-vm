@@ -42,38 +42,42 @@
   color-scheme: light;
 }
 
-/* === PALETA OSCURA (café pastel oscuro, alto contraste) ===
-   Fondos en familia café/espresso pastel: NO negro puro, sino tonos
-   oscuros con calidez (matiz 25-30°). Texto en cream para AA/AAA. */
+/* === PALETA OSCURA (grafito neutro + acento champán, estilo "beauty premium") ===
+   Antes toda la paleta oscura era una familia de cafés (fondo, superficies
+   y acento en el mismo matiz café/ámbar) — se sentía como "un solo color
+   con distintas intensidades". Ahora la base (bg/surface/border) es un
+   grafito neutro casi sin matiz cálido, y el color de marca (champán/dorado)
+   queda como el ÚNICO acento cálido — así contrasta y se lee como una marca
+   de lujo (piensa Chanel/Dior en modo oscuro) en vez de "todo café oscuro". */
 :root[data-theme="dark"] {
-  --bg:            #2A2118;   /* fondo principal — café espresso pastel */
-  --bg-elevated:   #362A1E;   /* superficies elevadas */
-  --surface:       #3D2F23;   /* cards — un escalón sobre bg-elevated */
-  --surface-soft:  #4A3A2C;   /* hover / secundario */
-  --text:          #FBF2E5;   /* texto principal — cream alto contraste */
-  --text-soft:     #E5D2B8;   /* texto secundario — beige cálido */
-  --text-muted:    #C0A88B;   /* captions / metadata */
-  --border:        #5C4A3A;   /* bordes visibles */
-  --border-strong: #7A6450;
-  --brand:         #E8C9A0;   /* champagne como acento */
+  --bg:            #17151A;   /* grafito casi negro, matiz neutro */
+  --bg-elevated:   #1F1C22;   /* superficies elevadas */
+  --surface:       #26222A;   /* cards — un escalón sobre bg-elevated */
+  --surface-soft:  #322D37;   /* hover / secundario */
+  --text:          #F5F1EA;   /* texto principal — cream alto contraste */
+  --text-soft:     #C7C1B8;   /* texto secundario — gris cálido suave */
+  --text-muted:    #928C82;   /* captions / metadata */
+  --border:        #3A3640;   /* bordes visibles, neutros */
+  --border-strong: #4C4753;
+  --brand:         #E8C9A0;   /* champán — único acento cálido de la paleta */
   --brand-soft:    #F2DDB8;
-  --brand-deep:    #FBF2E5;
-  --brand-contrast:#2A2118;   /* en dark, --brand es claro (champagne): texto oscuro */
+  --brand-deep:    #F5F1EA;
+  --brand-contrast:#1A1720;   /* en dark, --brand es claro (champán): texto oscuro */
   --accent:        #E8C9A0;
-  --topbar-bg:     #1F1812;
-  --topbar-text:   #FBF2E5;
-  --footer-bg:     #1A140F;   /* footer más profundo, anclaje visual */
-  --footer-text:   #E5D2B8;
+  --topbar-bg:     #0E0C11;
+  --topbar-text:   #F5F1EA;
+  --footer-bg:     #0B0A0D;   /* footer más profundo, anclaje visual */
+  --footer-text:   #C7C1B8;
   --danger:        #F4A8A8;
   --success:       #B5E0C2;
-  --shadow-sm:     0 2px 8px rgba(0,0,0,0.4);
-  --shadow-md:     0 8px 24px rgba(0,0,0,0.5);
-  --overlay-bg:    rgba(0,0,0,0.65);
+  --shadow-sm:     0 2px 8px rgba(0,0,0,0.45);
+  --shadow-md:     0 8px 28px rgba(0,0,0,0.55);
+  --overlay-bg:    rgba(0,0,0,0.7);
 
-  /* Decoración Galería 3D — tonos champán sobre café pastel */
-  --galeria-halo:  conic-gradient(from 0deg, rgba(232,201,160,0.32), rgba(217,181,139,0.24), rgba(242,221,184,0.32), rgba(232,201,160,0.32));
-  --galeria-particle-1: rgba(232,201,160,0.62);
-  --galeria-particle-2: rgba(242,221,184,0.45);
+  /* Decoración Galería 3D — champán sobre grafito neutro */
+  --galeria-halo:  conic-gradient(from 0deg, rgba(232,201,160,0.30), rgba(217,181,139,0.20), rgba(242,221,184,0.30), rgba(232,201,160,0.30));
+  --galeria-particle-1: rgba(232,201,160,0.60);
+  --galeria-particle-2: rgba(242,221,184,0.42);
 
   color-scheme: dark;
 }
@@ -130,7 +134,7 @@ html, body {
 
 /* /procedimientos — gradient global del background */
 :root[data-theme="dark"] .proc-page {
-  background: linear-gradient(180deg, #14100C 0%, #1F1812 100%) !important;
+  background: linear-gradient(180deg, #0E0C11 0%, #17151A 100%) !important;
 }
 /* Carrusel deslizable de la Galería 3D: SOLO visible en móvil. En
    desktop manda la rueda 3D, así que se oculta por defecto. */
