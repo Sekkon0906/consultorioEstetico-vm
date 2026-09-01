@@ -981,8 +981,8 @@ function FeaturedCarousel({
             exit={{ opacity: 0, x: direction * -40 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
             drag={total > 1 ? "x" : false}
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
+            dragConstraints={{ left: -120, right: 120 }}
+            dragElastic={0.35}
             onDragEnd={(_e, info) => {
               // Deslizar con el dedo: no eran solo las flechas.
               if (info.offset.x < -60) next();
