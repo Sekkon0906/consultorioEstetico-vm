@@ -1,14 +1,13 @@
 // Cliente ligero para disparar notificaciones por correo tras una mutación.
 // Best-effort: si falla (sin sesión, red, etc.) no rompe el flujo principal.
 
-import { supabase } from "@/lib/supabaseClient";
+import { obtenerToken } from "@/lib/sesion";
 
 async function postNotify(evento: "nueva" | "estado", citaId: string | number): Promise<void> {
   try {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const token = session?.access_token;
+    // El token sale de lib/sesion, que sabe si viene de la sesión propia o
+    // de Supabase. Este archivo ya no necesita saberlo.
+    const token = await obtenerToken();
     if (!token) return;
 
     await fetch("/api/citas/notify", {

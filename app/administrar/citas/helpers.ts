@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import { obtenerToken } from "@/lib/sesion";
 import { notificarCambioEstado } from "@/services/notifyApi";
 
 export type EstadoCita = "pendiente" | "confirmada" | "atendida" | "cancelada";
@@ -184,8 +185,7 @@ export async function solicitarReagendaAPI(
 
   // Notifica al paciente por email (best-effort, no rompe el flujo si falla).
   try {
-    const { data: sess } = await supabase.auth.getSession();
-    const token = sess.session?.access_token;
+    const token = await obtenerToken();
     if (token) {
       await fetch("/api/reagenda/notify", {
         method: "POST",
