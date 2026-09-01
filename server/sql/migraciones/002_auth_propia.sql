@@ -32,6 +32,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_email_unico
 CREATE UNIQUE INDEX IF NOT EXISTS idx_usuarios_google_sub
   ON usuarios (google_sub) WHERE google_sub IS NOT NULL;
 
+-- WHERE email = $1 — server/src/services/users.js findUserByEmail
+CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios (email);
+
 -- ---------------------------------------------------------------------------
 -- Sesiones: el refresh token se guarda hasheado, nunca en claro. Si la tabla
 -- se filtra, los tokens que contiene no sirven para iniciar sesión.
