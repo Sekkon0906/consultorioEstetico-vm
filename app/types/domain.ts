@@ -93,6 +93,11 @@ export interface Cita {
   // Extras
   qrCita?: string | null;
   motivoCancelacion?: string | null;
+
+  // Consentimiento informado firmado por el paciente
+  consentimientoFirmado?: boolean;
+  firmaUrl?: string | null;
+  consentimientoPdf?: string | null;
 }
 
 // ============================================================

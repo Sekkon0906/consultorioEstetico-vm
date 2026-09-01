@@ -152,7 +152,14 @@ export default function Navbar() {
 
   const handleItemEnter = (index: number) => updateIndicatorTo(linkRefs.current[index]);
   const handleMenuLeave = () => {
-    const activeIndex = menuItems.findIndex((item) => item.href === pathname);
+    // El mouse sale del menú justo cuando se hace clic para navegar — en
+    // ese instante `pathname` (de React) todavía no se actualizó, porque
+    // la navegación es asíncrona. Usar ese valor movía el indicador de
+    // vuelta a la página ANTERIOR por un instante (el "salto") hasta que
+    // el efecto de arriba lo corregía. window.location.pathname es la URL
+    // real del navegador, que sí cambia de inmediato al hacer clic.
+    const current = typeof window !== "undefined" ? window.location.pathname : pathname;
+    const activeIndex = menuItems.findIndex((item) => item.href === current);
     updateIndicatorTo(linkRefs.current[activeIndex] || null);
   };
 
@@ -221,7 +228,7 @@ export default function Navbar() {
         >
           <ul
             className="navbar-menu d-flex justify-content-center align-items-center mb-0"
-            style={{ fontWeight: 600, listStyle: "none", gap: "2.4rem" }}
+            style={{ fontWeight: 600, listStyle: "none", gap: "1.8rem" }}
           >
             {menuItems.map((item, index) => {
               const isActive = pathname === item.href;

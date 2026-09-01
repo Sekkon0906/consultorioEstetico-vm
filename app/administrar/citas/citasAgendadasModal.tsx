@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, CheckCircle2, Calculator } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Calculator, FileText, FileCheck } from "lucide-react";
 import type { Cita } from "./helpers";
 import { confirmarCitaAPI, confirmarPagoCitaAPI } from "./helpers";
 
@@ -80,6 +80,52 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
           <div style={{ background: "#EEF7EE", borderRadius: 14, padding: "1rem", marginBottom: "1.5rem" }}>
             <p style={{ fontWeight: 600, color: "#2D6A4F", margin: 0 }}>{cita.procedimiento}</p>
             {cita.nota && <p style={{ fontSize: "0.82rem", color: "#4A7A5A", margin: "0.2rem 0 0" }}>Nota: {cita.nota}</p>}
+          </div>
+
+          {/* Consentimiento informado — visible siempre que exista, para
+              que la doctora lo pueda ver e imprimir antes del procedimiento. */}
+          <div
+            style={{
+              background: cita.consentimientoFirmado ? "#EEF7EE" : "#FCEFE3",
+              borderRadius: 14,
+              padding: "1rem",
+              marginBottom: "1.5rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              flexWrap: "wrap",
+            }}
+          >
+            <p
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                fontWeight: 600,
+                fontSize: "0.88rem",
+                color: cita.consentimientoFirmado ? "#2D6A4F" : "#8B5A12",
+                margin: 0,
+              }}
+            >
+              {cita.consentimientoFirmado ? <FileCheck size={16} /> : <FileText size={16} />}
+              {cita.consentimientoFirmado ? "Consentimiento firmado" : "Consentimiento sin firmar"}
+            </p>
+            {cita.consentimientoPdf && (
+              <a
+                href={cita.consentimientoPdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontSize: "0.82rem",
+                  fontWeight: 600,
+                  color: "var(--brand-deep)",
+                  textDecoration: "underline",
+                }}
+              >
+                Ver e imprimir
+              </a>
+            )}
           </div>
 
           {/* Payment - only non-cancelled, non-atendida */}

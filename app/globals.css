@@ -3320,10 +3320,12 @@ footer a:hover i {
   display: grid;
   grid-template-columns: auto 1fr auto; /* logo | menú | perfil */
   align-items: center;
-  max-width: 1650px;
+  /* Bajado de 1650px: en pantallas grandes el navbar se sentía
+     "estirado", con los 6 enlaces muy separados entre sí. */
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0.6rem 2.5rem;
-  column-gap: 2rem;
+  padding: 0.6rem 2rem;
+  column-gap: 1.5rem;
 }
 
 /* === IZQUIERDA: LOGO === */
