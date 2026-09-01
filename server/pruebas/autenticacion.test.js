@@ -5,6 +5,12 @@ const { pool } = require("../src/lib/db");
 
 (async () => {
   const email = "paciente.prueba@ejemplo.com";
+
+  // Estado limpio: la prueba debe poder correrse mil veces seguidas. Sin
+  // esto, la segunda corrida fallaba al reinsertar en admin_users la fila
+  // que había dejado la primera.
+  await pool.query("DELETE FROM admin_users WHERE uid IN (SELECT id FROM usuarios WHERE email = $1)", [email]);
+  await pool.query("DELETE FROM usuarios WHERE email = $1", [email]);
   let fallos = 0;
   const check = (cond, msg) => { console.log((cond?"  OK   ":"  FALLA ") + msg); if(!cond) fallos++; };
 
@@ -68,6 +74,10 @@ const { pool } = require("../src/lib/db");
   await pool.query("INSERT INTO admin_users (uid) VALUES ($1)", [u[0].id]);
   const perfil2 = await auth.perfilPublico(u[0].id);
   check(perfil2.rol === "admin", "estar en admin_users SÍ da admin");
+
+  // Se limpia también al terminar, para no dejar la base sembrada.
+  await pool.query("DELETE FROM admin_users WHERE uid = $1", [u[0].id]);
+  await pool.query("DELETE FROM usuarios WHERE email = $1", [email]);
 
   console.log(fallos === 0 ? "\nTODAS LAS PRUEBAS PASAN" : `\n${fallos} PRUEBAS FALLARON`);
   await pool.end();
