@@ -7,7 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
 
 //  Tipos desde el dominio real (ya no usamos utils/localDB)
-import type { Procedimiento, SessionUser } from "../types/domain";
+import type { Procedimiento, SessionUser } from "@/types/domain";
 
 import { ArrowLeft, CalendarDays, Clock, RotateCcw } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";

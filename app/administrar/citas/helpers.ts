@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
-import { notificarCambioEstado } from "../../services/notifyApi";
+import { notificarCambioEstado } from "@/services/notifyApi";
 
 export type EstadoCita = "pendiente" | "confirmada" | "atendida" | "cancelada";
 

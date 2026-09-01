@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 //  Ahora usamos el tipo de dominio
-import type { MediaItem } from "../../types/domain";
+import type { MediaItem } from "@/types/domain";
 
 interface Props {
   show: boolean;

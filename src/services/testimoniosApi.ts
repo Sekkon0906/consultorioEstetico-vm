@@ -1,7 +1,7 @@
 // app/services/testimoniosApi.ts
 // Usa Supabase directamente, sin backend Express.
 
-import type { Testimonio } from "../types/domain";
+import type { Testimonio } from "@/types/domain";
 import { supabase } from "@/lib/supabaseClient";
 import { cached, invalidate } from "@/lib/cache";
 

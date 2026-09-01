@@ -7,9 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { Search, X, ArrowRight, Sparkles, Calendar, ChevronLeft, ChevronRight, Star, ChevronDown, Check, ArrowUpDown } from "lucide-react";
 
-import type { Procedimiento } from "../types/domain";
-import { getProcedimientosApi } from "../services/procedimientosApi";
-import { IMG } from "../src/lib/imagenes";
+import type { Procedimiento } from "@/types/domain";
+import { getProcedimientosApi } from "@/services/procedimientosApi";
+import { IMG } from "@/lib/imagenes";
 
 type Categoria = "todos" | "Facial" | "Corporal" | "Capilar";
 type SortMode = "name" | "priceAsc" | "priceDesc" | "featured" | "discount";

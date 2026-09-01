@@ -1,5 +1,5 @@
 // app/services/citasApi.ts
-import type { Cita, BloqueoHora } from "../types/domain";
+import type { Cita, BloqueoHora } from "@/types/domain";
 import { supabase } from "@/lib/supabaseClient";
 import { notificarNuevaCita } from "./notifyApi";
 

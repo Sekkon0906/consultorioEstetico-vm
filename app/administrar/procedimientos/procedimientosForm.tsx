@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 //  Tipos de dominio (ya no usamos localDB)
-import type { Procedimiento, CategoriaProcedimiento } from "../../types/domain";
+import type { Procedimiento, CategoriaProcedimiento } from "@/types/domain";
 //  Servicios que hablan con el backend
 import {
   createProcedimientoApi,
   updateProcedimientoApi,
-} from "../../services/procedimientosApi";
+} from "@/services/procedimientosApi";
 
 interface Props {
   procedimiento?: Procedimiento;

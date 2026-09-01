@@ -7,11 +7,11 @@ import dynamic from "next/dynamic";
 
 // Lazy: solo se monta cuando el usuario llega abajo del fold
 const ComentariosClientes = dynamic(
-  () => import("../src/components/ComentariosClientes"),
+  () => import("@/components/ComentariosClientes"),
   { ssr: false }
 );
-import type { Testimonio } from "../types/domain";
-import { getTestimoniosApi } from "../services/testimoniosApi";
+import type { Testimonio } from "@/types/domain";
+import { getTestimoniosApi } from "@/services/testimoniosApi";
 
 function getYouTubeId(url: string): string {
   if (!url) return "";

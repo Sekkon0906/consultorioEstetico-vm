@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Clock, CheckCircle2, FileText, Calendar, User, Phone, Mail, CreditCard } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import type { Cita, EstadoCita } from "../types/domain";
+import type { Cita, EstadoCita } from "@/types/domain";
 import type { ReactNode } from "react";
 
 export type { Cita, EstadoCita };

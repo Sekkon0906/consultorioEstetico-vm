@@ -16,7 +16,7 @@
     "incremental": true,
 
     // 👇 Aquí está el cambio importante
-    "baseUrl": "app/src",
+    "baseUrl": "src",
     "paths": {
       "@/*": ["*"]
     },

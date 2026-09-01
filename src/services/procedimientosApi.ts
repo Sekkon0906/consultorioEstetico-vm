@@ -1,7 +1,7 @@
 // app/services/procedimientosApi.ts
 // Usa Supabase directamente, sin backend Express.
 
-import type { Procedimiento } from "../types/domain";
+import type { Procedimiento } from "@/types/domain";
 import { supabase } from "@/lib/supabaseClient";
 import { cached, invalidate } from "@/lib/cache";
 

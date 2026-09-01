@@ -4,8 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
-import { getProcedimientosApi, updateProcedimientoApi, deleteProcedimientoApi, bustProcedimientosCache } from "../../services/procedimientosApi";
-import type { Procedimiento } from "../../types/domain";
+import { getProcedimientosApi, updateProcedimientoApi, deleteProcedimientoApi, bustProcedimientosCache } from "@/services/procedimientosApi";
+import type { Procedimiento } from "@/types/domain";
 import { Plus, Edit3, Trash2, X, ChevronUp, ChevronDown, Upload, Play, Star, ArrowLeft } from "lucide-react";
 
 type Cat = "Facial" | "Corporal" | "Capilar";

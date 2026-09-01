@@ -11,7 +11,7 @@ import dynamic from "next/dynamic";
 
 // Galería 3D y Video se cargan solo en cliente y bajo demanda — su bundle
 // (framer-motion + three.js indirecto + assets) no debe bloquear el LCP del hero.
-const Galeria3D = dynamic(() => import("./src/components/Galeria3D"), {
+const Galeria3D = dynamic(() => import("@/components/Galeria3D"), {
   ssr: false,
   loading: () => (
     <div style={{ minHeight: 600, display: "flex", alignItems: "center", justifyContent: "center", background: "#F6F4EF" }}>
@@ -20,11 +20,11 @@ const Galeria3D = dynamic(() => import("./src/components/Galeria3D"), {
   ),
 });
 
-const VideoAnim = dynamic(() => import("./src/components/VideoAnim"), {
+const VideoAnim = dynamic(() => import("@/components/VideoAnim"), {
   ssr: false,
 });
 
-import { IMG } from "./src/lib/imagenes";
+import { IMG } from "@/lib/imagenes";
 
 const HERO_VIDEO: string | null = null;
 const HERO_POSTER: string | null = null;

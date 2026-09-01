@@ -6,8 +6,8 @@ import { ArrowLeft } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
 import Button from "@/components/ui/Button";
-import type { Cita, MetodoPago, TipoPagoConsultorio, TipoPagoOnline } from "../types/domain";
-import { createCitaApi } from "../services/citasApi";
+import type { Cita, MetodoPago, TipoPagoConsultorio, TipoPagoOnline } from "@/types/domain";
+import { createCitaApi } from "@/services/citasApi";
 
 export type CrearCitaPayload = Omit<Cita, "id" | "fechaCreacion">;
 export type CitaSinPagos = Omit<CrearCitaPayload, "metodoPago" | "tipoPagoConsultorio" | "tipoPagoOnline" | "estado">;

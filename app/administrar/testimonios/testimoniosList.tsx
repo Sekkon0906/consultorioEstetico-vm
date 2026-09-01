@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
-import { getTestimoniosApi, deleteTestimonioApi, bustTestimoniosCache } from "../../services/testimoniosApi";
-import type { Testimonio } from "../../types/domain";
+import { getTestimoniosApi, deleteTestimonioApi, bustTestimoniosCache } from "@/services/testimoniosApi";
+import type { Testimonio } from "@/types/domain";
 import { Plus, Edit3, Trash2, X, Eye, EyeOff, Star, Upload, Play } from "lucide-react";
 
 var BUCKET = "testimonios";

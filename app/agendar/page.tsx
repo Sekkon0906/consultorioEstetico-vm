@@ -5,8 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
-import type { Procedimiento, Cita } from "../types/domain";
-import { getProcedimientosApi } from "../services/procedimientosApi";
+import type { Procedimiento, Cita } from "@/types/domain";
+import { getProcedimientosApi } from "@/services/procedimientosApi";
 import { useAuth } from "@/context/AuthContext";
 
 import AgendarCalendar from "./agendarCalendar";

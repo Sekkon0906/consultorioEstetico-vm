@@ -3,7 +3,7 @@
 import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { setLocale } from "../../actions/locale";
+import { setLocale } from "@/../app/actions/locale";
 
 /**
  * Toggle ES / EN. Llama a un server action que actualiza la cookie LOCALE

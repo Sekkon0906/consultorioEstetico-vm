@@ -5,9 +5,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { getProcedimientosApi } from "../../services/procedimientosApi";
+import { getProcedimientosApi } from "@/services/procedimientosApi";
 import { IMG } from "../lib/imagenes";
-import type { Procedimiento } from "../../types/domain";
+import type { Procedimiento } from "@/types/domain";
 
 /** Helper: redondeo determinista para evitar hydration mismatches por
  *  precisión IEEE-754 entre server y client. */
