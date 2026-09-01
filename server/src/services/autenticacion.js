@@ -31,7 +31,6 @@
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const argon2 = require("argon2");
-const { OAuth2Client } = require("google-auth-library");
 const { pool } = require("../lib/db");
 const { correoVerificacion, correoRecuperacion } = require("../lib/correo");
 
@@ -287,6 +286,21 @@ let googleCache = null;
 function clienteGoogle(redirectUri) {
   if (!googleConfigurado()) return null;
   if (!googleCache) {
+    // Se carga AQUÍ y no arriba a propósito: google-auth-library exige Node
+    // >= 22, y con el require en la cabecera un entorno con Node viejo tumbaba
+    // el servidor ENTERO al arrancar — por una función opcional que quizá ni
+    // esté configurada. Así, si el módulo no carga, lo único que deja de
+    // funcionar es el botón de Google.
+    let OAuth2Client;
+    try {
+      ({ OAuth2Client } = require("google-auth-library"));
+    } catch (err) {
+      console.error(
+        "[auth] No se pudo cargar google-auth-library; el inicio de sesión con " +
+        "Google queda deshabilitado. El resto de la API sigue funcionando.", err.message
+      );
+      return null;
+    }
     googleCache = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
