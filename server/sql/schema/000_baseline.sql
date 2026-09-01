@@ -262,6 +262,50 @@ CREATE TABLE IF NOT EXISTS comentarios_pacientes (
 -- archivo, en orden, y son igual de idempotentes.
 
 -- ============================================================================
+-- ÍNDICES QUE EXISTEN EN PRODUCCIÓN
+-- ----------------------------------------------------------------------------
+-- Se replican aquí porque `server/sql/indexes.sql` había quedado desfasado:
+-- varios de estos se crearon directo contra Supabase y nunca se versionaron.
+-- Sin ellos, un despliegue nuevo arrancaría más lento — y, en el caso de
+-- uq_citas_slot_activo, directamente con un bug de negocio.
+-- ============================================================================
+
+-- NOTA sobre nombres: en producción tres restricciones conservan el nombre
+-- autogenerado de cuando las tablas se llamaban distinto — `perfiles_pkey`
+-- (hoy usuarios), `bloqueos_pkey` y `bloqueos_fecha_hora_key` (hoy
+-- bloqueos_horas). Una base creada desde este archivo las tendrá con el
+-- nombre nuevo (`usuarios_pkey`, etc.). Son las mismas restricciones: misma
+-- tabla, mismas columnas, mismo efecto. No es una diferencia a corregir.
+
+-- REGLA DE NEGOCIO, no una optimización: impide que existan dos citas activas
+-- en la misma fecha y hora. Es lo que hace que no se puedan agendar dos
+-- pacientes en el mismo turno aunque dos peticiones lleguen a la vez (el
+-- chequeo previo en server/src/routes/citas.js tiene una ventana de carrera;
+-- este índice la cierra a nivel de base). Las canceladas quedan fuera, así
+-- que un turno cancelado se puede volver a agendar.
+CREATE UNIQUE INDEX IF NOT EXISTS uq_citas_slot_activo
+  ON citas (fecha, hora) WHERE (estado IS DISTINCT FROM 'cancelada');
+
+CREATE INDEX IF NOT EXISTS idx_citas_fecha            ON citas (fecha);
+CREATE INDEX IF NOT EXISTS idx_citas_estado           ON citas (estado);
+CREATE INDEX IF NOT EXISTS idx_citas_pagado           ON citas (pagado);
+CREATE INDEX IF NOT EXISTS idx_citas_procedimiento_id ON citas (procedimiento_id);
+
+-- Barrido del cron de recordatorios: solo mira citas sin recordatorio enviado
+-- y todavía vigentes, así que el índice parcial cubre exactamente esa consulta.
+CREATE INDEX IF NOT EXISTS idx_citas_pending_reminder
+  ON citas (fecha)
+  WHERE recordatorio_enviado_en IS NULL AND estado = ANY (ARRAY['pendiente','confirmada']);
+
+CREATE INDEX IF NOT EXISTS idx_horarios_fecha              ON horarios_por_fecha (fecha);
+CREATE INDEX IF NOT EXISTS idx_horarios_por_fecha_cita_id  ON horarios_por_fecha (cita_id);
+CREATE INDEX IF NOT EXISTS idx_bloqueos_horas_fecha_hora   ON bloqueos_horas (fecha, hora);
+CREATE INDEX IF NOT EXISTS idx_reagendas_user_id           ON reagendas (user_id);
+CREATE INDEX IF NOT EXISTS idx_comentarios_user_id         ON comentarios_pacientes (user_id);
+CREATE INDEX IF NOT EXISTS idx_proc_media_procedimiento_id ON procedimiento_media (procedimiento_id);
+CREATE INDEX IF NOT EXISTS idx_proc_galeria_procedimiento_id ON procedimiento_galeria (procedimiento_id);
+
+-- ============================================================================
 -- FUNCIONES Y TRIGGERS DE NEGOCIO (sí hacen falta: no son de Supabase Auth)
 -- ============================================================================
 
