@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { TypeAnimation } from "react-type-animation";
 import { useLocale, useTranslations } from "next-intl";
@@ -37,6 +38,17 @@ export default function HomePage() {
 
   const [imagenActual, setImagenActual] = useState(0);
   const [heroVisible, setHeroVisible] = useState(false);
+  const router = useRouter();
+  const [officeZooming, setOfficeZooming] = useState(false);
+
+  // Foto del consultorio: zoom leve al pasar el mouse, zoom mayor al hacer
+  // clic, y navega a /consultorio cuando la animación termina — la
+  // transición se ve, no salta de golpe.
+  const goToOffice = () => {
+    if (officeZooming) return;
+    setOfficeZooming(true);
+    setTimeout(() => router.push("/consultorio"), 420);
+  };
 
   useEffect(() => {
     const intervalo = setInterval(
@@ -216,8 +228,13 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Foto del consultorio — sin caption sobre la imagen */}
-          <div
+          {/* Foto del consultorio — clic lleva a /consultorio, con zoom
+              leve al pasar el mouse y zoom mayor al hacer clic antes de
+              navegar (la transición se ve, no salta de golpe). */}
+          <motion.button
+            type="button"
+            onClick={goToOffice}
+            aria-label={th("location.viewClinic")}
             className="home-loc-card"
             style={{
               position: "relative",
@@ -226,17 +243,39 @@ export default function HomePage() {
               overflow: "hidden",
               boxShadow: "0 8px 24px rgba(78, 59, 43, 0.15)",
               border: "1px solid rgba(176, 137, 104, 0.18)",
+              padding: 0,
+              cursor: "pointer",
+              display: "block",
             }}
           >
-            <Image
-              src={IMG.consultorioPrincipal}
-              alt={th("location.photoAlt")}
-              fill
-              sizes="(max-width: 820px) 92vw, 590px"
-              quality={80}
-              style={{ objectFit: "cover" }}
+            <motion.div
+              animate={{ scale: officeZooming ? 1.18 : 1 }}
+              whileHover={officeZooming ? undefined : { scale: 1.06 }}
+              transition={{ duration: officeZooming ? 0.42 : 0.35, ease: "easeOut" }}
+              style={{ position: "absolute", inset: 0 }}
+            >
+              <Image
+                src={IMG.consultorioPrincipal}
+                alt={th("location.photoAlt")}
+                fill
+                sizes="(max-width: 820px) 92vw, 590px"
+                quality={80}
+                style={{ objectFit: "cover" }}
+              />
+            </motion.div>
+            <motion.div
+              aria-hidden="true"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: officeZooming ? 1 : 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "rgba(58, 42, 26, 0.25)",
+                pointerEvents: "none",
+              }}
             />
-          </div>
+          </motion.button>
         </div>
 
         {/* CTAs en grid 2 col, alineados desde el centro hacia afuera:

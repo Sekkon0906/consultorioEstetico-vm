@@ -543,13 +543,15 @@ export default function Galeria3D() {
         </div>
       )}
 
-      {/* Dots — debajo de la rueda (no encima), mismo eje horizontal */}
+      {/* Dots — debajo de la rueda (no encima), mismo eje horizontal.
+          bottom subido de 13% a 19%: al bajar la rueda (fix anterior)
+          quedaba muy pegado al CTA de abajo (8 puntos de separación). */}
       {selected === null && tratamientos.length > 0 && (
         <div
           className="g3d-dots-wrap"
           style={{
             position: "absolute",
-            bottom: "13%",
+            bottom: "19%",
             right: "30%",
             transform: "translateX(50%)",
             zIndex: 5,

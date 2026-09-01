@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { Sliders, Phone, X } from "lucide-react";
+import { Sliders, X } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
 
@@ -77,10 +77,9 @@ export default function QuickAccessFab() {
 
             <p className="quick-fab-heading">{t("contactInfo")}</p>
 
-            <a href="tel:+573155445748" className="quick-fab-contact">
-              <Phone size={15} /> 315 5445748
-            </a>
-
+            {/* El teléfono en texto salió: el botón de WhatsApp de abajo
+                ya cubre el contacto directo, era redundante tenerlo dos
+                veces. */}
             <div className="quick-fab-socials">
               {socials.map((s) => (
                 <a
