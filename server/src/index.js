@@ -2,8 +2,10 @@ require("dotenv").config();
 
 const express = require("express");
 const cors    = require("cors");
+const cookieParser = require("cookie-parser");
 
 const authRoutes         = require("./routes/auth");
+const autenticacionRoutes = require("./routes/autenticacion");
 const usuariosRoutes     = require("./routes/usuarios");
 const procedimientosRoutes = require("./routes/procedimientos");
 const testimoniosRoutes  = require("./routes/testimonios");
@@ -35,6 +37,8 @@ app.use(cors({
 
 app.options("*", cors());
 app.use(express.json({ limit: "10mb" }));
+// El refresh token viaja en cookie httpOnly, fuera del alcance del JS del sitio.
+app.use(cookieParser());
 
 // ── HEALTH CHECK ─────────────────────────────────────────────
 app.get("/health", (_req, res) =>
@@ -42,7 +46,8 @@ app.get("/health", (_req, res) =>
 );
 
 // ── RUTAS ────────────────────────────────────────────────────
-app.use("/auth",           authRoutes);
+app.use("/auth",           authRoutes);          // Supabase Auth (en retirada)
+app.use("/auth2",          autenticacionRoutes); // autenticación propia
 app.use("/usuarios",       usuariosRoutes);
 app.use("/procedimientos", procedimientosRoutes);
 app.use("/testimonios",    testimoniosRoutes);

@@ -73,3 +73,38 @@ CREATE INDEX IF NOT EXISTS idx_tokens_unicos_user ON tokens_unicos (user_id, pro
 -- consultando esta tabla y NUNCA la columna usuarios.rol, que el propio
 -- usuario puede modificar.
 -- ---------------------------------------------------------------------------
+
+-- ---------------------------------------------------------------------------
+-- Desacople de Supabase Auth (añadido 2026-09-01, aplicado a producción)
+--
+-- `usuarios.id` referenciaba auth.users(id). Con esa llave foránea es
+-- IMPOSIBLE crear una cuenta sin pasar antes por Supabase, así que la
+-- autenticación propia no podría registrar a nadie. Se elimina y las
+-- relaciones se repuntan a public.usuarios, que pasa a ser la tabla de
+-- identidad del proyecto.
+--
+-- No se pierde ningún dato: las filas conservan su UUID, que es lo que citan
+-- citas, reagendas y comentarios_pacientes.
+-- ---------------------------------------------------------------------------
+ALTER TABLE usuarios DROP CONSTRAINT IF EXISTS perfiles_id_fkey;
+
+ALTER TABLE citas DROP CONSTRAINT IF EXISTS citas_user_id_fkey;
+ALTER TABLE citas ADD CONSTRAINT citas_user_id_fkey
+  FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE SET NULL;
+
+ALTER TABLE admin_users DROP CONSTRAINT IF EXISTS admin_users_uid_fkey;
+ALTER TABLE admin_users ADD CONSTRAINT admin_users_uid_fkey
+  FOREIGN KEY (uid) REFERENCES usuarios(id) ON DELETE CASCADE;
+
+-- La restricción de rol solo aceptaba 'user', pero el DEFAULT y el trigger
+-- enforce_usuarios_rol asignan 'usuario': ningún paciente nuevo podía
+-- registrarse porque el valor que generaba la base violaba su restricción.
+ALTER TABLE usuarios DROP CONSTRAINT IF EXISTS perfiles_rol_check;
+ALTER TABLE usuarios DROP CONSTRAINT IF EXISTS usuarios_rol_check;
+ALTER TABLE usuarios ADD CONSTRAINT usuarios_rol_check
+  CHECK (rol = ANY (ARRAY['usuario','user','admin']));
+
+-- Solo el backend toca estas tablas, por conexión directa. RLS activo sin
+-- políticas = nadie entra con la clave anon vía PostgREST.
+ALTER TABLE sesiones      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tokens_unicos ENABLE ROW LEVEL SECURITY;

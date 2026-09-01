@@ -55,7 +55,12 @@ CREATE TABLE IF NOT EXISTS usuarios (
   edad                      integer,
   genero                    text CHECK (genero = ANY (ARRAY['Masculino','Femenino','Otro'])),
   telefono                  text,
-  rol                       text NOT NULL DEFAULT 'usuario' CHECK (rol = ANY (ARRAY['user','admin'])),
+  -- 'usuario' es el valor que ponen el DEFAULT y el trigger
+  -- enforce_usuarios_rol. En producción la restricción solo aceptaba
+  -- 'user', así que ningún paciente podía registrarse: el valor que
+  -- generaba la propia base violaba su propia restricción.
+  rol                       text NOT NULL DEFAULT 'usuario'
+                              CHECK (rol = ANY (ARRAY['usuario','user','admin'])),
   antecedentes              text DEFAULT '',
   antecedentes_descripcion  text DEFAULT '',
   alergias                  text DEFAULT '',
@@ -154,7 +159,7 @@ CREATE TABLE IF NOT EXISTS charla_galeria (
 
 CREATE TABLE IF NOT EXISTS citas (
   id                       uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id                  uuid,
+  user_id                  uuid REFERENCES usuarios(id) ON DELETE SET NULL,
   nombres                  text NOT NULL,
   apellidos                text NOT NULL,
   telefono                 text NOT NULL,
