@@ -1,6 +1,7 @@
 // app/services/citasApi.ts
 import type { Cita, BloqueoHora } from "../types/domain";
 import { supabase } from "@/lib/supabaseClient";
+import { notificarNuevaCita } from "./notifyApi";
 
 function mapCita(row: Record<string, unknown>): Cita {
   return {
@@ -27,11 +28,14 @@ function mapCita(row: Record<string, unknown>): Cita {
     fechaCreacion: (row.creado_en as string) || "",
     motivoCancelacion: (row.motivo_cancelacion as string) || null,
     qrCita: (row.qr_cita as string) || null,
+    consentimientoFirmado: !!row.consentimiento_firmado,
+    firmaUrl: (row.firma_url as string) || null,
+    consentimientoPdf: (row.consentimiento_pdf as string) || null,
   };
 }
 
 const CITA_COLUMNS =
-  "id, user_id, nombres, apellidos, telefono, correo, procedimiento, tipo_cita, nota, fecha, hora, estado, pagado, monto, monto_pagado, monto_restante, metodo_pago, tipo_pago_consultorio, tipo_pago_online, creada_por, creado_en, motivo_cancelacion";
+  "id, user_id, nombres, apellidos, telefono, correo, procedimiento, tipo_cita, nota, fecha, hora, estado, pagado, monto, monto_pagado, monto_restante, metodo_pago, tipo_pago_consultorio, tipo_pago_online, creada_por, creado_en, motivo_cancelacion, consentimiento_firmado, firma_url, consentimiento_pdf";
 
 export async function getCitasByDayApi(fechaISO: string): Promise<Cita[]> {
   const { data, error } = await supabase.from("citas").select(CITA_COLUMNS).eq("fecha", fechaISO).order("hora", { ascending: true });
@@ -75,6 +79,8 @@ export async function createCitaApi(payload: Omit<Cita, "id" | "fechaCreacion">)
     tipo_pago_consultorio: payload.tipoPagoConsultorio || null, tipo_pago_online: payload.tipoPagoOnline || null, creada_por: "usuario",
   }).select(CITA_COLUMNS).single();
   if (error) throw new Error(error.message);
+  // Aviso a la doctora (best-effort, no bloquea la creación de la cita)
+  void notificarNuevaCita(data.id as string);
   return mapCita(data);
 }
 

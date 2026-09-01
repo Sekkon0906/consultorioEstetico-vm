@@ -1,11 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { TypeAnimation } from "react-type-animation";
-import Galeria3D from "./src/components/Galeria3D";
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
+
+// Galería 3D y Video se cargan solo en cliente y bajo demanda — su bundle
+// (framer-motion + three.js indirecto + assets) no debe bloquear el LCP del hero.
+const Galeria3D = dynamic(() => import("./src/components/Galeria3D"), {
+  ssr: false,
+  loading: () => (
+    <div style={{ minHeight: 600, display: "flex", alignItems: "center", justifyContent: "center", background: "#F6F4EF" }}>
+      <div style={{ color: "#8B7060", fontSize: "0.9rem" }}>Cargando galería…</div>
+    </div>
+  ),
+});
 
 const VideoAnim = dynamic(() => import("./src/components/VideoAnim"), {
   ssr: false,
@@ -13,39 +26,29 @@ const VideoAnim = dynamic(() => import("./src/components/VideoAnim"), {
 
 import { IMG } from "./src/lib/imagenes";
 
-/**
- * Cinemagraph / video del hero.
- *
- * Para activarlo:
- *   1. Coloca el archivo de video en /public/imagenes/hero/  (ej. doctora-loop.mp4)
- *   2. Coloca un poster (foto estática del primer frame) en la misma carpeta
- *      para que aparezca al instante mientras carga el video.
- *   3. Reemplaza los `null` de abajo por las rutas:
- *        const HERO_VIDEO  = "/imagenes/hero/doctora-loop.mp4";
- *        const HERO_POSTER = "/imagenes/hero/doctora-poster.jpg";
- *   4. (Recomendado) El video: mute, sin audio, en loop, MP4 H.264 o WebM,
- *      vertical/cuadrado, peso < 3 MB. Idealmente 5–8s, sutil (un mechón de
- *      pelo, un giro suave del brazo, una sonrisa breve).
- *
- * Si HERO_VIDEO es null se usa el carrusel de imágenes actual (sin cambios).
- */
 const HERO_VIDEO: string | null = null;
 const HERO_POSTER: string | null = null;
-
-/**
- * Imagen de fondo del hero (cubre toda la pantalla inicial).
- * Sube la foto a Supabase Storage en:
- *    ConsultorioImagenes/imagenesPublicas/doctora-hero.jpg
- * y se carga automáticamente desde IMG.heroDoctora.
- * Si por algún motivo no existe, hace fallback al primer carrusel.
- */
 const HERO_IMAGE: string | null = IMG.heroDoctora;
 
 export default function HomePage() {
+  const t = useTranslations("hero");
+  const th = useTranslations("home");
+  const locale = useLocale();
   const imagenes = IMG.homeCarrusel;
 
   const [imagenActual, setImagenActual] = useState(0);
   const [heroVisible, setHeroVisible] = useState(false);
+  const router = useRouter();
+  const [officeZooming, setOfficeZooming] = useState(false);
+
+  // Foto del consultorio: zoom leve al pasar el mouse, zoom mayor al hacer
+  // clic, y navega a /consultorio cuando la animación termina — la
+  // transición se ve, no salta de golpe.
+  const goToOffice = () => {
+    if (officeZooming) return;
+    setOfficeZooming(true);
+    setTimeout(() => router.push("/consultorio"), 420);
+  };
 
   useEffect(() => {
     const intervalo = setInterval(
@@ -55,7 +58,6 @@ export default function HomePage() {
     return () => clearInterval(intervalo);
   }, [imagenes.length]);
 
-  // Activa la animación de entrada del contenido del hero (antes quedaba en opacity:0)
   useEffect(() => {
     const t = setTimeout(() => setHeroVisible(true), 80);
     return () => clearTimeout(t);
@@ -63,11 +65,13 @@ export default function HomePage() {
 
   const memoizedVideo = useMemo(() => <VideoAnim />, []);
 
+  const rotator = t.raw("rotator") as string[];
+  const rotatorSequence = rotator.flatMap((w) => [w, 1800]);
+
   return (
     <>
       {/* ===== HERO FULL-SCREEN ===== */}
       <section className="hero-fs">
-        {/* Capa de fondo: video (si HERO_VIDEO) o imagen (HERO_IMAGE / fallback) */}
         <div className="hero-fs-bg">
           {HERO_VIDEO ? (
             <video
@@ -81,15 +85,19 @@ export default function HomePage() {
               aria-hidden="true"
             />
           ) : (
-            <img
+            <Image
               src={HERO_IMAGE || imagenes[imagenActual]}
-              alt="Dra. Vanessa Medina"
+              alt={t("imageAlt")}
+              fill
+              priority
+              sizes="100vw"
+              quality={85}
+              style={{ objectFit: "cover" }}
             />
           )}
           <div className="hero-fs-overlay" aria-hidden="true" />
         </div>
 
-        {/* Contenido a la derecha con animación */}
         <div className="hero-fs-content">
           <motion.div
             className="hero-fs-text"
@@ -103,7 +111,7 @@ export default function HomePage() {
               animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 12 }}
               transition={{ duration: 0.6, delay: 0.05 }}
             >
-              Medicina estética · Ibagué
+              {t("kicker")}
             </motion.span>
 
             <motion.h1
@@ -112,20 +120,15 @@ export default function HomePage() {
               animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 18 }}
               transition={{ duration: 0.7, delay: 0.18 }}
             >
-              Tu mejor versión <br /> empieza con
+              {t("title1")} <br /> {t("title2")}
               <br />
               <span className="hero-fs-rotator">
+                {/* key={locale} fuerza remount cuando cambia el idioma:
+                    sin esto, TypeAnimation conserva la secuencia interna
+                    inicial y nunca refleja la traducción nueva. */}
                 <TypeAnimation
-                  sequence={[
-                    "armonía.",
-                    1800,
-                    "autenticidad.",
-                    1800,
-                    "belleza natural.",
-                    1800,
-                    "confianza.",
-                    1800,
-                  ]}
+                  key={locale}
+                  sequence={rotatorSequence}
                   wrapper="span"
                   speed={55}
                   deletionSpeed={70}
@@ -141,9 +144,7 @@ export default function HomePage() {
               animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
               transition={{ duration: 0.7, delay: 0.4 }}
             >
-              Tratamientos personalizados con tecnología de última generación.
-              Resultados naturales que resaltan tu esencia, en manos de la
-              Dra. Vanessa Medina.
+              {t("subtitle")}
             </motion.p>
 
             <motion.div
@@ -153,10 +154,10 @@ export default function HomePage() {
               transition={{ duration: 0.7, delay: 0.55 }}
             >
               <Link href="/agendar" className="hero-fs-btn hero-fs-btn-primary">
-                <i className="fas fa-calendar-check me-2"></i> Agendar cita
+                <i className="fas fa-calendar-check me-2"></i> {t("ctaPrimary")}
               </Link>
               <Link href="/procedimientos" className="hero-fs-btn hero-fs-btn-ghost">
-                Conoce los procedimientos
+                {t("ctaSecondary")}
               </Link>
             </motion.div>
           </motion.div>
@@ -166,36 +167,19 @@ export default function HomePage() {
       {/* VIDEO CENTRAL */}
       {memoizedVideo}
 
-      {/* GALERÍA 3D */}
+      {/* GALERÍA 3D — el componente trae su propia imagen de fondo y título */}
       <section
-        className="py-5"
         style={{
-          backgroundColor: "#FAF9F7",
           borderTop: "1px solid #E8E1D4",
           borderBottom: "1px solid #E8E1D4",
         }}
       >
-        <div className="text-center mb-5">
-          <h2
-            className="fw-bold"
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              color: "#4E3B2B",
-            }}
-          >
-            Tratamientos más demandados
-          </h2>
-          <p className="lead" style={{ color: "#6C584C" }}>
-            Explora de forma interactiva algunos de nuestros procedimientos más
-            aclamados
-          </p>
-        </div>
         <Galeria3D />
       </section>
 
-      {/* UBICACIÓN */}
+      {/* UBICACIÓN — mapa + foto del consultorio + 2 CTAs */}
       <section
-        className="py-5 text-center"
+        className="py-5 text-center home-location-section"
         style={{
           backgroundColor: "#E9DED2",
           color: "#4E3B2B",
@@ -205,49 +189,140 @@ export default function HomePage() {
           className="fw-bold mb-3"
           style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          Nuestra ubicación
+          {th("location.title")}
         </h2>
-        <p className="mb-4" style={{ color: "#6C584C" }}>
-          Encuéntranos en el corazón de Ibagué, dentro de la Torre Empresarial.
+        <p className="mb-5" style={{ color: "#6C584C" }}>
+          {th("location.subtitle")}
         </p>
 
+        {/* Grid mapa + foto */}
         <div
+          className="home-loc-grid"
           style={{
-            width: "90%",
-            maxWidth: "900px",
-            height: "450px",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1.5rem",
+            width: "92%",
+            maxWidth: 1180,
             margin: "0 auto",
-            borderRadius: "20px",
-            overflow: "hidden",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
           }}
         >
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d994.454304702495!2d-75.24131428635316!3d4.445089870529062!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e38c4845c124d1d%3A0x4c5542efc906b982!2sEdificio%20Torre%20Empresarial!5e0!3m2!1ses-419!2sco!4v1763922944777!5m2!1ses-419!2sco"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="w-full h-full border-0"
-            allowFullScreen
-          />
+          {/* Mapa */}
+          <div
+            className="home-loc-card"
+            style={{
+              height: 420,
+              borderRadius: 20,
+              overflow: "hidden",
+              boxShadow: "0 8px 24px rgba(78, 59, 43, 0.15)",
+              border: "1px solid rgba(176, 137, 104, 0.18)",
+            }}
+          >
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d994.454304702495!2d-75.24131428635316!3d4.445089870529062!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e38c4845c124d1d%3A0x4c5542efc906b982!2sEdificio%20Torre%20Empresarial!5e0!3m2!1ses-419!2sco!4v1763922944777!5m2!1ses-419!2sco"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full h-full border-0"
+              allowFullScreen
+              title="Google Maps"
+            />
+          </div>
+
+          {/* Foto del consultorio — clic lleva a /consultorio, con zoom
+              leve al pasar el mouse y zoom mayor al hacer clic antes de
+              navegar (la transición se ve, no salta de golpe). */}
+          <motion.button
+            type="button"
+            onClick={goToOffice}
+            aria-label={th("location.viewClinic")}
+            className="home-loc-card"
+            style={{
+              position: "relative",
+              height: 420,
+              borderRadius: 20,
+              overflow: "hidden",
+              boxShadow: "0 8px 24px rgba(78, 59, 43, 0.15)",
+              border: "1px solid rgba(176, 137, 104, 0.18)",
+              padding: 0,
+              cursor: "pointer",
+              display: "block",
+            }}
+          >
+            <motion.div
+              animate={{ scale: officeZooming ? 1.18 : 1 }}
+              whileHover={officeZooming ? undefined : { scale: 1.06 }}
+              transition={{ duration: officeZooming ? 0.42 : 0.35, ease: "easeOut" }}
+              style={{ position: "absolute", inset: 0 }}
+            >
+              <Image
+                src={IMG.consultorioPrincipal}
+                alt={th("location.photoAlt")}
+                fill
+                sizes="(max-width: 820px) 92vw, 590px"
+                quality={80}
+                style={{ objectFit: "cover" }}
+              />
+            </motion.div>
+            <motion.div
+              aria-hidden="true"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: officeZooming ? 1 : 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "rgba(58, 42, 26, 0.25)",
+                pointerEvents: "none",
+              }}
+            />
+          </motion.button>
         </div>
 
-        <a
-          href="https://www.google.com/maps?q=Carrera+5ta+%2311-24,+Torre+Empresarial,+Consultorio+502,+Ibagué,+Tolima"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-lg fw-semibold mt-4"
+        {/* CTAs en grid 2 col, alineados desde el centro hacia afuera:
+            - Izq (bajo el mapa): "Ver en Google Maps", justify flex-end
+              → la píldora queda junto al gap central.
+            - Der (bajo la foto): "Conocer más sobre el consultorio",
+              justify flex-start → también junto al gap central.
+            Mismo gap horizontal que las imágenes para que se respete
+            el ritmo visual. */}
+        {/* Un solo botón: el mapa embebido ya trae su propio "Abrir en
+            Maps", así que el segundo botón (que apuntaba al mismo lugar)
+            era redundante. Queda solo el que lleva a contenido real. */}
+        <div
+          className="home-loc-grid home-loc-ctas"
           style={{
-            backgroundColor: "#B08968",
-            color: "white",
-            border: "none",
-            borderRadius: "50px",
-            padding: "0.8rem 2rem",
-            boxShadow: "0 4px 12px rgba(176, 137, 104, 0.25)",
-            transition: "all 0.3s ease",
+            display: "flex",
+            justifyContent: "center",
+            width: "92%",
+            maxWidth: 1180,
+            margin: "1.5rem auto 0",
           }}
         >
-          <i className="fas fa-map-marker-alt me-2"></i> Ver en Google Maps
-        </a>
+          <Link href="/consultorio" className="btn-ghost-app">
+            <i className="fas fa-clinic-medical" /> {th("location.viewClinic")}
+          </Link>
+        </div>
+
+        <style>{`
+          @media (max-width: 1024px) {
+            .home-loc-card { height: 360px !important; }
+          }
+          @media (max-width: 820px) {
+            .home-loc-grid {
+              grid-template-columns: 1fr !important;
+              width: 94% !important;
+              gap: 1.1rem !important;
+            }
+            .home-loc-card { height: 300px !important; }
+            /* En móvil los CTAs vuelven a centrarse cada uno en su fila */
+            .home-loc-ctas > div {
+              justify-content: center !important;
+            }
+          }
+          @media (max-width: 480px) {
+            .home-loc-card { height: 240px !important; border-radius: 16px !important; }
+          }
+        `}</style>
       </section>
     </>
   );

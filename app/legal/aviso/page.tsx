@@ -2,7 +2,7 @@ import Link from "next/link";
 import LegalDoc from "../LegalDoc";
 
 export const metadata = {
-  title: "Aviso de Privacidad · Dra. Vanessa Medina",
+  title: "Aviso de Privacidad · Consultorio JM",
   description: "Resumen corto del aviso de privacidad y tratamiento de datos.",
 };
 
@@ -10,12 +10,12 @@ export default function AvisoPage() {
   return (
     <LegalDoc
       titulo="Aviso de Privacidad"
-      actualizado="[FECHA_ACTUALIZACION]"
+      actualizado="5 de junio de 2026"
       current="/legal/aviso"
     >
       <p>
         La <strong>Dra. Julieth Vanessa Medina Orjuela</strong> (NIT{" "}
-        <code className="legal-placeholder">[NIT]</code>), con domicilio en
+        <strong>1.105.689.615-9</strong>), con domicilio en
         Carrera 5ta #11-24, Edificio Torre Empresarial, Consultorio 502,
         Ibagué — Tolima, recolecta y trata tus datos personales con las
         siguientes finalidades:

@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 //  Ahora usamos el tipo de dominio
 import type { MediaItem } from "../../types/domain";
@@ -68,7 +69,7 @@ export default function ModalGaleriaItem({
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="bg-[#FBF7F2] rounded-lg shadow-xl p-6 w-[95%] max-w-lg"
+          className="[background:var(--surface)] rounded-lg shadow-xl p-6 w-[95%] max-w-lg"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
@@ -89,7 +90,7 @@ export default function ModalGaleriaItem({
                 aria-label="Cerrar"
                 style={{ background: "none", border: "none", color: "#922B21", cursor: "pointer", fontWeight: 700 }}
               >
-                ×
+                Ã—
               </button>
             </div>
           )}
@@ -98,7 +99,7 @@ export default function ModalGaleriaItem({
             <select
               value={tipo}
               onChange={(e) => setTipo(e.target.value as "imagen" | "video")}
-              className="border border-[#E5D8C8] rounded p-2"
+              className="border [border-color:var(--border)] rounded p-2"
             >
               <option value="imagen">Imagen</option>
               <option value="video">Video</option>
@@ -109,14 +110,14 @@ export default function ModalGaleriaItem({
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
               placeholder="Título del medio"
-              className="border border-[#E5D8C8] rounded p-2"
+              className="border [border-color:var(--border)] rounded p-2"
             />
 
             <textarea
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
               placeholder="Descripción breve"
-              className="border border-[#E5D8C8] rounded p-2"
+              className="border [border-color:var(--border)] rounded p-2"
             />
 
             {tipo === "imagen" ? (
@@ -127,9 +128,13 @@ export default function ModalGaleriaItem({
                 }
               >
                 {preview ? (
-                  <img
+                  <Image
                     src={preview}
                     alt="Vista previa"
+                    width={160}
+                    height={160}
+                    quality={70}
+                    unoptimized
                     className="mx-auto rounded w-40 h-40 object-cover"
                   />
                 ) : (
@@ -153,7 +158,7 @@ export default function ModalGaleriaItem({
                 placeholder="Pega URL de video (YouTube o embebido)"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="border border-[#E5D8C8] rounded p-2"
+                className="border [border-color:var(--border)] rounded p-2"
               />
             )}
 

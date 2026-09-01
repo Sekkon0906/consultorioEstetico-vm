@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -55,7 +55,7 @@ export default function CitasAgendadasEditor({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       className="bg-white p-6 rounded-4 shadow-lg w-100 border"
-      style={{ borderColor: "#E5D8C8", maxWidth: 560 }}
+      style={{ borderColor: "var(--border)", maxWidth: 560 }}
     >
       <h2
         className="fw-bold text-center mb-4"
@@ -85,7 +85,7 @@ export default function CitasAgendadasEditor({
         <div>
           <label
             className="form-label small fw-semibold"
-            style={{ color: "#6E5A49" }}
+            style={{ color: "var(--text-soft)" }}
           >
             Procedimiento
           </label>
@@ -95,8 +95,8 @@ export default function CitasAgendadasEditor({
             value={form.procedimiento}
             onChange={handleChange}
             style={{
-              borderColor: "#E5D8C8",
-              backgroundColor: "#FFFDF9",
+              borderColor: "var(--border)",
+              backgroundColor: "var(--surface)",
             }}
           />
         </div>
@@ -104,7 +104,7 @@ export default function CitasAgendadasEditor({
           <div className="flex-1">
             <label
               className="form-label small fw-semibold"
-              style={{ color: "#6E5A49" }}
+              style={{ color: "var(--text-soft)" }}
             >
               Fecha
             </label>
@@ -115,15 +115,15 @@ export default function CitasAgendadasEditor({
               value={form.fecha?.slice(0, 10)}
               onChange={handleChange}
               style={{
-                borderColor: "#E5D8C8",
-                backgroundColor: "#FFFDF9",
+                borderColor: "var(--border)",
+                backgroundColor: "var(--surface)",
               }}
             />
           </div>
           <div className="flex-1">
             <label
               className="form-label small fw-semibold"
-              style={{ color: "#6E5A49" }}
+              style={{ color: "var(--text-soft)" }}
             >
               Hora
             </label>
@@ -134,8 +134,8 @@ export default function CitasAgendadasEditor({
               value={form.hora}
               onChange={handleChange}
               style={{
-                borderColor: "#E5D8C8",
-                backgroundColor: "#FFFDF9",
+                borderColor: "var(--border)",
+                backgroundColor: "var(--surface)",
               }}
             />
           </div>
@@ -143,7 +143,7 @@ export default function CitasAgendadasEditor({
         <div>
           <label
             className="form-label small fw-semibold"
-            style={{ color: "#6E5A49" }}
+            style={{ color: "var(--text-soft)" }}
           >
             Estado
           </label>
@@ -153,8 +153,8 @@ export default function CitasAgendadasEditor({
             value={form.estado}
             onChange={handleChange}
             style={{
-              borderColor: "#E5D8C8",
-              backgroundColor: "#FFFDF9",
+              borderColor: "var(--border)",
+              backgroundColor: "var(--surface)",
             }}
           >
             {ESTADOS.map((e) => (
@@ -167,7 +167,7 @@ export default function CitasAgendadasEditor({
         <div>
           <label
             className="form-label small fw-semibold"
-            style={{ color: "#6E5A49" }}
+            style={{ color: "var(--text-soft)" }}
           >
             Nota
           </label>
@@ -178,8 +178,8 @@ export default function CitasAgendadasEditor({
             value={form.nota ?? ""}
             onChange={handleChange}
             style={{
-              borderColor: "#E5D8C8",
-              backgroundColor: "#FFFDF9",
+              borderColor: "var(--border)",
+              backgroundColor: "var(--surface)",
             }}
           />
         </div>
@@ -191,7 +191,7 @@ export default function CitasAgendadasEditor({
           disabled={saving || saved}
           className="btn rounded-pill fw-semibold flex-1"
           style={{
-            backgroundColor: "#8B6A4B",
+            backgroundColor: "var(--brand)",
             color: "#fff",
             border: "none",
           }}
@@ -202,8 +202,8 @@ export default function CitasAgendadasEditor({
           onClick={onClose}
           className="btn rounded-pill fw-semibold"
           style={{
-            backgroundColor: "#E9DED2",
-            color: "#4E3B2B",
+            backgroundColor: "var(--border)",
+            color: "var(--text)",
             border: "none",
           }}
         >

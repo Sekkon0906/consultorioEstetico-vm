@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -114,9 +114,9 @@ export default function CitasAgendadas() {
     }
   };
 
-  if (!isClient) return <div className="text-center py-20 text-[#6E5A49]">Cargando citas...</div>;
+  if (!isClient) return <div className="text-center py-20 [color:var(--text-soft)]">Cargando citas...</div>;
 
-  const IS: React.CSSProperties = { width: "100%", padding: "0.5rem 0.8rem", borderRadius: 10, border: "1px solid #E5D8C8", fontSize: "0.85rem", color: "#4E3B2B", background: "#FFFCF8" };
+  const IS: React.CSSProperties = { width: "100%", padding: "0.5rem 0.8rem", borderRadius: 10, border: "1px solid var(--border)", fontSize: "0.85rem", color: "var(--text)", background: "var(--bg-elevated)" };
 
   return (
     <div className="p-6 space-y-6 relative">
@@ -126,21 +126,22 @@ export default function CitasAgendadas() {
 
       <div className="flex flex-col md:flex-row gap-6 justify-center items-start">
         {/* CALENDARIO */}
-        <div className="bg-[#FBF7F2] p-6 rounded-xl shadow-md w-full md:w-[45%] flex flex-col items-center" style={{ border: "1px solid #E5D8C8" }}>
+        <div className="[background:var(--surface)] p-6 rounded-xl shadow-md w-full md:w-[45%] flex flex-col items-center" style={{ border: "1px solid var(--border)" }}>
           <motion.button whileTap={{ scale: 0.97 }} onClick={() => { setBuzonGeneral(true); setSelectedDate(null); }}
-            style={{ width: "100%", padding: "0.6rem", borderRadius: 12, marginBottom: "1rem", fontWeight: 600, fontSize: "0.88rem", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: buzonGeneral ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "#F0E8DE", color: buzonGeneral ? "white" : "#4E3B2B" }}>
+            className={buzonGeneral ? "admin-cal-buzon is-active" : "admin-cal-buzon"}
+            style={{ width: "100%", padding: "0.6rem", borderRadius: 12, marginBottom: "1rem", fontWeight: 600, fontSize: "0.88rem", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
             <Inbox size={16} /> Buzon general
           </motion.button>
 
           <div className="flex justify-between items-center mb-4 w-full">
-            <button type="button" onClick={() => { if (mes === 0) { setMes(11); setAnio((a) => a - 1); } else setMes((m) => m - 1); }} className="text-[#8B6A4B] hover:text-[#C7A27A] text-lg font-semibold">{"<"}</button>
-            <span className="text-[#8B6A4B] font-bold capitalize tracking-wide text-lg">{MESES[mes]} {anio}</span>
-            <button type="button" onClick={() => { if (mes === 11) { setMes(0); setAnio((a) => a + 1); } else setMes((m) => m + 1); }} className="text-[#8B6A4B] hover:text-[#C7A27A] text-lg font-semibold">{">"}</button>
+            <button type="button" onClick={() => { if (mes === 0) { setMes(11); setAnio((a) => a - 1); } else setMes((m) => m - 1); }} className="[color:var(--brand)] hover:[color:var(--brand-soft)] text-lg font-semibold">{"<"}</button>
+            <span className="[color:var(--brand)] font-bold capitalize tracking-wide text-lg">{MESES[mes]} {anio}</span>
+            <button type="button" onClick={() => { if (mes === 11) { setMes(0); setAnio((a) => a + 1); } else setMes((m) => m + 1); }} className="[color:var(--brand)] hover:[color:var(--brand-soft)] text-lg font-semibold">{">"}</button>
           </div>
 
           <div className="grid grid-cols-7 w-full mb-2">
             {["Lun","Mar","Mie","Jue","Vie","Sab","Dom"].map((d) => (
-              <div key={d} className="text-center font-semibold text-[#6E5A49] text-sm border-b border-[#E5D8C8] pb-1">{d}</div>
+              <div key={d} className="text-center font-semibold [color:var(--text-soft)] text-sm border-b [border-color:var(--border)] pb-1">{d}</div>
             ))}
           </div>
           <div className="grid grid-cols-7 gap-1 w-full mb-4">
@@ -151,9 +152,9 @@ export default function CitasAgendadas() {
               const hoy = d != null && new Date(anio, mes, d).toDateString() === new Date().toDateString();
               return (
                 <motion.button key={i} type="button" whileTap={{ scale: 0.9 }} onClick={() => handleDateClick(d)} disabled={d == null}
-                  className={`h-10 w-full rounded-md text-sm font-medium transition-all relative ${d == null ? "bg-transparent cursor-default" : sel ? "bg-[#B08968] text-white shadow-inner" : hoy ? "bg-[#F5EEE6] text-[#B08968] font-bold ring-1 ring-[#B08968]" : "bg-white hover:bg-[#F1E6DA] text-[#32261C]"}`}>
+                  className={`admin-cal-day h-10 w-full rounded-md text-sm font-medium transition-all relative ${d == null ? "is-empty" : sel ? "is-selected" : hoy ? "is-today" : ""}`}>
                   {d ?? ""}
-                  {cnt > 0 && <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-[9px] font-bold text-white" style={{ background: "#B08968", padding: "0 3px" }}>{cnt}</span>}
+                  {cnt > 0 && <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-[9px] font-bold text-white" style={{ background: "var(--brand)", padding: "0 3px" }}>{cnt}</span>}
                 </motion.button>
               );
             })}
@@ -161,18 +162,18 @@ export default function CitasAgendadas() {
         </div>
 
         {/* LISTA */}
-        <div className="flex-1 bg-[#FBF7F2] p-6 rounded-xl shadow-md border border-[#E5D8C8] min-h-[400px]">
+        <div className="flex-1 [background:var(--surface)] p-6 rounded-xl shadow-md border [border-color:var(--border)] min-h-[400px]">
           {!selectedDate && !buzonGeneral ? (
-            <p className="text-[#6E5A49] text-center mt-16 italic">Selecciona un dia o el buzon general.</p>
+            <p className="[color:var(--text-soft)] text-center mt-16 italic">Selecciona un dia o el buzon general.</p>
           ) : (
             <>
               <div className="flex flex-wrap justify-between items-center mb-4 gap-3">
-                <h3 className="text-lg font-semibold text-[#8B6A4B]">{buzonGeneral ? "Todas las citas" : `Citas del ${selectedDate}`}</h3>
+                <h3 className="text-lg font-semibold [color:var(--brand)]">{buzonGeneral ? "Todas las citas" : `Citas del ${selectedDate}`}</h3>
                 <div className="flex flex-wrap gap-2 items-center">
                   <select value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)} style={IS}>
                     <option value="todos">Todos</option><option value="pendiente">Pendientes</option><option value="confirmada">Confirmadas</option><option value="atendida">Atendidas</option><option value="cancelada">Canceladas</option>
                   </select>
-                  <button type="button" onClick={() => setAscendente((p) => !p)} className="flex items-center gap-1 text-sm text-[#6E5A49] hover:text-[#8B6A4B]">
+                  <button type="button" onClick={() => setAscendente((p) => !p)} className="flex items-center gap-1 text-sm [color:var(--text-soft)] hover:[color:var(--brand)]">
                     {ascendente ? <><ChevronUp size={16} /> Asc</> : <><ChevronDown size={16} /> Desc</>}
                   </button>
                 </div>
@@ -184,14 +185,14 @@ export default function CitasAgendadas() {
                 <div className="bg-[#FCE4EC] rounded-lg py-2 text-center border border-[#F48FB1] text-[#C2185B]">Canceladas: {resumen.cancelada}</div>
               </div>
               <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto pr-2">
-                {loadingCitas ? <p className="text-[#6E5A49] text-center mt-20 italic">Cargando...</p>
+                {loadingCitas ? <p className="[color:var(--text-soft)] text-center mt-20 italic">Cargando...</p>
                 : citas.length > 0 ? citas.map((c) => (
                   <CitasAgendadasCard key={c.id} cita={c} onVerDetalles={setDetalle}
                     onConfirmar={setConfirmModal}
                     onCancelar={(c) => { setCancelModal(c); setCancelMotivo(""); }}
                     onReagendar={(c) => { setReagendarModal(c); setReagendarFecha(c.fecha); setReagendarHora(c.hora); setReagendarMotivo(""); setReagendarOk(false); setReagendarError(null); }}
                     onVerMotivo={setMotivoModal} onVerResumen={setResumenModal} />
-                )) : <p className="text-[#6E5A49] text-center mt-20 italic">No hay citas.</p>}
+                )) : <p className="[color:var(--text-soft)] text-center mt-20 italic">No hay citas.</p>}
               </div>
             </>
           )}
@@ -204,10 +205,10 @@ export default function CitasAgendadas() {
       {/* CONFIRMAR */}
       <AnimatePresence>{confirmModal && (
         <Overlay onClose={() => setConfirmModal(null)}>
-          <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3A2A1A", textAlign: "center", marginBottom: "1rem" }}>Confirmar cita</h4>
+          <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", textAlign: "center", marginBottom: "1rem" }}>Confirmar cita</h4>
           <InfoBlock cita={confirmModal} />
           <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center", marginTop: "1.5rem" }}>
-            <BtnM label="Cancelar" bg="#F0E8DE" color="#4E3B2B" onClick={() => setConfirmModal(null)} />
+            <BtnM label="Cancelar" bg="var(--surface-soft)" color="var(--text)" onClick={() => setConfirmModal(null)} />
             <BtnM label="Confirmar" bg="#2D6A4F" color="#fff" onClick={doConfirm} />
           </div>
         </Overlay>
@@ -216,12 +217,12 @@ export default function CitasAgendadas() {
       {/* CANCELAR */}
       <AnimatePresence>{cancelModal && (
         <Overlay onClose={() => setCancelModal(null)}>
-          <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3A2A1A", textAlign: "center", marginBottom: "1rem" }}>Cancelar cita</h4>
+          <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", textAlign: "center", marginBottom: "1rem" }}>Cancelar cita</h4>
           <InfoBlock cita={cancelModal} />
           <textarea value={cancelMotivo} onChange={(e) => setCancelMotivo(e.target.value)} rows={3} placeholder="Motivo de la cancelacion..." style={{ ...IS, marginTop: "1rem", resize: "vertical" as const }} />
           <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center", marginTop: "1.2rem" }}>
-            <BtnM label="Volver" bg="#F0E8DE" color="#4E3B2B" onClick={() => setCancelModal(null)} />
-            <BtnM label="Confirmar cancelacion" bg={cancelMotivo.trim() ? "#C62828" : "#E9DED2"} color={cancelMotivo.trim() ? "#fff" : "#9B8575"} onClick={doCancel} disabled={!cancelMotivo.trim()} />
+            <BtnM label="Volver" bg="var(--surface-soft)" color="var(--text)" onClick={() => setCancelModal(null)} />
+            <BtnM label="Confirmar cancelacion" bg={cancelMotivo.trim() ? "#C62828" : "var(--border)"} color={cancelMotivo.trim() ? "#fff" : "var(--text-muted)"} onClick={doCancel} disabled={!cancelMotivo.trim()} />
           </div>
         </Overlay>
       )}</AnimatePresence>
@@ -234,41 +235,41 @@ export default function CitasAgendadas() {
               <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#E8F5E9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
               </div>
-              <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.4rem" }}>Solicitud enviada</h4>
-              <p style={{ fontSize: "0.88rem", color: "#6C584C", margin: 0 }}>
+              <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.4rem" }}>Solicitud enviada</h4>
+              <p style={{ fontSize: "0.88rem", color: "var(--text-soft)", margin: 0 }}>
                 La solicitud de reagenda quedó registrada. El cliente deberá confirmarla;
                 la cita no se mueve hasta que la apruebe.
               </p>
             </div>
           ) : (
             <>
-              <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3A2A1A", textAlign: "center", marginBottom: "0.3rem" }}>Solicitar reagenda al cliente</h4>
-              <p style={{ fontSize: "0.8rem", color: "#8A7565", textAlign: "center", marginBottom: "1rem" }}>
+              <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", textAlign: "center", marginBottom: "0.3rem" }}>Solicitar reagenda al cliente</h4>
+              <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", textAlign: "center", marginBottom: "1rem" }}>
                 Se enviará una solicitud al cliente con la nueva propuesta. La cita actual NO se modifica hasta que el cliente confirme.
               </p>
               <InfoBlock cita={reagendarModal} />
               <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.8rem" }}>
                 <div style={{ display: "flex", gap: "0.8rem" }}>
                   <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Nueva fecha</label>
+                    <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text-soft)", display: "block", marginBottom: 4 }}>Nueva fecha</label>
                     <input type="date" value={reagendarFecha} onChange={(e) => setReagendarFecha(e.target.value)} style={IS} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Nueva hora</label>
+                    <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text-soft)", display: "block", marginBottom: 4 }}>Nueva hora</label>
                     <select value={reagendarHora} onChange={(e) => setReagendarHora(e.target.value)} style={IS}>
                       {HORAS.map((h) => <option key={h} value={h}>{h}</option>)}
                     </select>
                   </div>
                 </div>
                 <div>
-                  <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "#6C584C", display: "block", marginBottom: 4 }}>Motivo de la reagenda *</label>
+                  <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text-soft)", display: "block", marginBottom: 4 }}>Motivo de la reagenda *</label>
                   <textarea value={reagendarMotivo} onChange={(e) => { setReagendarMotivo(e.target.value); if (reagendarError) setReagendarError(null); }} rows={3} placeholder="Explica al cliente por qué se propone reagendar..." style={{ ...IS, resize: "vertical" as const }} />
                 </div>
               </div>
               {reagendarError && <p style={{ color: "#b02e2e", fontSize: "0.82rem", marginTop: "0.6rem", textAlign: "center" }}>{reagendarError}</p>}
               <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center", marginTop: "1.2rem" }}>
-                <BtnM label="Cancelar" bg="#F0E8DE" color="#4E3B2B" onClick={() => setReagendarModal(null)} />
-                <BtnM label={reagendarSaving ? "Enviando..." : "Enviar solicitud"} bg="#8B6A4B" color="#fff" onClick={doReagendar} disabled={reagendarSaving || !reagendarFecha || !reagendarHora || !reagendarMotivo.trim()} />
+                <BtnM label="Cancelar" bg="var(--surface-soft)" color="var(--text)" onClick={() => setReagendarModal(null)} />
+                <BtnM label={reagendarSaving ? "Enviando..." : "Enviar solicitud"} bg="var(--brand)" color="#fff" onClick={doReagendar} disabled={reagendarSaving || !reagendarFecha || !reagendarHora || !reagendarMotivo.trim()} />
               </div>
             </>
           )}
@@ -278,20 +279,20 @@ export default function CitasAgendadas() {
       {/* VER MOTIVO */}
       <AnimatePresence>{motivoModal && (
         <Overlay onClose={() => setMotivoModal(null)}>
-          <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3A2A1A", textAlign: "center", marginBottom: "1rem" }}>Motivo de cancelacion</h4>
-          <div style={{ background: "#FCE4EC", borderRadius: 14, padding: "1rem", textAlign: "center" }}>
+          <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", textAlign: "center", marginBottom: "1rem" }}>Motivo de cancelación</h4>
+          <div className="admin-citas-motivo" style={{ background: "#FCE4EC", borderRadius: 14, padding: "1rem", textAlign: "center" }}>
             <p style={{ fontSize: "0.9rem", color: "#7E1F1F", fontStyle: "italic", margin: 0 }}>{motivoModal.motivoCancelacion || "Sin motivo registrado"}</p>
           </div>
-          <div style={{ textAlign: "center", marginTop: "1.2rem" }}><BtnM label="Cerrar" bg="#F0E8DE" color="#4E3B2B" onClick={() => setMotivoModal(null)} /></div>
+          <div style={{ textAlign: "center", marginTop: "1.2rem" }}><BtnM label="Cerrar" bg="var(--surface-soft)" color="var(--text)" onClick={() => setMotivoModal(null)} /></div>
         </Overlay>
       )}</AnimatePresence>
 
       {/* VER RESUMEN */}
       <AnimatePresence>{resumenModal && (
         <Overlay onClose={() => setResumenModal(null)}>
-          <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3A2A1A", textAlign: "center", marginBottom: "1rem" }}>Resumen de cita atendida</h4>
+          <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", textAlign: "center", marginBottom: "1rem" }}>Resumen de cita atendida</h4>
           <InfoBlock cita={resumenModal} />
-          <div style={{ textAlign: "center", marginTop: "1.2rem" }}><BtnM label="Cerrar" bg="#B08968" color="#fff" onClick={() => setResumenModal(null)} /></div>
+          <div style={{ textAlign: "center", marginTop: "1.2rem" }}><BtnM label="Cerrar" bg="var(--brand)" color="#fff" onClick={() => setResumenModal(null)} /></div>
         </Overlay>
       )}</AnimatePresence>
     </div>
@@ -302,18 +303,18 @@ export default function CitasAgendadas() {
 
 function InfoBlock({ cita }: { cita: Cita }) {
   return (
-    <div style={{ background: "#FBF7F2", borderRadius: 14, padding: "1rem", display: "flex", flexDirection: "column", gap: "0.35rem", fontSize: "0.85rem", color: "#4E3B2B", border: "1px solid #E5D8C8" }}>
+    <div style={{ background: "var(--surface)", borderRadius: 14, padding: "1rem", display: "flex", flexDirection: "column", gap: "0.35rem", fontSize: "0.85rem", color: "var(--text)", border: "1px solid var(--border)" }}>
       <div style={{ fontWeight: 700, fontSize: "0.95rem" }}>{cita.nombres} {cita.apellidos}</div>
-      <div style={{ color: "#8B6A4B", fontWeight: 600 }}>{cita.procedimiento}</div>
-      <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", color: "#6C584C" }}>
+      <div style={{ color: "var(--brand)", fontWeight: 600 }}>{cita.procedimiento}</div>
+      <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", color: "var(--text-soft)" }}>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Phone size={12} /> {cita.telefono}</span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Mail size={12} /> {cita.correo}</span>
       </div>
-      <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", color: "#6C584C" }}>
+      <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", color: "var(--text-soft)" }}>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} /> {cita.fecha}</span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={12} /> {cita.hora}</span>
       </div>
-      {cita.nota && <div style={{ fontStyle: "italic", color: "#8A7565" }}>Nota: {cita.nota}</div>}
+      {cita.nota && <div style={{ fontStyle: "italic", color: "var(--text-muted)" }}>Nota: {cita.nota}</div>}
     </div>
   );
 }
@@ -321,10 +322,11 @@ function InfoBlock({ cita }: { cita: Cita }) {
 function Overlay({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }}
+      style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)" }}
       onClick={onClose}>
       <motion.div initial={{ scale: 0.92, y: 15 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 15 }}
-        style={{ background: "#fff", borderRadius: 24, padding: "2rem", width: "100%", maxWidth: 460, boxShadow: "0 20px 50px rgba(0,0,0,0.15)" }}
+        className="dark-aware-card admin-citas-modal"
+        style={{ background: "var(--surface)", color: "var(--text)", borderRadius: 24, padding: "2rem", width: "100%", maxWidth: 480, boxShadow: "0 24px 60px rgba(0,0,0,0.35)", border: "1px solid var(--border)" }}
         onClick={(e) => e.stopPropagation()}>
         {children}
       </motion.div>

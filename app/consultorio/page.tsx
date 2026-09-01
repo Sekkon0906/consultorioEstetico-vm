@@ -1,32 +1,11 @@
 "use client";
 
 import { IMG } from "@/lib/imagenes";
+import Image from "next/image";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-
-const galleryImages = [
-  {
-    src: IMG.consultorioRelleno[0],
-    label: "Sala de procedimiento",
-  },
-  {
-    src: IMG.consultorioRelleno[1],
-    label: "Divisiones y privacidad",
-  },
-  {
-    src: IMG.consultorioRelleno[2],
-    label: "Zona de trabajo",
-  },
-  {
-    src: IMG.consultorioRelleno[3],
-    label: "Acceso y luz natural",
-  },
-  {
-    src: IMG.consultorioRelleno[4],
-    label: "Detalle de ambiente",
-  },
-];
+import { useTranslations } from "next-intl";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -39,7 +18,25 @@ const cardVariant = {
 };
 
 export default function ConsultorioPage() {
+  const t = useTranslations("consultorio");
+  const imageLabels = t.raw("gallery.images") as string[];
+
+  const galleryImages = [
+    { src: IMG.consultorioRelleno[0], label: imageLabels[0] },
+    { src: IMG.consultorioRelleno[1], label: imageLabels[1] },
+    { src: IMG.consultorioRelleno[2], label: imageLabels[2] },
+    { src: IMG.consultorioRelleno[3], label: imageLabels[3] },
+    { src: IMG.consultorioRelleno[4], label: imageLabels[4] },
+  ];
+
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  // Imagen activa del showcase (galería grande + miniaturas).
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const showcasePrev = () =>
+    setActiveIndex((p) => (p - 1 + galleryImages.length) % galleryImages.length);
+  const showcaseNext = () =>
+    setActiveIndex((p) => (p + 1) % galleryImages.length);
 
   const closeModal = () => setSelectedIndex(null);
 
@@ -64,10 +61,14 @@ export default function ConsultorioPage() {
     <div className="min-h-screen bg-[#FAF6F1] text-[#2B2B2B] overflow-hidden">
       {/* HERO */}
       <section className="relative w-full h-[85vh] md:h-[90vh]">
-        <img
+        <Image
           src={IMG.consultorioPrincipal}
-          alt="Consultorio principal"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.9)" }}
+          alt={t("hero.imageAlt")}
+          fill
+          priority
+          sizes="100vw"
+          quality={85}
+          style={{ objectFit: "cover", filter: "brightness(0.9)" }}
         />
         <div className="absolute inset-0 bg-black/35" />
 
@@ -78,7 +79,7 @@ export default function ConsultorioPage() {
             transition={{ duration: 0.8 }}
             className="text-sm md:text-base tracking-[0.3em] uppercase mb-4"
           >
-            ESPACIO MÉDICO ESTÉTICO
+            {t("hero.kicker")}
           </motion.span>
 
           <motion.h1
@@ -87,7 +88,7 @@ export default function ConsultorioPage() {
             transition={{ duration: 1 }}
             className="text-4xl md:text-6xl font-semibold mb-4 drop-shadow-xl"
           >
-            Nuestro Consultorio
+            {t("hero.title")}
           </motion.h1>
 
           <motion.p
@@ -96,28 +97,27 @@ export default function ConsultorioPage() {
             transition={{ delay: 0.3, duration: 1 }}
             className="text-lg md:text-xl max-w-3xl"
           >
-            Un ambiente diseñado para tu bienestar, donde la estética,
-            la tecnología y la calma se integran en cada detalle.
+            {t("hero.subtitle")}
           </motion.p>
 
-<motion.div
-  initial={{ opacity: 0, y: 20, scale: 0.9 }}
-  animate={{ opacity: 1, y: 0, scale: 1 }}
-  transition={{ delay: 0.6, duration: 0.8 }}
-  className="mt-6 flex justify-center w-full"
->
-  <div className="inline-flex items-center justify-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full">
-    <span className="h-3 w-3 rounded-full bg-emerald-300 animate-pulse" />
-    <p className="relative top-[8px] text-sm md:text-base leading-none text-center">
-      Atmósfera tranquila  Equipos modernos  Atención personalizada
-    </p>
-  </div>
-</motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="mt-6 flex justify-center w-full"
+          >
+            <div className="inline-flex items-center justify-center gap-3 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full">
+              <span className="h-3 w-3 rounded-full bg-emerald-300 animate-pulse" />
+              <p className="relative top-[8px] text-sm md:text-base leading-none text-center">
+                {t("hero.highlight")}
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* DESCRIPCIÓN */}
-      <section className="max-w-6xl mx-auto py-16 md:py-20 px-6 text-center">
+      <section className="consultorio-desc-section max-w-6xl mx-auto py-16 md:py-20 px-6 text-center">
         <motion.h2
           variants={fadeUp}
           initial="hidden"
@@ -126,7 +126,7 @@ export default function ConsultorioPage() {
           transition={{ duration: 0.8 }}
           className="text-3xl md:text-4xl font-semibold text-[#B08968] mb-8"
         >
-          Elegancia, confort y tecnología
+          {t("description.title")}
         </motion.h2>
 
         <motion.p
@@ -135,63 +135,102 @@ export default function ConsultorioPage() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-lg leading-relaxed text-[#2B2B2B]/80 max-w-3xl mx-auto"
+          className="consultorio-desc-text text-lg leading-relaxed text-[#2B2B2B]/80 max-w-3xl mx-auto"
         >
-          Cada área del consultorio ha sido pensada para proporcionar comodidad,
-          privacidad y una experiencia estética profesional y cálida.
+          {t("description.text")}
         </motion.p>
       </section>
 
-      {/* GALERÍA */}
-      <section className="px-4 pb-16">
-        <div className="max-w-6xl mx-auto mb-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold text-[#B08968]">
-            Galería del consultorio
+      {/* GALERÍA — showcase interactivo: imagen grande + miniaturas */}
+      <section className="consultorio-gallery-section px-4 pb-16 pt-4">
+        <div className="max-w-5xl mx-auto mb-8 text-center">
+          <h2 className="consultorio-gallery-title text-2xl md:text-3xl font-semibold text-[#B08968]">
+            {t("gallery.title")}
           </h2>
         </div>
 
         <motion.div
-          initial="hidden"
-          whileInView="visible"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
-          variants={{
-            hidden: { opacity: 0, y: 40 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: { staggerChildren: 0.15 },
-            },
-          }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
+          transition={{ duration: 0.6 }}
+          className="consultorio-showcase max-w-5xl mx-auto"
         >
-          {galleryImages.map((img, index) => (
-            <motion.div
-              key={img.src}
-              variants={cardVariant}
-              whileHover={{ scale: 1.02, y: -4 }}
-              transition={{ type: "spring", stiffness: 140, damping: 12 }}
-              className="relative rounded-2xl shadow-lg bg-black/5 group overflow-hidden"
+          {/* Imagen principal */}
+          <div className="consultorio-showcase-main">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeIndex}
+                initial={{ opacity: 0, scale: 1.03 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                className="consultorio-showcase-imgwrap"
+                onClick={() => setSelectedIndex(activeIndex)}
+              >
+                <Image
+                  src={galleryImages[activeIndex].src}
+                  alt={galleryImages[activeIndex].label}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 1024px"
+                  quality={85}
+                  style={{ objectFit: "cover" }}
+                />
+                <div className="consultorio-showcase-overlay" />
+                <span className="consultorio-showcase-label">
+                  {galleryImages[activeIndex].label}
+                </span>
+                <span className="consultorio-showcase-zoom" aria-hidden="true">
+                  <i className="fas fa-expand" />
+                </span>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Flechas */}
+            <button
+              type="button"
+              onClick={showcasePrev}
+              aria-label={t("gallery.close")}
+              className="consultorio-showcase-arrow left"
             >
-              {/* todas del mismo tamaño */}
-              <div className="relative w-full h-[260px] md:h-[280px]">
-                <img
+              ‹
+            </button>
+            <button
+              type="button"
+              onClick={showcaseNext}
+              aria-label={t("gallery.viewSpace")}
+              className="consultorio-showcase-arrow right"
+            >
+              ›
+            </button>
+
+            {/* Contador */}
+            <span className="consultorio-showcase-counter">
+              {activeIndex + 1} / {galleryImages.length}
+            </span>
+          </div>
+
+          {/* Tira de miniaturas */}
+          <div className="consultorio-thumbs">
+            {galleryImages.map((img, i) => (
+              <button
+                key={img.src}
+                type="button"
+                onClick={() => setActiveIndex(i)}
+                aria-label={img.label}
+                className={`consultorio-thumb ${i === activeIndex ? "is-active" : ""}`}
+              >
+                <Image
                   src={img.src}
                   alt={img.label}
-                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                  fill
+                  sizes="120px"
+                  quality={55}
+                  style={{ objectFit: "cover" }}
                 />
-              </div>
-
-              {/* Botón */}
-              <div className="absolute inset-x-0 bottom-0 flex justify-center pb-4">
-                <button
-                  onClick={() => setSelectedIndex(index)}
-                  className="px-6 py-2 text-xs font-semibold bg-white/85 text-[#333] rounded-full hover:bg-white transition shadow-sm"
-                >
-                  VER ESPACIO
-                </button>
-              </div>
-            </motion.div>
-          ))}
+              </button>
+            ))}
+          </div>
         </motion.div>
       </section>
 
@@ -210,9 +249,8 @@ export default function ConsultorioPage() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()} // no cerrar si clic dentro
+              onClick={(e) => e.stopPropagation()}
             >
-              {/* Flecha izquierda */}
               <button
                 onClick={showPrev}
                 className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 ml-2 rounded-full bg-white/80 text-black w-9 h-9 items-center justify-center shadow-md hover:bg-white"
@@ -220,7 +258,6 @@ export default function ConsultorioPage() {
                 ‹
               </button>
 
-              {/* Imagen — completa, sin barras negras (fondo difuminado) */}
               <div
                 style={{
                   position: "relative",
@@ -234,34 +271,31 @@ export default function ConsultorioPage() {
                   justifyContent: "center",
                 }}
               >
-                <img
+                <Image
                   src={currentImage.src}
                   alt=""
                   aria-hidden
+                  fill
+                  sizes="100vw"
+                  quality={40}
                   style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
                     objectFit: "cover",
                     filter: "blur(28px) brightness(0.55)",
                     transform: "scale(1.15)",
                   }}
                 />
-                <img
+                <Image
                   src={currentImage.src}
                   alt={currentImage.label}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 1024px"
+                  quality={90}
                   style={{
-                    position: "relative",
-                    maxWidth: "100%",
-                    maxHeight: "80vh",
                     objectFit: "contain",
-                    display: "block",
                   }}
                 />
               </div>
 
-              {/* Flecha derecha */}
               <button
                 onClick={showNext}
                 className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 mr-2 rounded-full bg-white/80 text-black w-9 h-9 items-center justify-center shadow-md hover:bg-white"
@@ -269,12 +303,11 @@ export default function ConsultorioPage() {
                 ›
               </button>
 
-              {/* Cerrar */}
               <button
                 className="absolute top-4 right-4 bg-white text-black rounded-full px-3 py-1 text-sm font-semibold shadow-md hover:bg-neutral-200"
                 onClick={closeModal}
               >
-                Cerrar 
+                {t("gallery.close")}
               </button>
             </motion.div>
           </motion.div>
@@ -289,14 +322,14 @@ export default function ConsultorioPage() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8 }}
-          className="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-lg bg-white"
+          className="consultorio-map-card max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-lg bg-white"
         >
           <div className="p-6 md:p-8 text-center">
-            <h3 className="text-2xl font-semibold text-[#B08968] mb-2">
-              ¿Dónde estamos ubicados?
+            <h3 className="consultorio-map-title text-2xl font-semibold text-[#B08968] mb-2">
+              {t("map.title")}
             </h3>
-            <p className="text-sm md:text-base text-[#2B2B2B]/80">
-              Carrera 5ta #11-24. Edificio Torre Empresarial. Consultorio 502. Ibagué – Tolima.
+            <p className="consultorio-map-addr text-sm md:text-base text-[#2B2B2B]/80">
+              {t("map.address")}
             </p>
           </div>
 

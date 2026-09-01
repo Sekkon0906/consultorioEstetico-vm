@@ -93,6 +93,11 @@ export interface Cita {
   // Extras
   qrCita?: string | null;
   motivoCancelacion?: string | null;
+
+  // Consentimiento informado firmado por el paciente
+  consentimientoFirmado?: boolean;
+  firmaUrl?: string | null;
+  consentimientoPdf?: string | null;
 }
 
 // ============================================================
@@ -122,8 +127,22 @@ export interface Procedimiento {
   precio: string;
   imagen: string;
   categoria: CategoriaProcedimiento;
+  /** Subcategoría libre opcional (ej. "Labios", "Arrugas", "Perfilamiento").
+   *  La doctora la define en el admin; el frontend la usa para filtros
+   *  dinámicos dentro de cada categoría. */
+  subcategoria?: string | null;
   duracionMin?: number | null;
   destacado: boolean;
+  /** Si está activo, se muestra como promoción con precio rebajado. */
+  enPromocion?: boolean;
+  /** Precio con descuento (string flexible). Solo aplica si enPromocion=true. */
+  precioPromocional?: string | null;
+  /** Fecha (YYYY-MM-DD) hasta la que está disponible la promoción. Opcional. */
+  promocionHasta?: string | null;
+  /** Si aparece en la Galería 3D del home. Default false. */
+  mostrarGaleriaHome?: boolean;
+  /** Si aparece en el listado de /procedimientos. Default true. */
+  mostrarGaleriaProcedimientos?: boolean;
   galeria?: MediaItem[]; // solo para UI, no está en la tabla actual
 }
 

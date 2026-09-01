@@ -2,9 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Select, { MultiValue } from "react-select";
+import { useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
-
-const opciones = (arr: string[]) => arr.map((x) => ({ value: x, label: x }));
 
 interface Opcion {
   value: string;
@@ -42,6 +41,7 @@ export default function DatosMedicosForm({
   setMedicamentosDescripcion,
   canEdit,
 }: Props) {
+  const t = useTranslations("perfil.edit.medical");
   const selectStyles = {
     control: (p: Record<string, unknown>) => ({
       ...p,
@@ -52,16 +52,27 @@ export default function DatosMedicosForm({
     }),
   };
 
-  const ANTECEDENTES = [
-    "Hipertensión",
-    "Diabetes",
-    "Asma",
-    "Cirugías previas",
-    "Otra condición",
-    "No tengo",
+  const ANTECEDENTES: Opcion[] = [
+    { value: "Hipertensión", label: t("options.hipertension") },
+    { value: "Diabetes", label: t("options.diabetes") },
+    { value: "Asma", label: t("options.asma") },
+    { value: "Cirugías previas", label: t("options.cirugias") },
+    { value: "Otra condición", label: t("options.otraCondicion") },
+    { value: "No tengo", label: t("options.noTengo") },
   ];
-  const ALERGIAS = ["Penicilina", "Polen", "Lácteos", "Otra alergia", "No tengo"];
-  const MEDICAMENTOS = ["Ibuprofeno", "Insulina", "Otro medicamento", "No tengo"];
+  const ALERGIAS: Opcion[] = [
+    { value: "Penicilina", label: t("options.penicilina") },
+    { value: "Polen", label: t("options.polen") },
+    { value: "Lácteos", label: t("options.lacteos") },
+    { value: "Otra alergia", label: t("options.otraAlergia") },
+    { value: "No tengo", label: t("options.noTengo") },
+  ];
+  const MEDICAMENTOS: Opcion[] = [
+    { value: "Ibuprofeno", label: t("options.ibuprofeno") },
+    { value: "Insulina", label: t("options.insulina") },
+    { value: "Otro medicamento", label: t("options.otroMedicamento") },
+    { value: "No tengo", label: t("options.noTengo") },
+  ];
 
   const renderCampo = (
     titulo: string,
@@ -69,9 +80,15 @@ export default function DatosMedicosForm({
     setValor: (v: MultiValue<Opcion>) => void,
     desc: string,
     setDesc: (v: string) => void,
-    opcionesLista: string[]
+    opcionesLista: Opcion[]
   ) => {
     const tieneNoTengo = valor.some((x) => x.value === "No tengo");
+
+    // Re-mapear los `value` cargados desde BD a sus labels traducidos.
+    const valorLocalizado = valor.map((v) => {
+      const match = opcionesLista.find((o) => o.value === v.value);
+      return match ?? v;
+    });
 
     return (
       <div className="mb-3 text-start">
@@ -80,12 +97,12 @@ export default function DatosMedicosForm({
         </label>
         <Select
           isMulti
-          options={opciones(opcionesLista)}
-          value={valor}
+          options={opcionesLista}
+          value={valorLocalizado}
           onChange={(v) => setValor(v as MultiValue<Opcion>)}
           styles={selectStyles}
           classNamePrefix="react-select"
-          placeholder={`Selecciona ${titulo.toLowerCase()}...`}
+          placeholder={`${t("selectPrefix")} ${titulo.toLowerCase()}...`}
           isDisabled={!canEdit}
         />
         <AnimatePresence>
@@ -101,7 +118,7 @@ export default function DatosMedicosForm({
                 value={desc}
                 onChange={(e) => setDesc(e.target.value)}
                 className="form-control mt-2 rounded-3 shadow-sm"
-                placeholder="Describe detalles relevantes..."
+                placeholder={t("descriptionPlaceholder")}
                 disabled={!canEdit}
                 style={{
                   borderColor: PALETTE.border,
@@ -120,7 +137,7 @@ export default function DatosMedicosForm({
     <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
 
       {renderCampo(
-        "Antecedentes médicos",
+        t("background"),
         antecedentes,
         setAntecedentes,
         antecedentesDescripcion,
@@ -129,7 +146,7 @@ export default function DatosMedicosForm({
       )}
 
       {renderCampo(
-        "Alergias",
+        t("allergies"),
         alergias,
         setAlergias,
         alergiasDescripcion,
@@ -138,7 +155,7 @@ export default function DatosMedicosForm({
       )}
 
       {renderCampo(
-        "Medicamentos actuales",
+        t("medications"),
         medicamentos,
         setMedicamentos,
         medicamentosDescripcion,

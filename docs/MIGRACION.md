@@ -112,3 +112,14 @@ Checklist completo en el artifact. Los puntos que más se olvidan:
   límite de gasto.
 - **Restaurar un backup de verdad** antes de dar la fase 01 por cerrada.
 - Completar **NIT y registro profesional**, pendientes según el README.
+
+## Pendientes de UI sueltos
+
+- **Favicon adaptado a modo oscuro/claro.** El logo del navbar ya se
+  invierte por CSS en modo oscuro, pero el favicon (pestaña del navegador)
+  es un archivo de imagen fijo — CSS no lo toca. Falta: una versión clara
+  del logo (invertida) + declarar `<link rel="icon" media="(prefers-color-scheme: dark)">`
+  en `app/layout.tsx` para que el navegador elija sola. Bloqueado por mi
+  entorno: no puedo bajar `LogoJM.jpg` desde Supabase (dominio bloqueado
+  por política de red). Se resuelve adjuntando el archivo del logo
+  directamente en el chat.

@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 import type { Procedimiento, Cita } from "../types/domain";
 import { getProcedimientosApi } from "../services/procedimientosApi";
@@ -19,6 +20,8 @@ function AgendarPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const procParam = searchParams.get("proc") ?? "";
+  const t = useTranslations("agendar");
+  const tc = useTranslations("agendar.confirmacion");
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [fecha, setFecha] = useState<Date | null>(null);
@@ -71,11 +74,11 @@ function AgendarPageContent() {
   // Paso 1 → 2
   const handleAvanzar = () => {
     if (!fecha || !hora) {
-      setAviso("Selecciona un día y una hora antes de continuar.");
+      setAviso(t("warningSelectDayHour"));
       return;
     }
     if (!usuario) {
-      setAviso("Debes iniciar sesión para agendar una cita.");
+      setAviso(t("warningLoginRequired"));
       router.push("/login");
       return;
     }
@@ -110,12 +113,12 @@ function AgendarPageContent() {
 
   return (
     <main
-      className="min-h-screen w-full py-10 px-4 md:px-8 overflow-hidden"
+      className="dark-aware-section agendar-page min-h-screen w-full py-10 px-4 md:px-8 overflow-hidden"
       style={{
         background: `linear-gradient(135deg, ${PALETTE.bgGradFrom}, ${PALETTE.bgGradTo})`,
       }}
     >
-      <div className="mx-auto w-full max-w-7xl grid gap-6 items-start">
+      <div className="mx-auto w-full max-w-5xl grid gap-6 items-start">
         <AnimatePresence mode="wait">
 
           {step === 1 && (
@@ -146,7 +149,7 @@ function AgendarPageContent() {
                   <button
                     type="button"
                     onClick={() => setAviso(null)}
-                    aria-label="Cerrar aviso"
+                    aria-label={t("closeWarning")}
                     style={{ background: "none", border: "none", color: "#b02e2e", cursor: "pointer", fontWeight: 700 }}
                   >
                     ×
@@ -163,7 +166,7 @@ function AgendarPageContent() {
                     background: `linear-gradient(90deg, ${PALETTE.main}, ${PALETTE.accent})`,
                   }}
                 >
-                  Continuar
+                  {t("ctaContinue")}
                 </motion.button>
               </div>
             </motion.div>
@@ -222,7 +225,7 @@ function AgendarPageContent() {
                     background: `linear-gradient(90deg, ${PALETTE.main}, ${PALETTE.accent})`,
                   }}
                 >
-                  Volver al inicio
+                  {tc("backHome")}
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -230,7 +233,7 @@ function AgendarPageContent() {
                   onClick={() => router.push("/perfil/citas_agendadas")}
                   className="px-6 py-3 rounded-full font-semibold border border-[#B08968] text-[#7A5534] bg-white hover:bg-[#F6EFE7] transition"
                 >
-                  Ir a mis citas agendadas
+                  {tc("goToMyAppointments")}
                 </motion.button>
               </div>
             </motion.div>
@@ -242,9 +245,14 @@ function AgendarPageContent() {
   );
 }
 
+function SuspenseFallback() {
+  const t = useTranslations("agendar");
+  return <div className="p-10 text-center">{t("loading")}</div>;
+}
+
 export default function AgendarPage() {
   return (
-    <Suspense fallback={<div className="p-10 text-center">Cargando agenda...</div>}>
+    <Suspense fallback={<SuspenseFallback />}>
       <AgendarPageContent />
     </Suspense>
   );

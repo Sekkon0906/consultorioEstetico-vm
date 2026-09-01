@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, X, Download } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import jsPDF from "jspdf";
 
@@ -195,6 +197,7 @@ function generarPDFConsentimiento(
 }
 
 export default function FirmaConsentimiento(props: Props) {
+  const t = useTranslations("firma");
   var [showModal, setShowModal] = useState(false);
   var [step, setStep] = useState<"intro" | "firma" | "guardando" | "listo">("intro");
   var canvasRef = useRef<HTMLCanvasElement>(null);
@@ -256,27 +259,41 @@ export default function FirmaConsentimiento(props: Props) {
 
       setStep("listo");
       if (props.onFirmado) props.onFirmado();
-    } catch (err: any) { console.error(err); setFirmaError("No se pudo guardar la firma: " + (err?.message || "error desconocido")); setStep("firma"); }
+    } catch (err: any) { console.error(err); setFirmaError(t("saveError") + " " + (err?.message || "")); setStep("firma"); }
   };
 
   var cerrar = function() { setShowModal(false); setTimeout(function() { setStep("intro"); }, 300); };
 
-  return (
-    <>
-      <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={function() { setShowModal(true); }}
-        style={{ display: "flex", alignItems: "center", gap: 8, padding: "0.65rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(176,137,104,0.2)" }}>
-        <FileText size={16} /> Agregar firma
-      </motion.button>
+  // Lock scroll del body cuando el modal está abierto, y desbloquea al cerrar.
+  useEffect(function() {
+    if (showModal) {
+      var prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return function() { document.body.style.overflow = prev; };
+    }
+  }, [showModal]);
 
-      <AnimatePresence>
-        {showModal && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "1rem" }}
-            onClick={cerrar}>
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              style={{ background: "#FFFDF9", borderRadius: 24, boxShadow: "0 24px 60px rgba(0,0,0,0.2)", width: "90%", maxWidth: 500, position: "relative", overflow: "hidden" }}
-              onClick={function(e) { e.stopPropagation(); }}>
+  // Cerrar con ESC
+  useEffect(function() {
+    if (!showModal) return;
+    var onKey = function(e: KeyboardEvent) { if (e.key === "Escape") cerrar(); };
+    window.addEventListener("keydown", onKey);
+    return function() { window.removeEventListener("keydown", onKey); };
+  }, [showModal]);
+
+  // El modal se renderiza vía portal a document.body, así escapa
+  // de cualquier wrapper con overflow/transform que limite position:fixed.
+  var modalContent = (
+    <AnimatePresence>
+      {showModal && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 99999, padding: "1.5rem" }}
+          onClick={cerrar}>
+          <motion.div className="firma-modal-card dark-aware-card" initial={{ scale: 0.92, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 10 }}
+            transition={{ type: "spring", damping: 26, stiffness: 320 }}
+            style={{ background: "#FFFDF9", borderRadius: 24, boxShadow: "0 30px 80px rgba(0,0,0,0.5)", width: "100%", maxWidth: 580, maxHeight: "92vh", overflowY: "auto", position: "relative" }}
+            onClick={function(e) { e.stopPropagation(); }}>
               <div style={{ height: 4, background: "linear-gradient(90deg, #B08968, #C9AD8D)" }} />
               <button onClick={cerrar} style={{ position: "absolute", top: 14, right: 14, width: 32, height: 32, borderRadius: "50%", background: "rgba(78,59,43,0.06)", border: "none", color: "#4E3B2B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}><X size={16} /></button>
 
@@ -285,35 +302,35 @@ export default function FirmaConsentimiento(props: Props) {
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
                       <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem", boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}><FileText size={22} color="white" /></div>
-                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#2A1C12", marginBottom: "0.8rem" }}>Consentimiento informado</h3>
+                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#2A1C12", marginBottom: "0.8rem" }}>{t("title")}</h3>
                     </div>
-                    <div style={{ background: "#F4E9DC", borderRadius: 16, padding: "1.4rem", border: "1px solid rgba(176,137,104,0.3)", marginBottom: "1.5rem" }}>
-                      <p style={{ fontSize: "1.02rem", color: "#3A2A1A", lineHeight: 1.7, margin: 0 }}>Estás por agregar tu firma para el documento de consentimiento informado. Este documento solo lo tiene la doctora y es necesario para autorizar el procedimiento. Si tienes una inquietud, puedes hablar con ella directamente.</p>
+                    <div className="dark-aware-panel firma-intro-panel" style={{ background: "#F4E9DC", borderRadius: 16, padding: "1.4rem", border: "1px solid rgba(176,137,104,0.3)", marginBottom: "1.5rem" }}>
+                      <p style={{ fontSize: "1.02rem", color: "#3A2A1A", lineHeight: 1.7, margin: 0 }}>{t("intro")}</p>
                     </div>
                     <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
-                      <button onClick={cerrar} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer" }}>Cancelar</button>
-                      <button onClick={function() { setStep("firma"); }} style={{ padding: "0.7rem 1.8rem", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(176,137,104,0.25)" }}>Agregar firma</button>
+                      <button onClick={cerrar} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer" }}>{t("cancel")}</button>
+                      <button onClick={function() { setStep("firma"); }} style={{ padding: "0.7rem 1.8rem", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(176,137,104,0.25)" }}>{t("addSignature")}</button>
                     </div>
                   </motion.div>
                 )}
 
                 {step === "firma" && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.3rem", textAlign: "center" }}>Dibuja tu firma</h3>
-                    <p style={{ fontSize: "0.8rem", color: "#8A7565", textAlign: "center", marginBottom: "1rem" }}>Usa el dedo o el mouse para firmar</p>
-                    <div style={{ border: "2px dashed rgba(176,137,104,0.3)", borderRadius: 16, overflow: "hidden", marginBottom: "1rem", background: "white" }}>
+                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.3rem", textAlign: "center" }}>{t("drawTitle")}</h3>
+                    <p style={{ fontSize: "0.8rem", color: "#8A7565", textAlign: "center", marginBottom: "1rem" }}>{t("drawHint")}</p>
+                    <div className="firma-canvas-wrap dark-aware-keep" style={{ border: "2px dashed rgba(176,137,104,0.3)", borderRadius: 16, overflow: "hidden", marginBottom: "1rem", background: "white" }}>
                       <canvas ref={canvasRef} onMouseDown={startDraw} onMouseMove={draw} onMouseUp={endDraw} onMouseLeave={endDraw} onTouchStart={startDraw} onTouchMove={draw} onTouchEnd={endDraw}
                         style={{ width: "100%", height: 180, cursor: "crosshair", touchAction: "none", display: "block" }} />
                     </div>
                     <div style={{ display: "flex", gap: "0.6rem", justifyContent: "center", marginBottom: "1rem" }}>
-                      <button onClick={function() { limpiar(); setFirmaError(null); }} style={{ padding: "0.5rem 1.2rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.82rem", cursor: "pointer" }}>Limpiar</button>
+                      <button onClick={function() { limpiar(); setFirmaError(null); }} style={{ padding: "0.5rem 1.2rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.82rem", cursor: "pointer" }}>{t("clear")}</button>
                     </div>
                     {firmaError && (
                       <p style={{ color: "#b02e2e", fontSize: "0.82rem", textAlign: "center", marginBottom: "0.8rem" }}>{firmaError}</p>
                     )}
                     <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
-                      <button onClick={function() { setStep("intro"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer" }}>Volver</button>
-                      <button onClick={guardarFirma} disabled={!hasFirma} style={{ padding: "0.7rem 1.8rem", borderRadius: 100, background: hasFirma ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#E9DED2", color: hasFirma ? "white" : "#9B8575", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: hasFirma ? "pointer" : "not-allowed" }}>Confirmar firma</button>
+                      <button onClick={function() { setStep("intro"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "#6C584C", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer" }}>{t("back")}</button>
+                      <button onClick={guardarFirma} disabled={!hasFirma} style={{ padding: "0.7rem 1.8rem", borderRadius: 100, background: hasFirma ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#E9DED2", color: hasFirma ? "white" : "#9B8575", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: hasFirma ? "pointer" : "not-allowed" }}>{t("confirm")}</button>
                     </div>
                   </motion.div>
                 )}
@@ -321,7 +338,7 @@ export default function FirmaConsentimiento(props: Props) {
                 {step === "guardando" && (
                   <div style={{ textAlign: "center", padding: "2rem 0" }}>
                     <div className="spinner-border" style={{ color: "#B08968" }} />
-                    <p style={{ color: "#6C584C", marginTop: "1rem" }}>Generando documento y guardando firma...</p>
+                    <p style={{ color: "#6C584C", marginTop: "1rem" }}>{t("savingMessage")}</p>
                   </div>
                 )}
 
@@ -330,9 +347,9 @@ export default function FirmaConsentimiento(props: Props) {
                     <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#E8F5E9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>
-                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.5rem" }}>Firma registrada</h3>
-                    <p style={{ fontSize: "0.88rem", color: "#6C584C", marginBottom: "1.5rem" }}>Tu firma y el documento de consentimiento han sido guardados. La doctora tendra acceso al PDF firmado.</p>
-                    <button onClick={cerrar} style={{ padding: "0.7rem 2rem", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>Cerrar</button>
+                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.5rem" }}>{t("doneTitle")}</h3>
+                    <p style={{ fontSize: "0.88rem", color: "#6C584C", marginBottom: "1.5rem" }}>{t("doneMessage")}</p>
+                    <button onClick={cerrar} style={{ padding: "0.7rem 2rem", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("close")}</button>
                   </motion.div>
                 )}
               </div>
@@ -340,12 +357,23 @@ export default function FirmaConsentimiento(props: Props) {
           </motion.div>
         )}
       </AnimatePresence>
+  );
+
+  return (
+    <>
+      <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={function() { setShowModal(true); }}
+        style={{ display: "flex", alignItems: "center", gap: 8, padding: "0.65rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, #B08968, #C9AD8D)", color: "white", border: "none", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(176,137,104,0.2)" }}>
+        <FileText size={16} /> {t("addSignature")}
+      </motion.button>
+
+      {typeof document !== "undefined" ? createPortal(modalContent, document.body) : null}
     </>
   );
 }
 
 // Component for admin to download the PDF
 export function BotonPDFConsentimiento(props: { citaId: string | number; firmado: boolean; pdfUrl?: string }) {
+  const t = useTranslations("firma");
   return (
     <motion.button whileHover={props.firmado ? { scale: 1.03 } : {}} whileTap={props.firmado ? { scale: 0.97 } : {}}
       onClick={function() {
@@ -360,7 +388,7 @@ export function BotonPDFConsentimiento(props: { citaId: string | number; firmado
         fontWeight: 600, fontSize: "0.78rem", cursor: props.firmado ? "pointer" : "default",
         opacity: props.firmado ? 1 : 0.4,
       }}>
-      <Download size={14} /> PDF Consentimiento
+      <Download size={14} /> {t("downloadPdf")}
     </motion.button>
   );
 }

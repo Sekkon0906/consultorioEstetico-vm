@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { X, ChevronLeft, ChevronRight, Calendar, ImageIcon, Stethoscope } from "lucide-react";
 
@@ -27,6 +29,7 @@ function CardItem({
   onClick: () => void;
   fechaFmt: string | null;
 }) {
+  const t = useTranslations("doctora.formacion");
   return (
     <motion.div
       initial={{ opacity: 0, x: fromLeft ? -40 : 40 }}
@@ -34,6 +37,7 @@ function CardItem({
       transition={{ duration: 0.55, ease: "easeOut", delay: 0.15 }}
       whileHover={{ y: -5, boxShadow: "0 20px 50px rgba(78,59,43,0.14)" }}
       onClick={onClick}
+      className="formacion-card"
       style={{
         width: "100%",
         background: "#FFFDF9",
@@ -47,11 +51,16 @@ function CardItem({
     >
       {/* Imagen */}
       <div style={{ position: "relative", height: 145, overflow: "hidden" }}>
-        <img
-          src={charla.imagen || undefined}
-          alt={charla.titulo}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-        />
+        {charla.imagen && (
+          <Image
+            src={charla.imagen}
+            alt={charla.titulo}
+            fill
+            sizes="(max-width: 820px) 92vw, 380px"
+            quality={75}
+            style={{ objectFit: "cover" }}
+          />
+        )}
         <div style={{
           position: "absolute", inset: 0,
           background: "linear-gradient(0deg, rgba(40,26,14,0.52) 0%, transparent 58%)",
@@ -75,7 +84,7 @@ function CardItem({
             borderRadius: 20, padding: "3px 8px",
             fontSize: "0.62rem", color: "#8B6A4B", fontWeight: 700,
           }}>
-            <ImageIcon size={9} /> {charla.galeria.length} fotos
+            <ImageIcon size={9} /> {charla.galeria.length} {t("modal.photos")}
           </div>
         )}
       </div>
@@ -100,7 +109,7 @@ function CardItem({
           marginTop: "0.6rem", fontSize: "0.68rem",
           color: "#B08968", fontWeight: 600,
         }}>
-          Ver galería →
+          {t("viewGallery")}
         </div>
       </div>
     </motion.div>
@@ -117,12 +126,14 @@ function TimelineNode({
   index: number;
   onClick: () => void;
 }) {
+  const locale = useLocale();
+  const intlLocale = locale === "en" ? "en-US" : "es-CO";
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const isLeft = index % 2 === 0;
 
   const fechaFmt = charla.fecha
-    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString("es-CO", {
+    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString(intlLocale, {
         year: "numeric", month: "long", day: "numeric",
       })
     : null;
@@ -134,6 +145,7 @@ function TimelineNode({
   return (
     <div
       ref={ref}
+      className="timeline-node"
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 60px 1fr",
@@ -142,7 +154,7 @@ function TimelineNode({
       }}
     >
       {/* Izquierda */}
-      <div style={{ paddingRight: 24, display: "flex", justifyContent: "flex-end" }}>
+      <div className="timeline-side timeline-side-left" style={{ paddingRight: 24, display: "flex", justifyContent: "flex-end" }}>
         {isLeft ? (
           <CardItem charla={charla} inView={inView} fromLeft onClick={onClick} fechaFmt={fechaFmt} />
         ) : (
@@ -163,14 +175,14 @@ function TimelineNode({
       </div>
 
       {/* Centro: dot */}
-      <div style={{ display: "flex", justifyContent: "center", position: "relative", zIndex: 2 }}>
+      <div className="timeline-dot-col" style={{ display: "flex", justifyContent: "center", position: "relative", zIndex: 2 }}>
         <motion.button
           initial={{ scale: 0, opacity: 0 }}
           animate={inView ? { scale: 1, opacity: 1 } : {}}
           transition={{ delay: 0.08, type: "spring", stiffness: 320, damping: 22 }}
           whileHover={{ scale: 1.4 }}
           onClick={onClick}
-          aria-label={`Ver ${charla.titulo}`}
+          aria-label={charla.titulo}
           style={{
             width: 20, height: 20, borderRadius: "50%",
             background: "linear-gradient(135deg, #B08968, #8B6A4B)",
@@ -182,7 +194,7 @@ function TimelineNode({
       </div>
 
       {/* Derecha */}
-      <div style={{ paddingLeft: 24, display: "flex", justifyContent: "flex-start" }}>
+      <div className="timeline-side timeline-side-right" style={{ paddingLeft: 24, display: "flex", justifyContent: "flex-start" }}>
         {!isLeft ? (
           <CardItem charla={charla} inView={inView} fromLeft={false} onClick={onClick} fechaFmt={fechaFmt} />
         ) : (
@@ -209,6 +221,9 @@ function TimelineNode({
    MODAL
 ────────────────────────────────────────────── */
 function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void }) {
+  const t = useTranslations("doctora.formacion");
+  const locale = useLocale();
+  const intlLocale = locale === "en" ? "en-US" : "es-CO";
   const [idx, setIdx] = useState(0);
   const media = charla.galeria && charla.galeria.length > 0 ? charla.galeria : [charla.imagen];
   const total = media.length;
@@ -223,7 +238,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
   const next = () => setIdx(i => (i + 1) % total);
 
   const fechaFmt = charla.fecha
-    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString("es-CO", {
+    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString(intlLocale, {
         year: "numeric", month: "long", day: "numeric",
       })
     : null;
@@ -277,7 +292,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                 fontSize: "0.65rem", color: "#8B6A4B", fontWeight: 700,
                 marginBottom: "0.45rem", textTransform: "uppercase", letterSpacing: "0.05em",
               }}>
-                <Stethoscope size={10} /> Actualización profesional
+                <Stethoscope size={10} /> {t("modal.badge")}
               </div>
               <h3 style={{
                 fontFamily: "'Playfair Display', serif",
@@ -333,20 +348,23 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                 {isYoutube ? (
                   <iframe
                     src={current.replace("watch?v=", "embed/")}
-                    title="Video charla"
+                    title={t("modal.videoTitle")}
                     style={{ width: "100%", height: "100%", border: "none" }}
                     allowFullScreen
                   />
                 ) : isVideo ? (
                   <video src={current} controls
                     style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                ) : (
-                  <img
-                    src={current || charla.imagen || undefined}
+                ) : (current || charla.imagen) ? (
+                  <Image
+                    src={current || charla.imagen}
                     alt={`Foto ${idx + 1}`}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    fill
+                    sizes="(max-width: 820px) 92vw, 780px"
+                    quality={85}
+                    style={{ objectFit: "cover" }}
                   />
-                )}
+                ) : null}
               </motion.div>
             </AnimatePresence>
 
@@ -409,10 +427,18 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: "0.8rem", color: "white",
                     }}>▶</div>
-                  ) : (
-                    <img src={src || undefined} alt=""
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  )}
+                  ) : src ? (
+                    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                      <Image
+                        src={src}
+                        alt=""
+                        fill
+                        sizes="56px"
+                        quality={60}
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                  ) : null}
                 </motion.div>
               ))}
             </div>
@@ -427,6 +453,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
    COMPONENTE PRINCIPAL
 ────────────────────────────────────────────── */
 export default function FormacionContinua() {
+  const t = useTranslations("doctora.formacion");
   const [charlas, setCharlas] = useState<Charla[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Charla | null>(null);
@@ -434,28 +461,23 @@ export default function FormacionContinua() {
   useEffect(() => {
     async function fetchCharlas() {
       try {
+        // Una sola consulta con la galería embebida (evita N+1)
         const { data, error } = await supabase
           .from("charlas")
-          .select("id, titulo, descripcion, detalle, imagen, fecha")
+          .select("id, titulo, descripcion, detalle, imagen, fecha, charla_galeria(url, orden)")
           .order("fecha", { ascending: false, nullsFirst: false })
           .order("creado_en", { ascending: false });
 
         if (error) throw new Error(error.message);
 
-        const charlasConGaleria = await Promise.all(
-          (data ?? []).map(async c => {
-            const { data: galeriaData } = await supabase
-              .from("charla_galeria")
-              .select("url")
-              .eq("charla_id", c.id)
-              .order("orden", { ascending: true });
-
-            return {
-              ...c,
-              galeria: (galeriaData ?? []).map((g: { url: string }) => g.url),
-            } as Charla;
-          })
-        );
+        const charlasConGaleria = (data ?? []).map((c: Record<string, unknown>) => {
+          const { charla_galeria, ...rest } = c as { charla_galeria?: { url: string; orden: number }[] };
+          const galeria = (charla_galeria ?? [])
+            .slice()
+            .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
+            .map((g) => g.url);
+          return { ...rest, galeria } as Charla;
+        });
 
         setCharlas(charlasConGaleria);
       } catch (err) {
@@ -492,7 +514,7 @@ export default function FormacionContinua() {
         justifyContent: "center", background: "#FBF8F4",
       }}>
         <p style={{ color: "#8B7060", fontStyle: "italic", fontSize: "0.88rem" }}>
-          Sin actividades registradas aún.
+          {t("emptyState")}
         </p>
       </section>
     );
@@ -500,7 +522,7 @@ export default function FormacionContinua() {
 
   return (
     <>
-      <section style={{
+      <section className="dark-aware-section formacion-section" style={{
         background: "linear-gradient(180deg, #F7EFE7 0%, #FBF8F4 100%)",
         padding: "5rem 1.5rem 6rem",
         position: "relative",
@@ -528,20 +550,20 @@ export default function FormacionContinua() {
             textTransform: "uppercase", color: "#B08968",
             fontWeight: 700, marginBottom: "0.45rem",
           }}>
-            Crecimiento profesional
+            {t("kicker")}
           </p>
           <h2 style={{
             fontFamily: "'Playfair Display', serif",
             fontSize: "clamp(1.9rem, 4vw, 2.6rem)",
             fontWeight: 700, color: "#3A2A1A", margin: 0,
           }}>
-            Formación Continua
+            {t("title")}
           </h2>
           <p style={{
             fontSize: "0.82rem", color: "#8B7060",
             maxWidth: 430, margin: "0.7rem auto 0", lineHeight: 1.65,
           }}>
-            Charlas, congresos con colegas, nuevas técnicas y equipos
+            {t("subtitle")}
           </p>
           <div style={{
             width: 42, height: 3,
@@ -554,6 +576,7 @@ export default function FormacionContinua() {
         <div style={{ position: "relative", maxWidth: 860, margin: "0 auto" }}>
           {/* Línea vertical */}
           <motion.div
+            className="formacion-timeline-line"
             initial={{ scaleY: 0 }}
             whileInView={{ scaleY: 1 }}
             viewport={{ once: true }}
@@ -587,7 +610,7 @@ export default function FormacionContinua() {
             fontSize: "0.7rem", color: "#C9AD8D", fontStyle: "italic",
           }}
         >
-          Haz clic en cualquier evento para ver detalles y galería
+          {t("clickHint")}
         </motion.p>
       </section>
 

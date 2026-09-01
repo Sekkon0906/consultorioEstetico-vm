@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
@@ -59,11 +59,11 @@ export default function IngresosPage() {
     load();
   }, []);
 
-  if (loading) return <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border" style={{ color: "#B08968" }} /></div>;
+  if (loading) return <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
 
   return (
     <div>
-      <h2 style={{ fontWeight: 700, color: "#3A2A1A", marginBottom: "1.5rem" }}>Analitica del Consultorio</h2>
+      <h2 style={{ fontWeight: 700, color: "var(--text)", marginBottom: "1.5rem" }}>Analitica del Consultorio</h2>
 
       {stats && (
         <>
@@ -73,35 +73,35 @@ export default function IngresosPage() {
             <KPI icon={<XCircle size={18} />} label="Canceladas" value={stats.canceladas} color="#C62828" />
             <KPI icon={<Activity size={18} />} label="Citas hoy" value={stats.citasHoy} color="#1565C0" />
             <KPI icon={<Users size={18} />} label="Pacientes registrados" value={stats.pacientes} color="#6A1B9A" />
-            <KPI icon={<Calendar size={18} />} label="Total historico" value={stats.totalCitas} color="#B08968" />
+            <KPI icon={<Calendar size={18} />} label="Total historico" value={stats.totalCitas} color="var(--brand)" />
           </div>
 
-          <div style={{ background: "#FFFDF9", borderRadius: 18, border: "1px solid #E9DED2", padding: "1.5rem", marginBottom: "2rem" }}>
-            <h4 style={{ fontWeight: 600, color: "#3A2A1A", marginBottom: "1rem" }}>Citas por mes</h4>
+          <div style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.5rem", marginBottom: "2rem" }}>
+            <h4 style={{ fontWeight: 600, color: "var(--text)", marginBottom: "1rem" }}>Citas por mes</h4>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={citasMes}>
-                <XAxis dataKey="mes" tick={{ fill: "#6C584C", fontSize: 12 }} />
-                <YAxis tick={{ fill: "#6C584C", fontSize: 12 }} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #E9DED2" }} />
-                <Bar dataKey="total" name="Total" fill="#C9AD8D" radius={[6, 6, 0, 0]} />
+                <XAxis dataKey="mes" tick={{ fill: "var(--text-soft)", fontSize: 12 }} />
+                <YAxis tick={{ fill: "var(--text-soft)", fontSize: 12 }} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid var(--border)" }} />
+                <Bar dataKey="total" name="Total" fill="var(--brand-soft)" radius={[6, 6, 0, 0]} />
                 <Bar dataKey="atendidas" name="Atendidas" fill="#66BB6A" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          <div style={{ background: "#FFFDF9", borderRadius: 18, border: "1px solid #E9DED2", padding: "1.5rem" }}>
-            <h4 style={{ fontWeight: 600, color: "#3A2A1A", marginBottom: "1rem" }}>Top procedimientos</h4>
+          <div style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.5rem" }}>
+            <h4 style={{ fontWeight: 600, color: "var(--text)", marginBottom: "1rem" }}>Top procedimientos</h4>
             {topProcs.map(function(p, i) {
               var pct = stats.totalCitas > 0 ? Math.round((p.total / stats.totalCitas) * 100) : 0;
               return (
                 <motion.div key={p.nombre} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                  style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "0.5rem 0.8rem", borderRadius: 12, background: i % 2 === 0 ? "#F5EEE6" : "transparent", marginBottom: "0.3rem" }}>
-                  <span style={{ width: 22, height: 22, borderRadius: 6, background: "#B08968", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.68rem", fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
+                  style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "0.5rem 0.8rem", borderRadius: 12, background: i % 2 === 0 ? "var(--surface-soft)" : "transparent", marginBottom: "0.3rem" }}>
+                  <span style={{ width: 22, height: 22, borderRadius: 6, background: "var(--brand)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.68rem", fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontWeight: 600, color: "#3A2A1A", fontSize: "0.85rem", margin: 0 }}>{p.nombre}</p>
-                    <div style={{ height: 4, borderRadius: 2, background: "#E9DED2", marginTop: 3 }}><div style={{ height: "100%", borderRadius: 2, background: "#B08968", width: pct + "%" }} /></div>
+                    <p style={{ fontWeight: 600, color: "var(--text)", fontSize: "0.85rem", margin: 0 }}>{p.nombre}</p>
+                    <div style={{ height: 4, borderRadius: 2, background: "var(--border)", marginTop: 3 }}><div style={{ height: "100%", borderRadius: 2, background: "var(--brand)", width: pct + "%" }} /></div>
                   </div>
-                  <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#3A2A1A" }}>{p.total}</span>
+                  <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)" }}>{p.total}</span>
                 </motion.div>
               );
             })}
@@ -115,11 +115,11 @@ export default function IngresosPage() {
 function KPI(props: { icon: React.ReactNode; label: string; value: number; color: string }) {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-      style={{ background: "#FFFDF9", borderRadius: 16, border: "1px solid #E9DED2", padding: "1rem", display: "flex", alignItems: "center", gap: "0.8rem" }}>
+      style={{ background: "var(--surface)", borderRadius: 16, border: "1px solid var(--border)", padding: "1rem", display: "flex", alignItems: "center", gap: "0.8rem" }}>
       <div style={{ width: 36, height: 36, borderRadius: 10, background: props.color + "18", display: "flex", alignItems: "center", justifyContent: "center", color: props.color, flexShrink: 0 }}>{props.icon}</div>
       <div>
-        <p style={{ fontSize: "0.7rem", color: "#8A7565", fontWeight: 600, margin: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>{props.label}</p>
-        <p style={{ fontSize: "1.2rem", fontWeight: 700, color: "#3A2A1A", margin: 0 }}>{props.value}</p>
+        <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 600, margin: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>{props.label}</p>
+        <p style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text)", margin: 0 }}>{props.value}</p>
       </div>
     </motion.div>
   );

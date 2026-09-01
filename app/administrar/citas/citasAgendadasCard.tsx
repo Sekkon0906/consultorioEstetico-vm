@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { motion } from "framer-motion";
@@ -29,13 +29,14 @@ export default function CitasAgendadasCard({
 
   return (
     <motion.div
+      className="admin-cita-card"
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       style={{
-        background: "#fff",
+        background: "var(--surface)",
         borderRadius: 16,
-        border: "1px solid #F0E8DE",
+        border: "1px solid var(--border)",
         padding: "1.2rem 1.4rem",
         transition: "box-shadow 0.25s",
       }}
@@ -43,7 +44,7 @@ export default function CitasAgendadasCard({
     >
       {/* Top row: name + estado */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
-        <h3 style={{ fontSize: "1.05rem", fontWeight: 600, color: "#2B2218", margin: 0, lineHeight: 1.3 }}>
+        <h3 style={{ fontSize: "1.05rem", fontWeight: 600, color: "var(--text)", margin: 0, lineHeight: 1.3 }}>
           {cita.nombres} {cita.apellidos}
         </h3>
         <span style={{
@@ -59,19 +60,19 @@ export default function CitasAgendadasCard({
       </div>
 
       {/* Procedure */}
-      <p style={{ fontSize: "0.88rem", color: "#8B6A4B", fontWeight: 600, margin: "0 0 0.5rem" }}>
+      <p style={{ fontSize: "0.88rem", color: "var(--brand)", fontWeight: 600, margin: "0 0 0.5rem" }}>
         {cita.procedimiento}
       </p>
 
       {/* Info rows */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.8rem", color: "#6C584C", marginBottom: "0.8rem" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.8rem", color: "var(--text-soft)", marginBottom: "0.8rem" }}>
         <div style={{ display: "flex", gap: "1.2rem", flexWrap: "wrap" }}>
-          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Phone size={12} color="#8B6A4B" /> {cita.telefono}</span>
-          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Mail size={12} color="#8B6A4B" /> {cita.correo}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Phone size={12} color="var(--brand)" /> {cita.telefono}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Mail size={12} color="var(--brand)" /> {cita.correo}</span>
         </div>
         <div style={{ display: "flex", gap: "1.2rem", flexWrap: "wrap" }}>
-          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} color="#8B6A4B" /> {cita.fecha}</span>
-          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={12} color="#8B6A4B" /> {cita.hora}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} color="var(--brand)" /> {cita.fecha}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={12} color="var(--brand)" /> {cita.hora}</span>
         </div>
       </div>
 
@@ -79,15 +80,15 @@ export default function CitasAgendadasCard({
       <div style={{ display: "flex", gap: "0.45rem", flexWrap: "wrap", alignItems: "center" }}>
         {cita.estado === "pendiente" && (
           <>
-            <Btn label="Confirmar" icon={<CalendarCheck size={14} />} bg="#8B6A4B" color="#fff" onClick={() => onConfirmar?.(cita)} />
-            <Btn label="Reagendar" icon={<Edit3 size={14} />} bg="#F0E8DE" color="#4E3B2B" onClick={() => onReagendar?.(cita)} />
+            <Btn label="Confirmar" icon={<CalendarCheck size={14} />} bg="var(--brand)" color="#fff" onClick={() => onConfirmar?.(cita)} />
+            <Btn label="Reagendar" icon={<Edit3 size={14} />} bg="var(--surface-soft)" color="var(--text)" onClick={() => onReagendar?.(cita)} />
             <Btn label="Cancelar" icon={<XCircle size={14} />} bg="#C62828" color="#fff" onClick={() => onCancelar?.(cita)} />
           </>
         )}
         {cita.estado === "confirmada" && (
           <>
-            <Btn label="Facturar" icon={<Eye size={14} />} bg="#B08968" color="#fff" onClick={() => onVerDetalles?.(cita)} />
-            <Btn label="Reagendar" icon={<Edit3 size={14} />} bg="#F0E8DE" color="#4E3B2B" onClick={() => onReagendar?.(cita)} />
+            <Btn label="Facturar" icon={<Eye size={14} />} bg="var(--brand)" color="#fff" onClick={() => onVerDetalles?.(cita)} />
+            <Btn label="Reagendar" icon={<Edit3 size={14} />} bg="var(--surface-soft)" color="var(--text)" onClick={() => onReagendar?.(cita)} />
             <Btn label="Cancelar" icon={<XCircle size={14} />} bg="#C62828" color="#fff" onClick={() => onCancelar?.(cita)} />
           </>
         )}

@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -9,6 +10,42 @@ import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
 import { IMG } from "@/lib/imagenes";
 import LanguageSwitcher from "./LanguageSwitcher";
+import ThemeToggle from "./ThemeToggle";
+
+/**
+ * Avatar robusto: usa <img> nativo (no next/image) con
+ * referrerPolicy="no-referrer" — clave para que las fotos de Google
+ * (lh3.googleusercontent.com) no fallen por política de referer — y
+ * fallback automático a un avatar generado si la imagen no carga.
+ */
+function Avatar({
+  src,
+  alt,
+  fallback,
+  className,
+  style,
+}: {
+  src: string;
+  alt: string;
+  fallback: string;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  const [failed, setFailed] = useState(false);
+  const finalSrc = failed || !src ? fallback : src;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={finalSrc}
+      alt={alt}
+      referrerPolicy="no-referrer"
+      loading="lazy"
+      onError={() => setFailed(true)}
+      className={className}
+      style={{ objectFit: "cover", ...style }}
+    />
+  );
+}
 
 export default function Navbar() {
   const pathname = usePathname() || "/";
@@ -57,16 +94,22 @@ export default function Navbar() {
       const activeEl = activeIndex !== -1 ? linkRefs.current[activeIndex] : null;
       updateIndicatorTo(activeEl);
     };
-    // Espera a que el layout/tipografías se asienten tras el cambio de ruta
+    // Espera a que el layout/tipografías/traducciones se asienten
     const r1 = requestAnimationFrame(() => requestAnimationFrame(measure));
-    const t = setTimeout(measure, 250);
+    const t1 = setTimeout(measure, 80);
+    const t2 = setTimeout(measure, 250);
+    const t3 = setTimeout(measure, 600); // re-mide tras animaciones de framer-motion
     window.addEventListener("resize", measure);
     return () => {
       cancelAnimationFrame(r1);
-      clearTimeout(t);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
       window.removeEventListener("resize", measure);
     };
-  }, [pathname, menuItems.length]);
+    // Importante: depender de `menuItems` (no solo .length) para que se
+    // re-mida cuando cambian las etiquetas (cambio de idioma).
+  }, [pathname, menuItems]);
 
   /* === SECCIÓN ACTUAL (pt 22) === */
   const currentSection = useMemo(() => {
@@ -76,11 +119,12 @@ export default function Navbar() {
       .filter((i) => i.href !== "/" && pathname.startsWith(i.href))
       .sort((a, b) => b.href.length - a.href.length)[0];
     if (prefix) return prefix.label;
-    if (pathname.startsWith("/perfil")) return "Mi perfil";
+    if (pathname.startsWith("/perfil")) return t("profileSection");
+    if (pathname.startsWith("/legal")) return t("legalSection");
     if (pathname.startsWith("/login") || pathname.startsWith("/register"))
       return "Acceso";
     return "Inicio";
-  }, [pathname, menuItems]);
+  }, [pathname, menuItems, t]);
 
   /* === LOGOUT === */
   const requestLogout = () => {
@@ -108,22 +152,30 @@ export default function Navbar() {
 
   const handleItemEnter = (index: number) => updateIndicatorTo(linkRefs.current[index]);
   const handleMenuLeave = () => {
-    const activeIndex = menuItems.findIndex((item) => item.href === pathname);
+    // El mouse sale del menú justo cuando se hace clic para navegar — en
+    // ese instante `pathname` (de React) todavía no se actualizó, porque
+    // la navegación es asíncrona. Usar ese valor movía el indicador de
+    // vuelta a la página ANTERIOR por un instante (el "salto") hasta que
+    // el efecto de arriba lo corregía. window.location.pathname es la URL
+    // real del navegador, que sí cambia de inmediato al hacer clic.
+    const current = typeof window !== "undefined" ? window.location.pathname : pathname;
+    const activeIndex = menuItems.findIndex((item) => item.href === current);
     updateIndicatorTo(linkRefs.current[activeIndex] || null);
   };
 
-  const userPhoto =
-    user?.photo ||
-    (user
-      ? `https://ui-avatars.com/api/?name=${encodeURIComponent(
-          (user.nombres + " " + user.apellidos).trim()
-        )}&background=E6CCB2&color=7F5539`
-      : "https://cdn-icons-png.flaticon.com/512/847/847969.png");
+  // Fallback siempre disponible (avatar generado con iniciales).
+  const avatarFallback = user
+    ? `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        (user.nombres + " " + user.apellidos).trim()
+      )}&background=E6CCB2&color=7F5539`
+    : "https://ui-avatars.com/api/?name=JM&background=E6CCB2&color=7F5539";
+
+  const userPhoto = user?.photo || avatarFallback;
 
   return (
     <nav
-      className="navbar shadow-sm py-3"
-      style={{ backgroundColor: "#FAF9F7", position: "sticky", top: 0, zIndex: 1000 }}
+      className="navbar navbar-container shadow-sm py-3"
+      style={{ backgroundColor: "#FFFFFF", position: "sticky", top: 0, zIndex: 1000 }}
     >
       <div
         className="container-fluid d-flex align-items-center justify-content-between"
@@ -132,14 +184,20 @@ export default function Navbar() {
         {/* LOGO + SECCIÓN ACTUAL */}
         <div className="d-flex align-items-center" style={{ gap: "0.6rem" }}>
           <Link href="/" className="navbar-logo d-flex align-items-center">
-            <img
+            <Image
               src={IMG.logo}
               alt="Logo JM"
               width={75}
               height={55}
+              priority
               className="me-2"
+              style={{ width: "auto", height: "auto" }}
             />
           </Link>
+          {/* Solo en escritorio: en móvil este texto (sin recorte y sin caso
+              para /administrar, donde siempre decía "Inicio") competía por
+              espacio con el logo y el botón de menú, y en el panel rompía
+              el navbar. */}
           <AnimatePresence mode="wait">
             <motion.span
               key={currentSection}
@@ -147,11 +205,12 @@ export default function Navbar() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 8 }}
               transition={{ duration: 0.25 }}
+              className="d-none d-md-inline-block"
               style={{
                 fontWeight: 600,
                 fontSize: "0.92rem",
-                color: "#8d7a6a",
-                borderLeft: "1px solid #E6CCB2",
+                color: "var(--text-muted)",
+                borderLeft: "1px solid var(--border)",
                 paddingLeft: "0.6rem",
                 whiteSpace: "nowrap",
               }}
@@ -169,7 +228,7 @@ export default function Navbar() {
         >
           <ul
             className="navbar-menu d-flex justify-content-center align-items-center mb-0"
-            style={{ fontWeight: 600, listStyle: "none", gap: "2.4rem" }}
+            style={{ fontWeight: 600, listStyle: "none", gap: "1.8rem" }}
           >
             {menuItems.map((item, index) => {
               const isActive = pathname === item.href;
@@ -185,8 +244,8 @@ export default function Navbar() {
                 >
                   <Link
                     href={item.href}
-                    className="text-decoration-none"
-                    style={{ color: isActive ? "#B08968" : "#2B2B2B", fontWeight: 600, fontSize: "1.08rem", letterSpacing: "0.01em", whiteSpace: "nowrap" }}
+                    className={`text-decoration-none ${isActive ? "navbar-link-active" : ""}`}
+                    style={{ color: isActive ? "var(--brand)" : "var(--text)", fontWeight: 600, fontSize: "1.08rem", letterSpacing: "0.01em", whiteSpace: "nowrap" }}
                   >
                     {item.label}
                   </Link>
@@ -197,6 +256,7 @@ export default function Navbar() {
 
           <motion.div
             layout
+            className="navbar-indicator"
             animate={{
               left: indicator.left,
               width: indicator.width,
@@ -220,16 +280,11 @@ export default function Navbar() {
           className="navbar-user"
           style={{ position: "relative", display: "flex", justifyContent: "flex-end", flex: "0 0 auto" }}
         >
-          {/* Selector de idioma (siempre visible en desktop) */}
-          <div className="d-none d-md-inline-flex me-2 align-items-center">
-            <LanguageSwitcher />
-          </div>
-
           {/* HAMBURGUESA MÓVIL */}
           <button
             className={`hamburger-btn d-md-none ${mobileOpen ? "active" : ""}`}
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Abrir menú"
+            aria-label={mobileOpen ? t("closeMenu") : t("openMenu")}
           >
             <motion.div
               initial={{ rotate: 0 }}
@@ -237,9 +292,9 @@ export default function Navbar() {
               transition={{ duration: 0.4 }}
             >
               {mobileOpen ? (
-                <X size={30} strokeWidth={2.5} color="#6B4E3D" />
+                <X size={30} strokeWidth={2.5} color="var(--brand-deep)" />
               ) : (
-                <Menu size={30} strokeWidth={2.5} color="#6B4E3D" />
+                <Menu size={30} strokeWidth={2.5} color="var(--brand-deep)" />
               )}
             </motion.div>
           </button>
@@ -249,8 +304,8 @@ export default function Navbar() {
             <motion.button
               onClick={() => router.push("/login")}
               className="btn rounded-pill px-4 py-2 d-none d-md-inline-flex align-items-center gap-2"
-              style={{ border: "1.5px solid #B08968", color: "#6B4E3D", backgroundColor: "#fff8f3", fontWeight: 600 }}
-              whileHover={{ scale: 1.05, backgroundColor: "#B08968", color: "#fff", boxShadow: "0 6px 18px rgba(176,137,104,0.35)" }}
+              style={{ border: "1.5px solid var(--brand)", color: "var(--brand-deep)", backgroundColor: "var(--surface)", fontWeight: 600 }}
+              whileHover={{ scale: 1.05, backgroundColor: "var(--brand)", color: "#fff", boxShadow: "0 6px 18px rgba(176,137,104,0.35)" }}
               whileTap={{ scale: 0.96 }}
               transition={{ type: "spring", stiffness: 320, damping: 20 }}
             >
@@ -260,67 +315,81 @@ export default function Navbar() {
             <>
               <motion.button
                 onClick={() => setMenuOpen((p) => !p)}
-                className="user-button d-none d-md-flex align-items-center border-0 bg-white rounded-pill shadow-sm px-2 py-1"
+                className={`user-button d-none d-md-flex align-items-center border-0 bg-white rounded-pill shadow-sm px-2 py-1 ${pathname.startsWith("/perfil") ? "is-active-route" : ""}`}
+                style={{ position: "relative" }}
               >
-                <img
+                <Avatar
                   src={userPhoto}
-                  alt="Perfil"
-                  style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", border: "2px solid #FFDDBF" }}
+                  alt={t("profileAlt")}
+                  fallback={avatarFallback}
+                  style={{ width: 52, height: 52, borderRadius: "50%", border: "2px solid #FFDDBF" }}
                 />
+                {/* Indicador inferior cuando se está en /perfil/* */}
+                {pathname.startsWith("/perfil") && (
+                  <motion.span
+                    layoutId="user-button-indicator"
+                    className="user-button-indicator"
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                  />
+                )}
               </motion.button>
 
               <AnimatePresence>
                 {menuOpen && (
                   <motion.div
                     key="perfil-menu"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 10 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="position-absolute bg-white border rounded-4 shadow-lg p-3"
+                    initial={{ opacity: 0, y: -8, scale: 0.92 }}
+                    animate={{ opacity: 1, y: 12, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.94 }}
+                    transition={{ type: "spring", damping: 22, stiffness: 320, mass: 0.6 }}
+                    className="profile-menu position-absolute rounded-4 p-3"
                     style={{
                       top: "110%", right: 0, minWidth: "260px", zIndex: 100,
                       textAlign: "center",
-                      background: "linear-gradient(135deg, #fffdfb 0%, #f8f3ed 100%)",
+                      transformOrigin: "top right",
                     }}
                   >
-                    <div
-                      style={{ position: "absolute", top: "10px", right: "10px", cursor: "pointer" }}
+                    <button
+                      type="button"
+                      className="profile-menu-close"
                       onClick={() => setMenuOpen(false)}
+                      aria-label="Cerrar"
                     >
-                      <X size={20} strokeWidth={2} color="#6b4e3d" />
-                    </div>
+                      <X size={18} strokeWidth={2.2} />
+                    </button>
 
                     <div className="text-center mb-3" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                      <img
+                      <Avatar
                         src={userPhoto}
-                        alt="Perfil"
-                        style={{ width: 70, height: 70, borderRadius: "50%", objectFit: "cover", border: "2px solid #FFDDBF", marginBottom: "0.4rem" }}
+                        alt={t("profileAlt")}
+                        fallback={avatarFallback}
+                        className="profile-menu-avatar"
+                        style={{ width: 70, height: 70, borderRadius: "50%", marginBottom: "0.4rem" }}
                       />
-                      <div style={{ fontWeight: 700, color: "#6B4E3D" }}>
+                      <div className="profile-menu-name">
                         {user.nombres}
                       </div>
-                      <div style={{ fontSize: "0.85rem", color: "#8d7a6a" }}>{user.email}</div>
+                      <div className="profile-menu-email">{user.email}</div>
                     </div>
 
                     <div className="d-grid gap-2">
                       <button
-                        className="btn"
-                        style={{ background: "#E9E0D1", color: "#4B3A2E", fontWeight: 600, border: "none", borderRadius: "10px" }}
+                        type="button"
+                        className="profile-menu-btn profile-menu-btn-soft"
                         onClick={() => { setMenuOpen(false); router.push("/perfil/editar_info"); }}
                       >
                         {t("editProfile")}
                       </button>
                       <button
-                        className="btn"
-                        style={{ background: "#C9AD8D", color: "#fff", fontWeight: 600, border: "none", borderRadius: "10px" }}
+                        type="button"
+                        className="profile-menu-btn profile-menu-btn-primary"
                         onClick={() => { setMenuOpen(false); router.push("/perfil/citas_agendadas"); }}
                       >
                         {t("myAppointments")}
                       </button>
                       <button
-                        className="btn mt-2"
-                        style={{ background: "#fff3ef", color: "#b02e2e", fontWeight: 600, border: "1px solid #e4bfbf", borderRadius: "10px" }}
+                        type="button"
+                        className="profile-menu-btn profile-menu-btn-danger mt-2"
                         onClick={requestLogout}
                       >
                         {t("logout")}
@@ -331,6 +400,10 @@ export default function Navbar() {
               </AnimatePresence>
             </>
           )}
+
+          {/* Tema e idioma salieron de aquí: el navbar de escritorio competía
+              por espacio con 6 enlaces + login. Ahora viven en el acceso
+              rápido flotante (QuickAccessFab, esquina inferior derecha). */}
         </div>
       </div>
 
@@ -338,25 +411,22 @@ export default function Navbar() {
       <div className={`mobile-sidebar ${mobileOpen ? "open" : ""}`} style={{ transition: "transform 0.4s ease, opacity 0.4s ease" }}>
         {user ? (
           <div className="mobile-sidebar-header" style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <img src={userPhoto} alt="Perfil" className="user-avatar" style={{ marginBottom: "0.8rem" }} />
+            <Avatar src={userPhoto} alt={t("profileAlt")} fallback={avatarFallback} className="user-avatar" style={{ marginBottom: "0.8rem", borderRadius: "50%" }} />
             <div className="user-name">{user.nombres}</div>
             <div className="user-email">{user.email}</div>
             <div className="user-actions">
               <button className="user-action-btn" onClick={() => { setMobileOpen(false); router.push("/perfil/editar_info"); }}>
-                Editar perfil
+                {t("editProfile")}
               </button>
               <button className="user-action-btn" onClick={() => { setMobileOpen(false); router.push("/perfil/citas_agendadas"); }}>
-                Citas agendadas
-              </button>
-              <button className="user-action-btn" onClick={requestLogout} style={{ color: "#b02e2e" }}>
-                {t("logout")}
+                {t("myAppointments")}
               </button>
             </div>
           </div>
         ) : (
           <div className="mobile-sidebar-header">
             <button onClick={() => router.push("/login")} className="user-action-btn">
-              Iniciar sesión
+              {t("login")}
             </button>
           </div>
         )}
@@ -368,6 +438,18 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
+        </div>
+        {/* Footer del sidebar: controles + cerrar sesión al fondo */}
+        <div className="mobile-sidebar-footer">
+          <div className="mobile-sidebar-controls">
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
+          {user && (
+            <button className="mobile-sidebar-logout" onClick={requestLogout}>
+              {t("logout")}
+            </button>
+          )}
         </div>
       </div>
 
@@ -396,7 +478,7 @@ export default function Navbar() {
               className="bg-white rounded-4 shadow-lg p-4 text-center"
               style={{ maxWidth: 360, width: "100%", background: "linear-gradient(135deg, #fffdfb 0%, #f8f3ed 100%)" }}
             >
-              <h5 className="fw-bold mb-2" style={{ color: "#6B4E3D" }}>
+              <h5 className="fw-bold mb-2" style={{ color: "var(--brand-deep)" }}>
                 {t("logoutConfirm")}
               </h5>
               <p className="mb-4" style={{ color: "#8d7a6a", fontSize: "0.92rem" }}>
@@ -415,7 +497,7 @@ export default function Navbar() {
                   style={{ background: "#b02e2e", color: "#fff", fontWeight: 600, border: "none", borderRadius: "10px" }}
                   onClick={handleLogout}
                 >
-                  Cerrar sesión
+                  {t("logout")}
                 </button>
               </div>
             </motion.div>

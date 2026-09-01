@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
+import { useLocale, useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
 
 //  Tipos desde el dominio real (ya no usamos utils/localDB)
@@ -8,6 +11,7 @@ import type { Procedimiento, SessionUser } from "../types/domain";
 
 import { ArrowLeft, CalendarDays, Clock, RotateCcw } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
+import TreatmentPicker from "./TreatmentPicker";
 
 export interface AgendarFormData {
   fecha?: string;
@@ -38,6 +42,9 @@ export default function AgendarForm({
   handleConfirmar,
   goBack,
 }: AgendarFormProps) {
+  const t = useTranslations("agendar.form");
+  const locale = useLocale();
+  const [aceptaTerminos, setAceptaTerminos] = useState(false);
   const listaProcedimientos: Procedimiento[] = Array.isArray(procedimientos)
     ? procedimientos
     : [];
@@ -47,16 +54,6 @@ export default function AgendarForm({
     text: "#2A1C12",
     textSoft: "#4B3726",
   };
-
-  const procedimientosFaciales = listaProcedimientos.filter(
-    (p) => p.categoria === "Facial"
-  );
-  const procedimientosCorporales = listaProcedimientos.filter(
-    (p) => p.categoria === "Corporal"
-  );
-  const procedimientosCapilares = listaProcedimientos.filter(
-    (p) => p.categoria === "Capilar"
-  );
 
   const handleChange = <K extends keyof AgendarFormData>(
     key: K,
@@ -74,41 +71,28 @@ export default function AgendarForm({
 
   // === FORMATOS DE FECHA Y HORA ===
   const fmtDiaHumano = (date: Date): string => {
-    const dias = [
-      "domingo",
-      "lunes",
-      "martes",
-      "miércoles",
-      "jueves",
-      "viernes",
-      "sábado",
-    ];
-    return dias[date.getDay()];
+    const intlLocale = locale === "en" ? "en-US" : "es-CO";
+    return date.toLocaleDateString(intlLocale, { weekday: "long" });
   };
 
   const fmtFechaHumana = (date: Date): string => {
-    const meses = [
-      "enero",
-      "febrero",
-      "marzo",
-      "abril",
-      "mayo",
-      "junio",
-      "julio",
-      "agosto",
-      "septiembre",
-      "octubre",
-      "noviembre",
-      "diciembre",
-    ];
-    return `${date.getDate()} de ${
-      meses[date.getMonth()]
-    } de ${date.getFullYear()}`;
+    const intlLocale = locale === "en" ? "en-US" : "es-CO";
+    return date.toLocaleDateString(intlLocale, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
   };
 
   const fmtHoraHumana = (hhmm: string): string => {
     const [hStr, mStr] = hhmm.split(":");
     let h = Number(hStr);
+    if (locale === "en") {
+      const suf = h >= 12 ? "PM" : "AM";
+      if (h === 0) h = 12;
+      if (h > 12) h -= 12;
+      return `${h}:${mStr} ${suf}`;
+    }
     const suf = h >= 12 ? "p.m." : "a.m.";
     if (h === 0) h = 12;
     if (h > 12) h -= 12;
@@ -124,11 +108,13 @@ export default function AgendarForm({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -40 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
-      className="rounded-3xl shadow-2xl overflow-hidden"
+      className="agendar-form-card dark-aware-card rounded-3xl shadow-2xl overflow-hidden"
       style={{
         background: "linear-gradient(180deg, #FBF7F2 0%, #F4EBE2 100%)",
         border: `1px solid ${DARK_PALETTE.border}`,
         color: DARK_PALETTE.text,
+        maxWidth: 920,
+        margin: "0 auto",
       }}
     >
       {/* === BOTÓN VOLVER === */}
@@ -138,7 +124,7 @@ export default function AgendarForm({
       >
         <ArrowLeft size={20} className="text-[#5C4533]" />
         <span className="text-sm font-medium text-[#5C4533] hover:text-[#8B6A4B] transition-colors">
-          Volver
+          {t("back")}
         </span>
       </div>
 
@@ -151,7 +137,7 @@ export default function AgendarForm({
           className="text-3xl font-serif mb-2"
           style={{ color: DARK_PALETTE.text }}
         >
-          Completa tus datos
+          {t("title")}
         </h2>
 
         {usuario && esPrimeraCita && (
@@ -162,10 +148,9 @@ export default function AgendarForm({
             className="text-sm rounded-lg p-3 mx-auto max-w-lg bg-[#E8E1D4] border border-[#E0D3C0]"
             style={{ color: DARK_PALETTE.textSoft }}
           >
-            La <b>primera cita</b> es una <b>consulta de valoración</b>, y{" "}
-            <b>dependiendo del diagnóstico</b>, se podría{" "}
-            <b>realizar el procedimiento</b> indicado en la{" "}
-            <b>misma cita</b>.
+            {t.rich("firstAppointmentNote", {
+              b: (chunks) => <b>{chunks}</b>,
+            })}
           </motion.div>
         )}
       </div>
@@ -193,7 +178,7 @@ export default function AgendarForm({
               className="text-lg font-serif mb-2 text-center"
               style={{ color: DARK_PALETTE.text }}
             >
-              Fecha y hora seleccionadas
+              {t("selectedDateTime")}
             </h3>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
               <div className="flex items-center gap-2">
@@ -225,7 +210,7 @@ export default function AgendarForm({
                 }}
               >
                 <RotateCcw size={16} />
-                Cambiar horario
+                {t("changeSchedule")}
               </motion.button>
             </div>
           </motion.div>
@@ -237,12 +222,12 @@ export default function AgendarForm({
             className="block mb-1 text-sm font-semibold"
             style={{ color: DARK_PALETTE.textSoft }}
           >
-            Nombre completo *
+            {t("fullName")} *
           </label>
           <input
             value={formData.nombre}
             onChange={(e) => handleChange("nombre", e.target.value)}
-            placeholder="Ej: Laura Gómez"
+            placeholder={t("fullNamePlaceholder")}
             required
             className="w-full p-3 rounded-lg border bg-white focus:border-[#B08968] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
             style={{
@@ -257,13 +242,13 @@ export default function AgendarForm({
             className="block mb-1 text-sm font-semibold"
             style={{ color: DARK_PALETTE.textSoft }}
           >
-            Teléfono *
+            {t("phone")} *
           </label>
           <input
             value={formData.telefono}
             onChange={(e) => handleChange("telefono", e.target.value)}
             type="tel"
-            placeholder="Solo números"
+            placeholder={t("phonePlaceholder")}
             required
             pattern="[0-9]{7,}"
             className="w-full p-3 rounded-lg border bg-white focus:border-[#B08968] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
@@ -279,13 +264,13 @@ export default function AgendarForm({
             className="block mb-1 text-sm font-semibold"
             style={{ color: DARK_PALETTE.textSoft }}
           >
-            Correo electrónico *
+            {t("email")} *
           </label>
           <input
             value={formData.correo}
             onChange={(e) => handleChange("correo", e.target.value)}
             type="email"
-            placeholder="ejemplo@correo.com"
+            placeholder={t("emailPlaceholder")}
             required
             className="w-full p-3 rounded-lg border bg-white focus:border-[#B08968] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
             style={{
@@ -301,7 +286,7 @@ export default function AgendarForm({
             className="block mb-1 text-sm font-semibold"
             style={{ color: DARK_PALETTE.textSoft }}
           >
-            Tipo de cita
+            {t("appointmentType")}
           </label>
           <motion.div
             initial={{ opacity: 0.8 }}
@@ -313,7 +298,7 @@ export default function AgendarForm({
               color: DARK_PALETTE.textSoft,
             }}
           >
-            Valoración / Procedimiento
+            {t("appointmentTypeValue")}
           </motion.div>
         </div>
 
@@ -323,41 +308,14 @@ export default function AgendarForm({
             className="block mb-1 text-sm font-semibold"
             style={{ color: DARK_PALETTE.textSoft }}
           >
-            Procedimiento *
+            {t("procedure")} *
           </label>
-          <select
+          <TreatmentPicker
             value={formData.procedimiento}
-            onChange={(e) => handleChange("procedimiento", e.target.value)}
-            required
-            className="w-full p-3 rounded-lg border bg-white focus:border-[#B08968] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
-            style={{
-              borderColor: DARK_PALETTE.border,
-              color: DARK_PALETTE.text,
-            }}
-          >
-            <option value="">Selecciona un procedimiento</option>
-            <optgroup label="Faciales">
-              {procedimientosFaciales.map((p) => (
-                <option key={p.id} value={p.nombre}>
-                  {p.nombre}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label="Corporales">
-              {procedimientosCorporales.map((p) => (
-                <option key={p.id} value={p.nombre}>
-                  {p.nombre}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label="Capilares">
-              {procedimientosCapilares.map((p) => (
-                <option key={p.id} value={p.nombre}>
-                  {p.nombre}
-                </option>
-              ))}
-            </optgroup>
-          </select>
+            onChange={(val) => handleChange("procedimiento", val)}
+            procedimientos={listaProcedimientos}
+            placeholder={t("procedurePlaceholder")}
+          />
         </div>
 
         {/* Nota */}
@@ -366,13 +324,13 @@ export default function AgendarForm({
             className="block mb-1 text-sm font-semibold"
             style={{ color: DARK_PALETTE.textSoft }}
           >
-            Nota (opcional)
+            {t("noteLabel")}
           </label>
           <textarea
             value={formData.nota}
             onChange={(e) => handleChange("nota", e.target.value)}
             rows={3}
-            placeholder="Ej: tengo nervios a las agujas, es mi primera vez"
+            placeholder={t("notePlaceholder")}
             className="w-full p-3 rounded-lg border bg-white focus:border-[#B08968] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
             style={{
               borderColor: DARK_PALETTE.border,
@@ -381,8 +339,32 @@ export default function AgendarForm({
           />
         </div>
 
+        {/* Aceptación de Términos / política de abono y cancelación */}
+        <div className="md:col-span-2">
+          <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", color: DARK_PALETTE.textSoft }}>
+            <input
+              type="checkbox"
+              checked={aceptaTerminos}
+              onChange={(e) => setAceptaTerminos(e.target.checked)}
+              style={{ width: 18, height: 18, marginTop: 3, accentColor: DARK_PALETTE.main, flexShrink: 0 }}
+            />
+            <span style={{ fontSize: "0.84rem", lineHeight: 1.5 }}>
+              He leído y acepto los{" "}
+              <Link href="/legal/terminos" target="_blank" style={{ color: DARK_PALETTE.main, fontWeight: 600 }}>
+                Términos y Condiciones
+              </Link>
+              , incluida la política de abono de reserva ($50.000) y de
+              cancelación/reagenda, y el tratamiento de mis datos según la{" "}
+              <Link href="/legal/privacidad" target="_blank" style={{ color: DARK_PALETTE.main, fontWeight: 600 }}>
+                Política de Privacidad
+              </Link>
+              .
+            </span>
+          </label>
+        </div>
+
         {/* Botón continuar */}
-        <div className="md:col-span-2 mt-8 flex justify-center">
+        <div className="md:col-span-2 mt-6 flex justify-center">
           <motion.button
             type="submit"
             whileHover={{ scale: 1.05 }}
@@ -394,7 +376,8 @@ export default function AgendarForm({
                 !formData.nombre ||
                 !formData.telefono ||
                 !formData.correo ||
-                !formData.procedimiento
+                !formData.procedimiento ||
+                !aceptaTerminos
                   ? 0.6
                   : 1,
             }}
@@ -402,10 +385,11 @@ export default function AgendarForm({
               !formData.nombre ||
               !formData.telefono ||
               !formData.correo ||
-              !formData.procedimiento
+              !formData.procedimiento ||
+              !aceptaTerminos
             }
           >
-            Continuar
+            {t("continue")}
           </motion.button>
         </div>
       </form>

@@ -1,12 +1,19 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle, AlertCircle, XCircle, Loader } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { getMisCitasApi } from "../../services/citasApi";
-import FirmaConsentimiento from "../../src/components/FirmaConsentimiento";
 import type { Cita } from "../../types/domain";
 import { supabase } from "@/lib/supabaseClient";
+
+// Trae jsPDF (pesado) consigo. Se usa solo cuando el paciente abre el
+// modal de firma, así que no debe formar parte de la carga inicial de "Mis citas".
+const FirmaConsentimiento = dynamic(() => import("../../src/components/FirmaConsentimiento"), {
+  ssr: false,
+});
 
 interface ReagendaPend {
   id: number;
@@ -15,21 +22,24 @@ interface ReagendaPend {
   nueva_hora: string;
   motivo: string;
 }
-const ESTADOS = {
-  pendiente: { bg: "#FFF8E1", text: "#7D6608", icon: Loader, label: "Pendiente", step: 1 },
-  confirmada: { bg: "#E3F2FD", text: "#0B3C78", icon: CheckCircle, label: "Confirmada", step: 2 },
-  atendida: { bg: "#E8F5E9", text: "#145A32", icon: CheckCircle, label: "Atendida", step: 3 },
-  cancelada: { bg: "#FCE4EC", text: "#7E1F1F", icon: XCircle, label: "Cancelada", step: 0 },
-};
 
-const STEPS = [
-  { label: "Pendiente", key: "pendiente" },
-  { label: "Confirmada", key: "confirmada" },
-  { label: "Atendida", key: "atendida" },
-];
+const ESTADO_STYLES = {
+  pendiente: { bg: "#FFF8E1", text: "#7D6608", icon: Loader, step: 1 },
+  confirmada: { bg: "#E3F2FD", text: "#0B3C78", icon: CheckCircle, step: 2 },
+  atendida: { bg: "#E8F5E9", text: "#145A32", icon: CheckCircle, step: 3 },
+  cancelada: { bg: "#FCE4EC", text: "#7E1F1F", icon: XCircle, step: 0 },
+} as const;
 
-function ProgressBar({ estado }: { estado: string }) {
-  const currentStep = estado === "cancelada" ? 0 : ESTADOS[estado as keyof typeof ESTADOS]?.step || 0;
+function ProgressBar({ estado, t }: { estado: string; t: ReturnType<typeof useTranslations> }) {
+  const currentStep =
+    estado === "cancelada"
+      ? 0
+      : ESTADO_STYLES[estado as keyof typeof ESTADO_STYLES]?.step || 0;
+  const STEPS = [
+    { label: t("filters.pendiente"), key: "pendiente" },
+    { label: t("filters.confirmada"), key: "confirmada" },
+    { label: t("filters.atendida"), key: "atendida" },
+  ];
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 0, marginBottom: "1.2rem" }}>
       {STEPS.map((s, i) => {
@@ -56,13 +66,18 @@ function ProgressBar({ estado }: { estado: string }) {
   );
 }
 
-function formatFecha(fecha: string): string {
-  try {
-    return new Date(fecha + "T12:00:00").toLocaleDateString("es-CO", { weekday: "short", year: "numeric", month: "short", day: "numeric" });
-  } catch { return fecha; }
-}
-
 export default function CitasAgendadas() {
+  const t = useTranslations("perfil.citas");
+  const locale = useLocale();
+  const intlLocale = locale === "en" ? "en-US" : "es-CO";
+  const currencyLocale = intlLocale;
+
+  function formatFecha(fecha: string): string {
+    try {
+      return new Date(fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "short", year: "numeric", month: "short", day: "numeric" });
+    } catch { return fecha; }
+  }
+
   const [citas, setCitas] = useState<Cita[]>([]);
   const [loading, setLoading] = useState(true);
   const [ascendente, setAscendente] = useState(false);
@@ -87,8 +102,9 @@ export default function CitasAgendadas() {
     setLoading(true);
     getMisCitasApi()
       .then((cs) => { setCitas(cs); return cargarReagendas(cs.map((c) => c.id)); })
-      .catch(() => setError("No se pudieron cargar las citas."))
+      .catch(() => setError(t("errorLoad")))
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const aceptarReagenda = async (cita: Cita, r: ReagendaPend) => {
@@ -103,7 +119,7 @@ export default function CitasAgendadas() {
       setCitas((prev) => prev.map((c) => c.id === cita.id ? { ...c, fecha: r.nueva_fecha, hora: r.nueva_hora } : c));
       setReagendas((prev) => { const n = { ...prev }; delete n[cita.id]; return n; });
     } catch {
-      setError("No se pudo aplicar la reagenda. Intenta de nuevo.");
+      setError(t("reagenda.errorApply"));
     } finally {
       setReagProcesando(null);
     }
@@ -115,7 +131,7 @@ export default function CitasAgendadas() {
       await supabase.from("reagendas").update({ estado: "rechazada" }).eq("id", r.id);
       setReagendas((prev) => { const n = { ...prev }; delete n[cita.id]; return n; });
     } catch {
-      setError("No se pudo rechazar la solicitud. Intenta de nuevo.");
+      setError(t("reagenda.errorReject"));
     } finally {
       setReagProcesando(null);
     }
@@ -138,13 +154,13 @@ export default function CitasAgendadas() {
   }), [citas]);
 
   if (loading) return <div style={{ display: "flex", justifyContent: "center", padding: "5rem 0" }}><div className="spinner-border" style={{ color: "#B08968" }} /></div>;
-  if (error) return <div style={{ textAlign: "center", padding: "3rem" }}><p style={{ color: "#7E1F1F" }}>{error}</p><button onClick={() => window.location.reload()} style={{ marginTop: "1rem", padding: "0.6rem 2rem", borderRadius: 100, background: "#B08968", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>Reintentar</button></div>;
+  if (error) return <div style={{ textAlign: "center", padding: "3rem" }}><p style={{ color: "#7E1F1F" }}>{error}</p><button onClick={() => window.location.reload()} style={{ marginTop: "1rem", padding: "0.6rem 2rem", borderRadius: 100, background: "#B08968", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("retry")}</button></div>;
 
   return (
-    <div style={{ maxWidth: 1180, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
+    <div className="dark-aware-section citas-page" style={{ maxWidth: 1180, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.5rem" }}>Mis Citas Agendadas</h2>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.5rem" }}>{t("title")}</h2>
         <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, margin: "0 auto 1.2rem" }} />
       </motion.div>
 
@@ -155,43 +171,41 @@ export default function CitasAgendadas() {
         {/* SIDEBAR FILTROS */}
         <div className="citas-side" style={{ width: 220, flexShrink: 0, display: "flex", flexDirection: "column", gap: "0.5rem", position: "sticky", top: 90 }}>
           {([
-            { key: "todos", label: "Todos", count: citas.length },
-            { key: "pendiente", label: "Pendiente", count: resumen.pendiente },
-            { key: "confirmada", label: "Confirmada", count: resumen.confirmada },
-            { key: "atendida", label: "Atendida", count: resumen.atendida },
-            { key: "cancelada", label: "Cancelada", count: resumen.cancelada },
+            { key: "todos", label: t("filters.all"), count: citas.length },
+            { key: "pendiente", label: t("filters.pendiente"), count: resumen.pendiente },
+            { key: "confirmada", label: t("filters.confirmada"), count: resumen.confirmada },
+            { key: "atendida", label: t("filters.atendida"), count: resumen.atendida },
+            { key: "cancelada", label: t("filters.cancelada"), count: resumen.cancelada },
           ]).map(({ key, label, count }) => {
             const activo = filtroEstado === key;
             return (
               <button key={key} onClick={() => setFiltroEstado(key)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "0.6rem 1rem", borderRadius: 12, fontSize: "0.86rem", fontWeight: 600, border: "none", cursor: "pointer",
-                  background: activo ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#F5EEE6",
-                  color: activo ? "white" : "#4E3B2B",
-                  boxShadow: activo ? "0 4px 14px rgba(176,137,104,0.25)" : "none",
-                  transition: "background 0.2s, box-shadow 0.2s",
-                }}>
+                className={"citas-filter-btn" + (activo ? " is-active" : "")}
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "0.6rem 1rem", borderRadius: 12, fontSize: "0.86rem", fontWeight: 600, border: "none", cursor: "pointer", transition: "background 0.2s, box-shadow 0.2s" }}>
                 {label}
-                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 22, height: 22, padding: "0 6px", borderRadius: 100, fontSize: "0.73rem", fontWeight: 700,
-                  background: activo ? "rgba(255,255,255,0.28)" : "rgba(176,137,104,0.18)",
-                  color: activo ? "white" : "#8A5A12" }}>{count}</span>
+                <span className="citas-filter-count">{count}</span>
               </button>
             );
           })}
           <button onClick={() => setAscendente(a => !a)}
             style={{ marginTop: "0.4rem", padding: "0.55rem 1rem", borderRadius: 12, fontSize: "0.84rem", fontWeight: 600, border: "1px solid rgba(176,137,104,0.25)", cursor: "pointer", background: "#FFFDF9", color: "#4E3B2B", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-            {ascendente ? <ChevronUp size={14} /> : <ChevronDown size={14} />} Ordenar por fecha
+            {ascendente ? <ChevronUp size={14} /> : <ChevronDown size={14} />} {t("sortByDate")}
           </button>
         </div>
 
         {/* COLUMNA DE CITAS */}
         <div style={{ flex: 1, minWidth: 0 }}>
       {citasFiltradas.length === 0 ? (
-        <p style={{ textAlign: "center", color: "#8B7060", padding: "2rem 0" }}>No hay citas{filtroEstado !== "todos" ? ` con estado "${filtroEstado}"` : ""}</p>
+        <p style={{ textAlign: "center", color: "#8B7060", padding: "2rem 0" }}>
+          {filtroEstado === "todos"
+            ? t("emptyAll")
+            : t("emptyFiltered", { estado: t(`filters.${filtroEstado}` as any) })}
+        </p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <AnimatePresence>
             {citasFiltradas.map((cita, i) => {
-              const est = ESTADOS[cita.estado as keyof typeof ESTADOS] || ESTADOS.pendiente;
+              const est = ESTADO_STYLES[cita.estado as keyof typeof ESTADO_STYLES] || ESTADO_STYLES.pendiente;
               const isCancelada = cita.estado === "cancelada";
               const isConfirmada = cita.estado === "confirmada";
 
@@ -216,24 +230,26 @@ export default function CitasAgendadas() {
                             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", fontWeight: 700, color: "#7A6554", margin: 0, textDecoration: "line-through", textDecorationColor: "rgba(122,101,84,0.4)" }}>{cita.procedimiento}</h3>
                             <span style={{ fontSize: "0.78rem", color: "#9B8575" }}>{formatFecha(cita.fecha)} · {cita.hora}</span>
                           </div>
-                          <span style={{ background: est.bg, color: est.text, padding: "0.3rem 1rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 700, whiteSpace: "nowrap" }}>Cancelada</span>
+                          <span className="cita-estado-pill cancelada" style={{ background: est.bg, color: est.text, padding: "0.3rem 1rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 700, whiteSpace: "nowrap" }}>{t("estadoChip.cancelada")}</span>
                         </div>
                         {cita.motivoCancelacion && (
                           <div style={{ marginTop: "0.7rem", padding: "0.55rem 0.9rem", background: "#FCE4EC", borderRadius: 10, fontSize: "0.8rem", color: "#7E1F1F", display: "flex", alignItems: "center", gap: 8 }}>
-                            <AlertCircle size={13} /> Motivo: {cita.motivoCancelacion}
+                            <AlertCircle size={13} /> {t("labels.cancelReason")} {cita.motivoCancelacion}
                           </div>
                         )}
                       </div>
                     ) : (
                       <>
                         {/* Barra de progreso (única fuente del estado) */}
-                        <ProgressBar estado={cita.estado} />
+                        <ProgressBar estado={cita.estado} t={t} />
 
                         {/* Cabecera: procedimiento (izq) + fecha/hora destacada (der) */}
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.1rem", gap: "1rem", flexWrap: "wrap" }}>
                           <div>
                             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.15rem" }}>{cita.procedimiento}</h3>
-                            <span style={{ fontSize: "0.76rem", color: "#8A7565", textTransform: "uppercase", letterSpacing: "0.05em" }}>{cita.tipoCita === "valoracion" ? "Valoración" : "Implementación"}</span>
+                            <span style={{ fontSize: "0.76rem", color: "#8A7565", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                              {cita.tipoCita === "valoracion" ? t("labels.valoracion") : t("labels.implementacion")}
+                            </span>
                           </div>
                           <div style={{ textAlign: "right", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 14, padding: "0.6rem 1rem", minWidth: 150 }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6, fontSize: "0.9rem", fontWeight: 700, color: "#3A2A1A" }}>
@@ -260,9 +276,9 @@ export default function CitasAgendadas() {
                         {/* Monto */}
                         {cita.monto != null && cita.monto > 0 && (
                           <div style={{ padding: "0.55rem 1rem", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", borderRadius: 12, border: "1px solid rgba(176,137,104,0.1)", fontSize: "0.83rem", color: "#3A2A1A", marginBottom: "0.5rem" }}>
-                            <strong>Monto:</strong> ${cita.monto.toLocaleString("es-CO")}
-                            {cita.montoPagado != null && <span> · Pagado: ${cita.montoPagado.toLocaleString("es-CO")}</span>}
-                            {cita.montoRestante != null && cita.montoRestante > 0 && <span> · Restante: ${cita.montoRestante.toLocaleString("es-CO")}</span>}
+                            <strong>{t("labels.amount")}</strong> ${cita.monto.toLocaleString(currencyLocale)}
+                            {cita.montoPagado != null && <span> · {t("labels.paid")} ${cita.montoPagado.toLocaleString(currencyLocale)}</span>}
+                            {cita.montoRestante != null && cita.montoRestante > 0 && <span> · {t("labels.remaining")} ${cita.montoRestante.toLocaleString(currencyLocale)}</span>}
                           </div>
                         )}
                       </>
@@ -272,14 +288,14 @@ export default function CitasAgendadas() {
                     {!isCancelada && cita.estado !== "atendida" && reagendas[cita.id] && (
                       <div style={{ marginTop: "1rem", padding: "1rem 1.2rem", background: "#FFF6E9", border: "1px solid #E8C98A", borderRadius: 14 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, color: "#8A5A12", fontSize: "0.9rem", marginBottom: "0.5rem" }}>
-                          <AlertCircle size={16} /> El consultorio propone reagendar tu cita
+                          <AlertCircle size={16} /> {t("reagenda.title")}
                         </div>
                         <div style={{ fontSize: "0.85rem", color: "#5A4A3A", marginBottom: "0.3rem" }}>
-                          Nueva propuesta: <strong>{formatFecha(reagendas[cita.id].nueva_fecha)} — {reagendas[cita.id].nueva_hora}</strong>
+                          {t("reagenda.newProposal")} <strong>{formatFecha(reagendas[cita.id].nueva_fecha)} — {reagendas[cita.id].nueva_hora}</strong>
                         </div>
                         {reagendas[cita.id].motivo && (
                           <div style={{ fontSize: "0.82rem", color: "#6C584C", fontStyle: "italic", marginBottom: "0.7rem" }}>
-                            Motivo: {reagendas[cita.id].motivo}
+                            {t("reagenda.reason")} {reagendas[cita.id].motivo}
                           </div>
                         )}
                         <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
@@ -288,14 +304,14 @@ export default function CitasAgendadas() {
                             onClick={() => aceptarReagenda(cita, reagendas[cita.id])}
                             style={{ flex: 1, minWidth: 130, padding: "0.55rem 1rem", borderRadius: 100, border: "none", background: "linear-gradient(135deg, #2E7D32, #43A047)", color: "white", fontWeight: 600, fontSize: "0.83rem", cursor: "pointer", opacity: reagProcesando === reagendas[cita.id].id ? 0.6 : 1 }}
                           >
-                            {reagProcesando === reagendas[cita.id].id ? "Aplicando..." : "Aceptar nueva fecha"}
+                            {reagProcesando === reagendas[cita.id].id ? t("reagenda.applying") : t("reagenda.accept")}
                           </button>
                           <button
                             disabled={reagProcesando === reagendas[cita.id].id}
                             onClick={() => rechazarReagenda(cita, reagendas[cita.id])}
                             style={{ flex: 1, minWidth: 130, padding: "0.55rem 1rem", borderRadius: 100, border: "1px solid #E0CDB5", background: "#FFF", color: "#7E1F1F", fontWeight: 600, fontSize: "0.83rem", cursor: "pointer", opacity: reagProcesando === reagendas[cita.id].id ? 0.6 : 1 }}
                           >
-                            Rechazar
+                            {t("reagenda.reject")}
                           </button>
                         </div>
                       </div>
@@ -319,7 +335,7 @@ export default function CitasAgendadas() {
                     {(cita as any).consentimiento_firmado && (
                       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
                         <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.82rem", fontWeight: 600, color: "#145A32", background: "#E8F5E9", padding: "0.5rem 1.2rem", borderRadius: 100 }}>
-                          <CheckCircle size={14} /> Consentimiento firmado
+                          <CheckCircle size={14} /> {t("consent.signed")}
                         </span>
                       </div>
                     )}

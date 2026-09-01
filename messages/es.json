@@ -9,7 +9,9 @@
     "language": "Idioma"
   },
   "topbar": {
-    "address": "Carrera 5ta #11-24. Edificio Torre Empresarial. Consultorio 502. Ibagué – Tolima."
+    "address": "Carrera 5ta #11-24. Edificio Torre Empresarial. Consultorio 502. Ibagué – Tolima.",
+    "quickAccess": "Accesos rápidos",
+    "contactInfo": "Información de contacto"
   },
   "navbar": {
     "home": "Inicio",
@@ -20,11 +22,16 @@
     "book": "Agendar cita",
     "admin": "Administrar",
     "login": "Iniciar sesión",
+    "legalSection": "Información legal",
+    "profileSection": "Mi perfil",
     "editProfile": "Editar perfil",
     "myAppointments": "Citas agendadas",
     "logout": "Cerrar sesión",
     "logoutConfirm": "¿Cerrar sesión?",
-    "logoutMessage": "Tendrás que iniciar sesión nuevamente para acceder a tu cuenta."
+    "logoutMessage": "Tendrás que iniciar sesión nuevamente para acceder a tu cuenta.",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "profileAlt": "Perfil"
   },
   "hero": {
     "kicker": "Medicina estética · Ibagué",
@@ -33,10 +40,235 @@
     "rotator": ["armonía.", "autenticidad.", "belleza natural.", "confianza."],
     "subtitle": "Tratamientos personalizados con tecnología de última generación. Resultados naturales que resaltan tu esencia, en manos de la Dra. Vanessa Medina.",
     "ctaPrimary": "Agendar cita",
-    "ctaSecondary": "Conoce los procedimientos"
+    "ctaSecondary": "Conoce los procedimientos",
+    "imageAlt": "Dra. Vanessa Medina"
+  },
+  "home": {
+    "gallery": {
+      "title": "Conoce los <c>procedimientos</c> más demandados y <c>promociones</c>",
+      "subtitle": "Explora de forma interactiva algunos de mis procedimientos más solicitados. Selecciona alguno para ver toda su información y agendar tu cita en segundos.",
+      "back": "Volver",
+      "viewMore": "Saber más sobre el procedimiento",
+      "viewMoreShort": "Saber más",
+      "viewAll": "Ver todos los procedimientos",
+      "badgePromo": "Promoción",
+      "badgeDestacado": "Destacado"
+    },
+    "location": {
+      "title": "Nuestra ubicación",
+      "subtitle": "Encuéntrame en el corazón de Ibagué, dentro de la Torre Empresarial, Consultorio número 502.",
+      "viewMaps": "Ver en Google Maps",
+      "viewClinic": "Conocer más sobre el consultorio",
+      "photoAlt": "Consultorio principal"
+    },
+    "gallery_a11y": {
+      "close": "Cerrar",
+      "goToCard": "Ir al tratamiento {n}"
+    },
+    "video": {
+      "kicker": "Sobre mi práctica",
+      "title": "Por qué confiarme tus consultas y procedimientos",
+      "divider": "",
+      "subtitle": "Atención cercana, técnicas seguras y resultados que cuidan tu esencia.",
+      "distinguishTitle": "Lo que me distingue",
+      "features": [
+        { "title": "Tecnología HydraFacial", "desc": "Con certificación internacional" },
+        { "title": "Productos premium", "desc": "Grado médico avanzado" },
+        { "title": "Mínimo dolor", "desc": "Rápida recuperación" },
+        { "title": "Atención personalizada", "desc": "Un plan hecho para ti" }
+      ],
+      "iframeTitle": "Presentación",
+      "watchVideo": "Ver presentación",
+      "experienceTitle": "Mi experiencia habla",
+      "counters": {
+        "patients": "Pacientes satisfechos",
+        "treatments": "Tratamientos",
+        "years": "Años de experiencia",
+        "rating": "Calificación"
+      },
+      "ctaAboutDr": "Saber más sobre la doctora",
+      "ctaTestimonials": "Ver testimonios"
+    }
+  },
+  "testimonios": {
+    "badge": "Testimonios",
+    "title": "Testimonios de Nuestros Pacientes",
+    "subtitle": "Experiencias reales de pacientes que confiaron en la Dra. Vanessa Medina",
+    "empty": "No hay testimonios disponibles por el momento.",
+    "noVideo": "Sin video"
+  },
+  "comentarios": {
+    "title": "Comentarios de Nuestros Pacientes",
+    "subtitle": "Experiencias reales de quienes confiaron en nosotros",
+    "openForm": "Dejar mi comentario",
+    "closeForm": "Cerrar formulario",
+    "alreadyCommented": "Ya enviaste tu comentario. Gracias por compartir tu experiencia.",
+    "form": {
+      "title": "Cuenta tu experiencia",
+      "yourName": "Tu nombre",
+      "procedure": "Procedimiento realizado",
+      "procedurePlaceholder": "Selecciona...",
+      "experience": "Tu experiencia",
+      "experiencePlaceholder": "Cuéntanos cómo fue...",
+      "rating": "Puntuación",
+      "submit": "Enviar comentario",
+      "submitting": "Enviando..."
+    },
+    "ratingLabels": ["", "Muy malo", "Malo", "Regular", "Bueno", "Excelente"],
+    "messages": {
+      "completeFields": "Completa todos los campos.",
+      "sent": "Comentario enviado. Será visible una vez aprobado por la doctora."
+    },
+    "loading": "Cargando comentarios...",
+    "emptyState": "Sé el primero en compartir tu experiencia."
+  },
+  "doctora": {
+    "hero": {
+      "title": "¿Quién es la doctora Julieth Vanessa Medina?",
+      "p1": "Julieth Vanessa Medina es una médica colombiana apasionada por el bienestar y la belleza natural. Desde mis primeros años trabajando en hospitales, descubrí que mi verdadera vocación estaba en la medicina estética, donde podía unir ciencia, arte y empatía para resaltar la mejor versión de cada persona.",
+      "p2": "Con el tiempo, decidí abrir mi propio consultorio, un espacio diseñado para ofrecer confianza, resultados naturales y tratamientos con tecnología de última generación.",
+      "quote": "“La autenticidad, sofisticación y elegancia son la nueva era de la Medicina estética. Invertir en ti debe tratarse de resaltar lo que te hace único/a generando una belleza real y sin excesos.” —",
+      "quoteAuthor": "Julieth Medina",
+      "cta": "Agendar Cita",
+      "ctaSecondary": "Conocer más sobre la doctora",
+      "imageAlt": "Doctora"
+    },
+    "vision": {
+      "title": "Misión y Visión",
+      "missionTitle": "Nuestra Misión",
+      "missionText": "Brindar atención médica estética integral centrada en el bienestar y la armonía del paciente, utilizando tecnología avanzada y un enfoque humano para resultados naturales y duraderos.",
+      "visionTitle": "Nuestra Visión",
+      "visionText": "Ser un referente nacional e internacional en medicina estética ética, innovadora y responsable, inspirando a más profesionales y pacientes a adoptar una visión saludable y consciente de la belleza."
+    },
+    "filosofia": {
+      "title": "Filosofía y Valores de la Práctica",
+      "values": [
+        {
+          "title": "Cuidado Personalizado",
+          "text": "Cada paciente es único. Ofrecemos planes adaptados a sus necesidades estéticas y emocionales."
+        },
+        {
+          "title": "Seguridad ante todo",
+          "text": "Procedimientos con protocolos médicos certificados y materiales aprobados."
+        },
+        {
+          "title": "Naturalidad y Armonía",
+          "text": "Buscamos resaltar tu belleza natural sin perder autenticidad."
+        },
+        {
+          "title": "Ciencia y Arte",
+          "text": "La medicina estética combina precisión médica con sensibilidad artística."
+        }
+      ]
+    },
+    "formacion": {
+      "kicker": "Crecimiento profesional",
+      "title": "Formación Continua",
+      "subtitle": "Charlas, congresos con colegas, nuevas técnicas y equipos",
+      "viewGallery": "Ver galería →",
+      "emptyState": "Sin actividades registradas aún.",
+      "clickHint": "Haz clic en cualquier evento para ver detalles y galería",
+      "modal": {
+        "badge": "Actualización profesional",
+        "photos": "fotos",
+        "videoTitle": "Video charla"
+      }
+    }
+  },
+  "consultorio": {
+    "hero": {
+      "kicker": "ESPACIO MÉDICO ESTÉTICO",
+      "title": "Nuestro Consultorio",
+      "subtitle": "Un ambiente diseñado para tu bienestar, donde la estética, la tecnología y la calma se integran en cada detalle.",
+      "highlight": "Atmósfera tranquila · Equipos modernos · Atención personalizada",
+      "imageAlt": "Consultorio principal"
+    },
+    "description": {
+      "title": "Elegancia, confort y tecnología",
+      "text": "Cada área del consultorio ha sido pensada para proporcionar comodidad, privacidad y una experiencia estética profesional y cálida."
+    },
+    "gallery": {
+      "title": "Galería del consultorio",
+      "viewSpace": "VER ESPACIO",
+      "close": "Cerrar",
+      "images": [
+        "Sala de procedimiento",
+        "Divisiones y privacidad",
+        "Zona de trabajo",
+        "Acceso y luz natural",
+        "Detalle de ambiente"
+      ]
+    },
+    "map": {
+      "title": "¿Dónde estamos ubicados?",
+      "address": "Carrera 5ta #11-24. Edificio Torre Empresarial. Consultorio 502. Ibagué – Tolima."
+    }
+  },
+  "procedures": {
+    "detail": {
+      "back": "Volver a procedimientos",
+      "back2": "Volver",
+      "notFound": "No encontramos este procedimiento",
+      "descriptionTitle": "Sobre este procedimiento",
+      "standardPrice": "Precio estándar",
+      "priceNote": "El precio puede variar según la valoración médica.",
+      "bookCta": "Agendar este procedimiento",
+      "approxDuration": "Duración aproximada",
+      "minutes": "minutos",
+      "safety": "Seguridad",
+      "certified": "Protocolos certificados",
+      "care": "Atención",
+      "personalized": "Personalizada",
+      "galleryTitle": "Galería del procedimiento"
+    }
+  },
+  "procedimientos": {
+    "title": "Procedimientos Médicos y Estéticos",
+    "subtitle": "Descubre los tratamientos faciales, corporales y capilares que implemento, junto a los descuentos que voy sacando por temporadas. Todos los precios están en pesos colombianos (COP) y pueden ajustarse según tu valoración médica. Recuerda que cada procedimiento inicia con una valoración para diseñar tu plan personalizado.",
+    "currency": "COP",
+    "loading": "Cargando procedimientos...",
+    "errorLoad": "No se pudieron cargar los procedimientos. Intenta de nuevo más tarde.",
+    "featured": {
+      "kicker": "Destacados y promociones del mes",
+      "ctaBook": "Agendar este procedimiento",
+      "ctaInfo": "Conocer más",
+      "prevSlide": "Anterior",
+      "nextSlide": "Siguiente",
+      "slideAria": "Destacado {n} de {total}",
+      "promoBadge": "Destacado"
+    },
+    "filters": {
+      "searchPlaceholder": "Busca un procedimiento...",
+      "all": "Todos",
+      "facial": "Facial",
+      "corporal": "Corporal",
+      "capilar": "Capilar",
+      "resultsCount": "{count, plural, =0 {Sin resultados} =1 {1 procedimiento} other {# procedimientos}}",
+      "noResults": "No encontramos procedimientos que coincidan con tu búsqueda.",
+      "clearSearch": "Limpiar búsqueda",
+      "allSubcats": "Todas las subcategorías",
+      "sortBy": "",
+      "sortName": "Nombre",
+      "sortPriceAsc": "Precio: menor a mayor",
+      "sortPriceDesc": "Precio: mayor a menor",
+      "sortFeatured": "Destacados",
+      "sortDiscount": "Con descuento"
+    },
+    "categories": {
+      "facial": "Explora los procedimientos faciales",
+      "corporal": "Explora los procedimientos corporales",
+      "capilar": "Explora los procedimientos capilares"
+    },
+    "emptyCategory": "No hay procedimientos registrados en esta categoría por el momento.",
+    "standardPrice": "Precio estándar:",
+    "priceDisclaimer": "*Los precios están en pesos colombianos, y el costo puede cambiar según la valoración médica.*",
+    "book": "Agendar cita",
+    "viewResults": "Ver resultados",
+    "viewMore": "Ver más"
   },
   "footer": {
-    "contactTitle": "¿Tienes alguna pregunta?",
+    "contactBadge": "Contacto",
+    "contactTitle": "¿Tienes alguna pregunta relacionada con un procedimiento?",
     "contactSub": "Contáctame directamente por WhatsApp",
     "form": {
       "name": "Nombre completo",
@@ -46,9 +278,15 @@
       "message": "Tu mensaje",
       "acceptIntro": "Acepto los",
       "acceptTerms": "términos y condiciones",
-      "acceptAnd": "y la",
-      "acceptPrivacy": "política de privacidad",
-      "submit": "Enviar por WhatsApp"
+      "submit": "Enviar pregunta por WhatsApp",
+      "incompleteWarning": "Llena el formulario con tu pregunta",
+      "whatsappTitle": "*Nuevo mensaje desde la web*",
+      "whatsappName": "Nombre:",
+      "whatsappEmail": "Correo:",
+      "whatsappPhone": "Teléfono:",
+      "whatsappProcedure": "Procedimiento:",
+      "whatsappMessage": "Mensaje:",
+      "notSpecified": "No especificado"
     },
     "clinic": "Clínica Estética",
     "clinicDesc": "Atención personalizada y tratamientos de estética facial, corporal y capilar.",
@@ -63,7 +301,8 @@
       "notice": "Aviso de Privacidad"
     },
     "rights": "© Clínica Estética Dra. Julieth Medina. Todos los derechos reservados.",
-    "designedBy": "Diseñada por"
+    "designedBy": "Página desarrollada por",
+    "cookiePrefs": "Preferencias de cookies"
   },
   "cookies": {
     "title": "Tu privacidad importa",
@@ -79,5 +318,255 @@
     "rejectOptional": "Rechazar opcionales",
     "customize": "Personalizar",
     "savePreferences": "Guardar preferencias"
+  },
+  "firma": {
+    "addSignature": "Agregar firma",
+    "title": "Consentimiento informado",
+    "intro": "Estás por agregar tu firma para el documento de consentimiento informado. Este documento solo lo tiene la doctora y es necesario para autorizar el procedimiento. Si tienes una inquietud, puedes hablar con ella directamente.",
+    "cancel": "Cancelar",
+    "drawTitle": "Dibuja tu firma",
+    "drawHint": "Usa el dedo o el mouse para firmar",
+    "clear": "Limpiar",
+    "back": "Volver",
+    "confirm": "Confirmar firma",
+    "savingMessage": "Generando documento y guardando firma...",
+    "doneTitle": "Firma registrada",
+    "doneMessage": "Tu firma y el documento de consentimiento han sido guardados. La doctora tendrá acceso al PDF firmado.",
+    "close": "Cerrar",
+    "saveError": "No se pudo guardar la firma:",
+    "downloadPdf": "PDF Consentimiento"
+  },
+  "agendar": {
+    "loading": "Cargando agenda...",
+    "ctaContinue": "Continuar",
+    "warningSelectDayHour": "Selecciona un día y una hora antes de continuar.",
+    "warningLoginRequired": "Debes iniciar sesión para agendar una cita.",
+    "closeWarning": "Cerrar aviso",
+    "calendar": {
+      "months": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+      "weekdaysShort": ["L", "M", "X", "J", "V", "S", "D"],
+      "hoursAvailable": "Horas disponibles",
+      "pickDay": "Selecciona un día",
+      "pickDayHint": "Elige un día en el calendario",
+      "noHoursToday": "Ya no hay horas disponibles para hoy. Elige otro día.",
+      "noHoursForDay": "No hay horas disponibles para este día."
+    },
+    "form": {
+      "back": "Volver",
+      "title": "Completa tus datos",
+      "firstAppointmentNote": "La <b>primera cita</b> es una <b>consulta de valoración</b>, y <b>dependiendo del diagnóstico</b>, se podría <b>realizar el procedimiento</b> indicado en la <b>misma cita</b>.",
+      "selectedDateTime": "Fecha y hora seleccionadas",
+      "changeSchedule": "Cambiar horario",
+      "fullName": "Nombre completo",
+      "fullNamePlaceholder": "Ej: Laura Gómez",
+      "phone": "Teléfono",
+      "phonePlaceholder": "Solo números",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "ejemplo@correo.com",
+      "appointmentType": "Tipo de cita",
+      "appointmentTypeValue": "Valoración / Procedimiento",
+      "procedure": "Procedimiento",
+      "procedurePlaceholder": "Selecciona un procedimiento",
+      "groupFacial": "Faciales",
+      "groupCorporal": "Corporales",
+      "groupCapilar": "Capilares",
+      "noteLabel": "Nota (opcional)",
+      "notePlaceholder": "Ej: tengo nervios a las agujas, es mi primera vez",
+      "continue": "Continuar"
+    },
+    "pago": {
+      "back": "Volver",
+      "title": "Confirmar cita",
+      "summary": {
+        "patient": "Paciente:",
+        "procedure": "Procedimiento:",
+        "date": "Fecha:",
+        "time": "Hora:",
+        "phone": "Teléfono:",
+        "notSpecified": "No especificado",
+        "noteLabel": "Nota: "
+      },
+      "paymentMethodLabel": "Forma de pago en consultorio",
+      "cash": "Efectivo",
+      "card": "Tarjeta",
+      "cashHint": "Pagarás en efectivo al llegar al consultorio",
+      "cardHint": "Pagarás con tarjeta al llegar al consultorio",
+      "footerInfo": "Al confirmar, se enviará la información de tu cita por WhatsApp a la doctora",
+      "submit": "Confirmar y enviar por WhatsApp",
+      "submitting": "Confirmando...",
+      "errorCreate": "Error al crear la cita",
+      "whatsapp": {
+        "title": "*Nueva cita agendada*",
+        "patient": "*Paciente:*",
+        "phone": "*Teléfono:*",
+        "email": "*Correo:*",
+        "procedure": "*Procedimiento:*",
+        "date": "*Fecha:*",
+        "time": "*Hora:*",
+        "payment": "*Pago:*",
+        "paymentValue": "En consultorio",
+        "note": "*Nota:*",
+        "appointmentNumber": "*Cita #"
+      }
+    },
+    "confirmacion": {
+      "title": "Confirmación de tu cita",
+      "subtitle": "Tu cita ha sido registrada exitosamente. A continuación puedes ver su estado y los detalles.",
+      "steps": {
+        "pendiente": "Pendiente",
+        "confirmada": "Confirmada",
+        "atendida": "Atendida"
+      },
+      "details": {
+        "patient": "Paciente:",
+        "date": "Fecha:",
+        "time": "Hora:",
+        "email": "Correo:",
+        "procedure": "Procedimiento:",
+        "paymentMethod": "Método de pago:",
+        "paymentOnline": "Pago en línea",
+        "paymentOnsite": "Pago en consultorio",
+        "amount": "Valor:",
+        "na": "N/A"
+      },
+      "qrCaption": "Escanea este código para confirmar tu asistencia",
+      "qrAlt": "QR de la cita",
+      "errorUpdate": "Ocurrió un error al actualizar el estado de la cita.",
+      "errorClose": "Cerrar",
+      "downloadPdf": "Descargar PDF",
+      "markConfirmed": "Marcar como confirmada",
+      "markAttended": "Marcar como atendida",
+      "backHome": "Volver al inicio",
+      "goToMyAppointments": "Ir a mis citas agendadas",
+      "pdf": {
+        "title": "Confirmación de Cita",
+        "patient": "Paciente:",
+        "procedure": "Procedimiento:",
+        "date": "Fecha:",
+        "time": "Hora:",
+        "email": "Correo:",
+        "status": "Estado:",
+        "filename": "Cita"
+      }
+    },
+    "tarjeta": {
+      "titleConfirm": "Cita agendada",
+      "titleList": "Detalles de la cita",
+      "subtitle": "Tu solicitud ha sido registrada correctamente",
+      "steps": {
+        "pendiente": "Pendiente",
+        "confirmada": "Confirmada",
+        "atendida": "Atendida"
+      },
+      "rows": {
+        "date": "Fecha",
+        "time": "Hora",
+        "patient": "Paciente",
+        "procedure": "Procedimiento",
+        "phone": "Teléfono",
+        "email": "Correo",
+        "payment": "Pago",
+        "note": "Nota",
+        "paymentOnsite": "Pago en consultorio",
+        "paymentOnline": "Pago en línea"
+      },
+      "footerInfo": "El pago se realizará al asistir al consultorio. La información fue enviada por WhatsApp a la doctora.",
+      "appointmentNumber": "Número de cita: #"
+    }
+  },
+  "perfil": {
+    "edit": {
+      "title": "Mi perfil",
+      "personalSection": "Datos personales",
+      "medicalSection": "Datos médicos",
+      "saving": "Guardando...",
+      "save": "Guardar cambios",
+      "canEditHint": "Puedes actualizar tu información cuando quieras.",
+      "cantEditHint": "Vuelve en {days} día(s) para modificar tus datos.",
+      "personal": {
+        "names": "Nombres",
+        "lastNames": "Apellidos",
+        "phone": "Teléfono",
+        "age": "Edad",
+        "agePlaceholder": "Ej: 28",
+        "gender": "Género",
+        "genderMale": "Masculino",
+        "genderFemale": "Femenino",
+        "genderOther": "Otro"
+      },
+      "medical": {
+        "background": "Antecedentes médicos",
+        "allergies": "Alergias",
+        "medications": "Medicamentos actuales",
+        "selectPrefix": "Selecciona",
+        "descriptionPlaceholder": "Describe detalles relevantes...",
+        "options": {
+          "hipertension": "Hipertensión",
+          "diabetes": "Diabetes",
+          "asma": "Asma",
+          "cirugias": "Cirugías previas",
+          "otraCondicion": "Otra condición",
+          "noTengo": "No tengo",
+          "penicilina": "Penicilina",
+          "polen": "Polen",
+          "lacteos": "Lácteos",
+          "otraAlergia": "Otra alergia",
+          "ibuprofeno": "Ibuprofeno",
+          "insulina": "Insulina",
+          "otroMedicamento": "Otro medicamento"
+        }
+      },
+      "photo": {
+        "alt": "Foto de perfil",
+        "hint": "Tu foto se toma de tu cuenta de Google"
+      },
+      "messages": {
+        "personalSaved": "Datos personales actualizados.",
+        "medicalSaved": "Información médica actualizada.",
+        "personalError": "Error: No se pudieron guardar los datos personales.",
+        "medicalError": "Error: No se pudieron guardar los datos médicos.",
+        "saveError": "Error al guardar."
+      }
+    },
+    "citas": {
+      "title": "Mis Citas Agendadas",
+      "loading": "Cargando citas...",
+      "errorLoad": "No se pudieron cargar las citas.",
+      "retry": "Reintentar",
+      "sortByDate": "Ordenar por fecha",
+      "filters": {
+        "all": "Todos",
+        "pendiente": "Pendiente",
+        "confirmada": "Confirmada",
+        "atendida": "Atendida",
+        "cancelada": "Cancelada"
+      },
+      "emptyAll": "No hay citas",
+      "emptyFiltered": "No hay citas con estado \"{estado}\"",
+      "labels": {
+        "valoracion": "Valoración",
+        "implementacion": "Implementación",
+        "amount": "Monto:",
+        "paid": "Pagado:",
+        "remaining": "Restante:",
+        "cancelReason": "Motivo:"
+      },
+      "estadoChip": {
+        "cancelada": "Cancelada"
+      },
+      "reagenda": {
+        "title": "El consultorio propone reagendar tu cita",
+        "newProposal": "Nueva propuesta:",
+        "reason": "Motivo:",
+        "accept": "Aceptar nueva fecha",
+        "applying": "Aplicando...",
+        "reject": "Rechazar",
+        "errorApply": "No se pudo aplicar la reagenda. Intenta de nuevo.",
+        "errorReject": "No se pudo rechazar la solicitud. Intenta de nuevo."
+      },
+      "consent": {
+        "signed": "Consentimiento firmado"
+      }
+    }
   }
 }

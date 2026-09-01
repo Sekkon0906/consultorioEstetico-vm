@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import Select, { MultiValue, StylesConfig } from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -90,6 +91,7 @@ export default function Step2DatosMedicos({
 }: Props) {
   const [touched, setTouched] = useState(false);
   const [fechaError, setFechaError] = useState<string | null>(null);
+  const [aceptaPoliticas, setAceptaPoliticas] = useState(false);
 
   const antecedentsOptions = toOptions(ANTECEDENTES);
   const alergiasOptions = toOptions(ALERGIAS);
@@ -166,12 +168,16 @@ export default function Step2DatosMedicos({
     return e;
   }, [formData]);
 
-  const valid = Object.keys(errors).length === 0 && !fechaError;
+  const valid = Object.keys(errors).length === 0 && !fechaError && aceptaPoliticas;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setTouched(true);
 
+    if (!aceptaPoliticas) {
+      setErr("Debes aceptar la Política de Privacidad y los Términos para continuar.");
+      return;
+    }
     if (valid) {
       setErr(null);
       nextStep();
@@ -477,8 +483,39 @@ export default function Step2DatosMedicos({
           )}
       </div>
 
+      {/* Consentimiento / Habeas Data (Ley 1581 de 2012) */}
+      <div className="text-start mt-4 mb-2">
+        <label
+          style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", color: PALETTE.text }}
+        >
+          <input
+            type="checkbox"
+            checked={aceptaPoliticas}
+            onChange={(e) => setAceptaPoliticas(e.target.checked)}
+            style={{ width: 18, height: 18, marginTop: 3, accentColor: PALETTE.main, flexShrink: 0 }}
+          />
+          <span style={{ fontSize: "0.86rem", lineHeight: 1.5 }}>
+            Autorizo de manera previa, expresa e informada el tratamiento de mis
+            datos personales y de salud, y declaro haber leído y aceptar la{" "}
+            <Link href="/legal/privacidad" target="_blank" style={{ color: PALETTE.main, fontWeight: 600 }}>
+              Política de Privacidad
+            </Link>{" "}
+            y los{" "}
+            <Link href="/legal/terminos" target="_blank" style={{ color: PALETTE.main, fontWeight: 600 }}>
+              Términos y Condiciones
+            </Link>
+            .
+          </span>
+        </label>
+        {touched && !aceptaPoliticas && (
+          <div style={{ color: "#8C2B2B", fontSize: "0.8rem", marginTop: 4 }}>
+            Debes aceptar para crear tu cuenta.
+          </div>
+        )}
+      </div>
+
       {/* Botones */}
-      <div className="d-grid gap-2 mt-4">
+      <div className="d-grid gap-2 mt-2">
         <button
           type="submit"
           disabled={!valid}

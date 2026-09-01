@@ -1,7 +1,7 @@
 import LegalDoc from "../LegalDoc";
 
 export const metadata = {
-  title: "Política de Privacidad · Dra. Vanessa Medina",
+  title: "Política de Privacidad · Consultorio JM",
   description: "Política de tratamiento de datos personales conforme a la Ley 1581 de 2012.",
 };
 
@@ -9,13 +9,13 @@ export default function PrivacidadPage() {
   return (
     <LegalDoc
       titulo="Política de Privacidad y Tratamiento de Datos"
-      actualizado="[FECHA_ACTUALIZACION]"
+      actualizado="5 de junio de 2026"
       current="/legal/privacidad"
     >
       <h2>1. Responsable del tratamiento</h2>
       <p>
         <strong>Dra. Julieth Vanessa Medina Orjuela</strong> (en adelante, &ldquo;la Doctora&rdquo; o
-        &ldquo;el Consultorio&rdquo;), identificada con NIT <code className="legal-placeholder">[NIT]</code>,
+        &ldquo;el Consultorio&rdquo;), identificada con NIT <strong>1.105.689.615-9</strong>,
         con domicilio en Carrera 5ta #11-24, Edificio Torre Empresarial,
         Consultorio 502, Ibagué — Tolima, Colombia. Correo de contacto:{" "}
         <a href="mailto:dra.vanessamedinao@gmail.com">dra.vanessamedinao@gmail.com</a>. Teléfono:
@@ -107,16 +107,19 @@ export default function PrivacidadPage() {
         <li><strong>Vercel</strong> — alojamiento del sitio web.</li>
         <li><strong>Google</strong> — únicamente cuando el usuario elige iniciar sesión con su cuenta de Google (OAuth).</li>
         <li><strong>WhatsApp</strong> — utilizado por la doctora como canal de contacto y para recibir la notificación de las citas agendadas.</li>
+        <li><strong>Resend</strong> — envío de correos de recordatorio de citas (procesa el nombre y el correo del paciente).</li>
+        <li><strong>Sentry</strong> — diagnóstico técnico de errores para mantener el sitio estable; la grabación de sesión solo se activa con tu consentimiento de cookies de analítica (ver Política de Cookies).</li>
       </ul>
       <p>
-        No se utilizan herramientas de analítica web ni píxeles publicitarios
-        de terceros. No se venden datos personales a terceros.
+        No utilizamos herramientas de analítica publicitaria ni píxeles de
+        marketing de terceros, ni vendemos datos personales. La única
+        herramienta de diagnóstico técnico es Sentry, descrita arriba.
       </p>
 
       <h2>11. Vigencia y cambios</h2>
       <p>
         Esta política rige desde su publicación. Cualquier modificación se
-        comunicará en este sitio. Versión vigente: <code className="legal-placeholder">[FECHA_ACTUALIZACION]</code>.
+        comunicará en este sitio. Versión vigente: <strong>5 de junio de 2026</strong>.
       </p>
     </LegalDoc>
   );

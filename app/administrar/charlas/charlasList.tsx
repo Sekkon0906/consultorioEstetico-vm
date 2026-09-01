@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Edit3, Trash2, Calendar } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
@@ -36,29 +37,24 @@ export default function CharlasList() {
 
   const loadCharlas = async () => {
     try {
+      // Una sola consulta con la galería embebida (PostgREST join) en vez de
+      // N+1 (antes: 1 query de charlas + 1 query de galería por cada charla).
       const { data, error: err } = await supabase
         .from("charlas")
-        .select("id, titulo, descripcion, detalle, imagen, fecha, creado_en")
+        .select("id, titulo, descripcion, detalle, imagen, fecha, creado_en, charla_galeria(url, orden)")
         .order("fecha", { ascending: false, nullsFirst: false })
         .order("creado_en", { ascending: false });
 
       if (err) throw new Error(err.message);
 
-      // Cargar galeria para cada charla
-      const charlasConGaleria = await Promise.all(
-        (data ?? []).map(async (c) => {
-          const { data: galeriaData } = await supabase
-            .from("charla_galeria")
-            .select("url")
-            .eq("charla_id", c.id)
-            .order("orden", { ascending: true });
-
-          return {
-            ...c,
-            galeria: (galeriaData ?? []).map((g: { url: string }) => g.url),
-          } as Charla;
-        })
-      );
+      const charlasConGaleria = (data ?? []).map((c: Record<string, unknown>) => {
+        const { charla_galeria, ...rest } = c as { charla_galeria?: { url: string; orden: number }[] };
+        const galeria = (charla_galeria ?? [])
+          .slice()
+          .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
+          .map((g) => g.url);
+        return { ...rest, galeria } as Charla;
+      });
 
       setCharlas(charlasConGaleria);
     } catch (err) {
@@ -233,7 +229,7 @@ export default function CharlasList() {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold" style={{ color: "#4E3B2B" }}>
+        <h2 className="fw-bold" style={{ color: "var(--text)" }}>
           Formacion / Charlas
         </h2>
         {modo === "lista" && (
@@ -241,7 +237,7 @@ export default function CharlasList() {
             onClick={() => setModo("crear")}
             className="btn rounded-pill px-4"
             style={{
-              backgroundColor: "#8B6A4B",
+              backgroundColor: "var(--brand)",
               color: "#fff",
               border: "none",
             }}
@@ -278,7 +274,7 @@ export default function CharlasList() {
               style={{ maxWidth: 360, width: "100%" }}
             >
               <h5 className="fw-bold mb-2" style={{ color: "#6B4E3D" }}>
-                ¿Eliminar esta charla?
+                Â¿Eliminar esta charla?
               </h5>
               <p className="mb-4" style={{ color: "#8d7a6a", fontSize: "0.9rem" }}>
                 Esta acción no se puede deshacer.
@@ -286,7 +282,7 @@ export default function CharlasList() {
               <div className="d-flex gap-2">
                 <button
                   className="btn flex-fill rounded-pill"
-                  style={{ background: "#E9E0D1", color: "#4B3A2E", fontWeight: 600, border: "none" }}
+                  style={{ background: "var(--surface-soft)", color: "#4B3A2E", fontWeight: 600, border: "none" }}
                   onClick={() => setConfirmEliminarId(null)}
                 >
                   Cancelar
@@ -311,10 +307,10 @@ export default function CharlasList() {
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
-            className="card border-0 rounded-4 shadow-sm p-4 mb-5"
-            style={{ backgroundColor: "#FFFDF9" }}
+            className="card border-0 rounded-4 shadow-sm p-4 mb-5 dark-aware-card admin-form-card"
+            style={{ backgroundColor: "var(--surface)", border: "1px solid var(--border)" }}
           >
-            <h4 className="fw-semibold mb-4" style={{ color: "#4E3B2B" }}>
+            <h4 className="fw-semibold mb-4" style={{ color: "var(--text)" }}>
               {modo === "crear" ? "Nueva charla" : "Editar charla"}
             </h4>
             <div className="row g-3">
@@ -328,7 +324,7 @@ export default function CharlasList() {
                   onChange={(e) =>
                     setForm({ ...form, titulo: e.target.value })
                   }
-                  style={{ borderColor: "#E9DED2" }}
+                  style={{ borderColor: "var(--border)" }}
                 />
               </div>
               <div className="col-md-4">
@@ -340,7 +336,7 @@ export default function CharlasList() {
                   onChange={(e) =>
                     setForm({ ...form, fecha: e.target.value })
                   }
-                  style={{ borderColor: "#E9DED2" }}
+                  style={{ borderColor: "var(--border)" }}
                 />
               </div>
               <div className="col-12">
@@ -354,7 +350,7 @@ export default function CharlasList() {
                   onChange={(e) =>
                     setForm({ ...form, descripcion: e.target.value })
                   }
-                  style={{ borderColor: "#E9DED2" }}
+                  style={{ borderColor: "var(--border)" }}
                 />
               </div>
               <div className="col-12">
@@ -368,7 +364,7 @@ export default function CharlasList() {
                   onChange={(e) =>
                     setForm({ ...form, detalle: e.target.value })
                   }
-                  style={{ borderColor: "#E9DED2" }}
+                  style={{ borderColor: "var(--border)" }}
                 />
               </div>
               <div className="col-12">
@@ -380,7 +376,7 @@ export default function CharlasList() {
                     type="file"
                     accept="image/*"
                     className="form-control"
-                    style={{ maxWidth: 280, borderColor: "#E9DED2" }}
+                    style={{ maxWidth: 280, borderColor: "var(--border)" }}
                     onChange={(e) => {
                       const f = e.target.files?.[0];
                       if (f) handleImageUpload(f);
@@ -389,19 +385,23 @@ export default function CharlasList() {
                   {uploadingImg && (
                     <div
                       className="spinner-border spinner-border-sm"
-                      style={{ color: "#B08968" }}
+                      style={{ color: "var(--brand)" }}
                       role="status"
                     />
                   )}
                   {form.imagen && !uploadingImg && (
-                    <img
+                    <Image
                       src={form.imagen}
                       alt="preview"
+                      width={90}
+                      height={60}
+                      quality={70}
                       style={{
                         height: 60,
+                        width: "auto",
                         borderRadius: 8,
                         objectFit: "cover",
-                        border: "1px solid #E9DED2",
+                        border: "1px solid var(--border)",
                       }}
                     />
                   )}
@@ -416,22 +416,25 @@ export default function CharlasList() {
                   accept="image/*"
                   multiple
                   className="form-control"
-                  style={{ maxWidth: 320, borderColor: "#E9DED2" }}
+                  style={{ maxWidth: 320, borderColor: "var(--border)" }}
                   onChange={(e) => handleGaleriaUpload(e.target.files)}
                 />
                 {form.galeria.length > 0 && (
                   <div className="d-flex gap-2 flex-wrap mt-2">
                     {form.galeria.map((url, i) => (
                       <div key={i} className="position-relative">
-                        <img
+                        <Image
                           src={url}
                           alt={`galeria ${i}`}
+                          width={52}
+                          height={52}
+                          quality={65}
                           style={{
                             height: 52,
                             width: 52,
                             borderRadius: 6,
                             objectFit: "cover",
-                            border: "1px solid #E9DED2",
+                            border: "1px solid var(--border)",
                           }}
                         />
                         <button
@@ -467,7 +470,7 @@ export default function CharlasList() {
                 disabled={saving || uploadingImg}
                 className="btn rounded-pill fw-semibold flex-1"
                 style={{
-                  backgroundColor: "#8B6A4B",
+                  backgroundColor: "var(--brand)",
                   color: "#fff",
                   border: "none",
                 }}
@@ -478,8 +481,8 @@ export default function CharlasList() {
                 onClick={resetForm}
                 className="btn rounded-pill fw-semibold"
                 style={{
-                  backgroundColor: "#E9DED2",
-                  color: "#4E3B2B",
+                  backgroundColor: "var(--border)",
+                  color: "var(--text)",
                   border: "none",
                 }}
               >
@@ -492,7 +495,7 @@ export default function CharlasList() {
 
       {/* LISTA — mismo patrón que Procedimientos / Testimonios */}
       {charlas.length === 0 ? (
-        <p style={{ textAlign: "center", color: "#8B7060", padding: "2rem 0" }}>
+        <p style={{ textAlign: "center", color: "var(--text-soft)", padding: "2rem 0" }}>
           No hay charlas aun.
         </p>
       ) : (
@@ -500,32 +503,33 @@ export default function CharlasList() {
           {charlas.map((c, i) => (
             <motion.div
               key={c.id}
+              className="admin-card"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.02 }}
-              style={{ background: "#FFFDF9", borderRadius: 18, border: "1px solid #E9DED2", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}
+              style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}
             >
               {c.imagen ? (
-                <img src={c.imagen} alt={c.titulo} style={{ width: 76, height: 76, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} />
+                <Image src={c.imagen} alt={c.titulo} width={76} height={76} quality={70} style={{ width: 76, height: 76, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} />
               ) : (
-                <div style={{ width: 76, height: 76, borderRadius: 14, background: "#E9DED2", flexShrink: 0 }} />
+                <div style={{ width: 76, height: 76, borderRadius: 14, background: "var(--border)", flexShrink: 0 }} />
               )}
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="admin-card-body" style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                  <span style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "1.08rem" }}>{c.titulo}</span>
+                  <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }}>{c.titulo}</span>
                   {c.fecha && (
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#E9DED2", color: "#8B6A4B", padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--border)", color: "var(--brand)", padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>
                       <Calendar size={13} /> {c.fecha}
                     </span>
                   )}
                 </div>
-                <p style={{ fontSize: "0.92rem", color: "#6C584C", margin: "0.25rem 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <p style={{ fontSize: "0.92rem", color: "var(--text-soft)", margin: "0.25rem 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {c.descripcion}
                 </p>
               </div>
-              <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                <motion.button whileTap={{ scale: 0.95 }} onClick={() => startEditar(c)} style={{ width: 42, height: 42, borderRadius: 12, background: "#F5EEE6", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Edit3 size={18} color="#4E3B2B" />
+              <div className="admin-card-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                <motion.button whileTap={{ scale: 0.95 }} onClick={() => startEditar(c)} style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Edit3 size={18} color="var(--text)" />
                 </motion.button>
                 <motion.button whileTap={{ scale: 0.95 }} onClick={() => setConfirmEliminarId(c.id)} style={{ width: 42, height: 42, borderRadius: 12, background: "#fff3ef", border: "1px solid #e4bfbf", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Trash2 size={18} color="#b02e2e" />

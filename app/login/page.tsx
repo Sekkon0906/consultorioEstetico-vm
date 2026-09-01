@@ -1,9 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import FondoAnim from "../src/components/FondoAnim";
+import dynamic from "next/dynamic";
 import LoginForm from "./LoginForm";
 import { PALETTE } from "./palette2";
+
+// Fondo 3D (Three.js) diferido: es decorativo, no debe bloquear el login.
+const FondoAnim = dynamic(() => import("../src/components/FondoAnim"), {
+  ssr: false,
+});
 
 export default function LoginPage() {
   const [err, setErr] = useState<string | null>(null);

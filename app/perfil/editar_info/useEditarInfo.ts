@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { MultiValue } from "react-select";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/AuthContext";
 import { getCurrentUser, updateCurrentUser } from "@/lib/api";
 
 export function useEditarInfo() {
   const { user, refreshUser } = useAuth();
+  const tm = useTranslations("perfil.edit.messages");
 
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
@@ -66,13 +68,13 @@ export function useEditarInfo() {
         genero, photo,
       });
       if (!result.ok) {
-        setMessage("Error: No se pudieron guardar los datos personales.");
+        setMessage(tm("personalError"));
       } else {
         await refreshUser();
-        setMessage("Datos personales actualizados.");
+        setMessage(tm("personalSaved"));
       }
     } catch (err: any) {
-      setMessage("Error: " + (err.message || "Error al guardar."));
+      setMessage("Error: " + (err.message || tm("saveError")));
     } finally {
       setSaving(false);
     }
@@ -91,13 +93,13 @@ export function useEditarInfo() {
         medicamentosDescripcion,
       });
       if (!result.ok) {
-        setMessage("Error: No se pudieron guardar los datos medicos.");
+        setMessage(tm("medicalError"));
       } else {
         await refreshUser();
-        setMessage("Informacion medica actualizada.");
+        setMessage(tm("medicalSaved"));
       }
     } catch (err: any) {
-      setMessage("Error: " + (err.message || "Error al guardar."));
+      setMessage("Error: " + (err.message || tm("saveError")));
     } finally {
       setSaving(false);
     }

@@ -1,13 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import ComentariosClientes from "../src/components/ComentariosClientes";
+import Image from "next/image";
+import { useTranslations } from "next-intl";
+import dynamic from "next/dynamic";
+
+// Lazy: solo se monta cuando el usuario llega abajo del fold
+const ComentariosClientes = dynamic(
+  () => import("../src/components/ComentariosClientes"),
+  { ssr: false }
+);
 import type { Testimonio } from "../types/domain";
 import { getTestimoniosApi } from "../services/testimoniosApi";
 
 function getYouTubeId(url: string): string {
   if (!url) return "";
-  // Soporta watch?v=, youtu.be/, embed/, shorts/ y live/
   var match = url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([^&?/]+)/);
   return match ? match[1] : "";
 }
@@ -30,6 +37,7 @@ function tieneVideoValido(video: string | null | undefined): boolean {
 }
 
 export default function TestimoniosPage() {
+  const t = useTranslations("testimonios");
   var [testimonios, setTestimonios] = useState<Testimonio[]>([]);
   var [videoActivo, setVideoActivo] = useState<number | null>(null);
 
@@ -40,39 +48,39 @@ export default function TestimoniosPage() {
   var activos = testimonios.filter(function(t) { return t.activo; }).sort(function(a, b) { return new Date(b.creadoEn).getTime() - new Date(a.creadoEn).getTime(); });
 
   return (
-    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg, #FAF7F2 0%, #F5EEE5 100%)" }}>
+    <main className="dark-aware-section testimonios-page" style={{ minHeight: "100vh", background: "linear-gradient(180deg, #FAF7F2 0%, #F5EEE5 100%)" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "4rem 1.5rem 3rem" }}>
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B08968", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>Testimonios</span>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.8rem" }}>Testimonios de Nuestros Pacientes</h1>
+          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B08968", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("badge")}</span>
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.8rem" }}>{t("title")}</h1>
           <div style={{ width: 50, height: 3, background: "linear-gradient(90deg, #C9AD8D, #B08968)", borderRadius: 2, margin: "0 auto 0.8rem" }} />
-          <p style={{ fontSize: "1.05rem", color: "#7A6554", maxWidth: 600, margin: "0 auto" }}>Experiencias reales de pacientes que confiaron en la Dra. Vanessa Medina</p>
+          <p style={{ fontSize: "1.05rem", color: "#7A6554", maxWidth: 600, margin: "0 auto" }}>{t("subtitle")}</p>
         </div>
 
         {activos.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#9B8575" }}>No hay testimonios disponibles por el momento.</p>
+          <p style={{ textAlign: "center", color: "#9B8575" }}>{t("empty")}</p>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "1.5rem", maxWidth: 1240, margin: "0 auto" }}>
-            {activos.map(function(t, i) {
-              var videoValido = tieneVideoValido(t.video);
-              var ytId = getYouTubeId(t.video || "");
+            {activos.map(function(testimonio, i) {
+              var videoValido = tieneVideoValido(testimonio.video);
+              var ytId = getYouTubeId(testimonio.video || "");
               return (
-                <div key={t.id} style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, overflow: "hidden", boxShadow: "0 4px 14px rgba(78,59,43,0.06)", transition: "transform 0.3s", animation: "fadeInUp 0.6s ease " + (i * 0.08) + "s both" }}
+                <div key={testimonio.id} className="dark-aware-card" style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, overflow: "hidden", boxShadow: "0 4px 14px rgba(78,59,43,0.06)", transition: "transform 0.3s", animation: "fadeInUp 0.6s ease " + (i * 0.08) + "s both" }}
                   onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-4px)"; }}
                   onMouseLeave={function(e) { e.currentTarget.style.transform = ""; }}>
                   <div style={{ position: "relative", width: "100%", aspectRatio: "9/16", maxHeight: 420, overflow: "hidden", background: "#000" }}>
-                    {videoActivo === t.id && videoValido ? (
-                      esArchivoVideo(t.video) ? (
-                        <video src={t.video!} controls autoPlay playsInline style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", background: "#000" }} />
+                    {videoActivo === testimonio.id && videoValido ? (
+                      esArchivoVideo(testimonio.video) ? (
+                        <video src={testimonio.video!} controls autoPlay playsInline style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", background: "#000" }} />
                       ) : (
-                        <iframe src={toEmbedUrl(t.video!) + "?autoplay=1&modestbranding=1&rel=0"} title={t.nombre} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }} />
+                        <iframe src={toEmbedUrl(testimonio.video!) + "?autoplay=1&modestbranding=1&rel=0"} title={testimonio.nombre} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }} />
                       )
                     ) : (
-                      <div style={{ position: "absolute", inset: 0, cursor: videoValido ? "pointer" : "default" }} onClick={function() { if (videoValido) setVideoActivo(t.id); }}>
-                        {t.thumb ? (
-                          <img src={t.thumb} alt={t.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.88)" }} />
+                      <div style={{ position: "absolute", inset: 0, cursor: videoValido ? "pointer" : "default" }} onClick={function() { if (videoValido) setVideoActivo(testimonio.id); }}>
+                        {testimonio.thumb ? (
+                          <Image src={testimonio.thumb} alt={testimonio.nombre} fill sizes="(max-width: 640px) 92vw, 380px" quality={75} style={{ objectFit: "cover", filter: "brightness(0.88)" }} />
                         ) : ytId ? (
-                          <img src={"https://img.youtube.com/vi/" + ytId + "/hqdefault.jpg"} alt={t.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.85)" }} />
+                          <Image src={"https://img.youtube.com/vi/" + ytId + "/hqdefault.jpg"} alt={testimonio.nombre} fill sizes="(max-width: 640px) 92vw, 380px" quality={70} unoptimized style={{ objectFit: "cover", filter: "brightness(0.85)" }} />
                         ) : (
                           <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #4E3B2B, #B08968)" }} />
                         )}
@@ -81,13 +89,13 @@ export default function TestimoniosPage() {
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21" /></svg>
                           </div>
                         )}
-                        {!videoValido && <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.5)", color: "white", fontSize: "0.72rem", padding: "0.3rem 0.8rem", borderRadius: 100 }}>Sin video</div>}
+                        {!videoValido && <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.5)", color: "white", fontSize: "0.72rem", padding: "0.3rem 0.8rem", borderRadius: 100 }}>{t("noVideo")}</div>}
                       </div>
                     )}
                   </div>
                   <div style={{ padding: "1rem 1.1rem", textAlign: "center" }}>
-                    <h5 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "#4E3B2B", fontSize: "1.05rem", marginBottom: "0.4rem" }}>{t.nombre}</h5>
-                    <p style={{ color: "#6C584C", fontSize: "0.9rem", lineHeight: 1.55, fontStyle: "italic" }}>&quot;{t.texto}&quot;</p>
+                    <h5 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "#4E3B2B", fontSize: "1.05rem", marginBottom: "0.4rem" }}>{testimonio.nombre}</h5>
+                    <p style={{ color: "#6C584C", fontSize: "0.9rem", lineHeight: 1.55, fontStyle: "italic" }}>&quot;{testimonio.texto}&quot;</p>
                   </div>
                 </div>
               );

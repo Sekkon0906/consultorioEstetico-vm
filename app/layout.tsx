@@ -1,18 +1,101 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Montserrat, Playfair_Display } from "next/font/google";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./globals.css";
+
+// Fuentes con display: swap → texto visible inmediatamente con fallback,
+// luego se intercambia cuando descarga la web font (sin FOIT).
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-montserrat",
+  preload: true,
+});
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-playfair",
+  preload: true,
+});
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import NavbarClient from "@/components/NavbarClient";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
+import QuickAccessFab from "@/components/QuickAccessFab";
 import { AuthProvider } from "@/context/AuthContext";
+import { IMG } from "@/lib/imagenes";
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://clinicavanessamedina.com";
+
+// Sin esta etiqueta, los navegadores móviles asumen un ancho de 980px y
+// "alejan el zoom": la página se ve extensa y sin responsive en el celular.
+// width=device-width hace que el layout use el ancho real del dispositivo.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
-  title: "Clínica Estética Dra. Julieth Medina",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Consultorio JM · Medicina Estética en Ibagué",
+    template: "%s · Consultorio JM",
+  },
   description:
-    "Especialista en Medicina Estética, Nutrición y Antiedad en Ibagué",
+    "Especialista en Medicina Estética, Nutrición y Antiedad en Ibagué. Procedimientos faciales, corporales y capilares con valoración médica personalizada.",
+  keywords: [
+    "medicina estética Ibagué",
+    "Dra Vanessa Medina",
+    "procedimientos faciales",
+    "tratamientos corporales",
+    "rejuvenecimiento",
+    "Tolima",
+  ],
+  authors: [{ name: "Dra. Vanessa Medina" }],
+  creator: "Dra. Vanessa Medina",
+  icons: {
+    icon: IMG.logo,
+    shortcut: IMG.logo,
+    apple: IMG.logo,
+  },
+  alternates: {
+    canonical: "/",
+    languages: { "es-CO": "/", "en-US": "/" },
+  },
+  openGraph: {
+    title: "Consultorio JM · Medicina Estética en Ibagué",
+    description:
+      "Medicina estética y antienvejecimiento en Ibagué — Tolima. Valoración médica personalizada con la Dra. Vanessa Medina.",
+    url: SITE_URL,
+    siteName: "Consultorio JM",
+    images: [{ url: IMG.logo, width: 1200, height: 630, alt: "Consultorio JM" }],
+    type: "website",
+    locale: "es_CO",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Consultorio JM · Medicina Estética en Ibagué",
+    description:
+      "Medicina estética y antienvejecimiento en Ibagué — Tolima.",
+    images: [IMG.logo],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default async function RootLayout({
@@ -24,11 +107,57 @@ export default async function RootLayout({
   const messages = await getMessages();
   const tTop = await getTranslations("topbar");
 
+  // Script anti-flash: aplica data-theme ANTES del paint, según preferencia
+  // guardada o sistema. Evita el parpadeo claro→oscuro al cargar.
+  const themeInit = `(function(){try{var t=localStorage.getItem('THEME');var eff=t==='dark'?'dark':'light';document.documentElement.setAttribute('data-theme',eff);}catch(e){}})();`;
+
+  // JSON-LD MedicalBusiness para SEO local
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "MedicalBusiness",
+    name: "Consultorio JM",
+    alternateName: "Consultorio JM — Dra. Vanessa Medina",
+    description:
+      "Especialista en Medicina Estética, Nutrición y Antiedad en Ibagué — Tolima.",
+    url: SITE_URL,
+    telephone: "+57 315 5445748",
+    image: `${SITE_URL}${IMG.logo}`,
+    priceRange: "$$",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Ibagué",
+      addressRegion: "Tolima",
+      addressCountry: "CO",
+    },
+    sameAs: [
+      "https://www.facebook.com/profile.php?id=61556167276406",
+      "https://www.instagram.com/dravanessamedinao28/",
+    ],
+    medicalSpecialty: ["Dermatology", "PlasticSurgery"],
+  };
+
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning className={`${montserrat.variable} ${playfair.variable}`}>
+      <head>
+        {/* Preconnect a orígenes críticos para acelerar LCP */}
+        <link rel="preconnect" href="https://ibpkihfjripvizismhsk.supabase.co" />
+        <link rel="dns-prefetch" href="https://ibpkihfjripvizismhsk.supabase.co" />
+        <link rel="preconnect" href="https://lh3.googleusercontent.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.google.com" />
+        {/* Theme color para barra del navegador en móvil */}
+        <meta name="theme-color" content="#B08968" />
+        {/* Apple touch */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         style={{
-          backgroundColor: "#F6F4EF",
           fontFamily: "'Montserrat', sans-serif",
         }}
       >
@@ -86,6 +215,9 @@ export default async function RootLayout({
 
           {/* BANNER DE COOKIES (solo aparece si el usuario no ha decidido) */}
           <CookieBanner />
+
+          {/* ACCESO RÁPIDO FLOTANTE — tema, idioma y contacto, solo escritorio */}
+          <QuickAccessFab />
         </AuthProvider>
         </NextIntlClientProvider>
       </body>

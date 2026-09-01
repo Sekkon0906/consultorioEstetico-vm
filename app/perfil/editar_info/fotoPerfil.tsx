@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
 
 interface Props {
@@ -16,6 +18,7 @@ interface Props {
  * se usa la foto de la cuenta de Google (avatar_url) o un avatar generado.
  */
 export default function FotoPerfil({ photo, email }: Props) {
+  const t = useTranslations("perfil.edit.photo");
   const [preview, setPreview] = useState<string | undefined>(photo);
 
   useEffect(() => {
@@ -49,16 +52,19 @@ export default function FotoPerfil({ photo, email }: Props) {
           backgroundColor: "#f8f9fa",
         }}
       >
-        <img
+        <Image
           src={displayPhoto}
-          alt="Foto de perfil"
+          alt={t("alt")}
+          fill
+          sizes="140px"
+          unoptimized
           referrerPolicy="no-referrer"
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          style={{ objectFit: "cover" }}
         />
       </div>
 
       <p className="small mb-0" style={{ color: PALETTE.main, opacity: 0.75 }}>
-        Tu foto se toma de tu cuenta de Google
+        {t("hint")}
       </p>
     </motion.div>
   );

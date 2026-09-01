@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -91,21 +91,21 @@ export default function HorariosHabilitados() {
       return { bg: "#EEF7EE", color: "#2D6A4F", border: "#A8D8B9", label: `${cita.nombres}` };
     }
     if (esBloqueada(hora)) return { bg: "#FDE8D8", color: "#922B21", border: "#F0A898", label: "Bloqueada" };
-    return { bg: "#F5EEE6", color: "#4E3B2B", border: "#E9DED2", label: "Disponible" };
+    return { bg: "var(--surface-soft)", color: "var(--text)", border: "var(--border)", label: "Disponible" };
   };
 
   return (
     <div>
-      <h2 style={{ fontWeight: 700, color: "#4E3B2B", marginBottom: "1.5rem" }}>Gestion de Horarios</h2>
+      <h2 style={{ fontWeight: 700, color: "var(--text)", marginBottom: "1.5rem" }}>Gestion de Horarios</h2>
 
-      {toast && <div style={{ background: "#E9DED2", color: "#4E3B2B", border: "1px solid #D4C4B0", borderRadius: 12, padding: "0.6rem 1rem", textAlign: "center", fontWeight: 600, marginBottom: "1rem", fontSize: "0.88rem" }}>{toast}</div>}
+      {toast && <div style={{ background: "var(--border)", color: "var(--text)", border: "1px solid #D4C4B0", borderRadius: 12, padding: "0.6rem 1rem", textAlign: "center", fontWeight: 600, marginBottom: "1rem", fontSize: "0.88rem" }}>{toast}</div>}
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem" }}>
         {[{ k: "diario", l: "Bloqueo por dia" }, { k: "global", l: "Bloqueo global" }].map(t => (
           <button key={t.k} onClick={() => setTab(t.k as any)}
             style={{ padding: "0.6rem 1.3rem", borderRadius: 100, fontWeight: 600, fontSize: "0.85rem", border: "none", cursor: "pointer",
-              background: tab === t.k ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "#F5EEE6", color: tab === t.k ? "white" : "#4E3B2B" }}>
+              background: tab === t.k ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "var(--surface-soft)", color: tab === t.k ? "white" : "var(--text)" }}>
             {t.l}
           </button>
         ))}
@@ -113,16 +113,16 @@ export default function HorariosHabilitados() {
 
       {/* GLOBAL TAB */}
       {tab === "global" && (
-        <div style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, padding: "1.5rem" }}>
-          <h5 style={{ fontWeight: 600, color: "#4E3B2B", marginBottom: "0.5rem" }}>Horarios bloqueados permanentemente</h5>
-          <p style={{ fontSize: "0.82rem", color: "#8B7060", marginBottom: "1.2rem" }}>Estas horas nunca se mostraran como disponibles</p>
+        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, padding: "1.5rem" }}>
+          <h5 style={{ fontWeight: 600, color: "var(--text)", marginBottom: "0.5rem" }}>Horarios bloqueados permanentemente</h5>
+          <p style={{ fontSize: "0.82rem", color: "var(--text-soft)", marginBottom: "1.2rem" }}>Estas horas nunca se mostraran como disponibles</p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
             {HORAS_BASE.map(hora => {
               const bl = esGlobal(hora);
               return (
                 <button key={hora} onClick={() => setConfirmAction({ tipo: bl ? "global_desbloquear" : "global_bloquear", hora })}
-                  style={{ padding: "0.6rem", borderRadius: 12, fontWeight: 600, fontSize: "0.78rem", border: `1px solid ${bl ? "#C8B0E0" : "#E9DED2"}`, cursor: "pointer",
-                    background: bl ? "#EDE0F0" : "#F5EEE6", color: bl ? "#5B2C8E" : "#4E3B2B" }}>
+                  style={{ padding: "0.6rem", borderRadius: 12, fontWeight: 600, fontSize: "0.78rem", border: `1px solid ${bl ? "#C8B0E0" : "var(--border)"}`, cursor: "pointer",
+                    background: bl ? "#EDE0F0" : "var(--surface-soft)", color: bl ? "#5B2C8E" : "var(--text)" }}>
                   {hora} {bl ? "(Bloqueada)" : ""}
                 </button>
               );
@@ -135,16 +135,16 @@ export default function HorariosHabilitados() {
       {tab === "diario" && (
         <div className="row g-4">
           <div className="col-md-5">
-            <div style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, padding: "1.5rem" }}>
+            <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, padding: "1.5rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.2rem" }}>
                 <button onClick={() => { if (mes === 0) { setMes(11); setAnio(a => a - 1); } else setMes(m => m - 1); }}
-                  style={{ width: 34, height: 34, borderRadius: "50%", background: "#E9DED2", border: "none", color: "#4E3B2B", cursor: "pointer" }}>&lsaquo;</button>
-                <h5 style={{ fontWeight: 600, color: "#4E3B2B", margin: 0, fontSize: "1rem" }}>{MESES[mes]} {anio}</h5>
+                  style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--border)", border: "none", color: "var(--text)", cursor: "pointer" }}>&lsaquo;</button>
+                <h5 style={{ fontWeight: 600, color: "var(--text)", margin: 0, fontSize: "1rem" }}>{MESES[mes]} {anio}</h5>
                 <button onClick={() => { if (mes === 11) { setMes(0); setAnio(a => a + 1); } else setMes(m => m + 1); }}
-                  style={{ width: 34, height: 34, borderRadius: "50%", background: "#E9DED2", border: "none", color: "#4E3B2B", cursor: "pointer" }}>&rsaquo;</button>
+                  style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--border)", border: "none", color: "var(--text)", cursor: "pointer" }}>&rsaquo;</button>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", textAlign: "center", marginBottom: 4 }}>
-                {["L","M","X","J","V","S","D"].map(d => <div key={d} style={{ fontSize: "0.72rem", fontWeight: 700, color: "#8B7060" }}>{d}</div>)}
+                {["L","M","X","J","V","S","D"].map(d => <div key={d} style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--text-soft)" }}>{d}</div>)}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 4 }}>
                 {diasCal.map((dia, i) => {
@@ -156,8 +156,8 @@ export default function HorariosHabilitados() {
                   return (
                     <motion.button key={dia} whileHover={pasado ? {} : { scale: 1.1 }} onClick={() => !pasado && (setSelectedDate(iso), cargarDia(iso))} disabled={pasado}
                       style={{ width: 34, height: 34, borderRadius: "50%", border: hoy && !sel ? "2px solid #B08968" : "none", margin: "0 auto",
-                        background: sel ? "#8B6A4B" : pasado ? "transparent" : "#F5EEE6",
-                        color: sel ? "white" : pasado ? "#ccc" : "#4E3B2B",
+                        background: sel ? "var(--brand)" : pasado ? "transparent" : "var(--surface-soft)",
+                        color: sel ? "white" : pasado ? "#ccc" : "var(--text)",
                         fontWeight: sel || hoy ? 700 : 400, fontSize: "0.82rem", cursor: pasado ? "not-allowed" : "pointer",
                         display: "flex", alignItems: "center", justifyContent: "center", opacity: pasado ? 0.4 : 1,
                       }}>{dia}
@@ -170,17 +170,17 @@ export default function HorariosHabilitados() {
 
           <div className="col-md-7">
             {!selectedDate ? (
-              <div style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, padding: "3rem", textAlign: "center" }}>
-                <p style={{ color: "#8B7060" }}>Selecciona un dia para gestionar las horas</p>
+              <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, padding: "3rem", textAlign: "center" }}>
+                <p style={{ color: "var(--text-soft)" }}>Selecciona un dia para gestionar las horas</p>
               </div>
             ) : (
-              <div style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, padding: "1.5rem" }}>
-                <h5 style={{ fontWeight: 600, color: "#4E3B2B", marginBottom: "1rem" }}>
+              <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, padding: "1.5rem" }}>
+                <h5 style={{ fontWeight: 600, color: "var(--text)", marginBottom: "1rem" }}>
                   {new Date(selectedDate + "T12:00:00").toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
                 </h5>
 
                 {loadingDia ? (
-                  <div style={{ textAlign: "center", padding: "2rem 0" }}><div className="spinner-border spinner-border-sm" style={{ color: "#B08968" }} /></div>
+                  <div style={{ textAlign: "center", padding: "2rem 0" }}><div className="spinner-border spinner-border-sm" style={{ color: "var(--brand)" }} /></div>
                 ) : (
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
                     {HORAS_BASE.map(hora => {
@@ -221,14 +221,14 @@ export default function HorariosHabilitados() {
                 {/* Legend */}
                 <div style={{ display: "flex", gap: "0.8rem", marginTop: "1rem", flexWrap: "wrap", fontSize: "0.72rem" }}>
                   {[
-                    { bg: "#F5EEE6", border: "#E9DED2", label: "Disponible" },
+                    { bg: "var(--surface-soft)", border: "var(--border)", label: "Disponible" },
                     { bg: "#FFF8E1", border: "#F0E0A0", label: "Pendiente" },
                     { bg: "#E3F2FD", border: "#A0C8F0", label: "Confirmada" },
                     { bg: "#E8F5E9", border: "#A0D8A8", label: "Atendida" },
                     { bg: "#FDE8D8", border: "#F0A898", label: "Bloqueada" },
                     { bg: "#EDE0F0", border: "#C8B0E0", label: "Global" },
                   ].map(l => (
-                    <span key={l.label} style={{ display: "flex", alignItems: "center", gap: 4, color: "#6C584C" }}>
+                    <span key={l.label} style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--text-soft)" }}>
                       <span style={{ width: 12, height: 12, borderRadius: 3, background: l.bg, border: `1px solid ${l.border}`, display: "inline-block" }} />
                       {l.label}
                     </span>
@@ -249,16 +249,16 @@ export default function HorariosHabilitados() {
             <motion.div initial={{ scale: 0.85 }} animate={{ scale: 1 }} exit={{ scale: 0.85 }}
               style={{ background: "white", borderRadius: 20, padding: "2rem", maxWidth: 400, width: "90%", textAlign: "center" }}
               onClick={e => e.stopPropagation()}>
-              <h5 style={{ fontWeight: 700, color: "#4E3B2B", marginBottom: "0.8rem" }}>Confirmar accion</h5>
-              <p style={{ color: "#6C584C", marginBottom: "1.5rem", fontSize: "0.92rem" }}>
+              <h5 style={{ fontWeight: 700, color: "var(--text)", marginBottom: "0.8rem" }}>Confirmar accion</h5>
+              <p style={{ color: "var(--text-soft)", marginBottom: "1.5rem", fontSize: "0.92rem" }}>
                 {confirmAction.tipo === "bloquear" && `Bloquear ${confirmAction.hora} para ${selectedDate}?`}
                 {confirmAction.tipo === "desbloquear" && `Desbloquear ${confirmAction.hora} para ${selectedDate}?`}
                 {confirmAction.tipo === "global_bloquear" && `Bloquear ${confirmAction.hora} en todos los dias?`}
                 {confirmAction.tipo === "global_desbloquear" && `Desbloquear ${confirmAction.hora} globalmente?`}
               </p>
               <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
-                <button onClick={() => setConfirmAction(null)} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, border: "1px solid #E9DED2", background: "transparent", color: "#4E3B2B", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
-                <button onClick={ejecutarAccion} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, background: "#8B6A4B", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>Confirmar</button>
+                <button onClick={() => setConfirmAction(null)} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, border: "1px solid var(--border)", background: "transparent", color: "var(--text)", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
+                <button onClick={ejecutarAccion} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, background: "var(--brand)", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>Confirmar</button>
               </div>
             </motion.div>
           </motion.div>
