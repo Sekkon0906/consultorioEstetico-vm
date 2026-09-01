@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Sliders, Phone, X } from "lucide-react";
@@ -18,6 +19,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
  */
 export default function QuickAccessFab() {
   const t = useTranslations("topbar");
+  const tf = useTranslations("footer");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -43,6 +45,16 @@ export default function QuickAccessFab() {
     { href: "https://api.whatsapp.com/message/SEJTQDVCRWGSP1?autoload=1&app_absent=0", icon: "fab fa-whatsapp", label: "WhatsApp" },
   ];
 
+  // Mismas rutas y etiquetas que el footer — si alguien cierra el banner
+  // de cookies al entrar, este es el único lugar persistente donde
+  // volver a encontrar estos enlaces sin bajar hasta el pie de página.
+  const legalLinks = [
+    { href: "/legal/privacidad", label: tf("legalLinks.privacy") },
+    { href: "/legal/terminos", label: tf("legalLinks.terms") },
+    { href: "/legal/cookies", label: tf("legalLinks.cookies") },
+    { href: "/legal/aviso", label: tf("legalLinks.notice") },
+  ];
+
   return (
     <div ref={ref} className="quick-fab">
       <AnimatePresence>
@@ -63,6 +75,8 @@ export default function QuickAccessFab() {
 
             <div className="quick-fab-divider" />
 
+            <p className="quick-fab-heading">{t("contactInfo")}</p>
+
             <a href="tel:+573155445748" className="quick-fab-contact">
               <Phone size={15} /> 315 5445748
             </a>
@@ -79,6 +93,16 @@ export default function QuickAccessFab() {
                 >
                   <i className={s.icon} />
                 </a>
+              ))}
+            </div>
+
+            <div className="quick-fab-divider" />
+
+            <div className="quick-fab-legal">
+              {legalLinks.map((l) => (
+                <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
+                  {l.label}
+                </Link>
               ))}
             </div>
           </motion.div>

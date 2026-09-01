@@ -4506,9 +4506,11 @@ a:hover {
 .quick-fab-panel {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 0.65rem;
-  width: 230px;
-  padding: 1rem;
+  width: 240px;
+  padding: 1.1rem 1rem;
   border-radius: 18px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -4518,18 +4520,29 @@ a:hover {
 .quick-fab-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.7rem;
 }
 
 .quick-fab-divider {
+  width: 100%;
   height: 1px;
   background: var(--border);
+}
+
+.quick-fab-heading {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .quick-fab-contact {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   color: var(--text-soft);
   font-size: 0.85rem;
@@ -4540,6 +4553,7 @@ a:hover {
 
 .quick-fab-socials {
   display: flex;
+  justify-content: center;
   gap: 8px;
 }
 
@@ -4557,4 +4571,20 @@ a:hover {
 .quick-fab-social:hover {
   background: var(--brand);
   color: var(--brand-contrast);
+}
+
+.quick-fab-legal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+.quick-fab-legal a {
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  text-decoration: none;
+}
+.quick-fab-legal a:hover {
+  color: var(--brand-deep);
+  text-decoration: underline;
 }

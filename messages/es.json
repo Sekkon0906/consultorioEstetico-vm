@@ -10,7 +10,8 @@
   },
   "topbar": {
     "address": "Carrera 5ta #11-24. Edificio Torre Empresarial. Consultorio 502. Ibagué – Tolima.",
-    "quickAccess": "Accesos rápidos"
+    "quickAccess": "Accesos rápidos",
+    "contactInfo": "Información de contacto"
   },
   "navbar": {
     "home": "Inicio",

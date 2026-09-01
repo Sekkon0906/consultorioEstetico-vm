@@ -10,7 +10,8 @@
   },
   "topbar": {
     "address": "Carrera 5ta #11-24. Torre Empresarial Building. Office 502. Ibagué – Tolima, Colombia.",
-    "quickAccess": "Quick access"
+    "quickAccess": "Quick access",
+    "contactInfo": "Contact information"
   },
   "navbar": {
     "home": "Home",
