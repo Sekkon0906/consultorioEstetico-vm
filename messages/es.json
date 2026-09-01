@@ -275,6 +275,9 @@
       "email": "Correo electrónico",
       "procedure": "Selecciona un procedimiento",
       "phone": "Teléfono",
+      "registered": "¿Estás registrado?",
+      "yes": "Sí",
+      "no": "No",
       "message": "Tu mensaje",
       "acceptIntro": "Acepto los",
       "acceptTerms": "términos y condiciones",
@@ -284,6 +287,7 @@
       "whatsappName": "Nombre:",
       "whatsappEmail": "Correo:",
       "whatsappPhone": "Teléfono:",
+      "whatsappRegistered": "¿Registrado?:",
       "whatsappProcedure": "Procedimiento:",
       "whatsappMessage": "Mensaje:",
       "notSpecified": "No especificado"

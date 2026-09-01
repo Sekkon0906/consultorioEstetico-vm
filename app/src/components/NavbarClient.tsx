@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, useEffect } from "react";
+import { Fragment, useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -62,23 +62,33 @@ export default function Navbar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   /* === MENÚ PRINCIPAL === */
+  // `grupo` agrupa los enlaces por intención para poder separarlos
+  // visualmente: sin eso los 7 enlaces se leen como una fila de palabras
+  // sueltas flotando. "conoce" es quién es y dónde atiende, "servicios" es
+  // qué ofrece, "accion" es lo que se hace (agendar) y el panel privado.
   const menuItems = useMemo(() => {
     const base = [
-      { label: t("home"), href: "/" },
-      { label: t("doctor"), href: "/doctora" },
-      { label: t("office"), href: "/consultorio" },
-      { label: t("procedures"), href: "/procedimientos" },
-      { label: t("testimonials"), href: "/testimonios" },
-      { label: t("book"), href: "/agendar" },
+      { label: t("home"),         href: "/",               grupo: "conoce"    },
+      { label: t("doctor"),       href: "/doctora",        grupo: "conoce"    },
+      { label: t("office"),       href: "/consultorio",    grupo: "conoce"    },
+      { label: t("procedures"),   href: "/procedimientos", grupo: "servicios" },
+      { label: t("testimonials"), href: "/testimonios",    grupo: "servicios" },
+      { label: t("book"),         href: "/agendar",        grupo: "accion"    },
     ];
     if (user?.rol === "admin" || user?.rol === "developer")
-      base.push({ label: t("admin"), href: "/administrar" });
+      base.push({ label: t("admin"), href: "/administrar", grupo: "accion" });
     return base;
   }, [user?.rol, t]);
 
   /* === INDICADOR ACTIVO === */
   const updateIndicatorTo = (el: HTMLLIElement | null) => {
     if (!el) return;
+    // El CTA ("Agendar cita") es un botón con fondo propio: un subrayado
+    // debajo se vería suelto, así que ahí se esconde el indicador.
+    if (el.classList.contains("navbar-cta-item")) {
+      setIndicator((prev) => (prev.width === 0 ? prev : { ...prev, width: 0 }));
+      return;
+    }
     // offsetLeft/offsetWidth son valores de layout (NO afectados por el
     // scale del hover ni por transforms), y son relativos al mismo
     // offsetParent que el indicador → alineación correcta.
@@ -194,10 +204,11 @@ export default function Navbar() {
               style={{ width: "auto", height: "auto" }}
             />
           </Link>
-          {/* Solo en escritorio: en móvil este texto (sin recorte y sin caso
-              para /administrar, donde siempre decía "Inicio") competía por
-              espacio con el logo y el botón de menú, y en el panel rompía
-              el navbar. */}
+          {/* Solo en móvil. En escritorio el menú está a la vista y el
+              subrayado ya indica dónde estás, así que repetirlo aquí solo
+              robaba ancho a los enlaces. En móvil el menú va colapsado
+              detrás de la hamburguesa y no hay otra pista de ubicación.
+              Se recorta con ellipsis para no empujar la hamburguesa. */}
           <AnimatePresence mode="wait">
             <motion.span
               key={currentSection}
@@ -205,14 +216,17 @@ export default function Navbar() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 8 }}
               transition={{ duration: 0.25 }}
-              className="d-none d-md-inline-block"
+              className="d-inline-block d-md-none"
               style={{
                 fontWeight: 600,
-                fontSize: "0.92rem",
+                fontSize: "0.88rem",
                 color: "var(--text-muted)",
                 borderLeft: "1px solid var(--border)",
                 paddingLeft: "0.6rem",
                 whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                maxWidth: "38vw",
               }}
             >
               {currentSection}
@@ -228,28 +242,38 @@ export default function Navbar() {
         >
           <ul
             className="navbar-menu d-flex justify-content-center align-items-center mb-0"
-            style={{ fontWeight: 600, listStyle: "none", gap: "1.8rem" }}
+            /* gap chico: cada enlace ya trae su propio padding lateral, que
+               es lo que le da el área de clic y el fondo al pasar el cursor */
+            style={{ fontWeight: 600, listStyle: "none", gap: "0.5rem" }}
           >
             {menuItems.map((item, index) => {
               const isActive = pathname === item.href;
+              // Separador al cambiar de grupo: da estructura visual sin
+              // agregar ruido ni ocupar apenas ancho.
+              const abreGrupo = index > 0 && menuItems[index - 1].grupo !== item.grupo;
+              // "Agendar cita" es la acción principal del sitio: va como
+              // botón, no como un enlace más de la fila.
+              const esCta = item.href === "/agendar";
               return (
-                <motion.li
-                  key={index}
-                  ref={(el) => { linkRefs.current[index] = el; }}
-                  className="nav-item"
-                  style={{ cursor: "pointer" }}
-                  whileHover={{ scale: 1.07, filter: "brightness(1.08)" }}
-                  transition={{ duration: 0.18 }}
-                  onMouseEnter={() => handleItemEnter(index)}
-                >
-                  <Link
-                    href={item.href}
-                    className={`text-decoration-none ${isActive ? "navbar-link-active" : ""}`}
-                    style={{ color: isActive ? "var(--brand)" : "var(--text)", fontWeight: 600, fontSize: "1.08rem", letterSpacing: "0.01em", whiteSpace: "nowrap" }}
+                <Fragment key={item.href}>
+                  {abreGrupo && <li aria-hidden="true" className="navbar-sep" />}
+                  <motion.li
+                    ref={(el) => { linkRefs.current[index] = el; }}
+                    className={`nav-item ${esCta ? "navbar-cta-item" : ""}`}
+                    style={{ cursor: "pointer" }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.18 }}
+                    onMouseEnter={() => handleItemEnter(index)}
                   >
-                    {item.label}
-                  </Link>
-                </motion.li>
+                    <Link
+                      href={item.href}
+                      className={`text-decoration-none navbar-link ${esCta ? "navbar-cta" : ""} ${isActive ? "navbar-link-active" : ""}`}
+                      style={!esCta ? { color: isActive ? "var(--brand)" : "var(--text)" } : undefined}
+                    >
+                      {item.label}
+                    </Link>
+                  </motion.li>
+                </Fragment>
               );
             })}
           </ul>

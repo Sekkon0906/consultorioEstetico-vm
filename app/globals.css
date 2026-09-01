@@ -595,6 +595,12 @@ html, body {
    Galería 3D — modal de detalle (portaleado a document.body).
    El backdrop centra el card en TODAS las pantallas. Reglas en
    globals.css (HMR fiable) y con !important para ganar al <style jsx>. */
+/* El detalle del procedimiento. Antes desenfocaba el fondo y dejaba que la
+   página siguiera desplazándose por detrás, así que el panel "se iba" al
+   hacer scroll. Ahora el fondo queda limpio (solo un velo sobrio para dar
+   foco) y el scroll de la página se bloquea mientras está abierto: el panel
+   se queda quieto donde está. Pensado para crecer: cuando tenga más
+   información, el que desplaza es el panel, no la página. */
 .g3d-detail-backdrop {
   position: fixed !important;
   inset: 0 !important;
@@ -603,10 +609,13 @@ html, body {
   align-items: center !important;
   justify-content: center !important;
   padding: 1rem !important;
-  background: rgba(0, 0, 0, 0.74) !important;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(20, 16, 12, 0.55) !important;
   animation: g3d-backdrop-fade 0.25s ease;
+  overscroll-behavior: contain;
+}
+/* Bloquea el scroll de la página mientras el detalle está abierto. */
+body.g3d-detail-abierto {
+  overflow: hidden;
 }
 @keyframes g3d-backdrop-fade { from { opacity: 0; } to { opacity: 1; } }
 /* El card del modal: anula cualquier posicionamiento heredado del
@@ -619,6 +628,20 @@ html, body {
   bottom: auto !important;
   transform: none !important;
   margin: 0 !important;
+}
+
+/* === FORMULARIO DE CONTACTO DEL FOOTER ===
+   En móvil las dos columnas dejaban campos de ~140px, donde no cabe ni un
+   correo. Pasa a una sola columna, y el Sí/No de "¿estás registrado?" se
+   centra en vez de estirarse a lo ancho. */
+@media (max-width: 640px) {
+  .footer-form {
+    grid-template-columns: 1fr !important;
+  }
+  .footer-registered {
+    justify-self: center;
+    width: fit-content;
+  }
 }
 
 /* Feature items y counters (gradientes claros con 2 hex) */
@@ -3328,8 +3351,11 @@ footer a:hover i {
      "estirado", con los 6 enlaces muy separados entre sí. */
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0.6rem 2rem;
-  column-gap: 1.5rem;
+  /* La altura la marcaba el logo (75px) más el padding. Con el logo a 56px
+     y menos padding vertical, la barra pasa de ~90px a ~68px: se recupera
+     alto de pantalla sin que el logo pierda presencia. */
+  padding: 0.35rem 2rem;
+  column-gap: 1.25rem;
 }
 
 /* === IZQUIERDA: LOGO === */
@@ -3348,7 +3374,7 @@ footer a:hover i {
 }
 
 .navbar-logo img {
-  width: 75px;
+  width: 56px;
   height: auto;
 }
 
@@ -3374,6 +3400,55 @@ footer a:hover i {
 
 .navbar-menu a:hover {
   color: #b08968;
+}
+
+/* === SECCIONADO DEL MENÚ ===
+   Los enlaces se agrupan por intención (conoce / servicios / acción). El
+   separador y el fondo al pasar el cursor son lo que evita que se lean como
+   palabras sueltas flotando en un espacio en blanco. */
+.navbar-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  opacity: 0.75;
+  flex: 0 0 auto;
+  list-style: none;
+}
+
+.navbar-link {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  padding: 0.34rem 0.62rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar-link:not(.navbar-cta):hover {
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+}
+
+/* "Agendar cita": la acción principal del sitio. Como botón deja de competir
+   de igual a igual con los enlaces informativos. */
+.navbar-cta {
+  background: linear-gradient(135deg, var(--brand), var(--brand-soft));
+  color: var(--brand-contrast) !important;
+  padding: 0.42rem 1.05rem;
+  border-radius: 100px;
+  box-shadow: 0 2px 8px rgba(176, 137, 104, 0.28);
+}
+
+.navbar-cta:hover {
+  color: var(--brand-contrast) !important;
+  filter: brightness(1.06);
+}
+
+/* El subrayado indicador no debe aparecer bajo el CTA: ahí el fondo del
+   botón ya marca el estado, y una línea debajo se vería suelta. */
+.navbar-cta-item {
+  margin-inline: 0.15rem;
 }
 
 .menu-item.active a {

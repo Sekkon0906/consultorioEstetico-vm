@@ -275,6 +275,9 @@
       "email": "Email address",
       "procedure": "Choose a treatment",
       "phone": "Phone",
+      "registered": "Are you registered?",
+      "yes": "Yes",
+      "no": "No",
       "message": "Your message",
       "acceptIntro": "I accept the",
       "acceptTerms": "terms & conditions",
@@ -284,6 +287,7 @@
       "whatsappName": "Name:",
       "whatsappEmail": "Email:",
       "whatsappPhone": "Phone:",
+      "whatsappRegistered": "Registered?:",
       "whatsappProcedure": "Treatment:",
       "whatsappMessage": "Message:",
       "notSpecified": "Not provided"

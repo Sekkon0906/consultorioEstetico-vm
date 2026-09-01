@@ -26,6 +26,26 @@ export default function Galeria3D() {
   const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
 
+  // Con el detalle abierto se congela el scroll de la página: si no, el panel
+  // se desplaza fuera de vista al hacer scroll y hay que buscarlo de vuelta.
+  // Se limpia también al desmontar, para no dejar el body bloqueado si se
+  // navega a otra página con el detalle abierto.
+  useEffect(() => {
+    if (selected === null) return;
+    document.body.classList.add("g3d-detail-abierto");
+    return () => document.body.classList.remove("g3d-detail-abierto");
+  }, [selected]);
+
+  // Cerrar con Escape: es un panel modal, y sin esto solo se cierra con clic.
+  useEffect(() => {
+    if (selected === null) return;
+    const alPulsar = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelected(null);
+    };
+    window.addEventListener("keydown", alPulsar);
+    return () => window.removeEventListener("keydown", alPulsar);
+  }, [selected]);
+
   // Carrusel deslizable de móvil: puntos VISIBLES (a diferencia de la
   // versión anterior, que los ocultaba) sincronizados con la posición real
   // del scroll — así se siente "vivo" como la rueda de escritorio, sin el
@@ -980,6 +1000,34 @@ export default function Galeria3D() {
             max-width: 220px !important;
             margin: 0 auto;
           }
+        }
+
+        /* === PANTALLAS BAJAS (portátiles) ===
+           Todos los breakpoints de arriba son por ANCHO, y un portátil típico
+           es ancho pero bajo (1920x900, 1440x800). Ahí no se activaba ninguno:
+           el contenedor se recortaba por maxHeight:95vh mientras la rueda
+           mantenía su alto fijo en px, así que las tarjetas invadían el
+           subtítulo y los dots chocaban con el CTA. Se escala la rueda según
+           el alto disponible, que es la dimensión que realmente escasea. */
+        @media (min-width: 821px) and (max-height: 900px) {
+          .g3d-stage        { min-height: 520px !important; }
+          .g3d-title-wrap   { top: 3% !important; }
+          .g3d-title-wrap h1, .g3d-title-wrap h2 { font-size: clamp(1.5rem, 2.4vw, 2.1rem) !important; }
+          .g3d-title-wrap p { font-size: 0.92rem !important; }
+          .g3d-wheel-anchor { top: 60% !important; transform: translate(50%, -50%) scale(0.86) !important; }
+          .g3d-dots-wrap    { bottom: 16% !important; }
+        }
+        @media (min-width: 821px) and (max-height: 780px) {
+          .g3d-stage        { min-height: 460px !important; }
+          .g3d-title-wrap   { top: 2% !important; }
+          .g3d-title-wrap h1, .g3d-title-wrap h2 { font-size: clamp(1.3rem, 2.1vw, 1.75rem) !important; }
+          .g3d-title-wrap p { font-size: 0.85rem !important; line-height: 1.4 !important; }
+          .g3d-wheel-anchor { top: 59% !important; transform: translate(50%, -50%) scale(0.72) !important; }
+          .g3d-dots-wrap    { bottom: 14% !important; }
+        }
+        @media (min-width: 821px) and (max-height: 660px) {
+          .g3d-title-wrap p { display: none !important; }
+          .g3d-wheel-anchor { transform: translate(50%, -50%) scale(0.6) !important; }
         }
       `}</style>
     </div>

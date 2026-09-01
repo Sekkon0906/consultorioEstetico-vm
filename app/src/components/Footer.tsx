@@ -12,7 +12,10 @@ export default function Footer() {
   const t = useTranslations("footer");
   const [procs, setProcs] = useState<ProcItem[]>([]);
   const [showProcs, setShowProcs] = useState(false);
-  const [formData, setFormData] = useState({ name: "", email: "", procedure: "", phone: "", message: "", terms: false });
+  // `registered` queda como "" hasta que la persona elige: así se distingue
+  // "no respondió" de "respondió que no", que a la doctora le dicen cosas
+  // distintas al recibir el mensaje.
+  const [formData, setFormData] = useState({ name: "", email: "", procedure: "", phone: "", registered: "", message: "", terms: false });
   const [warning, setWarning] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,18 +51,23 @@ export default function Footer() {
       setWarning(t("form.incompleteWarning"));
       return;
     }
-    const { name, email, phone, procedure, message } = formData;
+    const { name, email, phone, procedure, registered, message } = formData;
+    const registeredTexto =
+      registered === "si" ? t("form.yes")
+      : registered === "no" ? t("form.no")
+      : t("form.notSpecified");
     const lineas = [
       t("form.whatsappTitle"),
       "",
       `${t("form.whatsappName")} ${name}`,
       `${t("form.whatsappEmail")} ${email}`,
       `${t("form.whatsappPhone")} ${phone || t("form.notSpecified")}`,
+      `${t("form.whatsappRegistered")} ${registeredTexto}`,
       `${t("form.whatsappProcedure")} ${procedure || t("form.notSpecified")}`,
       `${t("form.whatsappMessage")} ${message}`,
     ];
     window.open(`https://wa.me/573155445748?text=${encodeURIComponent(lineas.join("\n"))}`, "_blank");
-    setFormData({ name: "", email: "", procedure: "", phone: "", message: "", terms: false });
+    setFormData({ name: "", email: "", procedure: "", phone: "", registered: "", message: "", terms: false });
     setWarning(null);
   };
 
@@ -93,7 +101,7 @@ export default function Footer() {
           </h3>
           <p style={{ fontSize: "0.95rem", color: "#FFFFFF", marginBottom: "2rem" }}>{t("contactSub")}</p>
 
-          <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", maxWidth: 650, margin: "0 auto" }}>
+          <form onSubmit={handleSubmit} className="footer-form" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", maxWidth: 650, margin: "0 auto" }}>
             <input name="name" value={formData.name} onChange={handleChange} placeholder={t("form.name")} required style={inputStyle}
               onFocus={e => { e.currentTarget.style.borderColor = "#B08968"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
@@ -130,6 +138,54 @@ export default function Footer() {
             <input name="phone" value={formData.phone} onChange={handleChange} placeholder={t("form.phone")} style={inputStyle}
               onFocus={e => { e.currentTarget.style.borderColor = "#B08968"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
+
+            {/* ¿Ya está registrado? Ocupa el hueco que dejaba el teléfono.
+                Son dos botones y no un <select> porque con dos opciones un
+                desplegable es un clic de más, y en móvil abre el selector
+                nativo a pantalla completa para elegir entre "Sí" y "No". */}
+            <div
+              className="footer-registered"
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "center",
+                gap: "0.6rem", flexWrap: "wrap",
+                border: "1px solid rgba(176,137,104,0.4)",
+                borderRadius: 999, padding: "0.45rem 0.9rem",
+              }}
+            >
+              <span style={{ fontSize: "0.85rem", color: "rgba(250,249,247,0.75)" }}>
+                {t("form.registered")}
+              </span>
+              <div style={{ display: "flex", gap: "0.4rem" }}>
+                {([["si", t("form.yes")], ["no", t("form.no")]] as const).map(([valor, etiqueta]) => {
+                  const activo = formData.registered === valor;
+                  return (
+                    <button
+                      key={valor}
+                      type="button"
+                      aria-pressed={activo}
+                      onClick={() => setFormData(prev => ({
+                        // Volver a pulsar la opción activa la deselecciona:
+                        // el campo es opcional y debe poder dejarse en blanco.
+                        ...prev, registered: activo ? "" : valor,
+                      }))}
+                      style={{
+                        padding: "0.25rem 0.85rem",
+                        borderRadius: 999,
+                        fontSize: "0.82rem",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "background 0.2s, color 0.2s",
+                        border: activo ? "1px solid #B08968" : "1px solid rgba(176,137,104,0.35)",
+                        background: activo ? "#B08968" : "transparent",
+                        color: activo ? "#FFFFFF" : "rgba(250,249,247,0.7)",
+                      }}
+                    >
+                      {etiqueta}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             <textarea name="message" value={formData.message} onChange={handleChange} rows={3} placeholder={t("form.message")} required
               style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
               onFocus={e => { e.currentTarget.style.borderColor = "#B08968"; }}
@@ -183,7 +239,11 @@ export default function Footer() {
         </div>
 
         {/* Info */}
-        <div style={{ borderTop: "1px solid rgba(176,137,104,0.2)", paddingTop: "2rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "2rem", marginBottom: "2rem" }}>
+        {/* Las tres columnas van centradas: alineadas a la izquierda, con el
+            ancho libre de una pantalla grande, quedaban desperdigadas y sin
+            relación entre sí. `justifyItems: center` centra cada bloque en su
+            columna y `textAlign: center` el texto dentro de cada uno. */}
+        <div style={{ borderTop: "1px solid rgba(176,137,104,0.2)", paddingTop: "2rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "2rem", marginBottom: "2rem", justifyItems: "center", textAlign: "center" }}>
           <div>
             <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("clinic")}</h4>
             <p style={{ fontSize: "0.82rem", color: "#FFFFFF", lineHeight: 1.6 }}>{t("clinicDesc")}</p>
