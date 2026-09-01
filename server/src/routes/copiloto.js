@@ -9,13 +9,38 @@ const { DEFINICIONES, ejecutar, escribe } = require("../ia/herramientas");
 
 const MODELO = process.env.ANTHROPIC_MODEL || "claude-opus-5";
 
-// El cliente se crea una sola vez, pero solo si hay clave: así el servidor
+// ── Clave del copiloto ────────────────────────────────────────────────────
+// Dos fuentes, en orden: 1) la que la doctora guarda desde el panel
+// (cifrada en la base con pgcrypto), 2) ANTHROPIC_API_KEY del servidor.
+// Así el copiloto sigue funcionando con la variable de entorno de siempre
+// si nadie configuró una clave propia todavía.
+let clienteCache = { key: null, instancia: null };
+
+async function obtenerApiKey() {
+  if (process.env.SECRETS_ENCRYPTION_KEY) {
+    try {
+      const { rows } = await pool.query(
+        `select pgp_sym_decrypt(api_key_cifrada, $1) as clave
+           from integraciones_ia where proveedor = 'anthropic'`,
+        [process.env.SECRETS_ENCRYPTION_KEY]
+      );
+      if (rows[0]?.clave) return rows[0].clave;
+    } catch (err) {
+      console.error("No se pudo leer la clave guardada del copiloto:", err);
+    }
+  }
+  return process.env.ANTHROPIC_API_KEY || null;
+}
+
+// El cliente se recrea solo si la clave efectiva cambió, así el servidor
 // arranca igual aunque el copiloto no esté configurado todavía.
-let cliente = null;
-function getCliente() {
-  if (!process.env.ANTHROPIC_API_KEY) return null;
-  if (!cliente) cliente = new Anthropic();
-  return cliente;
+async function getCliente() {
+  const key = await obtenerApiKey();
+  if (!key) return null;
+  if (clienteCache.key === key) return clienteCache.instancia;
+  const instancia = new Anthropic({ apiKey: key });
+  clienteCache = { key, instancia };
+  return instancia;
 }
 
 const INSTRUCCIONES = `Eres el asistente administrativo del consultorio de medicina estética
@@ -76,7 +101,7 @@ function normalizarHistorial(historial) {
 // confirmación. Las herramientas de solo lectura se ejecutan aquí mismo; las de
 // escritura nunca.
 router.post("/mensaje", verifyToken, requireRole(["admin"]), async (req, res) => {
-  const api = getCliente();
+  const api = await getCliente();
   if (!api) {
     return res.status(503).json({
       ok: false,
@@ -256,6 +281,87 @@ router.get("/auditoria", verifyToken, requireRole(["admin"]), async (req, res) =
   } catch (err) {
     console.error("Error GET /copiloto/auditoria:", err);
     return res.status(500).json({ ok: false, error: "Error al leer la auditoría" });
+  }
+});
+
+// ── GET /copiloto/config ─────────────────────────────────────────────────────
+// Nunca devuelve la clave, solo si hay una configurada y de dónde sale --
+// para que el panel muestre "Configurada ✓" sin exponer el valor.
+router.get("/config", verifyToken, requireRole(["admin"]), async (_req, res) => {
+  try {
+    if (!process.env.SECRETS_ENCRYPTION_KEY) {
+      return res.json({
+        ok: true,
+        data: {
+          configurada: !!process.env.ANTHROPIC_API_KEY,
+          origen: process.env.ANTHROPIC_API_KEY ? "servidor" : null,
+          puedeGuardarPropia: false,
+        },
+      });
+    }
+    const { rows } = await pool.query(
+      `select configurada_en from integraciones_ia where proveedor = 'anthropic'`
+    );
+    const propia = rows[0];
+    return res.json({
+      ok: true,
+      data: {
+        configurada: !!propia || !!process.env.ANTHROPIC_API_KEY,
+        origen: propia ? "propia" : process.env.ANTHROPIC_API_KEY ? "servidor" : null,
+        configuradaEn: propia?.configurada_en || null,
+        puedeGuardarPropia: true,
+      },
+    });
+  } catch (err) {
+    console.error("Error GET /copiloto/config:", err);
+    return res.status(500).json({ ok: false, error: "Error al leer la configuración" });
+  }
+});
+
+// ── PUT /copiloto/config ─────────────────────────────────────────────────────
+// Guarda (o reemplaza) la clave propia de la doctora, cifrada. Requiere que
+// el servidor tenga SECRETS_ENCRYPTION_KEY -- sin eso no hay con qué cifrar,
+// y devolvemos un error claro en vez de guardarla en texto plano.
+router.put("/config", verifyToken, requireRole(["admin"]), async (req, res) => {
+  const { apiKey } = req.body || {};
+  if (typeof apiKey !== "string" || apiKey.trim().length < 10) {
+    return res.status(400).json({ ok: false, error: "Clave inválida" });
+  }
+  if (!process.env.SECRETS_ENCRYPTION_KEY) {
+    return res.status(503).json({
+      ok: false,
+      error: "El servidor no tiene SECRETS_ENCRYPTION_KEY configurada -- no hay con qué cifrar la clave. Pídele a quien administra el hosting que la agregue.",
+    });
+  }
+  try {
+    await pool.query(
+      `insert into integraciones_ia (proveedor, api_key_cifrada, configurada_en, configurada_por)
+       values ('anthropic', pgp_sym_encrypt($1, $2), now(), $3)
+       on conflict (proveedor) do update
+         set api_key_cifrada = excluded.api_key_cifrada,
+             configurada_en = now(),
+             configurada_por = excluded.configurada_por`,
+      [apiKey.trim(), process.env.SECRETS_ENCRYPTION_KEY, req.user.id]
+    );
+    clienteCache = { key: null, instancia: null }; // fuerza a recrear el cliente con la clave nueva
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("Error PUT /copiloto/config:", err);
+    return res.status(500).json({ ok: false, error: "No se pudo guardar la clave" });
+  }
+});
+
+// ── DELETE /copiloto/config ──────────────────────────────────────────────────
+// Quita la clave propia. El copiloto vuelve a depender de ANTHROPIC_API_KEY
+// del servidor (o queda inactivo si tampoco existe esa).
+router.delete("/config", verifyToken, requireRole(["admin"]), async (_req, res) => {
+  try {
+    await pool.query(`delete from integraciones_ia where proveedor = 'anthropic'`);
+    clienteCache = { key: null, instancia: null };
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("Error DELETE /copiloto/config:", err);
+    return res.status(500).json({ ok: false, error: "No se pudo quitar la clave" });
   }
 });
 

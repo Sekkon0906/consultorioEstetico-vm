@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Check, X, Sparkles, AlertCircle } from "lucide-react";
+import { Send, Check, X, Sparkles, AlertCircle, KeyRound, Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
 import Button from "@/components/ui/Button";
 
@@ -66,6 +66,23 @@ export default function CopilotoChat() {
   const [aplicando, setAplicando] = useState(false);
   const [error, setError]         = useState<string | null>(null);
   const finRef = useRef<HTMLDivElement>(null);
+
+  // Estado de la clave de API: quién la configuró (propia o del servidor)
+  // y el formulario para pegar/quitar la propia.
+  const [config, setConfig] = useState<{ configurada: boolean; origen: string | null; puedeGuardarPropia: boolean } | null>(null);
+  const [mostrarConfig, setMostrarConfig] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [guardandoKey, setGuardandoKey] = useState(false);
+  const [configError, setConfigError] = useState<string | null>(null);
+
+  const cargarConfig = () => {
+    api
+      .get<{ ok: boolean; data: typeof config }>("/copiloto/config")
+      .then((r) => setConfig(r.data))
+      .catch(() => setConfig(null));
+  };
+
+  useEffect(() => { cargarConfig(); }, []);
 
   useEffect(() => {
     finRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -146,16 +163,115 @@ export default function CopilotoChat() {
     setBurbujas((b) => [...b, { de: "copiloto", texto: "Descartado. ¿Qué ajustamos?" }]);
   };
 
+  const guardarClave = async () => {
+    const clave = apiKeyInput.trim();
+    if (clave.length < 10) { setConfigError("Esa clave se ve incompleta."); return; }
+    setGuardandoKey(true);
+    setConfigError(null);
+    try {
+      await api.put("/copiloto/config", { apiKey: clave });
+      setApiKeyInput("");
+      setMostrarConfig(false);
+      cargarConfig();
+    } catch (e: unknown) {
+      setConfigError(e instanceof Error ? e.message : "No se pudo guardar la clave");
+    } finally {
+      setGuardandoKey(false);
+    }
+  };
+
+  const quitarClave = async () => {
+    setGuardandoKey(true);
+    setConfigError(null);
+    try {
+      await api.delete("/copiloto/config");
+      cargarConfig();
+    } catch (e: unknown) {
+      setConfigError(e instanceof Error ? e.message : "No se pudo quitar la clave");
+    } finally {
+      setGuardandoKey(false);
+    }
+  };
+
   return (
     <div style={{ maxWidth: 780, margin: "0 auto", display: "flex", flexDirection: "column", height: "calc(100vh - 180px)" }}>
       <header style={{ marginBottom: "1.25rem" }}>
-        <h2 style={{ color: "#5A4230", fontWeight: 700, fontSize: "1.5rem", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
-          <Sparkles size={22} style={{ color: "#B08968" }} /> Asistente
-        </h2>
-        <p style={{ color: "#8A7461", fontSize: "0.88rem", marginTop: 6, marginBottom: 0 }}>
-          Pídele que cree o cambie procedimientos, promociones e información del consultorio.
-          Siempre te muestra qué va a hacer antes de hacerlo.
-        </p>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+          <div>
+            <h2 style={{ color: "#5A4230", fontWeight: 700, fontSize: "1.5rem", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
+              <Sparkles size={22} style={{ color: "#B08968" }} /> Asistente
+            </h2>
+            <p style={{ color: "#8A7461", fontSize: "0.88rem", marginTop: 6, marginBottom: 0 }}>
+              Pídele que cree o cambie procedimientos, promociones e información del consultorio.
+              Siempre te muestra qué va a hacer antes de hacerlo.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setMostrarConfig((v) => !v)}
+            style={{
+              display: "flex", alignItems: "center", gap: 6, padding: "0.4rem 0.8rem",
+              borderRadius: 100, border: "1px solid #DCC7AC",
+              background: config?.configurada ? "#E3EDE5" : "#FBF7F2",
+              color: config?.configurada ? "#3E6B50" : "#8A7461",
+              fontSize: "0.78rem", fontWeight: 600, cursor: "pointer", flexShrink: 0,
+            }}
+          >
+            <KeyRound size={13} />
+            {config === null ? "…" : config.configurada
+              ? (config.origen === "propia" ? "Clave propia configurada" : "Usando clave del servidor")
+              : "Sin configurar"}
+          </button>
+        </div>
+
+        <AnimatePresence>
+          {mostrarConfig && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              style={{ overflow: "hidden" }}
+            >
+              <div style={{ marginTop: "0.9rem", padding: "1rem", borderRadius: 14, background: "#FBF7F2", border: "1px solid #E8DCCB" }}>
+                <p style={{ margin: "0 0 0.6rem", color: "#5A4230", fontWeight: 600, fontSize: "0.85rem" }}>
+                  Clave de API del copiloto
+                </p>
+                <p style={{ margin: "0 0 0.7rem", color: "#8A7461", fontSize: "0.78rem", lineHeight: 1.5 }}>
+                  La de Anthropic (Claude), la que usa el asistente para responder. Se guarda cifrada;
+                  una vez configurada, solo hace falta escribir en el chat.
+                </p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <input
+                    type="password"
+                    value={apiKeyInput}
+                    onChange={(e) => setApiKeyInput(e.target.value)}
+                    placeholder="sk-ant-..."
+                    autoComplete="off"
+                    style={{ flex: 1, minWidth: 200, padding: "0.5rem 0.8rem", borderRadius: 8, border: "1px solid #DCC7AC", background: "#FFFDFB", color: "#3A2A1A", fontSize: "0.85rem", outline: "none" }}
+                  />
+                  <Button variant="primary" size="sm" onClick={guardarClave} disabled={guardandoKey}>
+                    {guardandoKey ? "Guardando…" : "Guardar"}
+                  </Button>
+                  {config?.origen === "propia" && (
+                    <Button variant="ghost" size="sm" onClick={quitarClave} disabled={guardandoKey}>
+                      <Trash2 size={13} /> Quitar
+                    </Button>
+                  )}
+                </div>
+                {config && !config.puedeGuardarPropia && (
+                  <p style={{ margin: "0.6rem 0 0", color: "#A5352B", fontSize: "0.76rem" }}>
+                    El servidor todavía no tiene <code>SECRETS_ENCRYPTION_KEY</code> configurada —
+                    sin eso no hay con qué cifrar la clave. Avísale a quien administra el hosting.
+                  </p>
+                )}
+                {configError && (
+                  <p style={{ margin: "0.6rem 0 0", color: "#A5352B", fontSize: "0.78rem" }}>{configError}</p>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Conversación */}
