@@ -1870,8 +1870,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.85rem 1.8rem;
-  border-radius: 999px;
+  padding: var(--btn-pad-lg);
+  border-radius: var(--btn-radio);
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
@@ -1925,8 +1925,8 @@ body {
   background: transparent !important;
   color: var(--brand-deep) !important;
   border: 1.5px solid var(--brand) !important;
-  border-radius: 100px !important;
-  padding: 0.65rem 1.6rem !important;
+  border-radius: var(--btn-radio) !important;
+  padding: var(--btn-pad-md) !important;
   font-weight: 600;
   font-size: 0.9rem;
   line-height: 1.2;
@@ -2137,8 +2137,8 @@ body {
 
 /* Botones del hero */
 .hero-btn {
-  border-radius: 999px;
-  padding: 0.85rem 1.9rem;
+  border-radius: var(--btn-radio);
+  padding: var(--btn-pad-lg);
   font-weight: 600;
   font-size: 0.95rem;
   border: none;
@@ -3166,8 +3166,8 @@ footer a:hover i {
   background: linear-gradient(135deg, #b08968, #d9b89a);
   color: #fff;
   border: none;
-  padding: 0.9rem 1.8rem;
-  border-radius: 999px;
+  padding: var(--btn-pad-lg);
+  border-radius: var(--btn-radio);
   font-weight: 600;
   font-size: 0.95rem;
   display: inline-flex;
@@ -3646,9 +3646,9 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 100px;
+  border-radius: var(--btn-radio);
   border: none;
-  font-weight: 600;
+  font-weight: var(--btn-peso);
   font-family: inherit;
   cursor: pointer;
   white-space: nowrap;
@@ -3659,9 +3659,9 @@ a:hover {
 .btn-app--full { width: 100%; }
 
 /* tamaños */
-.btn-app--sm { padding: 0.45rem 1rem;   font-size: 0.78rem; }
-.btn-app--md { padding: 0.65rem 1.5rem; font-size: 0.87rem; }
-.btn-app--lg { padding: 0.85rem 2rem;   font-size: 0.95rem; }
+.btn-app--sm { padding: var(--btn-pad-sm); font-size: var(--btn-txt-sm); }
+.btn-app--md { padding: var(--btn-pad-md); font-size: var(--btn-txt-md); }
+.btn-app--lg { padding: var(--btn-pad-lg); font-size: var(--btn-txt-lg); }
 
 /* variantes */
 .btn-app--primary {

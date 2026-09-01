@@ -71,6 +71,35 @@
   }
 }
 
+/* === GEOMETRÍA DE BOTONES ===
+   Había cinco clases distintas queriendo ser "el botón grande de llamada a
+   la acción", cada una con su propio padding (0.85/1.8, 0.85/1.9, 0.9/1.8,
+   0.65/1.6...) y su propio radio (999px, 100px, 12px). Diferencias que nadie
+   eligió: son de haber escrito cada sección en un momento distinto, y son
+   exactamente lo que hace que la página se sienta armada por varias manos.
+
+   Ahora la medida se decide UNA vez aquí y las clases la citan. Cambiar el
+   radio de todos los botones del sitio es cambiar una línea.
+
+   Tres tamaños, no catorce:
+     sm  acciones secundarias dentro de tarjetas y tablas
+     md  el caso normal
+     lg  llamadas a la acción principales de una página */
+:root {
+  --btn-radio:      999px;         /* pastilla: el botón del sitio es redondo */
+  --btn-radio-caja: 12px;          /* la excepción: controles tipo selector */
+
+  --btn-pad-sm:  0.45rem 1.1rem;
+  --btn-pad-md:  0.68rem 1.6rem;
+  --btn-pad-lg:  0.85rem 1.9rem;
+
+  --btn-txt-sm:  0.8rem;
+  --btn-txt-md:  0.88rem;
+  --btn-txt-lg:  0.95rem;
+
+  --btn-peso:    600;
+}
+
 /* === PALETA OSCURA (grafito neutro + acento champán, estilo "beauty premium") ===
    Antes toda la paleta oscura era una familia de cafés (fondo, superficies
    y acento en el mismo matiz café/ámbar) — se sentía como "un solo color
