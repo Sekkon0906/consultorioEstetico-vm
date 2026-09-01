@@ -1,0 +1,173 @@
+/* ============================================================
+   Tokens de tema (claro/oscuro), movimiento y logo
+   Extraído de globals.css, que tenía 4.717 líneas en un solo
+   archivo. El ORDEN de los @import en globals.css reproduce el
+   orden original: la cascada de CSS depende de él y reordenarlos
+   cambia qué regla gana sin que salte ningún error.
+============================================================ */
+
+
+/* ==========================
+   TOKENS DE TEMA — CLARO / OSCURO
+   El modo se controla con [data-theme="light|dark"] en <html>.
+   El switcher (ThemeToggle) lo ajusta; un script anti-flash en <head>
+   lo aplica antes del primer paint para evitar parpadeo.
+========================== */
+
+/* === PALETA CLARA (por defecto) === */
+:root,
+:root[data-theme="light"] {
+  --bg:            #FAF9F7;   /* fondo de página */
+  --bg-elevated:   #FFFFFF;   /* tarjetas elevadas */
+  --surface:       #FFFDF9;   /* superficies suaves (cards) */
+  --surface-soft:  #F5EEE6;   /* secundario / hover */
+  --text:          #3A2A1A;   /* texto principal */
+  --text-soft:     #6C584C;   /* texto secundario */
+  --text-muted:    #8A7565;   /* meta, captions */
+  --border:        #E9DED2;   /* bordes y separadores */
+  --border-strong: #D9C3B0;
+  --brand:         #B08968;   /* marca principal */
+  --brand-soft:    #C9AD8D;   /* marca suave */
+  --brand-deep:    #8B6A4B;   /* marca profunda (hover/accent) */
+  --brand-contrast:#FFFFFF;   /* texto sobre fondos --brand (botones) */
+  --accent:        #E0B892;   /* acento cálido */
+  --topbar-bg:     #E8E1D4;
+  --topbar-text:   #4E3B2B;
+  --footer-bg:     #5A4A3A;
+  --footer-text:   #E9DED2;
+  --danger:        #b02e2e;
+  --success:       #2D6A4F;
+  --shadow-sm:     0 2px 8px rgba(78,59,43,0.06);
+  --shadow-md:     0 8px 24px rgba(78,59,43,0.10);
+  --overlay-bg:    rgba(0,0,0,0.45);
+
+  /* Decoración Galería 3D — adaptativa */
+  --galeria-halo:  conic-gradient(from 0deg, rgba(176,137,104,0.22), rgba(201,173,141,0.16), rgba(139,106,75,0.20), rgba(176,137,104,0.22));
+  --galeria-particle-1: rgba(176,137,104,0.45);
+  --galeria-particle-2: rgba(139,106,75,0.30);
+
+  color-scheme: light;
+}
+
+/* === MOVIMIENTO ===
+   Había 12 duraciones distintas repartidas por el sitio (0.15s, 0.18s, 0.2s,
+   0.25s, 0.28s, 0.3s...) según quién escribió cada parte. Tres valores bastan,
+   y que todo se mueva al mismo ritmo es la mitad de que se sienta una sola
+   página. La curva es la misma en los tres: arranca rápido y frena suave,
+   que es como se mueven las cosas físicas. */
+:root {
+  --mov-rapido: 150ms;   /* cambios de color, hover */
+  --mov-normal: 250ms;   /* aparecer, desplegar */
+  --mov-lento:  400ms;   /* movimientos grandes, paneles */
+  --mov-curva:  cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Quien pide menos movimiento no debería recibir ninguno. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mov-rapido: 1ms;
+    --mov-normal: 1ms;
+    --mov-lento:  1ms;
+  }
+}
+
+/* === GEOMETRÍA DE BOTONES ===
+   Había cinco clases distintas queriendo ser "el botón grande de llamada a
+   la acción", cada una con su propio padding (0.85/1.8, 0.85/1.9, 0.9/1.8,
+   0.65/1.6...) y su propio radio (999px, 100px, 12px). Diferencias que nadie
+   eligió: son de haber escrito cada sección en un momento distinto, y son
+   exactamente lo que hace que la página se sienta armada por varias manos.
+
+   Ahora la medida se decide UNA vez aquí y las clases la citan. Cambiar el
+   radio de todos los botones del sitio es cambiar una línea.
+
+   Tres tamaños, no catorce:
+     sm  acciones secundarias dentro de tarjetas y tablas
+     md  el caso normal
+     lg  llamadas a la acción principales de una página */
+:root {
+  --btn-radio:      999px;         /* pastilla: el botón del sitio es redondo */
+  --btn-radio-caja: 12px;          /* la excepción: controles tipo selector */
+
+  --btn-pad-sm:  0.45rem 1.1rem;
+  --btn-pad-md:  0.68rem 1.6rem;
+  --btn-pad-lg:  0.85rem 1.9rem;
+
+  --btn-txt-sm:  0.8rem;
+  --btn-txt-md:  0.88rem;
+  --btn-txt-lg:  0.95rem;
+
+  --btn-peso:    600;
+}
+
+/* === PALETA OSCURA (grafito neutro + acento champán, estilo "beauty premium") ===
+   Antes toda la paleta oscura era una familia de cafés (fondo, superficies
+   y acento en el mismo matiz café/ámbar) — se sentía como "un solo color
+   con distintas intensidades". Ahora la base (bg/surface/border) es un
+   grafito neutro casi sin matiz cálido, y el color de marca (champán/dorado)
+   queda como el ÚNICO acento cálido — así contrasta y se lee como una marca
+   de lujo (piensa Chanel/Dior en modo oscuro) en vez de "todo café oscuro". */
+:root[data-theme="dark"] {
+  --bg:            #17151A;   /* grafito casi negro, matiz neutro */
+  --bg-elevated:   #1F1C22;   /* superficies elevadas */
+  --surface:       #26222A;   /* cards — un escalón sobre bg-elevated */
+  --surface-soft:  #322D37;   /* hover / secundario */
+  --text:          #F5F1EA;   /* texto principal — cream alto contraste */
+  --text-soft:     #C7C1B8;   /* texto secundario — gris cálido suave */
+  --text-muted:    #928C82;   /* captions / metadata */
+  --border:        #3A3640;   /* bordes visibles, neutros */
+  --border-strong: #4C4753;
+  --brand:         #E8C9A0;   /* champán — único acento cálido de la paleta */
+  --brand-soft:    #F2DDB8;
+  --brand-deep:    #F5F1EA;
+  --brand-contrast:#1A1720;   /* en dark, --brand es claro (champán): texto oscuro */
+  --accent:        #E8C9A0;
+  --topbar-bg:     #0E0C11;
+  --topbar-text:   #F5F1EA;
+  --footer-bg:     #0B0A0D;   /* footer más profundo, anclaje visual */
+  --footer-text:   #C7C1B8;
+  --danger:        #F4A8A8;
+  --success:       #B5E0C2;
+  --shadow-sm:     0 2px 8px rgba(0,0,0,0.45);
+  --shadow-md:     0 8px 28px rgba(0,0,0,0.55);
+  --overlay-bg:    rgba(0,0,0,0.7);
+
+  /* Decoración Galería 3D — champán sobre grafito neutro */
+  --galeria-halo:  conic-gradient(from 0deg, rgba(232,201,160,0.30), rgba(217,181,139,0.20), rgba(242,221,184,0.30), rgba(232,201,160,0.30));
+  --galeria-particle-1: rgba(232,201,160,0.60);
+  --galeria-particle-2: rgba(242,221,184,0.42);
+
+  color-scheme: dark;
+}
+
+/* === LOGO EN MODO OSCURO ===
+   Invierte la imagen del logo (que es oscura) a blanco — funciona porque
+   el logo JM es texto/líneas sobre fondo claro. */
+:root[data-theme="dark"] .navbar-logo img {
+  filter: brightness(0) invert(1);
+}
+
+/* === NAVBAR EN MODO OSCURO ===
+   Reglas con !important para asegurar el contraste blanco sobre el
+   fondo oscuro del navbar, independiente de inline styles o cache. */
+:root[data-theme="dark"] .navbar-menu a,
+:root[data-theme="dark"] .navbar-menu a:visited,
+:root[data-theme="dark"] .navbar-menu li a {
+  color: #FFFFFF !important;
+}
+:root[data-theme="dark"] .navbar-menu a.navbar-link-active {
+  color: var(--brand) !important;
+}
+:root[data-theme="dark"] .navbar-indicator {
+  background: #FFFFFF !important;
+  box-shadow: 0 0 8px rgba(255,255,255,0.5);
+}
+
+/* Aplicación a body por defecto. Las páginas/componentes que
+   actualmente usan colores en estilos inline NO cambian (se migran
+   por fases). El body se vuelve oscuro inmediatamente. */
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  transition: background var(--mov-normal) ease, color var(--mov-normal) ease;
+}

@@ -2,8 +2,13 @@ require("dotenv").config();
 
 const express = require("express");
 const cors    = require("cors");
+const cookieParser = require("cookie-parser");
+const {
+  cabecerasSeguras, limiteLogin, limiteCorreo, limiteIa, limiteGeneral,
+} = require("./middlewares/proteccion");
 
 const authRoutes         = require("./routes/auth");
+const autenticacionRoutes = require("./routes/autenticacion");
 const usuariosRoutes     = require("./routes/usuarios");
 const procedimientosRoutes = require("./routes/procedimientos");
 const testimoniosRoutes  = require("./routes/testimonios");
@@ -17,6 +22,13 @@ const configuracionRoutes = require("./routes/configuracion");
 const copilotoRoutes     = require("./routes/copiloto");
 
 const app = express();
+
+// Detrás del proxy de Railway/Vercel: sin esto, req.ip sería la del proxy y
+// el límite por IP contaría a todos los usuarios como uno solo.
+app.set("trust proxy", 1);
+
+// Cabeceras de seguridad antes que nada, para que apliquen a toda respuesta.
+app.use(cabecerasSeguras);
 
 // ── CORS ─────────────────────────────────────────────────────
 const allowedOrigins = process.env.CORS_ORIGIN
@@ -35,6 +47,11 @@ app.use(cors({
 
 app.options("*", cors());
 app.use(express.json({ limit: "10mb" }));
+// El refresh token viaja en cookie httpOnly, fuera del alcance del JS del sitio.
+app.use(cookieParser());
+
+// Tope general. Los endpoints sensibles llevan además el suyo, más estricto.
+app.use(limiteGeneral);
 
 // ── HEALTH CHECK ─────────────────────────────────────────────
 app.get("/health", (_req, res) =>
@@ -42,7 +59,14 @@ app.get("/health", (_req, res) =>
 );
 
 // ── RUTAS ────────────────────────────────────────────────────
-app.use("/auth",           authRoutes);
+app.use("/auth",           authRoutes);          // Supabase Auth (en retirada)
+// Límites específicos ANTES de montar la ruta: sin ellos, /auth2/login queda
+// abierto a probar contraseñas a discreción.
+app.use("/auth2/login",    limiteLogin);
+app.use("/auth2/registro", limiteLogin);
+app.use("/auth2/recuperar", limiteCorreo);
+app.use("/auth2/reenviar-verificacion", limiteCorreo);
+app.use("/auth2",          autenticacionRoutes); // autenticación propia
 app.use("/usuarios",       usuariosRoutes);
 app.use("/procedimientos", procedimientosRoutes);
 app.use("/testimonios",    testimoniosRoutes);
@@ -52,7 +76,7 @@ app.use("/charlas",        charlasRoutes);
 app.use("/analytics",      analyticsRoutes);
 app.use("/reportes",       reportesRoutes);
 app.use("/configuracion",  configuracionRoutes);
-app.use("/copiloto",       copilotoRoutes);
+app.use("/copiloto",       limiteIa, copilotoRoutes);
 app.use("/",               reagendasRoutes);  // /citas/:id/solicitar-reagenda y /reagendas
 
 // ── MANEJO GLOBAL DE ERRORES ─────────────────────────────────

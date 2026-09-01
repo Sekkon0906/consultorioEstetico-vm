@@ -222,7 +222,7 @@ export default function Step2DatosMedicos({
     menuPortal: (base) => ({ ...base, zIndex: 9999 }),
     multiValue: (provided) => ({
       ...provided,
-      background: "#E9DED2",
+      background: "var(--border)",
       borderRadius: 999,
       padding: "4px 8px",
       color: PALETTE.text,

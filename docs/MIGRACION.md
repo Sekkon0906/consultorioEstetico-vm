@@ -113,6 +113,70 @@ Checklist completo en el artifact. Los puntos que más se olvidan:
 - **Restaurar un backup de verdad** antes de dar la fase 01 por cerrada.
 - Completar **NIT y registro profesional**, pendientes según el README.
 
+## Esquema de base de datos versionado en el repo (2026-09-01)
+
+El objetivo del día: que la base de datos completa "viva" en el repositorio
+como código, para que el día que se despliegue fuera de Supabase sea solo
+correr los archivos SQL contra un Postgres nuevo — no reconstruir el esquema
+desde cero ni reinventar decisiones ya tomadas.
+
+**Archivos nuevos:**
+
+- `server/sql/schema/000_baseline.sql` — el esquema COMPLETO tal como existe
+  hoy en producción: las 17 tablas, sus columnas/checks/defaults, las
+  funciones y triggers de negocio (`set_updated_at`, `enforce_usuarios_rol`,
+  `enforce_firma_para_atendida`) y las 6 vistas de reportes. Volcado a mano
+  vía introspección SQL contra el proyecto real (`ibpkihfjripvizismhsk`), no
+  con `pg_dump` (sin acceso de shell al proyecto de Supabase desde este
+  entorno). **Verificado**: corre limpio de punta a punta contra un Postgres
+  16 local vacío, incluyendo después las migraciones 001/002/003/004 y
+  `indexes.sql` en cadena, sin un solo error.
+- `server/sql/schema/001_rls_solo_supabase.sql` — las políticas RLS que hay
+  hoy en Supabase, documentadas como referencia. **No hacen falta** para un
+  Postgres propio: dependen de `auth.uid()`/`auth.jwt()`, que solo existen
+  porque Supabase Auth + PostgREST los inyectan. El backend Express nunca
+  pasa por ahí — se conecta directo con `pg.Pool` usando un rol con
+  `BYPASSRLS` (confirmado en producción), y cada ruta ya valida el rol con
+  `verifyToken`/`requireRole`. La seguridad real hoy es esa capa, no RLS.
+
+**Orden de despliegue en un Postgres nuevo** (Railway Postgres, Neon, RDS, un
+contenedor propio):
+
+```bash
+psql $DATABASE_URL -f server/sql/schema/000_baseline.sql
+psql $DATABASE_URL -f server/sql/migraciones/001_configuracion_sitio.sql
+psql $DATABASE_URL -f server/sql/migraciones/003_auditoria_ia.sql
+psql $DATABASE_URL -f server/sql/migraciones/004_integraciones_ia.sql
+psql $DATABASE_URL -f server/sql/indexes.sql
+# Solo si ya se migró el login fuera de Supabase Auth (fase 03):
+# psql $DATABASE_URL -f server/sql/migraciones/002_auth_propia.sql
+```
+
+Después de eso, apuntar `DATABASE_URL` del backend a esa base y listo — el
+código nunca usa el SDK de Supabase para datos, solo SQL directo.
+
+**Bug real encontrado y corregido de paso**: las migraciones
+`001_configuracion_sitio.sql` y `003_auditoria_ia.sql` estaban escritas en el
+repo pero **nunca se habían aplicado** a la base de producción — las tablas
+`configuracion_sitio` y `auditoria_ia` no existían. Esto es casi con certeza
+la causa del error 404 reportado antes en "Información general" del panel.
+Se aplicaron ambas contra producción (son idempotentes, no tocan nada
+existente) y se confirmó que las tablas ya existen.
+
+**Hallazgo de seguridad corregido**: `integraciones_ia` (donde se cifran las
+claves de API del copiloto) tenía RLS desactivado — cualquiera con la clave
+`anon` pública del proyecto podía leerla vía la API REST automática de
+Supabase, aunque el backend nunca la usa así. Se activó RLS sin políticas
+(deny-all vía PostgREST); el backend sigue funcionando porque bypassa RLS.
+
+**Qué queda pendiente todavía** (deliberadamente, no es un olvido):
+
+- Migrar los **datos** reales (no solo el esquema) fuera de Supabase Postgres.
+- Migrar **Auth** fuera de Supabase (fase 03, `002_auth_propia.sql` ya
+  preparada pero sin aplicar).
+- Migrar **Storage** (imágenes, firmas, PDFs de consentimiento) fuera de los
+  buckets de Supabase.
+
 ## Pendientes de UI sueltos
 
 - **Favicon adaptado a modo oscuro/claro.** El logo del navbar ya se

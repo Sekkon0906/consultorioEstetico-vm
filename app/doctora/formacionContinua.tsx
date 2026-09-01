@@ -40,7 +40,7 @@ function CardItem({
       className="formacion-card"
       style={{
         width: "100%",
-        background: "#FFFDF9",
+        background: "var(--surface)",
         borderRadius: 18,
         border: "1px solid #EDE4D8",
         overflow: "hidden",
@@ -82,7 +82,7 @@ function CardItem({
             display: "flex", alignItems: "center", gap: 3,
             background: "rgba(255,253,249,0.92)",
             borderRadius: 20, padding: "3px 8px",
-            fontSize: "0.62rem", color: "#8B6A4B", fontWeight: 700,
+            fontSize: "0.62rem", color: "var(--brand-deep)", fontWeight: 700,
           }}>
             <ImageIcon size={9} /> {charla.galeria.length} {t("modal.photos")}
           </div>
@@ -92,7 +92,7 @@ function CardItem({
       {/* Texto */}
       <div style={{ padding: "0.85rem 1.1rem 0.95rem" }}>
         <h4 style={{
-          fontSize: "0.9rem", fontWeight: 700, color: "#3A2A1A",
+          fontSize: "0.9rem", fontWeight: 700, color: "var(--text)",
           marginBottom: "0.25rem", fontFamily: "'Playfair Display', serif",
           lineHeight: 1.35,
         }}>
@@ -107,7 +107,7 @@ function CardItem({
         </p>
         <div style={{
           marginTop: "0.6rem", fontSize: "0.68rem",
-          color: "#B08968", fontWeight: 600,
+          color: "var(--brand)", fontWeight: 600,
         }}>
           {t("viewGallery")}
         </div>
@@ -164,7 +164,7 @@ function TimelineNode({
               animate={inView ? { opacity: 1 } : {}}
               transition={{ delay: 0.4 }}
               style={{
-                fontSize: "0.65rem", color: "#C9AD8D", fontWeight: 700,
+                fontSize: "0.65rem", color: "var(--brand-soft)", fontWeight: 700,
                 letterSpacing: "0.12em", textTransform: "uppercase",
               }}
             >
@@ -204,7 +204,7 @@ function TimelineNode({
               animate={inView ? { opacity: 1 } : {}}
               transition={{ delay: 0.4 }}
               style={{
-                fontSize: "0.65rem", color: "#C9AD8D", fontWeight: 700,
+                fontSize: "0.65rem", color: "var(--brand-soft)", fontWeight: 700,
                 letterSpacing: "0.12em", textTransform: "uppercase",
               }}
             >
@@ -267,7 +267,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
         transition={{ type: "spring", damping: 28, stiffness: 320 }}
         onClick={e => e.stopPropagation()}
         style={{
-          background: "#FFFDF9", borderRadius: 26,
+          background: "var(--surface)", borderRadius: 26,
           width: "100%", maxWidth: 780,
           maxHeight: "92vh", overflowY: "auto",
           boxShadow: "0 40px 100px rgba(0,0,0,0.45)",
@@ -288,8 +288,8 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
             <div>
               <div style={{
                 display: "inline-flex", alignItems: "center", gap: 6,
-                background: "#F5EEE6", borderRadius: 20, padding: "3px 11px",
-                fontSize: "0.65rem", color: "#8B6A4B", fontWeight: 700,
+                background: "var(--surface-soft)", borderRadius: 20, padding: "3px 11px",
+                fontSize: "0.65rem", color: "var(--brand-deep)", fontWeight: 700,
                 marginBottom: "0.45rem", textTransform: "uppercase", letterSpacing: "0.05em",
               }}>
                 <Stethoscope size={10} /> {t("modal.badge")}
@@ -297,7 +297,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
               <h3 style={{
                 fontFamily: "'Playfair Display', serif",
                 fontSize: "1.4rem", fontWeight: 700,
-                color: "#3A2A1A", margin: 0, lineHeight: 1.3,
+                color: "var(--text)", margin: 0, lineHeight: 1.3,
               }}>
                 {charla.titulo}
               </h3>
@@ -306,23 +306,23 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                   display: "flex", alignItems: "center", gap: 5,
                   marginTop: "0.4rem", fontSize: "0.73rem", color: "#8B7060",
                 }}>
-                  <Calendar size={12} color="#B08968" /> {fechaFmt}
+                  <Calendar size={12} color="var(--brand)" /> {fechaFmt}
                 </div>
               )}
             </div>
             <button onClick={onClose} style={{
               width: 34, height: 34, borderRadius: "50%",
-              background: "#F5EEE6", border: "none", cursor: "pointer",
+              background: "var(--surface-soft)", border: "none", cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "center",
               flexShrink: 0, marginLeft: "1rem",
             }}>
-              <X size={16} color="#6C584C" />
+              <X size={16} color="var(--text-soft)" />
             </button>
           </div>
 
           {/* Descripción con acento */}
           <p style={{
-            fontSize: "0.86rem", color: "#6C584C", lineHeight: 1.75,
+            fontSize: "0.86rem", color: "var(--text-soft)", lineHeight: 1.75,
             marginBottom: "1.4rem",
             borderLeft: "3px solid #C9AD8D",
             paddingLeft: "0.9rem",
@@ -416,7 +416,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                   style={{
                     width: 56, height: 42, borderRadius: 8,
                     overflow: "hidden", cursor: "pointer", flexShrink: 0,
-                    border: i === idx ? "2px solid #B08968" : "2px solid transparent",
+                    border: i === idx ? "2px solid var(--brand)" : "2px solid transparent",
                     opacity: i === idx ? 1 : 0.5,
                     transition: "opacity 0.2s, border-color 0.2s",
                   }}
@@ -500,7 +500,7 @@ export default function FormacionContinua() {
           transition={{ repeat: Infinity, duration: 1.1, ease: "linear" }}
           style={{
             width: 32, height: 32, borderRadius: "50%",
-            border: "3px solid #E9DED2", borderTopColor: "#B08968",
+            border: "3px solid #E9DED2", borderTopColor: "var(--brand)",
           }}
         />
       </section>
@@ -547,7 +547,7 @@ export default function FormacionContinua() {
         >
           <p style={{
             fontSize: "0.67rem", letterSpacing: "0.22em",
-            textTransform: "uppercase", color: "#B08968",
+            textTransform: "uppercase", color: "var(--brand)",
             fontWeight: 700, marginBottom: "0.45rem",
           }}>
             {t("kicker")}
@@ -555,7 +555,7 @@ export default function FormacionContinua() {
           <h2 style={{
             fontFamily: "'Playfair Display', serif",
             fontSize: "clamp(1.9rem, 4vw, 2.6rem)",
-            fontWeight: 700, color: "#3A2A1A", margin: 0,
+            fontWeight: 700, color: "var(--text)", margin: 0,
           }}>
             {t("title")}
           </h2>
@@ -607,7 +607,7 @@ export default function FormacionContinua() {
           viewport={{ once: true }}
           style={{
             textAlign: "center", marginTop: "1.5rem",
-            fontSize: "0.7rem", color: "#C9AD8D", fontStyle: "italic",
+            fontSize: "0.7rem", color: "var(--brand-soft)", fontStyle: "italic",
           }}
         >
           {t("clickHint")}

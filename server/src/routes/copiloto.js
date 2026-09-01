@@ -58,9 +58,12 @@ Cómo trabajas:
   equivocada tiene consecuencias reales.
 - Cuando propones una modificación, la doctora la revisa y la confirma antes de que se
   aplique. Explica en una frase qué vas a hacer; ella verá los campos exactos.
-- No tienes acceso a datos de pacientes y no debes pedirlos. Sobre citas solo puedes dar
-  conteos agregados con resumen_de_citas. Si te piden saber quién tiene una cita, explica
-  que esa información solo está en la sección de Citas del panel.
+- Con citas_del_dia puedes decir qué citas hay en una fecha (nombre, hora, procedimiento,
+  estado). Con resumen_de_citas puedes dar conteos agregados en un rango. No tienes acceso
+  a teléfono, correo ni ningún otro dato de contacto del paciente: no lo pidas ni lo inventes.
+- No conoces la fecha de hoy por tu cuenta: siempre viene indicada al inicio del mensaje del
+  usuario. Cuando te pregunten por "hoy", "mañana" o un día de la semana, calcula la fecha
+  AAAA-MM-DD a partir de esa fecha de referencia antes de llamar a una herramienta.
 - Los precios son en pesos colombianos. Las fechas van en formato AAAA-MM-DD.`;
 
 // ── Utilidades ───────────────────────────────────────────────────────────────
@@ -118,7 +121,9 @@ router.post("/mensaje", verifyToken, requireRole(["admin"]), async (req, res) =>
   }
 
   const conversacionId = req.body.conversacionId || crypto.randomUUID();
-  const mensajes = [...normalizarHistorial(historial), { role: "user", content: mensaje }];
+  const hoy = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(new Date());
+  const mensajeConFecha = `[Fecha de hoy: ${hoy}]\n${mensaje}`;
+  const mensajes = [...normalizarHistorial(historial), { role: "user", content: mensajeConFecha }];
 
   try {
     // Bucle de lecturas: el modelo puede consultar varias veces antes de

@@ -4,8 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
-import { getProcedimientosApi, updateProcedimientoApi, deleteProcedimientoApi, bustProcedimientosCache } from "../../services/procedimientosApi";
-import type { Procedimiento } from "../../types/domain";
+import { getProcedimientosApi, updateProcedimientoApi, deleteProcedimientoApi, bustProcedimientosCache } from "@/services/procedimientosApi";
+import type { Procedimiento } from "@/types/domain";
 import { Plus, Edit3, Trash2, X, ChevronUp, ChevronDown, Upload, Play, Star, ArrowLeft } from "lucide-react";
 
 type Cat = "Facial" | "Corporal" | "Capilar";
@@ -380,7 +380,7 @@ export default function ProcedimientosList() {
               <div style={{ display: "flex", gap: "0.8rem", alignItems: "center", flexWrap: "wrap", marginTop: 6 }}>
                 {form.imagen && (
                   <div style={{ position: "relative" }}>
-                    <Image src={form.imagen} alt="" width={120} height={80} quality={70} style={{ height: 80, width: 120, borderRadius: 10, objectFit: "cover", border: "2px solid #B08968" }} />
+                    <Image src={form.imagen} alt="" width={120} height={80} quality={70} style={{ height: 80, width: 120, borderRadius: 10, objectFit: "cover", border: "2px solid var(--brand)" }} />
                     <button onClick={function() { setForm({ ...form, imagen: "" }); }} style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#C62828", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={10} /></button>
                   </div>
                 )}

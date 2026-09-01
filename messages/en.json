@@ -37,7 +37,12 @@
     "kicker": "Aesthetic medicine · Ibagué",
     "title1": "Your best version",
     "title2": "starts with",
-    "rotator": ["harmony.", "authenticity.", "natural beauty.", "confidence."],
+    "rotator": [
+      "harmony.",
+      "authenticity.",
+      "natural beauty.",
+      "confidence."
+    ],
     "subtitle": "Personalized treatments with state-of-the-art technology. Natural results that highlight your essence, in the hands of Dr. Vanessa Medina.",
     "ctaPrimary": "Book a visit",
     "ctaSecondary": "Explore treatments",
@@ -72,10 +77,22 @@
       "subtitle": "Close attention, safe techniques and results that honor your essence.",
       "distinguishTitle": "What makes me different",
       "features": [
-        { "title": "HydraFacial technology", "desc": "Internationally certified" },
-        { "title": "Premium products", "desc": "Advanced medical grade" },
-        { "title": "Minimal pain", "desc": "Quick recovery" },
-        { "title": "Personalized care", "desc": "A plan made just for you" }
+        {
+          "title": "HydraFacial technology",
+          "desc": "Internationally certified"
+        },
+        {
+          "title": "Premium products",
+          "desc": "Advanced medical grade"
+        },
+        {
+          "title": "Minimal pain",
+          "desc": "Quick recovery"
+        },
+        {
+          "title": "Personalized care",
+          "desc": "A plan made just for you"
+        }
       ],
       "iframeTitle": "Presentation",
       "watchVideo": "Watch presentation",
@@ -114,7 +131,14 @@
       "submit": "Send review",
       "submitting": "Sending..."
     },
-    "ratingLabels": ["", "Very poor", "Poor", "Fair", "Good", "Excellent"],
+    "ratingLabels": [
+      "",
+      "Very poor",
+      "Poor",
+      "Fair",
+      "Good",
+      "Excellent"
+    ],
     "messages": {
       "completeFields": "Please fill in every field.",
       "sent": "Review sent. It will be visible once the doctor approves it."
@@ -275,6 +299,9 @@
       "email": "Email address",
       "procedure": "Choose a treatment",
       "phone": "Phone",
+      "registered": "Are you registered?",
+      "yes": "Yes",
+      "no": "No",
       "message": "Your message",
       "acceptIntro": "I accept the",
       "acceptTerms": "terms & conditions",
@@ -284,6 +311,7 @@
       "whatsappName": "Name:",
       "whatsappEmail": "Email:",
       "whatsappPhone": "Phone:",
+      "whatsappRegistered": "Registered?:",
       "whatsappProcedure": "Treatment:",
       "whatsappMessage": "Message:",
       "notSpecified": "Not provided"
@@ -343,8 +371,29 @@
     "warningLoginRequired": "You need to sign in to book an appointment.",
     "closeWarning": "Dismiss",
     "calendar": {
-      "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-      "weekdaysShort": ["M", "T", "W", "T", "F", "S", "S"],
+      "months": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "weekdaysShort": [
+        "M",
+        "T",
+        "W",
+        "T",
+        "F",
+        "S",
+        "S"
+      ],
       "hoursAvailable": "Available times",
       "pickDay": "Pick a day",
       "pickDayHint": "Choose a day on the calendar",
@@ -568,5 +617,23 @@
         "signed": "Consent signed"
       }
     }
+  },
+  "loginPage": {
+    "titulo": "Sign in",
+    "correo": "Email address",
+    "correoPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Your password",
+    "entrar": "Sign in",
+    "entrando": "Signing in…",
+    "oEntraCon": "Or continue with:",
+    "correoInvalido": "Invalid email",
+    "passwordVacia": "Enter your password",
+    "revisaCampos": "Please check the highlighted fields.",
+    "credencialesMal": "Incorrect email or password.",
+    "errorGoogle": "Could not sign in with Google.",
+    "olvidePassword": "Forgot your password?",
+    "sinCuenta": "Don't have an account?",
+    "registrate": "Sign up"
   }
 }

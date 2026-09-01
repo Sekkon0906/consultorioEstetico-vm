@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 //  Tipo de dominio
-import type { Testimonio } from "../../types/domain";
+import type { Testimonio } from "@/types/domain";
 //  Servicios que hablan con el backend
 import {
   createTestimonioApi,
   updateTestimonioApi,
-} from "../../services/testimoniosApi";
+} from "@/services/testimoniosApi";
 
 interface Props {
   testimonio?: Testimonio;

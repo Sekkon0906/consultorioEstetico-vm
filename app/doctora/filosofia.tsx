@@ -33,9 +33,9 @@ export default function Filosofia() {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="dark-aware-card p-4 rounded-4 shadow-sm h-100"
-                style={{ background: "#fff", border: "1px solid #E9DED2" }}
+                style={{ background: "#fff", border: "1px solid var(--border)" }}
               >
-                <div style={{ fontSize: "2rem", color: "#B08968" }}>
+                <div style={{ fontSize: "2rem", color: "var(--brand)" }}>
                   <i className={`fas ${icons[i]}`} />
                 </div>
                 <h5

@@ -267,7 +267,7 @@ function RegisterPageContent() {
           justify-content: center;
           font-weight: 700;
           color: ${PALETTE.main};
-          transition: all 0.28s ease;
+          transition: all var(--mov-normal) ease;
         }
         .circle.filled {
           background-color: ${PALETTE.main};
@@ -278,7 +278,7 @@ function RegisterPageContent() {
           height: 4px;
           background-color: #e6d9cf;
           margin: 0 10px;
-          transition: background-color 0.28s ease;
+          transition: background-color var(--mov-normal) ease;
         }
         .line.active {
           background-color: ${PALETTE.main};

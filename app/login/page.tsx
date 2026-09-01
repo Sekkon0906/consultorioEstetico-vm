@@ -6,7 +6,7 @@ import LoginForm from "./LoginForm";
 import { PALETTE } from "./palette2";
 
 // Fondo 3D (Three.js) diferido: es decorativo, no debe bloquear el login.
-const FondoAnim = dynamic(() => import("../src/components/FondoAnim"), {
+const FondoAnim = dynamic(() => import("@/components/FondoAnim"), {
   ssr: false,
 });
 

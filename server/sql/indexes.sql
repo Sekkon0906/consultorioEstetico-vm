@@ -116,9 +116,10 @@ CREATE INDEX IF NOT EXISTS idx_charla_galeria_charla_id_orden
 --   La búsqueda por id ya está cubierta por la PRIMARY KEY.
 -- ---------------------------------------------------------------------------
 
--- WHERE email = $1
---   server/src/services/users.js  findUserByEmail
-CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios (email);
+-- idx_usuarios_email vive en migraciones/002_auth_propia.sql: la columna
+-- `email` no existe en usuarios hasta que esa migración corre (fase de auth
+-- propia, todavía no aplicada). Ponerla aquí rompía un deploy limpio del
+-- baseline en un Postgres nuevo.
 
 -- ORDER BY creado_en DESC
 --   server/src/routes/usuarios.js  GET /usuarios (listado admin)

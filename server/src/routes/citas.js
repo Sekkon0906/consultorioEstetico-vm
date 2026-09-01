@@ -47,7 +47,11 @@ router.get("/", verifyToken, async (req, res) => {
     const values = [];
     const conditions = [];
 
-    if (rol === "usuario") {
+    // Se filtra SALVO que sea admin, no "si es usuario". Con la versión
+    // anterior, cualquier rol distinto de la cadena exacta "usuario" recibía
+    // el listado completo: nombres, teléfonos y correos de todos los
+    // pacientes. Así falla cerrado.
+    if (rol !== "admin") {
       conditions.push(`user_id = $${values.length + 1}`);
       values.push(userId);
     }
@@ -126,14 +130,33 @@ router.put("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
 
   try {
-    if (rol === "usuario") {
+    // Se decide por lo que SÍ es admin, no por lo que no es "usuario".
+    //
+    // Antes esto era `if (rol === "usuario") { ...límites... }` y todo lo
+    // demás caía en la rama de administración, sin requireRole y sin
+    // comprobar propiedad. Es un patrón que falla ABIERTO: bastaba que el
+    // rol llegara con cualquier otro valor —un rol nuevo, un null, un
+    // cambio en cómo se resuelve— para que quien fuera pudiera reescribir
+    // fechas, montos y estado de pago de CUALQUIER cita.
+    //
+    // Ahora falla cerrado: quien no es admin solo puede cancelar lo suyo.
+    const esAdmin = rol === "admin";
+
+    if (!esAdmin) {
       if (req.body.estado !== "cancelada") {
         return res.status(403).json({ ok: false, error: "Solo puedes cancelar tus propias citas" });
       }
-      await pool.query(
+      // El AND user_id = $2 es lo que impide cancelar la cita de otro:
+      // sin esa condición, cualquiera con el id de una cita ajena la anula.
+      const { rowCount } = await pool.query(
         `UPDATE citas SET estado='cancelada', actualizado_en=NOW() WHERE id=$1 AND user_id=$2`,
         [id, userId]
       );
+      if (!rowCount) {
+        // Mismo mensaje si la cita no existe o si es de otra persona: decir
+        // "no es tuya" confirmaría que existe, y con ella el turno reservado.
+        return res.status(404).json({ ok: false, error: "Cita no encontrada" });
+      }
       return res.json({ ok: true });
     }
 

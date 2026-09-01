@@ -8,12 +8,20 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.122.0",
+    "@aws-sdk/client-s3": "^3.1123.0",
     "@supabase/supabase-js": "^2.49.4",
+    "argon2": "^0.45.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.7.0",
+    "google-auth-library": "^11.0.2",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
-    "pg": "^8.14.1"
+    "pg": "^8.14.1",
+    "resend": "^6.25.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

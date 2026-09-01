@@ -10,9 +10,9 @@ const IS: React.CSSProperties = {
   width: "100%",
   padding: "0.55rem 0.75rem",
   borderRadius: 8,
-  border: "1px solid #DCC7AC",
-  background: "#FFFDFB",
-  color: "#3A2A1A",
+  border: "1px solid var(--border-strong)",
+  background: "var(--bg-elevated)",
+  color: "var(--text)",
   fontSize: "0.88rem",
   outline: "none",
 };
@@ -105,7 +105,7 @@ export default function ConfiguracionForm() {
   };
 
   if (cargando) {
-    return <p style={{ color: "#6C584C", padding: "1rem" }}>Cargando configuración…</p>;
+    return <p style={{ color: "var(--text-soft)", padding: "1rem" }}>Cargando configuración…</p>;
   }
 
   const nombresGrupo = Object.keys(grupos).sort((a, b) => {
@@ -116,10 +116,10 @@ export default function ConfiguracionForm() {
   return (
     <div style={{ maxWidth: 780, margin: "0 auto", paddingBottom: 100 }}>
       <header style={{ marginBottom: "1.75rem" }}>
-        <h2 style={{ color: "#5A4230", fontWeight: 700, fontSize: "1.5rem", margin: 0 }}>
+        <h2 style={{ color: "var(--text)", fontWeight: 700, fontSize: "1.5rem", margin: 0 }}>
           Información general
         </h2>
-        <p style={{ color: "#8A7461", fontSize: "0.88rem", marginTop: 6, marginBottom: 0 }}>
+        <p style={{ color: "var(--text-muted)", fontSize: "0.88rem", marginTop: 6, marginBottom: 0 }}>
           Los datos del consultorio que cambian con el tiempo. Se actualizan en todo
           el sitio a la vez, incluidas las páginas legales y el consentimiento informado.
         </p>
@@ -134,7 +134,7 @@ export default function ConfiguracionForm() {
 
       {nombresGrupo.map((g) => (
         <section key={g} style={{ marginBottom: "2rem" }}>
-          <h3 style={{ color: "#5A4230", fontWeight: 600, fontSize: "1.05rem", margin: "0 0 2px" }}>
+          <h3 style={{ color: "var(--text)", fontWeight: 600, fontSize: "1.05rem", margin: "0 0 2px" }}>
             {TITULOS[g] || g}
           </h3>
           {DESCRIPCIONES[g] && (
@@ -148,18 +148,18 @@ export default function ConfiguracionForm() {
               <div key={c.clave}>
                 <label
                   htmlFor={c.clave}
-                  style={{ display: "block", color: "#5A4230", fontWeight: 600, fontSize: "0.82rem", marginBottom: 4 }}
+                  style={{ display: "block", color: "var(--text)", fontWeight: 600, fontSize: "0.82rem", marginBottom: 4 }}
                 >
                   {c.etiqueta}
                   {c.clave in cambios && (
-                    <span style={{ color: "#B08968", fontWeight: 500, marginLeft: 6, fontSize: "0.72rem" }}>
+                    <span style={{ color: "var(--brand)", fontWeight: 500, marginLeft: 6, fontSize: "0.72rem" }}>
                       sin guardar
                     </span>
                   )}
                 </label>
 
                 {c.tipo === "booleano" ? (
-                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "0.85rem", color: "#3A2A1A" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "0.85rem", color: "var(--text)" }}>
                     <input
                       id={c.clave}
                       type="checkbox"
@@ -202,7 +202,7 @@ export default function ConfiguracionForm() {
       <div
         style={{
           position: "sticky", bottom: 0, background: "rgba(251,247,242,0.96)",
-          backdropFilter: "blur(8px)", borderTop: "1px solid #DCC7AC",
+          backdropFilter: "blur(8px)", borderTop: "1px solid var(--border-strong)",
           padding: "0.85rem 0", marginTop: "1rem",
           display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
         }}

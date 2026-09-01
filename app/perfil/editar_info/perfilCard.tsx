@@ -29,12 +29,12 @@ export default function PerfilCard() {
 
       <div style={{ padding: "2rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
-          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "1.2rem", fontWeight: 700, flexShrink: 0, boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}>
+          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "1.2rem", fontWeight: 700, flexShrink: 0, boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}>
             {initial || "?"}
           </div>
           <div>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", fontWeight: 700, color: "#3A2A1A", margin: 0 }}>{t("title")}</h2>
-            <p style={{ fontSize: "0.82rem", color: "#8A7565", margin: 0 }}>{user?.email || ""}</p>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", fontWeight: 700, color: "var(--text)", margin: 0 }}>{t("title")}</h2>
+            <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", margin: 0 }}>{user?.email || ""}</p>
           </div>
         </div>
 
@@ -50,8 +50,8 @@ export default function PerfilCard() {
 
         <div className="row g-4">
           <div className="col-md-6">
-            <div className="dark-aware-panel" style={{ background: "#F5EEE6", borderRadius: 18, padding: "1.5rem" }}>
-              <h4 style={{ fontWeight: 700, color: "#3A2A1A", fontSize: "1.05rem", marginBottom: "1rem" }}>{t("personalSection")}</h4>
+            <div className="dark-aware-panel" style={{ background: "var(--surface-soft)", borderRadius: 18, padding: "1.5rem" }}>
+              <h4 style={{ fontWeight: 700, color: "var(--text)", fontSize: "1.05rem", marginBottom: "1rem" }}>{t("personalSection")}</h4>
               <DatosPersonalesForm
                 nombres={nombres} apellidos={apellidos} telefono={telefono} edad={edad} genero={genero}
                 setNombres={setNombres} setApellidos={setApellidos} setTelefono={setTelefono} setEdad={setEdad} setGenero={setGenero}
@@ -81,13 +81,13 @@ export default function PerfilCard() {
             whileTap={canEdit && !saving ? { scale: 0.97 } : {}}
             onClick={async () => { await handleSavePersonal(); await handleSaveMedical(); }}
             disabled={!canEdit || saving}
-            style={{ padding: "0.85rem 2.5rem", borderRadius: 100, background: canEdit && !saving ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "#E9DED2", color: canEdit && !saving ? "white" : "#9B8575", border: "none", fontWeight: 700, fontSize: "1rem", cursor: canEdit && !saving ? "pointer" : "not-allowed", boxShadow: canEdit && !saving ? "0 6px 18px rgba(176,137,104,0.3)" : "none" }}
+            style={{ padding: "0.85rem 2.5rem", borderRadius: 100, background: canEdit && !saving ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "var(--border)", color: canEdit && !saving ? "white" : "#9B8575", border: "none", fontWeight: 700, fontSize: "1rem", cursor: canEdit && !saving ? "pointer" : "not-allowed", boxShadow: canEdit && !saving ? "0 6px 18px rgba(176,137,104,0.3)" : "none" }}
           >
             {saving ? t("saving") : t("save")}
           </motion.button>
         </div>
 
-        <p style={{ textAlign: "center", fontSize: "0.82rem", color: "#8A7565", marginTop: "1.2rem" }}>
+        <p style={{ textAlign: "center", fontSize: "0.82rem", color: "var(--text-muted)", marginTop: "1.2rem" }}>
           {canEdit ? t("canEditHint") : t("cantEditHint", { days: daysRemaining })}
         </p>
       </div>

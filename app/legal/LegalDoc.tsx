@@ -76,7 +76,7 @@ export default function LegalDoc({ titulo, actualizado, current, children }: Pro
                 textDecoration: "none",
                 padding: "0.35rem 0.9rem",
                 borderRadius: 100,
-                background: active ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "var(--bg-elevated)",
+                background: active ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--bg-elevated)",
                 color: active ? "#FFF" : "var(--text-soft)",
                 border: "1px solid " + (active ? "transparent" : "var(--border)"),
                 boxShadow: active ? "0 2px 10px rgba(176,137,104,0.25)" : "none",

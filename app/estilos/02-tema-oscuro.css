@@ -1,0 +1,295 @@
+/* ============================================================
+   Overrides de modo oscuro por sección
+   Extraído de globals.css, que tenía 4.717 líneas en un solo
+   archivo. El ORDEN de los @import en globals.css reproduce el
+   orden original: la cascada de CSS depende de él y reordenarlos
+   cambia qué regla gana sin que salte ningún error.
+============================================================ */
+
+
+/* ==========================
+   OVERRIDES MODO OSCURO — secciones con backgrounds hardcoded
+   en estilos inline. Se invierten a tonos oscuros respetando la
+   misma jerarquía visual (sección elevada, hover, etc).
+========================== */
+:root[data-theme="dark"] .home-location-section {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] .home-location-section h2,
+:root[data-theme="dark"] .home-location-section p {
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] .home-location-section [style*="color: rgb(108, 88, 76)"],
+:root[data-theme="dark"] .home-location-section [style*="color:#6C584C"] {
+  color: var(--text-soft) !important;
+}
+
+/* /procedimientos — gradient global del background */
+:root[data-theme="dark"] .proc-page {
+  background: linear-gradient(180deg, #0E0C11 0%, #17151A 100%) !important;
+}
+/* Carrusel deslizable de la Galería 3D: SOLO visible en móvil. En
+   desktop manda la rueda 3D, así que se oculta por defecto. */
+.g3d-grid-wrap-outer { display: none; }
+
+/* La toolbar sticky debe pegarse JUSTO debajo del navbar (sticky en top:0),
+   no en top:0 (colisionaba). Lo ponemos aquí en globals (HMR fiable) con
+   especificidad de página para que gane al <style jsx> del componente. */
+.proc-page .proc-toolbar-sticky {
+  top: 72px;
+}
+@media (max-width: 767px) {
+  .proc-page .proc-toolbar-sticky { top: 56px; }
+}
+/* Carrusel destacado en móvil: dots arriba (stories) + flechas sobre la
+   imagen, para que no se solapen con los botones del card. */
+@media (max-width: 820px) {
+  .proc-page .featured-dots { top: 14px !important; bottom: auto !important; }
+  .proc-page .featured-arrow { top: 28% !important; }
+}
+/* Toolbar sticky: glassmorphism oscuro */
+:root[data-theme="dark"] .proc-toolbar-sticky {
+  background: rgba(20, 16, 12, 0.85) !important;
+  border-bottom-color: rgba(232, 201, 160, 0.18) !important;
+}
+:root[data-theme="dark"] .proc-search-input {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+:root[data-theme="dark"] .proc-search-input::placeholder {
+  color: var(--text-muted) !important;
+}
+:root[data-theme="dark"] .proc-chip {
+  color: var(--text-soft) !important;
+  border-color: var(--border) !important;
+}
+:root[data-theme="dark"] .proc-chip:hover {
+  color: var(--text) !important;
+  border-color: var(--brand) !important;
+}
+:root[data-theme="dark"] .proc-subchip {
+  background: var(--surface) !important;
+  color: var(--text-soft) !important;
+  border-color: var(--border) !important;
+}
+:root[data-theme="dark"] .proc-subchip.is-active {
+  background: var(--text) !important;
+  color: var(--bg) !important;
+}
+:root[data-theme="dark"] .proc-sort-trigger,
+:root[data-theme="dark"] .proc-sort-menu {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+:root[data-theme="dark"] .proc-sort-option {
+  color: var(--text) !important;
+}
+/* Cards de procedimientos */
+:root[data-theme="dark"] .proc-card {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+:root[data-theme="dark"] .proc-card-title { color: var(--text) !important; }
+:root[data-theme="dark"] .proc-card-desc { color: var(--text-soft) !important; }
+:root[data-theme="dark"] .proc-card-cat-chip {
+  background: rgba(20,16,12,0.85) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+/* Carrusel featured */
+:root[data-theme="dark"] .featured-card,
+:root[data-theme="dark"] .proc-page .featured-card {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg-elevated) 100%) !important;
+  border-color: rgba(232,201,160,0.35) !important;
+}
+:root[data-theme="dark"] .featured-card h2,
+:root[data-theme="dark"] .featured-card p { color: var(--text) !important; }
+
+/* Kicker pill "FEATURED & PROMOTIONS THIS MONTH" — el texto #8B5A12 sobre
+   bg champagne pastel no contrasta en dark. Reforzamos. */
+:root[data-theme="dark"] .featured-kicker-pill,
+:root[data-theme="dark"] .featured-card [style*="color: #8B5A12"],
+:root[data-theme="dark"] .featured-card [style*="color:#8B5A12"] {
+  color: var(--brand) !important;
+  background: linear-gradient(135deg, rgba(232, 201, 160, 0.22), rgba(242, 221, 184, 0.18)) !important;
+  border-color: var(--brand) !important;
+  -webkit-text-fill-color: var(--brand) !important;
+  box-shadow: 0 2px 12px rgba(232, 201, 160, 0.22) !important;
+}
+:root[data-theme="dark"] .featured-kicker-pill svg {
+  color: var(--brand) !important;
+}
+
+/* Precio en cards de procedimientos — siempre blanco para visibilidad */
+:root[data-theme="dark"] .proc-card-price,
+:root[data-theme="dark"] .proc-card-price-new {
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] .proc-card-price-unit {
+  color: var(--text-muted) !important;
+}
+:root[data-theme="dark"] .proc-card-price-old {
+  color: var(--text-muted) !important;
+}
+/* Precio en featured carousel */
+:root[data-theme="dark"] .featured-card [style*="color: #B08968"],
+:root[data-theme="dark"] .featured-card [style*="color:#B08968"] {
+  color: var(--brand) !important;
+}
+/* Botón "Learn more" / btn-ghost-app dentro del featured card */
+:root[data-theme="dark"] .featured-card .btn-ghost-app {
+  background: rgba(232, 201, 160, 0.08) !important;
+  color: var(--text) !important;
+  border-color: var(--brand) !important;
+}
+/* Dots del carrusel */
+:root[data-theme="dark"] .featured-dots {
+  background: rgba(31, 24, 18, 0.85) !important;
+  border-color: var(--border) !important;
+}
+:root[data-theme="dark"] .featured-arrow {
+  background: rgba(31, 24, 18, 0.85) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+/* Hero — gradient/overlay del hero queda igual (imagen + dark overlay),
+   pero el title rotator se mantiene champagne. */
+
+/* Sticky topbar */
+:root[data-theme="dark"] .topbar {
+  background: var(--topbar-bg) !important;
+  color: var(--topbar-text) !important;
+}
+:root[data-theme="dark"] .topbar-item { color: var(--topbar-text) !important; }
+
+/* Footer ya usa color hex hardcoded #3E2E22 — lo dejamos oscuro siempre,
+   pero forzamos var(--footer-bg) en modo oscuro para mayor profundidad. */
+:root[data-theme="dark"] footer,
+:root[data-theme="dark"] .site-footer {
+  background: var(--footer-bg) !important;
+}
+
+/* Encabezado de /procedimientos (h1 con color inline) */
+:root[data-theme="dark"] .proc-page h1,
+:root[data-theme="dark"] .proc-page h2,
+:root[data-theme="dark"] .proc-page h3 {
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] .proc-page p {
+  color: var(--text-soft) !important;
+}
+:root[data-theme="dark"] .proc-page small {
+  color: var(--text-muted) !important;
+}
+:root[data-theme="dark"] .proc-page .proc-card .proc-card-arrow,
+:root[data-theme="dark"] .featured-card a[href^="/agendar"] {
+  filter: brightness(1.1);
+}
+
+/* Bloques de información que vienen del componente FormacionContinua
+   en /doctora — el background gradient claro debería hacerse oscuro */
+:root[data-theme="dark"] [style*="background: linear-gradient(180deg, #F7EFE7 0%, #FBF8F4 100%)"],
+:root[data-theme="dark"] [style*="background:#FBF8F4"],
+:root[data-theme="dark"] [style*="background: #FBF8F4"] {
+  background: var(--bg-elevated) !important;
+  color: var(--text) !important;
+}
+
+/* Texto del hero de /procedimientos (inline #3A2A1A / #6C584C) */
+:root[data-theme="dark"] [style*="color: #3A2A1A"],
+:root[data-theme="dark"] [style*="color:#3A2A1A"] {
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] [style*="color: #6C584C"],
+:root[data-theme="dark"] [style*="color:#6C584C"] {
+  color: var(--text-soft) !important;
+}
+:root[data-theme="dark"] [style*="color: #8B7060"],
+:root[data-theme="dark"] [style*="color:#8B7060"],
+:root[data-theme="dark"] [style*="color: #A0907B"],
+:root[data-theme="dark"] [style*="color:#A0907B"] {
+  color: var(--text-muted) !important;
+}
+
+/* /consultorio fondo claro */
+:root[data-theme="dark"] .bg-\[\#FAF6F1\] {
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] .text-\[\#2B2B2B\] {
+  color: var(--text) !important;
+}
+
+/* ============================================================
+   ESTADOS DE COLOR EN MODO OSCURO
+   Los chips de estado (cita confirmada, atendida, cancelada,
+   pendiente) usan pasteles con texto oscuro encima. El par es
+   coherente, así que en modo oscuro SE LEEN — pero cantan como
+   bloques brillantes sobre el fondo grafito, y rompen la calma
+   del tema.
+
+   Aquí se les da versión oscura conservando el matiz, que es lo
+   que comunica: verde sigue siendo verde (atendida), azul azul
+   (confirmada), rojo rojo (cancelada). Se oscurece el fondo y se
+   aclara el texto, manteniendo el contraste entre ambos.
+============================================================ */
+
+/* Verde — atendida / éxito */
+:root[data-theme="dark"] [style*="#E8F5E9"],
+:root[data-theme="dark"] [style*="#EEF7EE"],
+:root[data-theme="dark"] [style*="#EAF6EC"] {
+  background-color: #16301F !important;
+  color: #A7DDB8 !important;
+  border-color: #2C5A3C !important;
+}
+
+/* Azul — confirmada / informativo */
+:root[data-theme="dark"] [style*="#E3F2FD"] {
+  background-color: #14293D !important;
+  color: #9FC9EE !important;
+  border-color: #2A4C6D !important;
+}
+
+/* Rojo / rosa — cancelada, error, alerta */
+:root[data-theme="dark"] [style*="#FCE4EC"],
+:root[data-theme="dark"] [style*="#FCEAEA"],
+:root[data-theme="dark"] [style*="#FBEAEA"],
+:root[data-theme="dark"] [style*="#F7E4E1"],
+:root[data-theme="dark"] [style*="#FFF3EF"] {
+  background-color: #38201F !important;
+  color: #EDA9A2 !important;
+  border-color: #5E332F !important;
+}
+
+/* Ámbar / durazno — pendiente, aviso */
+:root[data-theme="dark"] [style*="#FFF8E1"],
+:root[data-theme="dark"] [style*="#FDE8D8"],
+:root[data-theme="dark"] [style*="#FCEFE3"],
+:root[data-theme="dark"] [style*="#FFF6E9"] {
+  background-color: #33291A !important;
+  color: #E0BE86 !important;
+  border-color: #56452B !important;
+}
+
+/* Morado — categorías y etiquetas sueltas */
+:root[data-theme="dark"] [style*="#EDE0F0"] {
+  background-color: #2B1F33 !important;
+  color: #C9A9D6 !important;
+  border-color: #46345190 !important;
+}
+
+/* Cremas casi blancos que se usaban como superficie de tarjeta */
+:root[data-theme="dark"] [style*="#FFFCF8"],
+:root[data-theme="dark"] [style*="#FDFBF8"],
+:root[data-theme="dark"] [style*="#FAF7F2"],
+:root[data-theme="dark"] [style*="#F8F5F0"],
+:root[data-theme="dark"] [style*="#F6F4EF"],
+:root[data-theme="dark"] [style*="#F8F9FA"] {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+}

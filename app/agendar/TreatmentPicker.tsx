@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Search, X, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
-import type { Procedimiento } from "../types/domain";
+import type { Procedimiento } from "@/types/domain";
 
 interface Props {
   value: string;

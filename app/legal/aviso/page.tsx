@@ -44,7 +44,7 @@ export default function AvisoPage() {
         <Link href="/legal/privacidad">Política de Privacidad completa</Link>.
       </p>
 
-      <p style={{ marginTop: "1.4rem", fontSize: "0.88rem", color: "#8A7565" }}>
+      <p style={{ marginTop: "1.4rem", fontSize: "0.88rem", color: "var(--text-muted)" }}>
         Este aviso se entrega en cumplimiento de la Ley 1581 de 2012 y el
         Decreto 1377 de 2013.
       </p>

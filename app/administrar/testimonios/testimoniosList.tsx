@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
-import { getTestimoniosApi, deleteTestimonioApi, bustTestimoniosCache } from "../../services/testimoniosApi";
-import type { Testimonio } from "../../types/domain";
+import { getTestimoniosApi, deleteTestimonioApi, bustTestimoniosCache } from "@/services/testimoniosApi";
+import type { Testimonio } from "@/types/domain";
 import { Plus, Edit3, Trash2, X, Eye, EyeOff, Star, Upload, Play } from "lucide-react";
 
 var BUCKET = "testimonios";
@@ -170,7 +170,7 @@ export default function TestimoniosList() {
                 </div>
                 <div style={{ background: "var(--surface-soft)", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}><Lbl>Foto del paciente</Lbl>
                   <div style={{ display: "flex", gap: "0.8rem", alignItems: "center", flexWrap: "wrap", marginTop: 6 }}>
-                    {form.thumb && <div style={{ position: "relative" }}><Image src={form.thumb} alt="" width={64} height={64} quality={70} style={{ height: 64, width: 64, borderRadius: 10, objectFit: "cover", border: "2px solid #B08968" }} /><button onClick={function() { setForm({ ...form, thumb: "" }); }} style={{ position: "absolute", top: -5, right: -5, width: 18, height: 18, borderRadius: "50%", background: "#C62828", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} /></button></div>}
+                    {form.thumb && <div style={{ position: "relative" }}><Image src={form.thumb} alt="" width={64} height={64} quality={70} style={{ height: 64, width: 64, borderRadius: 10, objectFit: "cover", border: "2px solid var(--brand)" }} /><button onClick={function() { setForm({ ...form, thumb: "" }); }} style={{ position: "absolute", top: -5, right: -5, width: 18, height: 18, borderRadius: "50%", background: "#C62828", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} /></button></div>}
                     <label style={{ padding: "0.45rem 1rem", borderRadius: 12, border: "1px dashed #B08968", cursor: upl ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: upl ? 0.6 : 1 }}><Upload size={14} /> {upl ? "Subiendo..." : form.thumb ? "Cambiar" : "Subir foto"}<input type="file" accept="image/*" style={{ display: "none" }} onChange={handleThumb} disabled={upl} /></label>
                   </div>
                 </div>

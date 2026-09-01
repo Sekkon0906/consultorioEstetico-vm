@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Check, X, Sparkles, AlertCircle, KeyRound, Trash2 } from "lucide-react";
+import { Send, Check, X, Sparkles, AlertCircle, KeyRound, Trash2, Mic, MicOff } from "lucide-react";
 import { api } from "@/lib/api";
 import Button from "@/components/ui/Button";
 
@@ -41,6 +41,35 @@ type RespuestaApi = {
   historial?: unknown[];
 };
 
+// El navegador no siempre trae los tipos de la Web Speech API.
+interface EventoReconocimiento extends Event {
+  results: { [i: number]: { [j: number]: { transcript: string }; isFinal: boolean }; length: number };
+}
+interface Reconocedor extends EventTarget {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  start: () => void;
+  stop: () => void;
+  onresult: ((e: EventoReconocimiento) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+}
+
+function crearReconocedor(): Reconocedor | null {
+  if (typeof window === "undefined") return null;
+  const Ctor =
+    (window as unknown as { SpeechRecognition?: new () => Reconocedor; webkitSpeechRecognition?: new () => Reconocedor })
+      .SpeechRecognition ||
+    (window as unknown as { webkitSpeechRecognition?: new () => Reconocedor }).webkitSpeechRecognition;
+  if (!Ctor) return null;
+  const r = new Ctor();
+  r.lang = "es-CO";
+  r.continuous = false;
+  r.interimResults = false;
+  return r;
+}
+
 function valorLegible(v: unknown): string {
   if (typeof v === "boolean") return v ? "Sí" : "No";
   if (Array.isArray(v)) {
@@ -75,6 +104,33 @@ export default function CopilotoChat() {
   const [guardandoKey, setGuardandoKey] = useState(false);
   const [configError, setConfigError] = useState<string | null>(null);
 
+  // Dictado por voz (Web Speech API del navegador; sin costo ni dependencia externa).
+  const [grabando, setGrabando] = useState(false);
+  const [vozDisponible, setVozDisponible] = useState(false);
+  const reconocedorRef = useRef<Reconocedor | null>(null);
+
+  useEffect(() => {
+    setVozDisponible(!!crearReconocedor());
+  }, []);
+
+  const alternarVoz = () => {
+    if (grabando) {
+      reconocedorRef.current?.stop();
+      return;
+    }
+    const r = crearReconocedor();
+    if (!r) return;
+    reconocedorRef.current = r;
+    r.onresult = (e) => {
+      const texto = e.results[e.results.length - 1]?.[0]?.transcript?.trim();
+      if (texto) enviar(texto);
+    };
+    r.onerror = () => setGrabando(false);
+    r.onend = () => setGrabando(false);
+    setGrabando(true);
+    r.start();
+  };
+
   const cargarConfig = () => {
     api
       .get<{ ok: boolean; data: typeof config }>("/copiloto/config")
@@ -88,8 +144,8 @@ export default function CopilotoChat() {
     finRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [burbujas, propuesta]);
 
-  const enviar = async () => {
-    const texto = entrada.trim();
+  const enviar = async (textoVoz?: string) => {
+    const texto = (textoVoz ?? entrada).trim();
     if (!texto || pensando) return;
 
     setBurbujas((b) => [...b, { de: "doctora", texto }]);
@@ -198,10 +254,10 @@ export default function CopilotoChat() {
       <header style={{ marginBottom: "1.25rem" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div>
-            <h2 style={{ color: "#5A4230", fontWeight: 700, fontSize: "1.5rem", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
-              <Sparkles size={22} style={{ color: "#B08968" }} /> Asistente
+            <h2 style={{ color: "var(--text)", fontWeight: 700, fontSize: "1.5rem", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
+              <Sparkles size={22} style={{ color: "var(--brand)" }} /> Asistente
             </h2>
-            <p style={{ color: "#8A7461", fontSize: "0.88rem", marginTop: 6, marginBottom: 0 }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.88rem", marginTop: 6, marginBottom: 0 }}>
               Pídele que cree o cambie procedimientos, promociones e información del consultorio.
               Siempre te muestra qué va a hacer antes de hacerlo.
             </p>
@@ -212,9 +268,9 @@ export default function CopilotoChat() {
             onClick={() => setMostrarConfig((v) => !v)}
             style={{
               display: "flex", alignItems: "center", gap: 6, padding: "0.4rem 0.8rem",
-              borderRadius: 100, border: "1px solid #DCC7AC",
-              background: config?.configurada ? "#E3EDE5" : "#FBF7F2",
-              color: config?.configurada ? "#3E6B50" : "#8A7461",
+              borderRadius: 100, border: "1px solid var(--border)",
+              background: config?.configurada ? "color-mix(in srgb, var(--success) 18%, transparent)" : "var(--surface-soft)",
+              color: config?.configurada ? "var(--success)" : "var(--text-muted)",
               fontSize: "0.78rem", fontWeight: 600, cursor: "pointer", flexShrink: 0,
             }}
           >
@@ -233,11 +289,11 @@ export default function CopilotoChat() {
               exit={{ opacity: 0, height: 0 }}
               style={{ overflow: "hidden" }}
             >
-              <div style={{ marginTop: "0.9rem", padding: "1rem", borderRadius: 14, background: "#FBF7F2", border: "1px solid #E8DCCB" }}>
-                <p style={{ margin: "0 0 0.6rem", color: "#5A4230", fontWeight: 600, fontSize: "0.85rem" }}>
+              <div style={{ marginTop: "0.9rem", padding: "1rem", borderRadius: 14, background: "var(--surface-soft)", border: "1px solid var(--border)" }}>
+                <p style={{ margin: "0 0 0.6rem", color: "var(--text)", fontWeight: 600, fontSize: "0.85rem" }}>
                   Clave de API del copiloto
                 </p>
-                <p style={{ margin: "0 0 0.7rem", color: "#8A7461", fontSize: "0.78rem", lineHeight: 1.5 }}>
+                <p style={{ margin: "0 0 0.7rem", color: "var(--text-muted)", fontSize: "0.78rem", lineHeight: 1.5 }}>
                   La de Anthropic (Claude), la que usa el asistente para responder. Se guarda cifrada;
                   una vez configurada, solo hace falta escribir en el chat.
                 </p>
@@ -248,7 +304,7 @@ export default function CopilotoChat() {
                     onChange={(e) => setApiKeyInput(e.target.value)}
                     placeholder="sk-ant-..."
                     autoComplete="off"
-                    style={{ flex: 1, minWidth: 200, padding: "0.5rem 0.8rem", borderRadius: 8, border: "1px solid #DCC7AC", background: "#FFFDFB", color: "#3A2A1A", fontSize: "0.85rem", outline: "none" }}
+                    style={{ flex: 1, minWidth: 200, padding: "0.5rem 0.8rem", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg-elevated)", color: "var(--text)", fontSize: "0.85rem", outline: "none" }}
                   />
                   <Button variant="primary" size="sm" onClick={guardarClave} disabled={guardandoKey}>
                     {guardandoKey ? "Guardando…" : "Guardar"}
@@ -260,13 +316,13 @@ export default function CopilotoChat() {
                   )}
                 </div>
                 {config && !config.puedeGuardarPropia && (
-                  <p style={{ margin: "0.6rem 0 0", color: "#A5352B", fontSize: "0.76rem" }}>
+                  <p style={{ margin: "0.6rem 0 0", color: "var(--danger)", fontSize: "0.76rem" }}>
                     El servidor todavía no tiene <code>SECRETS_ENCRYPTION_KEY</code> configurada —
                     sin eso no hay con qué cifrar la clave. Avísale a quien administra el hosting.
                   </p>
                 )}
                 {configError && (
-                  <p style={{ margin: "0.6rem 0 0", color: "#A5352B", fontSize: "0.78rem" }}>{configError}</p>
+                  <p style={{ margin: "0.6rem 0 0", color: "var(--danger)", fontSize: "0.78rem" }}>{configError}</p>
                 )}
               </div>
             </motion.div>
@@ -277,11 +333,11 @@ export default function CopilotoChat() {
       {/* Conversación */}
       <div style={{ flex: 1, overflowY: "auto", paddingRight: 4, display: "flex", flexDirection: "column", gap: 12 }}>
         {burbujas.length === 0 && !pensando && (
-          <div style={{ background: "#FBF7F2", border: "1px dashed #DCC7AC", borderRadius: 12, padding: "1.25rem" }}>
-            <p style={{ color: "#5A4230", fontWeight: 600, fontSize: "0.88rem", margin: "0 0 8px" }}>
+          <div style={{ background: "var(--surface-soft)", border: "1px dashed var(--border)", borderRadius: 12, padding: "1.25rem" }}>
+            <p style={{ color: "var(--text)", fontWeight: 600, fontSize: "0.88rem", margin: "0 0 8px" }}>
               Por ejemplo:
             </p>
-            <ul style={{ color: "#8A7461", fontSize: "0.85rem", margin: 0, paddingLeft: "1.1rem", lineHeight: 1.9 }}>
+            <ul style={{ color: "var(--text-muted)", fontSize: "0.85rem", margin: 0, paddingLeft: "1.1rem", lineHeight: 1.9 }}>
               <li>Agrega rinomodelación con ácido hialurónico, facial, 45 minutos, 850.000</li>
               <li>Pon el botox en promoción a 600.000 hasta el 30 de septiembre</li>
               <li>Cambia el WhatsApp del consultorio a 3105551234</li>
@@ -301,9 +357,9 @@ export default function CopilotoChat() {
               style={{
                 padding: "0.7rem 1rem", borderRadius: 14, fontSize: "0.89rem", lineHeight: 1.55,
                 whiteSpace: "pre-wrap",
-                background: b.de === "doctora" ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#FBF7F2",
-                color: b.de === "doctora" ? "white" : "#3A2A1A",
-                border: b.de === "doctora" ? "none" : "1px solid #E8DCCB",
+                background: b.de === "doctora" ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--surface-soft)",
+                color: b.de === "doctora" ? "var(--brand-contrast)" : "var(--text)",
+                border: b.de === "doctora" ? "none" : "1px solid var(--border)",
               }}
             >
               {b.texto}
@@ -312,7 +368,7 @@ export default function CopilotoChat() {
         ))}
 
         {pensando && (
-          <div style={{ alignSelf: "flex-start", color: "#8A7461", fontSize: "0.85rem", fontStyle: "italic" }}>
+          <div style={{ alignSelf: "flex-start", color: "var(--text-muted)", fontSize: "0.85rem", fontStyle: "italic" }}>
             Pensando…
           </div>
         )}
@@ -324,22 +380,22 @@ export default function CopilotoChat() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              style={{ background: "#FFFDFB", border: "2px solid #B08968", borderRadius: 14, padding: "1.1rem", alignSelf: "stretch" }}
+              style={{ background: "var(--bg-elevated)", border: "2px solid var(--brand)", borderRadius: 14, padding: "1.1rem", alignSelf: "stretch" }}
             >
-              <p style={{ color: "#8A6440", fontWeight: 700, fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 10px" }}>
+              <p style={{ color: "var(--brand-deep)", fontWeight: 700, fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 10px" }}>
                 {ACCIONES[propuesta.herramienta] || propuesta.herramienta}
               </p>
 
               <dl style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "6px 14px", margin: "0 0 14px", fontSize: "0.86rem" }}>
                 {Object.entries(propuesta.argumentos).map(([k, v]) => (
                   <div key={k} style={{ display: "contents" }}>
-                    <dt style={{ color: "#8A7461", fontWeight: 600 }}>{CAMPOS[k] || k}</dt>
-                    <dd style={{ margin: 0, color: "#3A2A1A", whiteSpace: "pre-wrap" }}>{valorLegible(v)}</dd>
+                    <dt style={{ color: "var(--text-muted)", fontWeight: 600 }}>{CAMPOS[k] || k}</dt>
+                    <dd style={{ margin: 0, color: "var(--text)", whiteSpace: "pre-wrap" }}>{valorLegible(v)}</dd>
                   </div>
                 ))}
               </dl>
 
-              <p style={{ color: "#8A7461", fontSize: "0.78rem", margin: "0 0 12px" }}>
+              <p style={{ color: "var(--text-muted)", fontSize: "0.78rem", margin: "0 0 12px" }}>
                 Revisa los datos. Nada se ha guardado todavía.
               </p>
 
@@ -356,7 +412,7 @@ export default function CopilotoChat() {
         </AnimatePresence>
 
         {error && (
-          <div style={{ display: "flex", gap: 8, alignItems: "flex-start", background: "#F7E4E1", border: "1px solid #E0B4AC", color: "#A5352B", padding: "0.7rem 0.9rem", borderRadius: 10, fontSize: "0.85rem" }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-start", background: "color-mix(in srgb, var(--danger) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--danger) 40%, transparent)", color: "var(--danger)", padding: "0.7rem 0.9rem", borderRadius: 10, fontSize: "0.85rem" }}>
             <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
             <span>{error}</span>
           </div>
@@ -366,20 +422,37 @@ export default function CopilotoChat() {
       </div>
 
       {/* Entrada */}
-      <div style={{ display: "flex", gap: 10, paddingTop: "1rem", borderTop: "1px solid #E8DCCB", marginTop: "0.75rem" }}>
+      <div style={{ display: "flex", gap: 10, paddingTop: "1rem", borderTop: "1px solid var(--border)", marginTop: "0.75rem" }}>
         <input
           value={entrada}
           onChange={(e) => setEntrada(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }}
-          placeholder="Escribe lo que necesitas…"
+          placeholder={grabando ? "Escuchando…" : "Escribe o dicta lo que necesitas…"}
           disabled={pensando}
-          style={{ flex: 1, padding: "0.65rem 1rem", borderRadius: 100, border: "1px solid #DCC7AC", background: "#FFFDFB", color: "#3A2A1A", fontSize: "0.89rem", outline: "none" }}
+          style={{ flex: 1, padding: "0.65rem 1rem", borderRadius: 100, border: "1px solid var(--border)", background: "var(--bg-elevated)", color: "var(--text)", fontSize: "0.89rem", outline: "none" }}
         />
+        {vozDisponible && (
+          <button
+            type="button"
+            onClick={alternarVoz}
+            disabled={pensando}
+            aria-label={grabando ? "Detener dictado" : "Dictar por voz"}
+            style={{
+              width: 44, height: 44, borderRadius: "50%", border: "none", flexShrink: 0,
+              background: grabando ? "var(--danger)" : "var(--surface-soft)",
+              color: grabando ? "var(--bg)" : "var(--text-muted)",
+              display: "grid", placeItems: "center", cursor: "pointer",
+              animation: grabando ? "pulse 1.4s ease-in-out infinite" : "none",
+            }}
+          >
+            {grabando ? <MicOff size={17} /> : <Mic size={17} />}
+          </button>
+        )}
         <button
-          onClick={enviar}
+          onClick={() => enviar()}
           disabled={pensando || !entrada.trim()}
           aria-label="Enviar"
-          style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: entrada.trim() && !pensando ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#DCC7AC", color: "white", display: "grid", placeItems: "center", cursor: entrada.trim() && !pensando ? "pointer" : "default", flexShrink: 0 }}
+          style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: entrada.trim() && !pensando ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border-strong)", color: "var(--brand-contrast)", display: "grid", placeItems: "center", cursor: entrada.trim() && !pensando ? "pointer" : "default", flexShrink: 0 }}
         >
           <Send size={17} />
         </button>

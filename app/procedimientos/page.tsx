@@ -7,9 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { Search, X, ArrowRight, Sparkles, Calendar, ChevronLeft, ChevronRight, Star, ChevronDown, Check, ArrowUpDown } from "lucide-react";
 
-import type { Procedimiento } from "../types/domain";
-import { getProcedimientosApi } from "../services/procedimientosApi";
-import { IMG } from "../src/lib/imagenes";
+import type { Procedimiento } from "@/types/domain";
+import { getProcedimientosApi } from "@/services/procedimientosApi";
+import { IMG } from "@/lib/imagenes";
 
 type Categoria = "todos" | "Facial" | "Corporal" | "Capilar";
 type SortMode = "name" | "priceAsc" | "priceDesc" | "featured" | "discount";
@@ -195,7 +195,7 @@ export default function ProcedimientosPage() {
             fontFamily: "'Playfair Display', serif",
             fontSize: "clamp(2rem, 4vw, 3.2rem)",
             fontWeight: 700,
-            color: "#3A2A1A",
+            color: "var(--text)",
             margin: 0,
             lineHeight: 1.15,
           }}
@@ -207,7 +207,7 @@ export default function ProcedimientosPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           style={{
-            color: "#6C584C",
+            color: "var(--text-soft)",
             fontSize: "clamp(0.95rem, 1.1vw, 1.1rem)",
             lineHeight: 1.6,
             maxWidth: 720,
@@ -484,7 +484,7 @@ export default function ProcedimientosPage() {
           color: #3A2A1A;
           font-size: 0.92rem;
           outline: none;
-          transition: border-color 0.25s ease, box-shadow 0.25s ease;
+          transition: border-color var(--mov-normal) ease, box-shadow var(--mov-normal) ease;
           font-family: inherit;
         }
         .proc-search-input::placeholder {
@@ -509,7 +509,7 @@ export default function ProcedimientosPage() {
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: background 0.2s ease;
+          transition: background var(--mov-rapido) ease;
         }
         .proc-search-clear:hover {
           background: rgba(176, 137, 104, 0.25);
@@ -529,7 +529,7 @@ export default function ProcedimientosPage() {
           font-size: 0.86rem;
           font-weight: 600;
           cursor: pointer;
-          transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+          transition: background var(--mov-normal) ease, color var(--mov-normal) ease, border-color var(--mov-normal) ease, transform var(--mov-rapido) ease;
           letter-spacing: 0.01em;
         }
         .proc-chip:hover {
@@ -537,7 +537,7 @@ export default function ProcedimientosPage() {
           color: #3A2A1A;
         }
         .proc-chip.is-active {
-          background: linear-gradient(135deg, #B08968, #C9AD8D);
+          background: linear-gradient(135deg, var(--brand), var(--brand-soft));
           color: #FFFDF9;
           border-color: transparent;
           box-shadow: 0 6px 16px rgba(176, 137, 104, 0.28);
@@ -571,7 +571,7 @@ export default function ProcedimientosPage() {
           font-size: 0.78rem;
           font-weight: 500;
           cursor: pointer;
-          transition: background 0.25s ease, color 0.25s ease,
+          transition: background var(--mov-normal) ease, color var(--mov-normal) ease,
             border-color 0.25s ease, transform 0.2s ease;
         }
         .proc-subchip:hover {
@@ -613,7 +613,7 @@ export default function ProcedimientosPage() {
           font-weight: 600;
           cursor: pointer;
           outline: none;
-          transition: border-color 0.25s ease, box-shadow 0.25s ease,
+          transition: border-color var(--mov-normal) ease, box-shadow var(--mov-normal) ease,
             background 0.25s ease;
           font-family: inherit;
         }
@@ -628,7 +628,7 @@ export default function ProcedimientosPage() {
         }
         .proc-sort-caret {
           color: #8B7060;
-          transition: transform 0.25s ease;
+          transition: transform var(--mov-normal) ease;
           flex-shrink: 0;
         }
         .proc-sort-menu {
@@ -662,7 +662,7 @@ export default function ProcedimientosPage() {
           text-align: left;
           border-radius: 9px;
           cursor: pointer;
-          transition: background 0.18s ease, color 0.18s ease;
+          transition: background var(--mov-rapido) ease, color var(--mov-rapido) ease;
           font-family: inherit;
         }
         .proc-sort-option:hover {
@@ -670,7 +670,7 @@ export default function ProcedimientosPage() {
           color: #3A2A1A;
         }
         .proc-sort-option.is-selected {
-          background: linear-gradient(135deg, #B08968, #C9AD8D);
+          background: linear-gradient(135deg, var(--brand), var(--brand-soft));
           color: #FFFDF9;
           font-weight: 600;
         }
@@ -699,7 +699,7 @@ export default function ProcedimientosPage() {
           overflow: hidden;
           border: 1px solid rgba(176, 137, 104, 0.12);
           box-shadow: 0 4px 16px rgba(58, 42, 26, 0.06);
-          transition: box-shadow 0.4s ease, transform 0.4s ease, border-color 0.3s ease;
+          transition: box-shadow var(--mov-lento) ease, transform var(--mov-lento) ease, border-color var(--mov-normal) ease;
           cursor: pointer;
           display: flex;
           flex-direction: column;
@@ -865,12 +865,12 @@ export default function ProcedimientosPage() {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #B08968, #C9AD8D);
+          background: linear-gradient(135deg, var(--brand), var(--brand-soft));
           color: #FFF;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          transition: transform var(--mov-normal) ease, box-shadow var(--mov-normal) ease;
         }
         .proc-card:hover .proc-card-arrow {
           transform: translateX(2px);
@@ -1074,7 +1074,7 @@ function FeaturedCarousel({
                   fontFamily: "'Playfair Display', serif",
                   fontSize: "clamp(1.35rem, 2vw, 1.8rem)",
                   fontWeight: 700,
-                  color: "#3A2A1A",
+                  color: "var(--text)",
                   margin: 0,
                   lineHeight: 1.2,
                 }}
@@ -1084,7 +1084,7 @@ function FeaturedCarousel({
               {item.desc && (
                 <p
                   style={{
-                    color: "#6C584C",
+                    color: "var(--text-soft)",
                     fontSize: "0.92rem",
                     lineHeight: 1.55,
                     margin: 0,
@@ -1100,7 +1100,7 @@ function FeaturedCarousel({
               {item.precio && (
                 <p
                   style={{
-                    color: "#B08968",
+                    color: "var(--brand)",
                     fontWeight: 700,
                     fontSize: "0.95rem",
                     margin: "0.2rem 0 0",
@@ -1125,7 +1125,7 @@ function FeaturedCarousel({
                     gap: 6,
                     padding: "0.6rem 1.2rem",
                     borderRadius: 100,
-                    background: "linear-gradient(135deg, #B08968, #C9AD8D)",
+                    background: "linear-gradient(135deg, var(--brand), var(--brand-soft))",
                     color: "#FFF",
                     fontWeight: 600,
                     textDecoration: "none",
@@ -1216,12 +1216,12 @@ function FeaturedCarousel({
           align-items: center;
           justify-content: center;
           box-shadow: 0 6px 18px rgba(58, 42, 26, 0.18);
-          transition: background 0.25s ease, transform 0.25s ease,
+          transition: background var(--mov-normal) ease, transform var(--mov-normal) ease,
             box-shadow 0.25s ease;
           z-index: 3;
         }
         .featured-arrow:hover {
-          background: linear-gradient(135deg, #B08968, #C9AD8D);
+          background: linear-gradient(135deg, var(--brand), var(--brand-soft));
           color: #FFF;
           transform: translateY(-50%) scale(1.08);
           box-shadow: 0 10px 24px rgba(176, 137, 104, 0.35);
@@ -1255,7 +1255,7 @@ function FeaturedCarousel({
           border: none;
           cursor: pointer;
           padding: 0;
-          transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+          transition: width var(--mov-lento) cubic-bezier(0.22, 1, 0.36, 1),
             background 0.25s ease;
         }
         .featured-dot.is-active {
@@ -1415,14 +1415,14 @@ function EmptyState({
           alignItems: "center",
           justifyContent: "center",
           margin: "0 auto 1rem",
-          color: "#B08968",
+          color: "var(--brand)",
         }}
       >
         <Search size={26} />
       </div>
       <p
         style={{
-          color: "#6C584C",
+          color: "var(--text-soft)",
           fontSize: "1rem",
           marginBottom: "1.4rem",
         }}

@@ -3,7 +3,7 @@
 import type {
   Procedimiento,
   CategoriaProcedimiento,
-} from "../../types/domain";
+} from "@/types/domain";
 
 // ============================================================
 // Buscar procedimientos por categoría (usando una lista ya cargada)

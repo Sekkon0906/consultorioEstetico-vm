@@ -4,7 +4,7 @@
 import {
   activarTestimonioApi,
   desactivarTestimonioApi,
-} from "../../services/testimoniosApi";
+} from "@/services/testimoniosApi";
 
 /**
  *  Activa un testimonio en la BD real

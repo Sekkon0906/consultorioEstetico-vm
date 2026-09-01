@@ -1,0 +1,57 @@
+/* ============================================================
+   Panel de administración
+   Extraído de globals.css, que tenía 4.717 líneas en un solo
+   archivo. El ORDEN de los @import en globals.css reproduce el
+   orden original: la cascada de CSS depende de él y reordenarlos
+   cambia qué regla gana sin que salte ningún error.
+============================================================ */
+
+
+/* ============================================================
+   Bootstrap form-control overrides en modo oscuro
+   El admin usa intensivamente clases form-control / form-label
+   de Bootstrap. Estas vienen con bg blanco hardcoded.
+============================================================ */
+:root[data-theme="dark"] .form-control,
+:root[data-theme="dark"] .form-select {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+:root[data-theme="dark"] .form-control::placeholder,
+:root[data-theme="dark"] .form-select::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1;
+}
+:root[data-theme="dark"] .form-control:focus,
+:root[data-theme="dark"] .form-select:focus {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text) !important;
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 0.18rem rgba(232, 201, 160, 0.18) !important;
+}
+:root[data-theme="dark"] .form-control:disabled,
+:root[data-theme="dark"] .form-control[readonly] {
+  background-color: var(--bg) !important;
+  color: var(--text-muted) !important;
+}
+:root[data-theme="dark"] .form-label {
+  color: var(--text-soft) !important;
+}
+:root[data-theme="dark"] .form-text {
+  color: var(--text-muted) !important;
+}
+:root[data-theme="dark"] .form-check-input {
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--border) !important;
+}
+:root[data-theme="dark"] .form-check-input:checked {
+  background-color: var(--brand) !important;
+  border-color: var(--brand) !important;
+}
+/* Texto secundario dentro de cards bootstrap admin */
+:root[data-theme="dark"] .admin-form-card .text-muted,
+:root[data-theme="dark"] .admin-form-card small,
+:root[data-theme="dark"] .admin-form-card .small {
+  color: var(--text-muted) !important;
+}
