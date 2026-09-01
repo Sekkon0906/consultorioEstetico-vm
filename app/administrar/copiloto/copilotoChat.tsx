@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Check, X, Sparkles, AlertCircle, KeyRound, Trash2 } from "lucide-react";
+import { Send, Check, X, Sparkles, AlertCircle, KeyRound, Trash2, Mic, MicOff } from "lucide-react";
 import { api } from "@/lib/api";
 import Button from "@/components/ui/Button";
 
@@ -41,6 +41,35 @@ type RespuestaApi = {
   historial?: unknown[];
 };
 
+// El navegador no siempre trae los tipos de la Web Speech API.
+interface EventoReconocimiento extends Event {
+  results: { [i: number]: { [j: number]: { transcript: string }; isFinal: boolean }; length: number };
+}
+interface Reconocedor extends EventTarget {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  start: () => void;
+  stop: () => void;
+  onresult: ((e: EventoReconocimiento) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+}
+
+function crearReconocedor(): Reconocedor | null {
+  if (typeof window === "undefined") return null;
+  const Ctor =
+    (window as unknown as { SpeechRecognition?: new () => Reconocedor; webkitSpeechRecognition?: new () => Reconocedor })
+      .SpeechRecognition ||
+    (window as unknown as { webkitSpeechRecognition?: new () => Reconocedor }).webkitSpeechRecognition;
+  if (!Ctor) return null;
+  const r = new Ctor();
+  r.lang = "es-CO";
+  r.continuous = false;
+  r.interimResults = false;
+  return r;
+}
+
 function valorLegible(v: unknown): string {
   if (typeof v === "boolean") return v ? "Sí" : "No";
   if (Array.isArray(v)) {
@@ -75,6 +104,33 @@ export default function CopilotoChat() {
   const [guardandoKey, setGuardandoKey] = useState(false);
   const [configError, setConfigError] = useState<string | null>(null);
 
+  // Dictado por voz (Web Speech API del navegador; sin costo ni dependencia externa).
+  const [grabando, setGrabando] = useState(false);
+  const [vozDisponible, setVozDisponible] = useState(false);
+  const reconocedorRef = useRef<Reconocedor | null>(null);
+
+  useEffect(() => {
+    setVozDisponible(!!crearReconocedor());
+  }, []);
+
+  const alternarVoz = () => {
+    if (grabando) {
+      reconocedorRef.current?.stop();
+      return;
+    }
+    const r = crearReconocedor();
+    if (!r) return;
+    reconocedorRef.current = r;
+    r.onresult = (e) => {
+      const texto = e.results[e.results.length - 1]?.[0]?.transcript?.trim();
+      if (texto) enviar(texto);
+    };
+    r.onerror = () => setGrabando(false);
+    r.onend = () => setGrabando(false);
+    setGrabando(true);
+    r.start();
+  };
+
   const cargarConfig = () => {
     api
       .get<{ ok: boolean; data: typeof config }>("/copiloto/config")
@@ -88,8 +144,8 @@ export default function CopilotoChat() {
     finRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [burbujas, propuesta]);
 
-  const enviar = async () => {
-    const texto = entrada.trim();
+  const enviar = async (textoVoz?: string) => {
+    const texto = (textoVoz ?? entrada).trim();
     if (!texto || pensando) return;
 
     setBurbujas((b) => [...b, { de: "doctora", texto }]);
@@ -371,12 +427,29 @@ export default function CopilotoChat() {
           value={entrada}
           onChange={(e) => setEntrada(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviar(); } }}
-          placeholder="Escribe lo que necesitas…"
+          placeholder={grabando ? "Escuchando…" : "Escribe o dicta lo que necesitas…"}
           disabled={pensando}
           style={{ flex: 1, padding: "0.65rem 1rem", borderRadius: 100, border: "1px solid #DCC7AC", background: "#FFFDFB", color: "#3A2A1A", fontSize: "0.89rem", outline: "none" }}
         />
+        {vozDisponible && (
+          <button
+            type="button"
+            onClick={alternarVoz}
+            disabled={pensando}
+            aria-label={grabando ? "Detener dictado" : "Dictar por voz"}
+            style={{
+              width: 44, height: 44, borderRadius: "50%", border: "none", flexShrink: 0,
+              background: grabando ? "#A5352B" : "#FBF7F2",
+              color: grabando ? "white" : "#8A7461",
+              display: "grid", placeItems: "center", cursor: "pointer",
+              animation: grabando ? "pulse 1.4s ease-in-out infinite" : "none",
+            }}
+          >
+            {grabando ? <MicOff size={17} /> : <Mic size={17} />}
+          </button>
+        )}
         <button
-          onClick={enviar}
+          onClick={() => enviar()}
           disabled={pensando || !entrada.trim()}
           aria-label="Enviar"
           style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: entrada.trim() && !pensando ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#DCC7AC", color: "white", display: "grid", placeItems: "center", cursor: entrada.trim() && !pensando ? "pointer" : "default", flexShrink: 0 }}

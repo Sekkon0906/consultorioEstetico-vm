@@ -8,9 +8,11 @@
  *  2. El modelo NUNCA obtiene permisos que un humano no tenga: estas funciones
  *     se ejecutan detrás del mismo verifyToken + requireRole(["admin"]) que el
  *     formulario equivalente del panel.
- *  3. El modelo NO se acerca a datos de pacientes. No hay ninguna herramienta
- *     que lea filas de `citas` ni de `usuarios`. Las consultas de negocio
- *     devuelven solo agregados: cuántas, cuánto — nunca quién.
+ *  3. El modelo solo ve datos de pacientes que la doctora ya puede ver en el
+ *     panel de citas (nombre, hora, procedimiento del día) a través de
+ *     `citas_del_dia`. No hay ninguna herramienta que lea `usuarios` ni datos
+ *     de contacto (teléfono, correo). Las consultas de negocio históricas
+ *     (`resumen_de_citas`) siguen devolviendo solo agregados.
  *  4. Lo que escribe se confirma antes. `escribe: true` marca las herramientas
  *     cuya ejecución exige aprobación explícita de la doctora.
  */
@@ -165,6 +167,21 @@ const DEFINICIONES = [
       additionalProperties: false,
     },
   },
+  {
+    name: "citas_del_dia",
+    description:
+      "Lista las citas de una fecha con nombre del paciente, hora, procedimiento y estado. " +
+      "Úsala cuando la doctora pregunte 'qué citas tengo hoy', 'cuántas citas hay mañana', etc.",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: {
+        fecha: { type: "string", description: "Fecha AAAA-MM-DD. Si la doctora dice 'hoy' o 'mañana', calcula la fecha exacta." },
+      },
+      required: ["fecha"],
+      additionalProperties: false,
+    },
+  },
 ];
 
 // Herramientas que modifican datos: exigen confirmación de la doctora.
@@ -188,6 +205,9 @@ function validar(nombre, args) {
   if (nombre === "resumen_de_citas") {
     if (!RE_FECHA.test(args.desde) || !RE_FECHA.test(args.hasta)) return "Las fechas deben tener formato AAAA-MM-DD.";
     if (args.desde > args.hasta) return "La fecha inicial no puede ser posterior a la final.";
+  }
+  if (nombre === "citas_del_dia" && !RE_FECHA.test(args.fecha || "")) {
+    return "La fecha debe tener formato AAAA-MM-DD.";
   }
   if (nombre === "crear_procedimiento" && (args.duracion_min < 5 || args.duracion_min > 480)) {
     return "La duración debe estar entre 5 y 480 minutos.";
@@ -318,6 +338,25 @@ const EJECUTORES = {
       total: total.rows[0].total,
       por_estado: porEstado.rows,
       procedimientos_mas_solicitados: porProcedimiento.rows,
+    };
+  },
+  async citas_del_dia(args) {
+    const { rows } = await pool.query(
+      `SELECT nombres, apellidos, hora, procedimiento, estado
+         FROM citas
+        WHERE fecha = $1::date AND estado != 'cancelada'
+        ORDER BY hora ASC`,
+      [args.fecha]
+    );
+    return {
+      fecha: args.fecha,
+      total: rows.length,
+      citas: rows.map((r) => ({
+        paciente: `${r.nombres} ${r.apellidos || ""}`.trim(),
+        hora: r.hora,
+        procedimiento: r.procedimiento,
+        estado: r.estado,
+      })),
     };
   },
 };
