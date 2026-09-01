@@ -899,7 +899,7 @@ export default function Galeria3D() {
           box-shadow:
             0 14px 32px rgba(0, 0, 0, 0.3),
             0 0 0 1px rgba(176, 137, 104, 0.08);
-          transition: box-shadow 0.4s ease, transform 0.3s ease;
+          transition: box-shadow var(--mov-lento) ease, transform var(--mov-normal) ease;
         }
         .g3d-card.is-front {
           box-shadow:

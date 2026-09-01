@@ -42,6 +42,28 @@
   color-scheme: light;
 }
 
+/* === MOVIMIENTO ===
+   Había 12 duraciones distintas repartidas por el sitio (0.15s, 0.18s, 0.2s,
+   0.25s, 0.28s, 0.3s...) según quién escribió cada parte. Tres valores bastan,
+   y que todo se mueva al mismo ritmo es la mitad de que se sienta una sola
+   página. La curva es la misma en los tres: arranca rápido y frena suave,
+   que es como se mueven las cosas físicas. */
+:root {
+  --mov-rapido: 150ms;   /* cambios de color, hover */
+  --mov-normal: 250ms;   /* aparecer, desplegar */
+  --mov-lento:  400ms;   /* movimientos grandes, paneles */
+  --mov-curva:  cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Quien pide menos movimiento no debería recibir ninguno. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --mov-rapido: 1ms;
+    --mov-normal: 1ms;
+    --mov-lento:  1ms;
+  }
+}
+
 /* === PALETA OSCURA (grafito neutro + acento champán, estilo "beauty premium") ===
    Antes toda la paleta oscura era una familia de cafés (fondo, superficies
    y acento en el mismo matiz café/ámbar) — se sentía como "un solo color
@@ -111,7 +133,7 @@
 html, body {
   background: var(--bg);
   color: var(--text);
-  transition: background 0.25s ease, color 0.25s ease;
+  transition: background var(--mov-normal) ease, color var(--mov-normal) ease;
 }
 
 /* ==========================
@@ -1287,7 +1309,7 @@ body.g3d-detail-abierto {
     border: none;
     padding: 0;
     background: rgba(232, 201, 160, 0.35);
-    transition: width 0.3s cubic-bezier(0.16,1,0.3,1), background 0.3s;
+    transition: width var(--mov-normal) cubic-bezier(0.16,1,0.3,1), background var(--mov-normal);
   }
   .g3d-stage .g3d-grid-dot.is-active {
     width: 18px;
@@ -1488,7 +1510,7 @@ body.g3d-detail-abierto {
   font-size: 0.85rem;
   z-index: 2;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--mov-normal) ease;
 }
 .consultorio-showcase-main:hover .consultorio-showcase-zoom {
   opacity: 1;
@@ -1511,7 +1533,7 @@ body.g3d-detail-abierto {
   justify-content: center;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
   z-index: 3;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background var(--mov-rapido) ease, transform var(--mov-rapido) ease;
 }
 .consultorio-showcase-arrow:hover {
   background: #fff;
@@ -1548,7 +1570,7 @@ body.g3d-detail-abierto {
   cursor: pointer;
   padding: 0;
   opacity: 0.6;
-  transition: opacity 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+  transition: opacity var(--mov-normal) ease, border-color var(--mov-normal) ease, transform var(--mov-rapido) ease;
 }
 .consultorio-thumb:hover {
   opacity: 0.9;
@@ -1696,7 +1718,7 @@ body.g3d-detail-abierto {
   font-weight: 500;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color var(--mov-rapido), box-shadow var(--mov-rapido);
   font-family: inherit;
 }
 .treatment-picker-btn:hover,
@@ -1835,7 +1857,7 @@ body.g3d-detail-abierto {
   text-align: left;
   cursor: pointer;
   margin-bottom: 0.4rem;
-  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  transition: background var(--mov-rapido), border-color var(--mov-rapido), transform var(--mov-rapido);
   font-family: inherit;
   font-size: 0.9rem;
 }
@@ -2509,7 +2531,7 @@ body.g3d-detail-abierto {
   align-items: center;
   justify-content: center;
   color: var(--text-soft);
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: background var(--mov-rapido) ease, color var(--mov-rapido) ease;
 }
 .profile-menu-close:hover {
   background: var(--surface-soft);
@@ -2538,7 +2560,7 @@ body.g3d-detail-abierto {
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  transition: transform var(--mov-rapido) ease, box-shadow var(--mov-rapido) ease, filter var(--mov-rapido) ease;
 }
 .profile-menu-btn:hover {
   transform: translateY(-1px);
@@ -2605,7 +2627,7 @@ body.g3d-detail-abierto {
 
 /* Transición suave en chrome común */
 .topbar, .navbar, footer {
-  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  transition: background var(--mov-normal) ease, color var(--mov-normal) ease, border-color var(--mov-normal) ease;
 }
 /* ==========================
    ESCALA GLOBAL (legibilidad)
@@ -2754,7 +2776,7 @@ body {
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+  transition: transform var(--mov-rapido) ease, box-shadow var(--mov-rapido) ease, background var(--mov-rapido) ease, color var(--mov-rapido) ease;
   white-space: nowrap;
 }
 
@@ -2810,7 +2832,7 @@ body {
   font-size: 0.9rem;
   line-height: 1.2;
   cursor: pointer;
-  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  transition: background var(--mov-normal) ease, color var(--mov-normal) ease, border-color var(--mov-normal) ease, transform var(--mov-normal) ease, box-shadow var(--mov-normal) ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2863,7 +2885,7 @@ body {
   text-underline-offset: 3px !important;
   padding-bottom: 4px;
   border-bottom: 2px solid rgba(255, 215, 138, 0.55);
-  transition: color 0.25s ease, border-color 0.25s ease, text-shadow 0.25s ease;
+  transition: color var(--mov-normal) ease, border-color var(--mov-normal) ease, text-shadow var(--mov-normal) ease;
 }
 .footer-terms-link:hover,
 .footer-terms-link:focus-visible {
@@ -2965,7 +2987,7 @@ body {
   padding: 2.5rem 1.6rem 3rem;
   opacity: 0;
   transform: translateY(25px);
-  transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+  transition: opacity 0.8s ease var(--mov-normal), transform 0.8s ease var(--mov-normal);
 }
 
 .hero-content-visible {
@@ -3029,7 +3051,7 @@ body {
   gap: 0.5rem;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
   transition:
-    transform 0.18s ease,
+    transform var(--mov-rapido) ease,
     box-shadow 0.18s ease,
     background-color 0.18s ease,
     color 0.18s ease;
@@ -3170,7 +3192,7 @@ body {
 ========================== */
 footer a i {
   color: inherit !important;
-  transition: color 0.3s ease;
+  transition: color var(--mov-normal) ease;
 }
 
 footer a:hover i {
@@ -3332,12 +3354,36 @@ footer a:hover i {
    NAVBAR FINAL EQUILIBRADA
 ========================== */
 
+/* La barra se comporta como una lámina de vidrio sobre el contenido, no como
+   un bloque opaco: deja entrever lo que pasa por debajo y se separa del
+   contenido con una línea fina en vez de una sombra marcada. El desenfoque
+   es lo que mantiene el texto legible sobre cualquier fondo.
+   color-mix mantiene el color atado al token: sigue al tema sin repetir el
+   valor. */
 .navbar-container {
-  background-color: var(--topbar-bg);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  background-color: color-mix(in srgb, var(--topbar-bg) 82%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid transparent;
   position: sticky;
   top: 0;
   z-index: 50;
+  transition: background-color var(--mov-normal) var(--mov-curva),
+              border-color var(--mov-normal) var(--mov-curva);
+}
+
+/* Al desplazar, la barra se afirma: un punto más opaca y con el borde
+   visible, para que se despegue del contenido que pasa por debajo. La clase
+   la pone NavbarClient al detectar scroll. */
+.navbar-container.is-scrolled {
+  background-color: color-mix(in srgb, var(--topbar-bg) 92%, transparent);
+  border-bottom-color: var(--border);
+}
+
+/* Si el navegador no soporta desenfoque, el fondo va opaco: más vale sólido
+   que texto ilegible sobre una barra semitransparente. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .navbar-container { background-color: var(--topbar-bg); }
 }
 :root:not([data-theme="dark"]) .navbar-container {
   background-color: #faf9f7;
@@ -3364,7 +3410,7 @@ footer a:hover i {
   align-items: center;
   justify-content: flex-start;
   text-decoration: none;
-  transition: transform 0.25s ease, filter 0.25s ease;
+  transition: transform var(--mov-normal) ease, filter var(--mov-normal) ease;
   cursor: pointer;
 }
 
@@ -3395,7 +3441,7 @@ footer a:hover i {
 .navbar-menu a {
   text-decoration: none;
   color: inherit;
-  transition: color 0.25s ease;
+  transition: color var(--mov-normal) ease;
 }
 
 .navbar-menu a:hover {
@@ -3423,7 +3469,7 @@ footer a:hover i {
   white-space: nowrap;
   padding: 0.34rem 0.62rem;
   border-radius: 8px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color var(--mov-rapido) ease, color var(--mov-rapido) ease;
 }
 
 .navbar-link:not(.navbar-cta):hover {
@@ -3462,7 +3508,7 @@ footer a:hover i {
   height: 3px;
   background: linear-gradient(90deg, #b08968, #ffe4c0, #b08968);
   border-radius: 3px;
-  transition: all 0.4s cubic-bezier(0.45, 0, 0.55, 1);
+  transition: all var(--mov-lento) cubic-bezier(0.45, 0, 0.55, 1);
 }
 
 /* === DERECHA: PERFIL / SESIÓN === */
@@ -3486,7 +3532,7 @@ footer a:hover i {
   cursor: pointer;
   position: relative;
   overflow: visible;
-  transition: transform 0.25s ease, filter 0.25s ease;
+  transition: transform var(--mov-normal) ease, filter var(--mov-normal) ease;
 }
 
 .user-button:hover {
@@ -3524,7 +3570,7 @@ footer a:hover i {
 
   opacity: 0;
   transform: scale(0.82) rotate(0deg);
-  transition: opacity 0.3s ease, transform 0.8s cubic-bezier(0.22, 0.7, 0.2, 1);
+  transition: opacity var(--mov-normal) ease, transform 0.8s cubic-bezier(0.22, 0.7, 0.2, 1);
   pointer-events: none;
 }
 
@@ -3580,7 +3626,7 @@ footer a:hover i {
     overflow: hidden;
     opacity: 0;
     pointer-events: none;
-    transition: all 0.35s ease;
+    transition: all var(--mov-normal) ease;
     z-index: 55;
   }
 
@@ -3622,7 +3668,7 @@ footer a:hover i {
   justify-content: center;
   gap: 5px;
   z-index: 100;
-  transition: transform 0.3s ease;
+  transition: transform var(--mov-normal) ease;
 }
 
 .hamburger-btn:hover {
@@ -3634,7 +3680,7 @@ footer a:hover i {
   height: 2px;
   background-color: #6b4e3d;
   border-radius: 2px;
-  transition: all 0.3s ease;
+  transition: all var(--mov-normal) ease;
 }
 
 .hamburger-btn.active .line1 {
@@ -3664,7 +3710,7 @@ footer a:hover i {
   opacity: 0;
   pointer-events: none;
   transition:
-    transform 0.45s cubic-bezier(0.22, 0.7, 0.2, 1),
+    transform var(--mov-lento) cubic-bezier(0.22, 0.7, 0.2, 1),
     opacity 0.35s ease;
   z-index: 90;
 }
@@ -3725,7 +3771,7 @@ footer a:hover i {
   font-weight: 600;
   white-space: nowrap;
   text-align: center;
-  transition: all 0.25s ease;
+  transition: all var(--mov-normal) ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
@@ -3759,7 +3805,7 @@ footer a:hover i {
   font-size: 0.95rem;
   border-bottom: 1px solid #e8dcd1;
   color: #4b3a2e;
-  transition: color 0.25s ease;
+  transition: color var(--mov-normal) ease;
 }
 
 .mobile-sidebar a {
@@ -3989,7 +4035,7 @@ footer a:hover i {
   padding: 0;
   cursor: pointer;
   background: rgba(255, 255, 255, 0.45);
-  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s ease;
+  transition: width var(--mov-lento) cubic-bezier(0.22, 1, 0.36, 1), background var(--mov-normal) ease;
 }
 .doc-hero-dot.is-active {
   width: 26px;
@@ -4029,7 +4075,7 @@ footer a:hover i {
   align-items: center;
   gap: 0.55rem;
   transition: 
-    transform 0.25s ease,
+    transform var(--mov-normal) ease,
     box-shadow 0.25s ease,
     background 0.4s ease;
   box-shadow: 0 8px 18px rgba(176, 137, 104, 0.28);
@@ -4217,7 +4263,7 @@ footer a:hover i {
   height: clamp(480px, 70vh, 700px);
   overflow: hidden;
   background: radial-gradient(circle at center, #fffaf6 15%, #f4ece4 90%);
-  transition: height 0.4s ease;
+  transition: height var(--mov-lento) ease;
 }
 
 /* HALO */
@@ -4248,7 +4294,7 @@ footer a:hover i {
   top: -10%;
   left: -10%;
   z-index: 0;
-  transition: transform 0.2s linear;
+  transition: transform var(--mov-rapido) linear;
 }
 .galeria3d-particle {
   position: absolute;
@@ -4272,7 +4318,7 @@ footer a:hover i {
   cursor: pointer;
   z-index: 10;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: background 0.25s ease, transform 0.25s ease;
+  transition: background var(--mov-normal) ease, transform var(--mov-normal) ease;
 }
 .galeria3d-btn:hover {
   background: #fff7ef;
@@ -4287,7 +4333,7 @@ footer a:hover i {
   width: clamp(200px, 32vw, 300px);
   height: clamp(160px, 28vw, 230px);
   transform-style: preserve-3d;
-  transition: transform 0.3s ease-out;
+  transition: transform var(--mov-normal) ease-out;
   z-index: 2;
 }
 
@@ -4300,7 +4346,7 @@ footer a:hover i {
   height: 100%;
   backface-visibility: hidden;
   text-align: center;
-  transition: filter 0.3s ease;
+  transition: filter var(--mov-normal) ease;
 }
 
 /* CARD */
@@ -4314,7 +4360,7 @@ footer a:hover i {
   box-shadow: 0 8px 25px rgba(176, 137, 104, 0.25);
   border: 1px solid #e9ded2;
   cursor: pointer;
-  transition: transform 0.25s ease;
+  transition: transform var(--mov-normal) ease;
 }
 .card3d:hover {
   transform: scale(1.06);
@@ -4450,7 +4496,7 @@ a:hover {
   background-color: rgba(192, 150, 100, 0.15) !important;
   border-radius: 8px !important;
   box-shadow: 0 0 8px rgba(192, 150, 100, 0.4);
-  transition: all 0.3s ease-in-out;
+  transition: all var(--mov-normal) ease-in-out;
 }
 .selected-day:hover {
   background-color: rgba(192, 150, 100, 0.25) !important;
@@ -4465,7 +4511,7 @@ a:hover {
 
 .fc-daygrid-day {
   border: 1px solid #e5d8c8;
-  transition: background 0.2s ease;
+  transition: background var(--mov-rapido) ease;
 }
 
 .fc-daygrid-day:hover {
@@ -4508,7 +4554,7 @@ a:hover {
   cursor: pointer;
   white-space: nowrap;
   line-height: 1.2;
-  transition: box-shadow 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+  transition: box-shadow var(--mov-rapido) ease, opacity var(--mov-rapido) ease, background var(--mov-rapido) ease;
 }
 .btn-app:disabled { cursor: default; opacity: 0.55; }
 .btn-app--full { width: 100%; }
@@ -4647,7 +4693,7 @@ a:hover {
   background: var(--surface-soft);
   color: var(--text-soft);
   font-size: 0.85rem;
-  transition: background 0.2s, color 0.2s;
+  transition: background var(--mov-rapido), color var(--mov-rapido);
 }
 .quick-fab-social:hover {
   background: var(--brand);

@@ -484,7 +484,7 @@ export default function ProcedimientosPage() {
           color: #3A2A1A;
           font-size: 0.92rem;
           outline: none;
-          transition: border-color 0.25s ease, box-shadow 0.25s ease;
+          transition: border-color var(--mov-normal) ease, box-shadow var(--mov-normal) ease;
           font-family: inherit;
         }
         .proc-search-input::placeholder {
@@ -509,7 +509,7 @@ export default function ProcedimientosPage() {
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: background 0.2s ease;
+          transition: background var(--mov-rapido) ease;
         }
         .proc-search-clear:hover {
           background: rgba(176, 137, 104, 0.25);
@@ -529,7 +529,7 @@ export default function ProcedimientosPage() {
           font-size: 0.86rem;
           font-weight: 600;
           cursor: pointer;
-          transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+          transition: background var(--mov-normal) ease, color var(--mov-normal) ease, border-color var(--mov-normal) ease, transform var(--mov-rapido) ease;
           letter-spacing: 0.01em;
         }
         .proc-chip:hover {
@@ -571,7 +571,7 @@ export default function ProcedimientosPage() {
           font-size: 0.78rem;
           font-weight: 500;
           cursor: pointer;
-          transition: background 0.25s ease, color 0.25s ease,
+          transition: background var(--mov-normal) ease, color var(--mov-normal) ease,
             border-color 0.25s ease, transform 0.2s ease;
         }
         .proc-subchip:hover {
@@ -613,7 +613,7 @@ export default function ProcedimientosPage() {
           font-weight: 600;
           cursor: pointer;
           outline: none;
-          transition: border-color 0.25s ease, box-shadow 0.25s ease,
+          transition: border-color var(--mov-normal) ease, box-shadow var(--mov-normal) ease,
             background 0.25s ease;
           font-family: inherit;
         }
@@ -628,7 +628,7 @@ export default function ProcedimientosPage() {
         }
         .proc-sort-caret {
           color: #8B7060;
-          transition: transform 0.25s ease;
+          transition: transform var(--mov-normal) ease;
           flex-shrink: 0;
         }
         .proc-sort-menu {
@@ -662,7 +662,7 @@ export default function ProcedimientosPage() {
           text-align: left;
           border-radius: 9px;
           cursor: pointer;
-          transition: background 0.18s ease, color 0.18s ease;
+          transition: background var(--mov-rapido) ease, color var(--mov-rapido) ease;
           font-family: inherit;
         }
         .proc-sort-option:hover {
@@ -699,7 +699,7 @@ export default function ProcedimientosPage() {
           overflow: hidden;
           border: 1px solid rgba(176, 137, 104, 0.12);
           box-shadow: 0 4px 16px rgba(58, 42, 26, 0.06);
-          transition: box-shadow 0.4s ease, transform 0.4s ease, border-color 0.3s ease;
+          transition: box-shadow var(--mov-lento) ease, transform var(--mov-lento) ease, border-color var(--mov-normal) ease;
           cursor: pointer;
           display: flex;
           flex-direction: column;
@@ -870,7 +870,7 @@ export default function ProcedimientosPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          transition: transform var(--mov-normal) ease, box-shadow var(--mov-normal) ease;
         }
         .proc-card:hover .proc-card-arrow {
           transform: translateX(2px);
@@ -1216,7 +1216,7 @@ function FeaturedCarousel({
           align-items: center;
           justify-content: center;
           box-shadow: 0 6px 18px rgba(58, 42, 26, 0.18);
-          transition: background 0.25s ease, transform 0.25s ease,
+          transition: background var(--mov-normal) ease, transform var(--mov-normal) ease,
             box-shadow 0.25s ease;
           z-index: 3;
         }
@@ -1255,7 +1255,7 @@ function FeaturedCarousel({
           border: none;
           cursor: pointer;
           padding: 0;
-          transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+          transition: width var(--mov-lento) cubic-bezier(0.22, 1, 0.36, 1),
             background 0.25s ease;
         }
         .featured-dot.is-active {

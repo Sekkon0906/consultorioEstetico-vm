@@ -58,6 +58,17 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [indicator, setIndicator] = useState({ left: 0, width: 0 });
+
+  // La barra se afirma al desplazar (más opaca y con borde). passive:true
+  // porque el listener no llama a preventDefault: así el navegador no tiene
+  // que esperarlo para desplazar y el scroll no se siente pesado.
+  const [desplazado, setDesplazado] = useState(false);
+  useEffect(() => {
+    const alDesplazar = () => setDesplazado(window.scrollY > 8);
+    alDesplazar();
+    window.addEventListener("scroll", alDesplazar, { passive: true });
+    return () => window.removeEventListener("scroll", alDesplazar);
+  }, []);
   const linkRefs = useRef<(HTMLLIElement | null)[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -184,7 +195,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className="navbar navbar-container shadow-sm py-3"
+      className={`navbar navbar-container py-3 ${desplazado ? "is-scrolled" : ""}`}
       style={{ backgroundColor: "#FFFFFF", position: "sticky", top: 0, zIndex: 1000 }}
     >
       <div

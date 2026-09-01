@@ -325,7 +325,7 @@ export default function Footer() {
           /* Borde dorado siempre visible — píldora sutil que enmarca */
           border: 1px solid rgba(232, 201, 160, 0.4);
           background: rgba(232, 201, 160, 0.06);
-          transition: background 0.3s ease, border-color 0.3s ease,
+          transition: background var(--mov-normal) ease, border-color var(--mov-normal) ease,
             text-shadow 0.3s ease, transform 0.25s ease;
         }
         .designer-credit:hover {
@@ -373,7 +373,7 @@ export default function Footer() {
             #FFE6B3,
             transparent
           );
-          transition: width 0.45s ease;
+          transition: width var(--mov-lento) ease;
         }
         .designer-credit:hover::after {
           width: 80%;
