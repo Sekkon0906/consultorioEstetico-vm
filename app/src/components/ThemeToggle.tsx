@@ -57,7 +57,7 @@ export default function ThemeToggle() {
           justifyContent: "center",
           borderRadius: 100,
           border: "none",
-          background: active ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "transparent",
+          background: active ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "transparent",
           color: active ? "#fff" : "var(--text-soft)",
           cursor: "pointer",
           transition: "background 0.2s, color 0.2s",

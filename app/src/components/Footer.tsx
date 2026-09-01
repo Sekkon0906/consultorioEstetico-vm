@@ -73,7 +73,7 @@ export default function Footer() {
 
   const inputStyle: React.CSSProperties = {
     background: "rgba(255,253,250,0.08)", border: "1px solid rgba(176,137,104,0.4)",
-    color: "#FAF9F7", borderRadius: 12, padding: "0.7rem 1rem", fontSize: "0.9rem",
+    color: "var(--footer-text)", borderRadius: 12, padding: "0.7rem 1rem", fontSize: "0.9rem",
     outline: "none", width: "100%", transition: "border-color 0.3s",
   };
 
@@ -88,7 +88,7 @@ export default function Footer() {
   const contactLines = t("contactLines").split("\n");
 
   return (
-    <footer style={{ background: "#3E2E22", color: "#FFFFFF", position: "relative", overflow: "hidden" }}>
+    <footer style={{ background: "var(--footer-bg)", color: "#FFFFFF", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 20% 0%, rgba(201,173,141,0.12) 0%, transparent 50%)", pointerEvents: "none" }} />
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1000, margin: "0 auto", padding: "4rem 1.5rem 2rem" }}>
@@ -96,34 +96,34 @@ export default function Footer() {
         {/* Form section — contrastes mejorados */}
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
           <span style={{ display: "inline-block", fontSize: "0.74rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#F0D8B0", background: "rgba(240,216,176,0.14)", border: "1px solid rgba(240,216,176,0.35)", borderRadius: 100, padding: "0.4rem 1.2rem", marginBottom: "1rem" }}>{t("contactBadge")}</span>
-          <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.35rem, 2.8vw, 1.9rem)", fontWeight: 700, color: "#FFFDF9", marginBottom: "0.5rem", lineHeight: 1.25 }}>
+          <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.35rem, 2.8vw, 1.9rem)", fontWeight: 700, color: "#FFFFFF", marginBottom: "0.5rem", lineHeight: 1.25 }}>
             {t("contactTitle")}
           </h3>
           <p style={{ fontSize: "0.95rem", color: "#FFFFFF", marginBottom: "2rem" }}>{t("contactSub")}</p>
 
           <form onSubmit={handleSubmit} className="footer-form" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", maxWidth: 650, margin: "0 auto" }}>
             <input name="name" value={formData.name} onChange={handleChange} placeholder={t("form.name")} required style={inputStyle}
-              onFocus={e => { e.currentTarget.style.borderColor = "#B08968"; }}
+              onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
             <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder={t("form.email")} required style={inputStyle}
-              onFocus={e => { e.currentTarget.style.borderColor = "#B08968"; }}
+              onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
 
             {/* Procedure selector */}
             <div style={{ gridColumn: "1 / -1", position: "relative" }}>
               <button type="button" onClick={() => setShowProcs(!showProcs)}
-                style={{ ...inputStyle, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", textAlign: "left", color: formData.procedure ? "#FAF9F7" : "rgba(250,249,247,0.5)" }}>
+                style={{ ...inputStyle, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", textAlign: "left", color: formData.procedure ? "var(--footer-text)" : "rgba(250,249,247,0.5)" }}>
                 {formData.procedure || t("form.procedure")}
-                <i className={`fas fa-chevron-${showProcs ? "up" : "down"}`} style={{ fontSize: "0.7rem", color: "#B08968" }} />
+                <i className={`fas fa-chevron-${showProcs ? "up" : "down"}`} style={{ fontSize: "0.7rem", color: "var(--brand)" }} />
               </button>
               {showProcs && (
                 <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#4A3A2E", border: "1px solid rgba(176,137,104,0.3)", borderRadius: 12, marginTop: 4, maxHeight: 280, overflowY: "auto", zIndex: 20, boxShadow: "0 12px 30px rgba(0,0,0,0.3)" }}>
                   {Object.entries(grouped).map(([cat, items]) => (
                     <div key={cat}>
-                      <div style={{ padding: "0.5rem 1rem", fontSize: "0.75rem", fontWeight: 700, color: "#C9AD8D", background: "rgba(176,137,104,0.15)", textTransform: "uppercase", letterSpacing: "0.1em", position: "sticky", top: 0 }}>{cat}</div>
+                      <div style={{ padding: "0.5rem 1rem", fontSize: "0.75rem", fontWeight: 700, color: "var(--brand-soft)", background: "rgba(176,137,104,0.15)", textTransform: "uppercase", letterSpacing: "0.1em", position: "sticky", top: 0 }}>{cat}</div>
                       {items.map((p, i) => (
                         <button key={i} type="button" onClick={() => { setFormData(prev => ({ ...prev, procedure: p })); setShowProcs(false); }}
-                          style={{ display: "block", width: "100%", textAlign: "left", padding: "0.55rem 1rem", background: "none", border: "none", color: "#E9DED2", fontSize: "0.85rem", cursor: "pointer", transition: "background 0.2s" }}
+                          style={{ display: "block", width: "100%", textAlign: "left", padding: "0.55rem 1rem", background: "none", border: "none", color: "var(--footer-text)", fontSize: "0.85rem", cursor: "pointer", transition: "background 0.2s" }}
                           onMouseEnter={e => { e.currentTarget.style.background = "rgba(176,137,104,0.2)"; }}
                           onMouseLeave={e => { e.currentTarget.style.background = "none"; }}>
                           {p}
@@ -136,7 +136,7 @@ export default function Footer() {
             </div>
 
             <input name="phone" value={formData.phone} onChange={handleChange} placeholder={t("form.phone")} style={inputStyle}
-              onFocus={e => { e.currentTarget.style.borderColor = "#B08968"; }}
+              onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
 
             {/* ¿Ya está registrado? Ocupa el hueco que dejaba el teléfono.
@@ -175,8 +175,8 @@ export default function Footer() {
                         fontWeight: 600,
                         cursor: "pointer",
                         transition: "background 0.2s, color 0.2s",
-                        border: activo ? "1px solid #B08968" : "1px solid rgba(176,137,104,0.35)",
-                        background: activo ? "#B08968" : "transparent",
+                        border: activo ? "1px solid var(--brand)" : "1px solid rgba(176,137,104,0.35)",
+                        background: activo ? "var(--brand)" : "transparent",
                         color: activo ? "#FFFFFF" : "rgba(250,249,247,0.7)",
                       }}
                     >
@@ -188,11 +188,11 @@ export default function Footer() {
             </div>
             <textarea name="message" value={formData.message} onChange={handleChange} rows={3} placeholder={t("form.message")} required
               style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
-              onFocus={e => { e.currentTarget.style.borderColor = "#B08968"; }}
+              onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
 
             <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-              <input name="terms" type="checkbox" checked={formData.terms} onChange={handleChange} style={{ accentColor: "#B08968" }} />
+              <input name="terms" type="checkbox" checked={formData.terms} onChange={handleChange} style={{ accentColor: "var(--brand)" }} />
               <small style={{ color: "rgba(245, 235, 220, 0.9)", fontSize: "0.82rem" }}>
                 {t("form.acceptIntro")}{" "}
                 <Link
@@ -245,11 +245,11 @@ export default function Footer() {
             columna y `textAlign: center` el texto dentro de cada uno. */}
         <div style={{ borderTop: "1px solid rgba(176,137,104,0.2)", paddingTop: "2rem", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "2rem", marginBottom: "2rem", justifyItems: "center", textAlign: "center" }}>
           <div>
-            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("clinic")}</h4>
+            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "var(--brand-soft)", marginBottom: "0.6rem" }}>{t("clinic")}</h4>
             <p style={{ fontSize: "0.82rem", color: "#FFFFFF", lineHeight: 1.6 }}>{t("clinicDesc")}</p>
           </div>
           <div>
-            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("address")}</h4>
+            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "var(--brand-soft)", marginBottom: "0.6rem" }}>{t("address")}</h4>
             <p style={{ fontSize: "0.82rem", color: "#FFFFFF", lineHeight: 1.6 }}>
               {addressLines.map((line, i) => (
                 <span key={i}>
@@ -260,7 +260,7 @@ export default function Footer() {
             </p>
           </div>
           <div>
-            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "#E9DED2", marginBottom: "0.6rem" }}>{t("contact")}</h4>
+            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1rem", fontWeight: 600, color: "var(--brand-soft)", marginBottom: "0.6rem" }}>{t("contact")}</h4>
             <p style={{ fontSize: "0.82rem", color: "#FFFFFF", lineHeight: 1.6 }}>
               {contactLines.map((line, i) => (
                 <span key={i}>
@@ -281,7 +281,7 @@ export default function Footer() {
               { href: "https://wa.me/573155445748", icon: "fab fa-whatsapp" },
             ].map((r, i) => (
               <a key={i} href={r.href} target="_blank" rel="noopener noreferrer"
-                style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(176,137,104,0.12)", border: "1px solid rgba(176,137,104,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#C9AD8D", fontSize: "1rem", transition: "all 0.3s", textDecoration: "none" }}
+                style={{ width: 38, height: 38, borderRadius: "50%", background: "rgba(176,137,104,0.12)", border: "1px solid rgba(176,137,104,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--brand-soft)", fontSize: "1rem", transition: "all 0.3s", textDecoration: "none" }}
                 onMouseEnter={e => { e.currentTarget.style.background = "rgba(176,137,104,0.3)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "rgba(176,137,104,0.12)"; e.currentTarget.style.transform = ""; }}>
                 <i className={r.icon} />

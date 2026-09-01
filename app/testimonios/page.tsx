@@ -51,8 +51,8 @@ export default function TestimoniosPage() {
     <main className="dark-aware-section testimonios-page" style={{ minHeight: "100vh", background: "linear-gradient(180deg, #FAF7F2 0%, #F5EEE5 100%)" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "4rem 1.5rem 3rem" }}>
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#B08968", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("badge")}</span>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.8rem" }}>{t("title")}</h1>
+          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--brand)", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("badge")}</span>
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "var(--text)", marginBottom: "0.8rem" }}>{t("title")}</h1>
           <div style={{ width: 50, height: 3, background: "linear-gradient(90deg, #C9AD8D, #B08968)", borderRadius: 2, margin: "0 auto 0.8rem" }} />
           <p style={{ fontSize: "1.05rem", color: "#7A6554", maxWidth: 600, margin: "0 auto" }}>{t("subtitle")}</p>
         </div>
@@ -65,7 +65,7 @@ export default function TestimoniosPage() {
               var videoValido = tieneVideoValido(testimonio.video);
               var ytId = getYouTubeId(testimonio.video || "");
               return (
-                <div key={testimonio.id} className="dark-aware-card" style={{ background: "#FFFDF9", border: "1px solid #E9DED2", borderRadius: 18, overflow: "hidden", boxShadow: "0 4px 14px rgba(78,59,43,0.06)", transition: "transform 0.3s", animation: "fadeInUp 0.6s ease " + (i * 0.08) + "s both" }}
+                <div key={testimonio.id} className="dark-aware-card" style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, overflow: "hidden", boxShadow: "0 4px 14px rgba(78,59,43,0.06)", transition: "transform 0.3s", animation: "fadeInUp 0.6s ease " + (i * 0.08) + "s both" }}
                   onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-4px)"; }}
                   onMouseLeave={function(e) { e.currentTarget.style.transform = ""; }}>
                   <div style={{ position: "relative", width: "100%", aspectRatio: "9/16", maxHeight: 420, overflow: "hidden", background: "#000" }}>
@@ -95,7 +95,7 @@ export default function TestimoniosPage() {
                   </div>
                   <div style={{ padding: "1rem 1.1rem", textAlign: "center" }}>
                     <h5 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "#4E3B2B", fontSize: "1.05rem", marginBottom: "0.4rem" }}>{testimonio.nombre}</h5>
-                    <p style={{ color: "#6C584C", fontSize: "0.9rem", lineHeight: 1.55, fontStyle: "italic" }}>&quot;{testimonio.texto}&quot;</p>
+                    <p style={{ color: "var(--text-soft)", fontSize: "0.9rem", lineHeight: 1.55, fontStyle: "italic" }}>&quot;{testimonio.texto}&quot;</p>
                   </div>
                 </div>
               );

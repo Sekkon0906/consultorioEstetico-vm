@@ -47,7 +47,7 @@ export default function RecuperarPage() {
         <div className="col-md-6 mx-auto">
           <div
             className="card shadow-lg border-0 rounded-4 animate-fadein"
-            style={{ backgroundColor: "#FFFDF9" }}
+            style={{ backgroundColor: "var(--surface)" }}
           >
             <div className="card-body p-5">
               <h2
@@ -81,8 +81,8 @@ export default function RecuperarPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     style={{
-                      borderColor: "#E9DED2",
-                      backgroundColor: "#FFFDF9",
+                      borderColor: "var(--border)",
+                      backgroundColor: "var(--surface)",
                     }}
                   />
 
@@ -99,7 +99,7 @@ export default function RecuperarPage() {
                     type="submit"
                     className="btn w-100 py-2 fw-semibold"
                     style={{
-                      backgroundColor: "#B08968",
+                      backgroundColor: "var(--brand)",
                       border: "none",
                       color: "#FFF",
                       borderRadius: "50px",
@@ -114,7 +114,7 @@ export default function RecuperarPage() {
               <p
                 onClick={() => router.push("/login")}
                 style={{
-                  color: "#B08968",
+                  color: "var(--brand)",
                   textDecoration: "underline",
                   marginTop: "1rem",
                   cursor: "pointer",

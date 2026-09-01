@@ -1,6 +1,9 @@
 import { supabase } from "./supabaseClient";
 
-const ADMIN_EMAILS = ["medinapipe123@gmail.com", "admin@clinicavm.com"];
+// La lista de correos admin ya NO vive aquí. Estaba empaquetada en el
+// JavaScript que recibe cualquier visitante, publicando exactamente qué
+// cuenta atacar para entrar al panel. El rol lo decide el servidor
+// consultando admin_users; el cliente solo lo lee de la respuesta.
 
 // ============================================================
 // AUTH helpers
@@ -26,7 +29,6 @@ export async function syncUserWithSupabase(): Promise<{
     const photoURL = (authUser.user_metadata?.avatar_url as string) || null;
     const [nombres, ...rest] = fullName.trim().split(" ");
     const apellidos = rest.join(" ");
-    const rol = ADMIN_EMAILS.includes(email) ? "admin" : "usuario";
 
     // Buscar usuario existente
     const { data: existing, error: selErr } = await supabase
@@ -47,7 +49,9 @@ export async function syncUserWithSupabase(): Promise<{
           id: authUser.id,
           nombres: nombres || "Paciente",
           apellidos: apellidos || "",
-          rol,
+          // `rol` no se envía: lo fija el trigger enforce_usuarios_rol en la
+          // base. Mandarlo desde el cliente era pedirle al navegador que
+          // declarara sus propios permisos.
           photo: photoURL,
         },
         { onConflict: "id" }

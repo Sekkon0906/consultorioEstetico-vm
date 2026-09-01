@@ -195,7 +195,7 @@ export default function ProcedimientosPage() {
             fontFamily: "'Playfair Display', serif",
             fontSize: "clamp(2rem, 4vw, 3.2rem)",
             fontWeight: 700,
-            color: "#3A2A1A",
+            color: "var(--text)",
             margin: 0,
             lineHeight: 1.15,
           }}
@@ -207,7 +207,7 @@ export default function ProcedimientosPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           style={{
-            color: "#6C584C",
+            color: "var(--text-soft)",
             fontSize: "clamp(0.95rem, 1.1vw, 1.1rem)",
             lineHeight: 1.6,
             maxWidth: 720,
@@ -537,7 +537,7 @@ export default function ProcedimientosPage() {
           color: #3A2A1A;
         }
         .proc-chip.is-active {
-          background: linear-gradient(135deg, #B08968, #C9AD8D);
+          background: linear-gradient(135deg, var(--brand), var(--brand-soft));
           color: #FFFDF9;
           border-color: transparent;
           box-shadow: 0 6px 16px rgba(176, 137, 104, 0.28);
@@ -670,7 +670,7 @@ export default function ProcedimientosPage() {
           color: #3A2A1A;
         }
         .proc-sort-option.is-selected {
-          background: linear-gradient(135deg, #B08968, #C9AD8D);
+          background: linear-gradient(135deg, var(--brand), var(--brand-soft));
           color: #FFFDF9;
           font-weight: 600;
         }
@@ -865,7 +865,7 @@ export default function ProcedimientosPage() {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #B08968, #C9AD8D);
+          background: linear-gradient(135deg, var(--brand), var(--brand-soft));
           color: #FFF;
           display: flex;
           align-items: center;
@@ -1074,7 +1074,7 @@ function FeaturedCarousel({
                   fontFamily: "'Playfair Display', serif",
                   fontSize: "clamp(1.35rem, 2vw, 1.8rem)",
                   fontWeight: 700,
-                  color: "#3A2A1A",
+                  color: "var(--text)",
                   margin: 0,
                   lineHeight: 1.2,
                 }}
@@ -1084,7 +1084,7 @@ function FeaturedCarousel({
               {item.desc && (
                 <p
                   style={{
-                    color: "#6C584C",
+                    color: "var(--text-soft)",
                     fontSize: "0.92rem",
                     lineHeight: 1.55,
                     margin: 0,
@@ -1100,7 +1100,7 @@ function FeaturedCarousel({
               {item.precio && (
                 <p
                   style={{
-                    color: "#B08968",
+                    color: "var(--brand)",
                     fontWeight: 700,
                     fontSize: "0.95rem",
                     margin: "0.2rem 0 0",
@@ -1125,7 +1125,7 @@ function FeaturedCarousel({
                     gap: 6,
                     padding: "0.6rem 1.2rem",
                     borderRadius: 100,
-                    background: "linear-gradient(135deg, #B08968, #C9AD8D)",
+                    background: "linear-gradient(135deg, var(--brand), var(--brand-soft))",
                     color: "#FFF",
                     fontWeight: 600,
                     textDecoration: "none",
@@ -1221,7 +1221,7 @@ function FeaturedCarousel({
           z-index: 3;
         }
         .featured-arrow:hover {
-          background: linear-gradient(135deg, #B08968, #C9AD8D);
+          background: linear-gradient(135deg, var(--brand), var(--brand-soft));
           color: #FFF;
           transform: translateY(-50%) scale(1.08);
           box-shadow: 0 10px 24px rgba(176, 137, 104, 0.35);
@@ -1415,14 +1415,14 @@ function EmptyState({
           alignItems: "center",
           justifyContent: "center",
           margin: "0 auto 1rem",
-          color: "#B08968",
+          color: "var(--brand)",
         }}
       >
         <Search size={26} />
       </div>
       <p
         style={{
-          color: "#6C584C",
+          color: "var(--text-soft)",
           fontSize: "1rem",
           marginBottom: "1.4rem",
         }}

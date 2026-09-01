@@ -38,7 +38,7 @@ export default function LanguageSwitcher() {
           padding: "0.25rem 0.55rem",
           borderRadius: 100,
           border: "none",
-          background: active ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "transparent",
+          background: active ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "transparent",
           color: active ? "#fff" : "var(--text-soft)",
           fontWeight: 700,
           fontSize: "0.74rem",

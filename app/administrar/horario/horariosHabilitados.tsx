@@ -155,7 +155,7 @@ export default function HorariosHabilitados() {
                   const hoy = new Date(anio, mes, dia).toDateString() === new Date().toDateString();
                   return (
                     <motion.button key={dia} whileHover={pasado ? {} : { scale: 1.1 }} onClick={() => !pasado && (setSelectedDate(iso), cargarDia(iso))} disabled={pasado}
-                      style={{ width: 34, height: 34, borderRadius: "50%", border: hoy && !sel ? "2px solid #B08968" : "none", margin: "0 auto",
+                      style={{ width: 34, height: 34, borderRadius: "50%", border: hoy && !sel ? "2px solid var(--brand)" : "none", margin: "0 auto",
                         background: sel ? "var(--brand)" : pasado ? "transparent" : "var(--surface-soft)",
                         color: sel ? "white" : pasado ? "#ccc" : "var(--text)",
                         fontWeight: sel || hoy ? 700 : 400, fontSize: "0.82rem", cursor: pasado ? "not-allowed" : "pointer",

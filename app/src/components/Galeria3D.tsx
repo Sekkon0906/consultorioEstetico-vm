@@ -246,7 +246,7 @@ export default function Galeria3D() {
         <h2
           style={{
             fontFamily: "'Playfair Display', serif",
-            color: "#FFFDF9",
+            color: "var(--surface)",
             fontWeight: 700,
             /* Título mucho más grande para tomar más presencia visual. */
             fontSize: "clamp(1.7rem, 2.8vw, 2.5rem)",
@@ -439,7 +439,7 @@ export default function Galeria3D() {
                       height: "100%",
                       borderRadius: 20,
                       overflow: "hidden",
-                      backgroundColor: "#FFFDF9",
+                      backgroundColor: "var(--surface)",
                       border: "1.5px solid rgba(255, 235, 215, 0.55)",
                       cursor: "pointer",
                     }}
@@ -490,7 +490,7 @@ export default function Galeria3D() {
                           margin: 0,
                           fontSize: "0.92rem",
                           fontWeight: 600,
-                          color: "#3A2A1A",
+                          color: "var(--text)",
                           fontFamily: "'Playfair Display', serif",
                           textAlign: "center",
                           letterSpacing: "0.01em",
@@ -638,7 +638,7 @@ export default function Galeria3D() {
               gap: 8,
               padding: "0.75rem 1.8rem",
               borderRadius: 100,
-              background: "linear-gradient(135deg, #B08968, #C9AD8D)",
+              background: "linear-gradient(135deg, var(--brand), var(--brand-soft))",
               color: "#FFFFFF",
               border: "none",
               fontWeight: 600,
@@ -669,7 +669,7 @@ export default function Galeria3D() {
           className="g3d-detail dark-aware-card"
           onClick={(e) => e.stopPropagation()}
           style={{
-            backgroundColor: "#FFFDF9",
+            backgroundColor: "var(--surface)",
             width: "min(680px, 92vw)",
             maxWidth: "92vw",
             maxHeight: "88vh",
@@ -709,7 +709,7 @@ export default function Galeria3D() {
               left: 18,
               background: "rgba(176,137,104,0.08)",
               border: "1px solid rgba(176,137,104,0.18)",
-              color: "#5A4635",
+              color: "var(--text)",
               fontWeight: 600,
               fontSize: "0.82rem",
               cursor: "pointer",
@@ -741,7 +741,7 @@ export default function Galeria3D() {
               borderRadius: "50%",
               background: "rgba(176,137,104,0.08)",
               border: "1px solid rgba(176,137,104,0.18)",
-              color: "#5A4635",
+              color: "var(--text)",
               fontWeight: 600,
               fontSize: "1.05rem",
               cursor: "pointer",
@@ -796,7 +796,7 @@ export default function Galeria3D() {
             <div
               style={{
                 flex: 1,
-                color: "#3A2A1A",
+                color: "var(--text)",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
@@ -825,7 +825,7 @@ export default function Galeria3D() {
                 />
                 <p
                   style={{
-                    color: "#6C584C",
+                    color: "var(--text-soft)",
                     lineHeight: 1.65,
                     fontSize: "0.94rem",
                     marginBottom: "1.4rem",

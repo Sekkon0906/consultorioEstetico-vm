@@ -181,7 +181,7 @@ export default function HomePage() {
       <section
         className="py-5 text-center home-location-section"
         style={{
-          backgroundColor: "#E9DED2",
+          backgroundColor: "var(--border)",
           color: "#4E3B2B",
         }}
       >
@@ -191,7 +191,7 @@ export default function HomePage() {
         >
           {th("location.title")}
         </h2>
-        <p className="mb-5" style={{ color: "#6C584C" }}>
+        <p className="mb-5" style={{ color: "var(--text-soft)" }}>
           {th("location.subtitle")}
         </p>
 

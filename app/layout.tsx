@@ -145,7 +145,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://lh3.googleusercontent.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.google.com" />
         {/* Theme color para barra del navegador en móvil */}
-        <meta name="theme-color" content="#B08968" />
+        <meta name="theme-color" content="var(--brand)" />
         {/* Apple touch */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />

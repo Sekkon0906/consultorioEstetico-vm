@@ -88,7 +88,7 @@ export default function CookieBanner() {
             right: 18,
             maxWidth: 580,
             zIndex: 9000,
-            background: "#FFFDF9",
+            background: "var(--surface)",
             border: "1px solid rgba(176,137,104,0.2)",
             borderRadius: 18,
             boxShadow: "0 16px 48px rgba(78,59,43,0.2)",
@@ -104,7 +104,7 @@ export default function CookieBanner() {
                   width: 32,
                   height: 32,
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, #B08968, #C9AD8D)",
+                  background: "linear-gradient(135deg, var(--brand), var(--brand-soft))",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -119,7 +119,7 @@ export default function CookieBanner() {
                   fontFamily: "'Playfair Display', serif",
                   fontSize: "1.05rem",
                   fontWeight: 700,
-                  color: "#3A2A1A",
+                  color: "var(--text)",
                   margin: 0,
                 }}
               >
@@ -138,7 +138,7 @@ export default function CookieBanner() {
               {t("message")}{" "}
               <Link
                 href="/legal/cookies"
-                style={{ color: "#B08968", textDecoration: "underline" }}
+                style={{ color: "var(--brand)", textDecoration: "underline" }}
               >
                 {t("moreInfo")}
               </Link>
@@ -157,7 +157,7 @@ export default function CookieBanner() {
                   <div
                     className="dark-aware-panel"
                     style={{
-                      background: "#F5EEE6",
+                      background: "var(--surface-soft)",
                       borderRadius: 12,
                       padding: "0.8rem 0.9rem",
                       marginBottom: "0.9rem",
@@ -242,7 +242,7 @@ const ghostBtn: React.CSSProperties = {
   borderRadius: 100,
   border: "1px solid rgba(176,137,104,0.3)",
   background: "transparent",
-  color: "#6C584C",
+  color: "var(--text-soft)",
   fontWeight: 600,
   fontSize: "0.82rem",
   cursor: "pointer",
@@ -278,11 +278,11 @@ function Pref({
         checked={checked}
         disabled={!!locked}
         onChange={(e) => onChange?.(e.target.checked)}
-        style={{ marginTop: 3, accentColor: "#B08968" }}
+        style={{ marginTop: 3, accentColor: "var(--brand)" }}
       />
       <span>
-        <strong style={{ color: "#3A2A1A", fontSize: "0.86rem" }}>{label}</strong>
-        <span style={{ display: "block", color: "#6C584C", fontSize: "0.78rem", lineHeight: 1.45 }}>
+        <strong style={{ color: "var(--text)", fontSize: "0.86rem" }}>{label}</strong>
+        <span style={{ display: "block", color: "var(--text-soft)", fontSize: "0.78rem", lineHeight: 1.45 }}>
           {desc}
         </span>
       </span>

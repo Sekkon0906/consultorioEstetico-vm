@@ -76,30 +76,30 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
   return (
     <motion.div key="pago" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.5 }} style={{ maxWidth: 620, margin: "0 auto" }}>
       <div className="agendar-pago-card dark-aware-card" style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", padding: "2.5rem 2rem", textAlign: "center" }}>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.5rem" }}>{t("title")}</h2>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem" }}>{t("title")}</h2>
         <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, margin: "0 auto 1.5rem" }} />
 
         {/* Resumen */}
         <div className="pago-summary-box" style={{ textAlign: "left", background: "linear-gradient(145deg, #FFFBF7, #F0E5D8)", borderRadius: 16, padding: "1.5rem", border: "1px solid rgba(176,137,104,0.12)", marginBottom: "1.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "0.5rem 1rem", fontSize: "0.9rem", color: "#5A4A3A" }}>
-            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>{t("summary.patient")}</span><span>{citaData.nombres} {citaData.apellidos || ""}</span>
-            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>{t("summary.procedure")}</span><span>{citaData.procedimiento}</span>
-            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>{t("summary.date")}</span><span>{new Date(citaData.fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
-            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>{t("summary.time")}</span><span>{citaData.hora}</span>
-            <span style={{ fontWeight: 600, color: "#3A2A1A" }}>{t("summary.phone")}</span><span>{citaData.telefono || t("summary.notSpecified")}</span>
+            <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.patient")}</span><span>{citaData.nombres} {citaData.apellidos || ""}</span>
+            <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.procedure")}</span><span>{citaData.procedimiento}</span>
+            <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.date")}</span><span>{new Date(citaData.fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
+            <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.time")}</span><span>{citaData.hora}</span>
+            <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.phone")}</span><span>{citaData.telefono || t("summary.notSpecified")}</span>
           </div>
-          {citaData.nota && <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "1px solid rgba(176,137,104,0.15)" }}><span style={{ fontWeight: 600, color: "#3A2A1A", fontSize: "0.9rem" }}>{t("summary.noteLabel")}</span><span style={{ fontSize: "0.9rem", color: "#5A4A3A" }}>{citaData.nota}</span></div>}
+          {citaData.nota && <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "1px solid rgba(176,137,104,0.15)" }}><span style={{ fontWeight: 600, color: "var(--text)", fontSize: "0.9rem" }}>{t("summary.noteLabel")}</span><span style={{ fontSize: "0.9rem", color: "#5A4A3A" }}>{citaData.nota}</span></div>}
         </div>
 
         {/* Toggle Efectivo / Tarjeta */}
         <div style={{ marginBottom: "1.5rem" }}>
-          <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "#3A2A1A", marginBottom: "0.8rem" }}>{t("paymentMethodLabel")}</p>
+          <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text)", marginBottom: "0.8rem" }}>{t("paymentMethodLabel")}</p>
           <div
             onClick={() => setTipoPago(isEfectivo ? "Tarjeta" : "Efectivo")}
             style={{
               display: "inline-flex", alignItems: "center", cursor: "pointer", userSelect: "none",
               background: isEfectivo
-                ? "linear-gradient(135deg, #B08968, #C9AD8D)"
+                ? "linear-gradient(135deg, var(--brand), var(--brand-soft))"
                 : "linear-gradient(135deg, #6C8B6A, #8DB08A)",
               borderRadius: 50, padding: "5px", width: 240, height: 48, position: "relative",
               boxShadow: "inset 0 2px 6px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)",
@@ -139,7 +139,7 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
                 transition={{ duration: 0.4 }}
               >
                 {isEfectivo ? (
-                  <i className="fas fa-money-bill-wave" style={{ color: "#B08968", fontSize: "0.9rem" }} />
+                  <i className="fas fa-money-bill-wave" style={{ color: "var(--brand)", fontSize: "0.9rem" }} />
                 ) : (
                   <i className="fas fa-credit-card" style={{ color: "#6C8B6A", fontSize: "0.9rem" }} />
                 )}
@@ -147,12 +147,12 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
             </motion.div>
           </div>
 
-          <p style={{ fontSize: "0.82rem", color: "#8A7565", marginTop: "0.6rem" }}>
+          <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginTop: "0.6rem" }}>
             {isEfectivo ? t("cashHint") : t("cardHint")}
           </p>
         </div>
 
-        <p style={{ fontSize: "0.78rem", color: "#8A7565", marginBottom: "1.5rem", fontStyle: "italic" }}>
+        <p style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: "1.5rem", fontStyle: "italic" }}>
           {t("footerInfo")}
         </p>
 

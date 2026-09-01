@@ -100,7 +100,7 @@ export default function VideoAnim() {
         onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px) scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(176,137,104,0.16)"; }}
         onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
         <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #B08968, #D4A87A)", color: "white", fontSize: "0.75rem", marginBottom: 6 }}><i className={icon} /></div>
-        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.7rem", fontWeight: 700, color: "#3A2A1A", lineHeight: 1 }}>{count}{suffix}</div>
+        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.7rem", fontWeight: 700, color: "var(--text)", lineHeight: 1 }}>{count}{suffix}</div>
         <div style={{ fontSize: "0.7rem", fontWeight: 500, color: "#7A6554", marginTop: 3 }}>{label}</div>
         <div style={{ position: "absolute", top: "-50%", left: "-50%", width: "200%", height: "200%", background: "linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.2) 50%, transparent 60%)", transform: "rotate(25deg)", animation: "va-shine 4s ease-in-out infinite", pointerEvents: "none" }} />
       </div>
@@ -138,7 +138,7 @@ export default function VideoAnim() {
 
         {/* Header — sin kicker para ahorrar vertical y que título+video+CTAs entren juntos en pantalla */}
         <div ref={hdr.ref} style={{ ...rs(hdr.v), textAlign: "center", marginBottom: "1.4rem", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.4rem, 2.6vw, 2rem)", fontWeight: 700, color: "#3A2A1A", maxWidth: 780, margin: "0 auto 0.6rem", lineHeight: 1.2 }}>{t("title")}</h2>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.4rem, 2.6vw, 2rem)", fontWeight: 700, color: "var(--text)", maxWidth: 780, margin: "0 auto 0.6rem", lineHeight: 1.2 }}>{t("title")}</h2>
           <div style={{ width: 50, height: 3, background: "linear-gradient(90deg,#C9AD8D,#B08968)", borderRadius: 2, margin: "0 auto 0.55rem" }} />
           <p style={{ fontSize: "0.95rem", color: "#7A6554", margin: 0 }}>{t("subtitle")}</p>
         </div>
@@ -148,7 +148,7 @@ export default function VideoAnim() {
 
           {/* LEFT - Features */}
           <div className="dark-aware-card" ref={lft.ref} style={{ ...rs(lft.v, 0.15), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.2rem 1rem" }}>
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.85rem", textAlign: "center" }}>{t("distinguishTitle")}</h3>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.85rem", textAlign: "center" }}>{t("distinguishTitle")}</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               {features.map((f, i) => (
                 <div key={i} style={{
@@ -159,8 +159,8 @@ export default function VideoAnim() {
                 }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateX(4px)"; e.currentTarget.style.boxShadow = "0 4px 14px rgba(176,137,104,0.1)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateX(0)"; e.currentTarget.style.boxShadow = ""; }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.8rem" }}><i className={f.icon} /></div>
-                  <div><div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#3A2A1A" }}>{f.title}</div><div style={{ fontSize: "0.72rem", color: "#8A7565", marginTop: 1 }}>{f.desc}</div></div>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.8rem" }}><i className={f.icon} /></div>
+                  <div><div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text)" }}>{f.title}</div><div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 1 }}>{f.desc}</div></div>
                 </div>
               ))}
             </div>
@@ -194,7 +194,7 @@ export default function VideoAnim() {
           {/* RIGHT - Counters */}
           <div className="dark-aware-card" ref={el => { rgt.ref.current = el; countersRef.current = el; }}
             style={{ ...rs(rgt.v, 0.2), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.2rem 1rem" }}>
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.85rem", textAlign: "center" }}>{t("experienceTitle")}</h3>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.85rem", textAlign: "center" }}>{t("experienceTitle")}</h3>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.7rem" }}>
               <Counter value={680} label={t("counters.patients")} suffix="+" icon="fas fa-users" delay={0} />
               <Counter value={15} label={t("counters.treatments")} suffix="+" icon="fas fa-syringe" delay={150} />

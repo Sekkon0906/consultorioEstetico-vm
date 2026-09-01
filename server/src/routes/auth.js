@@ -3,11 +3,7 @@ const router   = express.Router();
 const supabase = require("../lib/supabaseAdmin");
 const { pool } = require("../lib/db");
 
-const ADMIN_EMAILS = ["medinapipe123@gmail.com", "admin@clinicavm.com"];
-
-function resolveRol(email) {
-  return ADMIN_EMAILS.includes(email) ? "admin" : "usuario";
-}
+const { rolDe, sembrarAdminSiHaceFalta } = require("../lib/roles");
 
 /**
  * POST /auth/callback
@@ -32,7 +28,6 @@ router.post("/callback", async (req, res) => {
     const photoURL   = user.user_metadata?.avatar_url || null;
     const [nombres, ...rest] = fullName.trim().split(" ");
     const apellidos  = rest.join(" ");
-    const rol        = resolveRol(email);
 
     // 2. Buscar usuario existente por UUID (id = auth.uid)
     const { rows: existing } = await pool.query(
@@ -42,32 +37,44 @@ router.post("/callback", async (req, res) => {
     );
 
     if (existing.length) {
+      // Si admin_users está vacía, la primera cuenta de la lista de arranque
+      // queda como administradora. Con la tabla ya poblada esto no hace nada.
+      await sembrarAdminSiHaceFalta(user.id, email);
+
       // Refrescar la foto desde Google (avatar_url) en cada login.
       // Si Google no envía foto, se conserva la almacenada.
       if (photoURL && photoURL !== existing[0].photo) {
         const { rows: updated } = await pool.query(
           `UPDATE usuarios SET photo = $1
            WHERE id = $2
-           RETURNING id, nombres, apellidos, rol, photo, telefono`,
+           RETURNING id, nombres, apellidos, photo, telefono`,
           [photoURL, user.id]
         );
-        return res.json({ ok: true, user: { ...updated[0], email } });
+        return res.json({ ok: true, user: { ...updated[0], rol: await rolDe(user.id), email } });
       }
-      return res.json({ ok: true, user: { ...existing[0], email } });
+      return res.json({ ok: true, user: { ...existing[0], rol: await rolDe(user.id), email } });
     }
 
-    // 3. Crear usuario nuevo (el trigger ya pudo haberlo creado)
+    // 3. Crear usuario nuevo (el trigger ya pudo haberlo creado).
+    // `rol` no se envía: lo fija el trigger enforce_usuarios_rol, y quien
+    // manda de verdad es admin_users.
     const { rows: created } = await pool.query(
-      `INSERT INTO usuarios (id, nombres, apellidos, rol, photo)
+      `INSERT INTO usuarios (id, nombres, apellidos, email, photo)
        VALUES ($1, $2, $3, $4, $5)
        ON CONFLICT (id) DO UPDATE SET
          nombres = EXCLUDED.nombres,
+         email   = COALESCE(usuarios.email, EXCLUDED.email),
          photo   = COALESCE(EXCLUDED.photo, usuarios.photo)
-       RETURNING id, nombres, apellidos, rol, photo, telefono`,
-      [user.id, nombres || "Paciente", apellidos || "", rol, photoURL]
+       RETURNING id, nombres, apellidos, photo, telefono`,
+      [user.id, nombres || "Paciente", apellidos || "", email, photoURL]
     );
 
-    return res.status(201).json({ ok: true, user: { ...created[0], email } });
+    await sembrarAdminSiHaceFalta(user.id, email);
+
+    return res.status(201).json({
+      ok: true,
+      user: { ...created[0], rol: await rolDe(user.id), email },
+    });
   } catch (err) {
     console.error("Error /auth/callback:", err);
     return res.status(500).json({ ok: false, error: "Error interno del servidor" });

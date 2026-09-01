@@ -168,9 +168,9 @@ export default function SiluetasAnimadas({ tipo }: { tipo?: string | null }) {
       // Trazo con degradado cálido (tonos de la marca) en vez de plano
       const halfH = Math.min(w, h) * 0.42;
       const ink = ctx.createLinearGradient(0, h * 0.5 - halfH, 0, h * 0.5 + halfH);
-      ink.addColorStop(0, "#6C584C");
-      ink.addColorStop(0.5, "#8B6A4B");
-      ink.addColorStop(1, "#C9AD8D");
+      ink.addColorStop(0, "var(--text-soft)");
+      ink.addColorStop(0.5, "var(--brand-deep)");
+      ink.addColorStop(1, "var(--brand-soft)");
 
       ctx.globalAlpha = alpha;
       ctx.shadowColor = "rgba(176,137,104,0.28)";

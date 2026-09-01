@@ -51,13 +51,13 @@ function ProgressBar({ estado, t }: { estado: string; t: ReturnType<typeof useTr
               <motion.div
                 initial={{ scale: 0.8 }}
                 animate={{ scale: active ? 1 : 0.8 }}
-                style={{ width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", fontWeight: 700, color: active ? "white" : "#9B8575", background: active ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#E9DED2", transition: "all 0.4s", boxShadow: active ? "0 2px 8px rgba(176,137,104,0.3)" : "none" }}>
+                style={{ width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", fontWeight: 700, color: active ? "white" : "#9B8575", background: active ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border)", transition: "all 0.4s", boxShadow: active ? "0 2px 8px rgba(176,137,104,0.3)" : "none" }}>
                 {active ? <CheckCircle size={14} /> : i + 1}
               </motion.div>
-              <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "#3A2A1A" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
+              <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
             </div>
             {!isLast && (
-              <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 4px", marginBottom: 18, background: currentStep > i + 1 ? "linear-gradient(90deg, #B08968, #C9AD8D)" : "#E9DED2", transition: "background 0.4s" }} />
+              <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 4px", marginBottom: 18, background: currentStep > i + 1 ? "linear-gradient(90deg, #B08968, #C9AD8D)" : "var(--border)", transition: "background 0.4s" }} />
             )}
           </div>
         );
@@ -153,14 +153,14 @@ export default function CitasAgendadas() {
     cancelada: citas.filter(c => c.estado === "cancelada").length,
   }), [citas]);
 
-  if (loading) return <div style={{ display: "flex", justifyContent: "center", padding: "5rem 0" }}><div className="spinner-border" style={{ color: "#B08968" }} /></div>;
-  if (error) return <div style={{ textAlign: "center", padding: "3rem" }}><p style={{ color: "#7E1F1F" }}>{error}</p><button onClick={() => window.location.reload()} style={{ marginTop: "1rem", padding: "0.6rem 2rem", borderRadius: 100, background: "#B08968", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("retry")}</button></div>;
+  if (loading) return <div style={{ display: "flex", justifyContent: "center", padding: "5rem 0" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
+  if (error) return <div style={{ textAlign: "center", padding: "3rem" }}><p style={{ color: "#7E1F1F" }}>{error}</p><button onClick={() => window.location.reload()} style={{ marginTop: "1rem", padding: "0.6rem 2rem", borderRadius: 100, background: "var(--brand)", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("retry")}</button></div>;
 
   return (
     <div className="dark-aware-section citas-page" style={{ maxWidth: 1180, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.5rem" }}>{t("title")}</h2>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem" }}>{t("title")}</h2>
         <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, margin: "0 auto 1.2rem" }} />
       </motion.div>
 
@@ -188,7 +188,7 @@ export default function CitasAgendadas() {
             );
           })}
           <button onClick={() => setAscendente(a => !a)}
-            style={{ marginTop: "0.4rem", padding: "0.55rem 1rem", borderRadius: 12, fontSize: "0.84rem", fontWeight: 600, border: "1px solid rgba(176,137,104,0.25)", cursor: "pointer", background: "#FFFDF9", color: "#4E3B2B", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            style={{ marginTop: "0.4rem", padding: "0.55rem 1rem", borderRadius: 12, fontSize: "0.84rem", fontWeight: 600, border: "1px solid rgba(176,137,104,0.25)", cursor: "pointer", background: "var(--surface)", color: "#4E3B2B", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
             {ascendente ? <ChevronUp size={14} /> : <ChevronDown size={14} />} {t("sortByDate")}
           </button>
         </div>
@@ -246,36 +246,36 @@ export default function CitasAgendadas() {
                         {/* Cabecera: procedimiento (izq) + fecha/hora destacada (der) */}
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.1rem", gap: "1rem", flexWrap: "wrap" }}>
                           <div>
-                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.15rem" }}>{cita.procedimiento}</h3>
-                            <span style={{ fontSize: "0.76rem", color: "#8A7565", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.15rem" }}>{cita.procedimiento}</h3>
+                            <span style={{ fontSize: "0.76rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                               {cita.tipoCita === "valoracion" ? t("labels.valoracion") : t("labels.implementacion")}
                             </span>
                           </div>
                           <div style={{ textAlign: "right", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 14, padding: "0.6rem 1rem", minWidth: 150 }}>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6, fontSize: "0.9rem", fontWeight: 700, color: "#3A2A1A" }}>
-                              <Clock size={14} color="#B08968" /> {cita.hora}
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6, fontSize: "0.9rem", fontWeight: 700, color: "var(--text)" }}>
+                              <Clock size={14} color="var(--brand)" /> {cita.hora}
                             </div>
-                            <div style={{ fontSize: "0.76rem", color: "#8A7565", marginTop: 2 }}>{formatFecha(cita.fecha)}</div>
+                            <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", marginTop: 2 }}>{formatFecha(cita.fecha)}</div>
                           </div>
                         </div>
 
                         {/* Metadatos compactos (una sola línea tenue) */}
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem 1.2rem", fontSize: "0.8rem", color: "#8A7565", marginBottom: "1rem" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 5 }}><User size={13} color="#B08968" /> {cita.nombres} {cita.apellidos}</span>
-                          {cita.telefono && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Phone size={13} color="#B08968" /> {cita.telefono}</span>}
-                          {cita.correo && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Mail size={13} color="#B08968" /> {cita.correo}</span>}
-                          {cita.metodoPago && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><i className="fas fa-wallet" style={{ color: "#B08968" }} /> {cita.metodoPago} ({cita.tipoPagoConsultorio || cita.tipoPagoOnline || ""})</span>}
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem 1.2rem", fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "1rem" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 5 }}><User size={13} color="var(--brand)" /> {cita.nombres} {cita.apellidos}</span>
+                          {cita.telefono && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Phone size={13} color="var(--brand)" /> {cita.telefono}</span>}
+                          {cita.correo && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Mail size={13} color="var(--brand)" /> {cita.correo}</span>}
+                          {cita.metodoPago && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><i className="fas fa-wallet" style={{ color: "var(--brand)" }} /> {cita.metodoPago} ({cita.tipoPagoConsultorio || cita.tipoPagoOnline || ""})</span>}
                         </div>
 
                         {cita.nota && (
-                          <div style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: "0.83rem", color: "#6C584C", padding: "0.55rem 0.8rem", background: "#F5EEE6", borderRadius: 10, marginBottom: "0.8rem" }}>
-                            <FileText size={14} color="#B08968" style={{ marginTop: 2, flexShrink: 0 }} /> {cita.nota}
+                          <div style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: "0.83rem", color: "var(--text-soft)", padding: "0.55rem 0.8rem", background: "var(--surface-soft)", borderRadius: 10, marginBottom: "0.8rem" }}>
+                            <FileText size={14} color="var(--brand)" style={{ marginTop: 2, flexShrink: 0 }} /> {cita.nota}
                           </div>
                         )}
 
                         {/* Monto */}
                         {cita.monto != null && cita.monto > 0 && (
-                          <div style={{ padding: "0.55rem 1rem", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", borderRadius: 12, border: "1px solid rgba(176,137,104,0.1)", fontSize: "0.83rem", color: "#3A2A1A", marginBottom: "0.5rem" }}>
+                          <div style={{ padding: "0.55rem 1rem", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", borderRadius: 12, border: "1px solid rgba(176,137,104,0.1)", fontSize: "0.83rem", color: "var(--text)", marginBottom: "0.5rem" }}>
                             <strong>{t("labels.amount")}</strong> ${cita.monto.toLocaleString(currencyLocale)}
                             {cita.montoPagado != null && <span> · {t("labels.paid")} ${cita.montoPagado.toLocaleString(currencyLocale)}</span>}
                             {cita.montoRestante != null && cita.montoRestante > 0 && <span> · {t("labels.remaining")} ${cita.montoRestante.toLocaleString(currencyLocale)}</span>}
@@ -294,7 +294,7 @@ export default function CitasAgendadas() {
                           {t("reagenda.newProposal")} <strong>{formatFecha(reagendas[cita.id].nueva_fecha)} — {reagendas[cita.id].nueva_hora}</strong>
                         </div>
                         {reagendas[cita.id].motivo && (
-                          <div style={{ fontSize: "0.82rem", color: "#6C584C", fontStyle: "italic", marginBottom: "0.7rem" }}>
+                          <div style={{ fontSize: "0.82rem", color: "var(--text-soft)", fontStyle: "italic", marginBottom: "0.7rem" }}>
                             {t("reagenda.reason")} {reagendas[cita.id].motivo}
                           </div>
                         )}

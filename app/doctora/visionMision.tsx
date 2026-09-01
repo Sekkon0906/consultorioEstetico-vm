@@ -38,8 +38,8 @@ export default function VisionMision() {
               viewport={{ once: true }}
               className="dark-aware-card p-4 rounded-4 shadow-sm h-100"
               style={{
-                backgroundColor: "#FFFDF9",
-                border: "1px solid #E9DED2",
+                backgroundColor: "var(--surface)",
+                border: "1px solid var(--border)",
               }}
             >
               <h4
@@ -72,8 +72,8 @@ export default function VisionMision() {
               viewport={{ once: true }}
               className="dark-aware-card p-4 rounded-4 shadow-sm h-100"
               style={{
-                backgroundColor: "#FFFDF9",
-                border: "1px solid #E9DED2",
+                backgroundColor: "var(--surface)",
+                border: "1px solid var(--border)",
               }}
             >
               <h4

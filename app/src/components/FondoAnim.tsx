@@ -20,7 +20,7 @@ export default function FondoAnim() {
     <div className="absolute inset-0 -z-10">
       <Canvas camera={{ position: [0, 0, 10], fov: 50 }}>
         {/* Fondo base y niebla */}
-        <color attach="background" args={["#FAF9F7"]} />
+        <color attach="background" args={["var(--bg)"]} />
         <fog attach="fog" args={["#f2ece4", 10, 25]} />
         <ambientLight intensity={0.6} />
         <pointLight position={[10, 10, 10]} intensity={1.2} />

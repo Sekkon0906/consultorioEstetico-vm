@@ -76,14 +76,14 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
 
           {/* Title */}
           <div style={{ textAlign: "left", marginBottom: "1.8rem", display: "flex", alignItems: "center", gap: "1rem" }}>
-            <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, #B08968, #C9AD8D)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}>
+            <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}>
               <CheckCircle2 size={22} color="white" />
             </div>
             <div>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", fontWeight: 700, color: "#3A2A1A", marginBottom: "0.15rem" }}>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.15rem" }}>
                 {modo === "confirmacion" ? t("titleConfirm") : t("titleList")}
               </h3>
-              <p style={{ fontSize: "0.82rem", color: "#8A7565", margin: 0 }}>{t("subtitle")}</p>
+              <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", margin: 0 }}>{t("subtitle")}</p>
             </div>
           </div>
 
@@ -97,14 +97,14 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
                     <motion.div initial={{ scale: 0.8 }} animate={{ scale: active ? 1 : 0.85 }}
                       style={{ width: 30, height: 30, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                        background: active ? "linear-gradient(135deg, #B08968, #C9AD8D)" : "#E9DED2",
+                        background: active ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border)",
                         color: active ? "white" : "#9B8575", boxShadow: active ? "0 2px 8px rgba(176,137,104,0.3)" : "none",
                         transition: "all 0.4s" }}>
                       {s.icon}
                     </motion.div>
-                    <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "#3A2A1A" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
                   </div>
-                  {!isLast && <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 6px", marginBottom: 18, background: progreso > i + 1 ? "linear-gradient(90deg, #B08968, #C9AD8D)" : "#E9DED2", transition: "all 0.4s" }} />}
+                  {!isLast && <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 6px", marginBottom: 18, background: progreso > i + 1 ? "linear-gradient(90deg, #B08968, #C9AD8D)" : "var(--border)", transition: "all 0.4s" }} />}
                 </div>
               );
             })}
@@ -112,14 +112,14 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
 
           {/* Info rows — grid 2 columnas en desktop, 1 en móvil */}
           <div className="tarjeta-cita-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.7rem" }}>
-            <InfoRow icon={<Calendar size={15} color="#B08968" />} label={t("rows.date")} value={fmtFecha(cita.fecha)} />
-            <InfoRow icon={<Clock size={15} color="#B08968" />} label={t("rows.time")} value={fmtHoraHumana(cita.hora)} />
-            <InfoRow icon={<User size={15} color="#B08968" />} label={t("rows.patient")} value={`${cita.nombres} ${cita.apellidos || ""}`} />
-            <InfoRow icon={<FileText size={15} color="#B08968" />} label={t("rows.procedure")} value={cita.procedimiento} />
-            {cita.telefono && <InfoRow icon={<Phone size={15} color="#B08968" />} label={t("rows.phone")} value={cita.telefono} />}
-            {cita.correo && <InfoRow icon={<Mail size={15} color="#B08968" />} label={t("rows.email")} value={cita.correo} />}
-            {metodoPagoTxt && <InfoRow icon={<CreditCard size={15} color="#B08968" />} label={t("rows.payment")} value={metodoPagoTxt} />}
-            {cita.nota && <InfoRow icon={<FileText size={15} color="#B08968" />} label={t("rows.note")} value={cita.nota} fullWidth />}
+            <InfoRow icon={<Calendar size={15} color="var(--brand)" />} label={t("rows.date")} value={fmtFecha(cita.fecha)} />
+            <InfoRow icon={<Clock size={15} color="var(--brand)" />} label={t("rows.time")} value={fmtHoraHumana(cita.hora)} />
+            <InfoRow icon={<User size={15} color="var(--brand)" />} label={t("rows.patient")} value={`${cita.nombres} ${cita.apellidos || ""}`} />
+            <InfoRow icon={<FileText size={15} color="var(--brand)" />} label={t("rows.procedure")} value={cita.procedimiento} />
+            {cita.telefono && <InfoRow icon={<Phone size={15} color="var(--brand)" />} label={t("rows.phone")} value={cita.telefono} />}
+            {cita.correo && <InfoRow icon={<Mail size={15} color="var(--brand)" />} label={t("rows.email")} value={cita.correo} />}
+            {metodoPagoTxt && <InfoRow icon={<CreditCard size={15} color="var(--brand)" />} label={t("rows.payment")} value={metodoPagoTxt} />}
+            {cita.nota && <InfoRow icon={<FileText size={15} color="var(--brand)" />} label={t("rows.note")} value={cita.nota} fullWidth />}
           </div>
           <style>{`
             @media (max-width: 700px) {
@@ -129,8 +129,8 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
 
           {/* Footer message */}
           <div className="tarjeta-cita-footer-msg" style={{ marginTop: "1.5rem", padding: "1rem", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", borderRadius: 14, border: "1px solid rgba(176,137,104,0.1)", textAlign: "center" }}>
-            <p style={{ fontSize: "0.82rem", color: "#6C584C", margin: 0 }}>
-              <i className="fas fa-info-circle" style={{ marginRight: 6, color: "#B08968" }} />
+            <p style={{ fontSize: "0.82rem", color: "var(--text-soft)", margin: 0 }}>
+              <i className="fas fa-info-circle" style={{ marginRight: 6, color: "var(--brand)" }} />
               {t("footerInfo")}
             </p>
           </div>
@@ -150,8 +150,8 @@ function InfoRow({ icon, label, value, fullWidth }: { icon: ReactNode; label: st
     <div className="tarjeta-cita-row dark-aware-panel" style={{ display: "flex", alignItems: "flex-start", gap: "0.8rem", padding: "0.55rem 0.8rem", borderRadius: 12, background: "#FDFBF8", border: "1px solid rgba(176,137,104,0.06)", textAlign: "left", gridColumn: fullWidth ? "1 / -1" : undefined }}>
       <div style={{ marginTop: 2, flexShrink: 0 }}>{icon}</div>
       <div style={{ textAlign: "left" }}>
-        <span style={{ display: "block", fontSize: "0.7rem", color: "#8A7565", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
-        <p style={{ fontSize: "0.9rem", color: "#3A2A1A", fontWeight: 500, margin: 0 }}>{value}</p>
+        <span style={{ display: "block", fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
+        <p style={{ fontSize: "0.9rem", color: "var(--text)", fontWeight: 500, margin: 0 }}>{value}</p>
       </div>
     </div>
   );
