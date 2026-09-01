@@ -1,0 +1,135 @@
+/* ============================================================
+   Galería 3D y su panel de detalle
+   Extraído de globals.css, que tenía 4.717 líneas en un solo
+   archivo. El ORDEN de los @import en globals.css reproduce el
+   orden original: la cascada de CSS depende de él y reordenarlos
+   cambia qué regla gana sin que salte ningún error.
+============================================================ */
+
+
+/* ============================================================
+   PANEL ADMIN — reskinned con tokens
+============================================================ */
+.admin-sidebar {
+  background: var(--surface-soft);
+  border-right: 1px solid var(--border);
+}
+.admin-nav-link {
+  background: var(--surface);
+  color: var(--text);
+}
+.admin-nav-link:hover {
+  background: var(--surface-soft);
+  color: var(--brand-deep);
+}
+.admin-nav-link.is-active {
+  background: linear-gradient(135deg, var(--brand-deep), var(--brand));
+  color: #FFFFFF;
+  box-shadow: var(--shadow-sm);
+}
+.admin-logout-btn {
+  background: var(--danger);
+  color: #FFFFFF;
+}
+.admin-logout-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.admin-menu-btn,
+.admin-close-btn {
+  background: var(--brand-deep);
+}
+.admin-close-btn {
+  background: transparent;
+  color: var(--text);
+}
+.admin-close-btn:hover {
+  background: var(--surface-soft);
+}
+
+:root[data-theme="dark"] .admin-sidebar {
+  background: var(--bg-elevated) !important;
+  border-color: var(--border) !important;
+}
+:root[data-theme="dark"] .admin-nav-link {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] .admin-nav-link:hover {
+  background: var(--surface-soft) !important;
+  color: var(--brand) !important;
+}
+:root[data-theme="dark"] .admin-nav-link.is-active {
+  background: linear-gradient(135deg, var(--brand), var(--brand-deep)) !important;
+  color: var(--bg) !important;
+}
+:root[data-theme="dark"] .admin-logout-btn {
+  background: rgba(244, 168, 168, 0.18) !important;
+  color: var(--danger) !important;
+  border: 1px solid var(--danger) !important;
+}
+:root[data-theme="dark"] .admin-logout-btn:hover {
+  background: rgba(244, 168, 168, 0.28) !important;
+}
+:root[data-theme="dark"] .admin-menu-btn {
+  background: var(--brand) !important;
+  color: var(--bg) !important;
+}
+
+/* === Forzar texto claro en cualquier card oscura del admin que aún
+       tenga inline colors dark === */
+:root[data-theme="dark"] .admin-sidebar h1,
+:root[data-theme="dark"] .admin-sidebar h2,
+:root[data-theme="dark"] .admin-sidebar p,
+:root[data-theme="dark"] .admin-sidebar b {
+  color: var(--text) !important;
+}
+
+/* Spinner / loader de Bootstrap usado en admin */
+:root[data-theme="dark"] .spinner-border {
+  color: var(--brand) !important;
+}
+
+/* ============================================================
+   Calendario del panel admin (/administrar?section=citas)
+============================================================ */
+.admin-cal-buzon {
+  background: var(--surface-soft);
+  color: var(--text);
+}
+.admin-cal-buzon.is-active {
+  background: linear-gradient(135deg, var(--brand-deep), var(--brand));
+  color: #FFFFFF;
+}
+.admin-cal-day {
+  background: var(--bg-elevated);
+  color: var(--text);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.admin-cal-day:hover:not(.is-empty):not(.is-selected) {
+  background: var(--surface-soft);
+}
+.admin-cal-day.is-empty {
+  background: transparent;
+  cursor: default;
+}
+.admin-cal-day.is-selected {
+  background: linear-gradient(135deg, var(--brand-deep), var(--brand));
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(176, 137, 104, 0.3);
+}
+.admin-cal-day.is-today {
+  background: var(--surface-soft);
+  color: var(--brand);
+  font-weight: 700;
+  border-color: var(--brand);
+}
+
+:root[data-theme="light"] .admin-cal-day {
+  background: #FFFFFF;
+}
+:root[data-theme="light"] .admin-cal-day.is-today {
+  background: #F5EEE6;
+}

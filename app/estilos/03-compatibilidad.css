@@ -1,0 +1,386 @@
+/* ============================================================
+   Red de seguridad: atrapa estilos en línea con color fijo
+   Extraído de globals.css, que tenía 4.717 líneas en un solo
+   archivo. El ORDEN de los @import en globals.css reproduce el
+   orden original: la cascada de CSS depende de él y reordenarlos
+   cambia qué regla gana sin que salte ningún error.
+============================================================ */
+
+
+/* ============================================================
+   OVERRIDES MASIVOS — atrapa cualquier inline style con hex
+   hardcoded. Necesario porque el rediseño usó estilos inline
+   en lugar de tokens. La lista cubre los hex más frecuentes.
+============================================================ */
+
+/* === BACKGROUNDS CLAROS → surface oscuro === */
+:root[data-theme="dark"] [style*="background: #FFFDF9"],
+:root[data-theme="dark"] [style*="background:#FFFDF9"],
+:root[data-theme="dark"] [style*="background-color: #FFFDF9"],
+:root[data-theme="dark"] [style*="background-color:#FFFDF9"],
+:root[data-theme="dark"] [style*="background: #FFFFFF"],
+:root[data-theme="dark"] [style*="background:#FFFFFF"],
+:root[data-theme="dark"] [style*="background-color: #FFFFFF"],
+:root[data-theme="dark"] [style*="background-color:#FFFFFF"],
+:root[data-theme="dark"] [style*="background: #fff"],
+:root[data-theme="dark"] [style*="background:#fff"],
+:root[data-theme="dark"] [style*="background-color: #fff"],
+:root[data-theme="dark"] [style*="background-color:#fff"],
+:root[data-theme="dark"] [style*="background: #FFF"],
+:root[data-theme="dark"] [style*="background:#FFF"],
+:root[data-theme="dark"] [style*="background-color: #FFF"],
+:root[data-theme="dark"] [style*="background-color:#FFF"],
+:root[data-theme="dark"] [style*="background: #FFFBF7"],
+:root[data-theme="dark"] [style*="background:#FFFBF7"],
+:root[data-theme="dark"] [style*="background-color: #FFFBF7"],
+:root[data-theme="dark"] [style*="background-color:#FFFBF7"],
+:root[data-theme="dark"] [style*="background: #FAF9F7"],
+:root[data-theme="dark"] [style*="background:#FAF9F7"],
+:root[data-theme="dark"] [style*="background-color: #FAF9F7"],
+:root[data-theme="dark"] [style*="background-color:#FAF9F7"],
+:root[data-theme="dark"] [style*="background: #FBF8F4"],
+:root[data-theme="dark"] [style*="background:#FBF8F4"],
+:root[data-theme="dark"] [style*="background-color: #FBF8F4"],
+:root[data-theme="dark"] [style*="background-color:#FBF8F4"] {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+/* Fondos beige/cream secundarios → surface-soft */
+:root[data-theme="dark"] [style*="background: #F5EEE6"],
+:root[data-theme="dark"] [style*="background:#F5EEE6"],
+:root[data-theme="dark"] [style*="background-color: #F5EEE6"],
+:root[data-theme="dark"] [style*="background-color:#F5EEE6"],
+:root[data-theme="dark"] [style*="background: #F5EEE5"],
+:root[data-theme="dark"] [style*="background:#F5EEE5"],
+:root[data-theme="dark"] [style*="background-color: #F5EEE5"],
+:root[data-theme="dark"] [style*="background-color:#F5EEE5"],
+:root[data-theme="dark"] [style*="background: #F0E5D8"],
+:root[data-theme="dark"] [style*="background:#F0E5D8"],
+:root[data-theme="dark"] [style*="background: #F0E8DE"],
+:root[data-theme="dark"] [style*="background:#F0E8DE"],
+:root[data-theme="dark"] [style*="background: #E9DED2"],
+:root[data-theme="dark"] [style*="background:#E9DED2"],
+:root[data-theme="dark"] [style*="background-color: #E9DED2"],
+:root[data-theme="dark"] [style*="background-color:#E9DED2"],
+:root[data-theme="dark"] [style*="background: #E9E0D1"],
+:root[data-theme="dark"] [style*="background:#E9E0D1"],
+:root[data-theme="dark"] [style*="background: #E8E1D4"],
+:root[data-theme="dark"] [style*="background:#E8E1D4"],
+:root[data-theme="dark"] [style*="background: #FBF7F2"],
+:root[data-theme="dark"] [style*="background:#FBF7F2"],
+:root[data-theme="dark"] [style*="background: #F4EBE2"],
+:root[data-theme="dark"] [style*="background:#F4EBE2"],
+:root[data-theme="dark"] [style*="background: #F4ECDF"],
+:root[data-theme="dark"] [style*="background:#F4ECDF"],
+:root[data-theme="dark"] [style*="background: #F7EFE3"],
+:root[data-theme="dark"] [style*="background:#F7EFE3"],
+:root[data-theme="dark"] [style*="background: #F3EBDF"],
+:root[data-theme="dark"] [style*="background:#F3EBDF"],
+:root[data-theme="dark"] [style*="background: #FBF9F5"],
+:root[data-theme="dark"] [style*="background:#FBF9F5"] {
+  background: var(--surface-soft) !important;
+  color: var(--text) !important;
+}
+
+/* === TEXTOS OSCUROS → texto claro === */
+:root[data-theme="dark"] [style*="color: #3A2A1A"],
+:root[data-theme="dark"] [style*="color:#3A2A1A"],
+:root[data-theme="dark"] [style*="color: #4E3B2B"],
+:root[data-theme="dark"] [style*="color:#4E3B2B"],
+:root[data-theme="dark"] [style*="color: #3E2E22"],
+:root[data-theme="dark"] [style*="color:#3E2E22"],
+:root[data-theme="dark"] [style*="color: #2B2B2B"],
+:root[data-theme="dark"] [style*="color:#2B2B2B"],
+:root[data-theme="dark"] [style*="color: #2A1C12"],
+:root[data-theme="dark"] [style*="color:#2A1C12"] {
+  color: var(--text) !important;
+}
+
+:root[data-theme="dark"] [style*="color: #6C584C"],
+:root[data-theme="dark"] [style*="color:#6C584C"],
+:root[data-theme="dark"] [style*="color: #5A4635"],
+:root[data-theme="dark"] [style*="color:#5A4635"],
+:root[data-theme="dark"] [style*="color: #5A4A3A"],
+:root[data-theme="dark"] [style*="color:#5A4A3A"],
+:root[data-theme="dark"] [style*="color: #4B3A2E"],
+:root[data-theme="dark"] [style*="color:#4B3A2E"],
+:root[data-theme="dark"] [style*="color: #6E4F37"],
+:root[data-theme="dark"] [style*="color:#6E4F37"],
+:root[data-theme="dark"] [style*="color: #7C5B3E"],
+:root[data-theme="dark"] [style*="color:#7C5B3E"],
+:root[data-theme="dark"] [style*="color: #5C4533"],
+:root[data-theme="dark"] [style*="color:#5C4533"] {
+  color: var(--text-soft) !important;
+}
+
+:root[data-theme="dark"] [style*="color: #8A7565"],
+:root[data-theme="dark"] [style*="color:#8A7565"],
+:root[data-theme="dark"] [style*="color: #8B7060"],
+:root[data-theme="dark"] [style*="color:#8B7060"],
+:root[data-theme="dark"] [style*="color: #9B8575"],
+:root[data-theme="dark"] [style*="color:#9B8575"],
+:root[data-theme="dark"] [style*="color: #A0907B"],
+:root[data-theme="dark"] [style*="color:#A0907B"],
+:root[data-theme="dark"] [style*="color: #8d7a6a"],
+:root[data-theme="dark"] [style*="color:#8d7a6a"] {
+  color: var(--text-muted) !important;
+}
+
+/* === BORDES claros → border oscuro === */
+:root[data-theme="dark"] [style*="border-color: #E9DED2"],
+:root[data-theme="dark"] [style*="border-color:#E9DED2"],
+:root[data-theme="dark"] [style*="borderColor: #E9DED2"],
+:root[data-theme="dark"] [style*="border: 1px solid #E9DED2"],
+:root[data-theme="dark"] [style*="border:1px solid #E9DED2"],
+:root[data-theme="dark"] [style*="border: 1px solid #EDE4D8"],
+:root[data-theme="dark"] [style*="border-color: #EDE4D8"],
+:root[data-theme="dark"] [style*="border-color: #E0CDB5"],
+:root[data-theme="dark"] [style*="border-color: #FFDDBF"] {
+  border-color: var(--border) !important;
+}
+
+/* === GRADIENTES CLAROS comunes → gradiente oscuro === */
+:root[data-theme="dark"] [style*="linear-gradient(180deg, #FBF7F2 0%, #F4EBE2 100%)"],
+:root[data-theme="dark"] [style*="linear-gradient(180deg, #F7EFE7 0%, #FBF8F4 100%)"],
+:root[data-theme="dark"] [style*="linear-gradient(135deg, #FFFDF9 0%, #F7EFE3 100%)"],
+:root[data-theme="dark"] [style*="linear-gradient(145deg, #FFFBF7, #F0E5D8)"],
+:root[data-theme="dark"] [style*="linear-gradient(180deg,var(--bg) 0%,var(--surface-soft) 100%)"],
+:root[data-theme="dark"] [style*="linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%)"] {
+  background: linear-gradient(180deg, var(--bg) 0%, var(--surface) 100%) !important;
+}
+
+/* === HERO KICKER pill ("MEDICINA ESTÉTICA · IBAGUÉ") ===
+   El badge usa un fondo champagne suave que en dark se vuelve oscuro
+   sobre fondo oscuro y queda ilegible. Forzamos contraste. */
+:root[data-theme="dark"] .hero-fs-kicker {
+  background: rgba(232, 201, 160, 0.18) !important;
+  color: var(--brand) !important;
+  border-color: rgba(232, 201, 160, 0.5) !important;
+}
+
+/* === BOTONES GHOST ("Conoce los procedimientos" etc) ===
+   En dark: borde y texto champagne sobre fondo translúcido. */
+:root[data-theme="dark"] .hero-fs-btn-ghost {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text) !important;
+  border-color: var(--brand) !important;
+}
+:root[data-theme="dark"] .hero-fs-btn-ghost:hover {
+  background: rgba(232, 201, 160, 0.18) !important;
+}
+
+/* === HOVER overrides para fondos beige claros usados en hover === */
+:root[data-theme="dark"] [style*="background: #FFF9F1"],
+:root[data-theme="dark"] [style*="background:#FFF9F1"] {
+  background: var(--surface-soft) !important;
+}
+
+/* === Cards de doctora (Visión/Misión/Filosofía) ===
+   Tienen background blanco + texto que en dark se ven igual.
+   Capturados por el bloque de backgrounds blancos arriba, pero
+   forzamos también los textos hijos. */
+:root[data-theme="dark"] [style*="background: #FFFDF9"] h2,
+:root[data-theme="dark"] [style*="background: #FFFDF9"] h3,
+:root[data-theme="dark"] [style*="background: #FFFDF9"] h4,
+:root[data-theme="dark"] [style*="background-color: #FFFDF9"] h2,
+:root[data-theme="dark"] [style*="background-color: #FFFDF9"] h3,
+:root[data-theme="dark"] [style*="background-color: #FFFDF9"] h4 {
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] [style*="background: #FFFDF9"] p,
+:root[data-theme="dark"] [style*="background-color: #FFFDF9"] p {
+  color: var(--text-soft) !important;
+}
+
+/* === Sections con fondo blanco/cream que contienen títulos === */
+:root[data-theme="dark"] section[style*="background: #FFFDF9"] h1,
+:root[data-theme="dark"] section[style*="background: #FFFDF9"] h2,
+:root[data-theme="dark"] section[style*="background-color: #FFFDF9"] h1,
+:root[data-theme="dark"] section[style*="background-color: #FFFDF9"] h2,
+:root[data-theme="dark"] section[style*="background: #FBF8F4"] h1,
+:root[data-theme="dark"] section[style*="background: #FBF8F4"] h2 {
+  color: var(--text) !important;
+}
+
+/* === Cards genéricos con shadow blanco === */
+:root[data-theme="dark"] [style*="box-shadow: 0 8px 24px rgba(78,59,43"] {
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* === Inputs y selects (formularios) === */
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+/* === Botones ghost-app (en general) === */
+:root[data-theme="dark"] .btn-ghost-app {
+  background: transparent !important;
+  color: var(--text) !important;
+  border-color: var(--brand) !important;
+}
+:root[data-theme="dark"] .btn-ghost-app:hover {
+  background: rgba(232, 201, 160, 0.15) !important;
+  color: var(--brand) !important;
+}
+
+/* === Botón secundario de doctora (Conocer más sobre la doctora) === */
+:root[data-theme="dark"] .btn-doctora-secondary {
+  background: rgba(232, 201, 160, 0.12) !important;
+  color: var(--text) !important;
+  border-color: var(--brand) !important;
+}
+:root[data-theme="dark"] .btn-doctora-secondary:hover {
+  background: rgba(232, 201, 160, 0.22) !important;
+  color: var(--brand) !important;
+}
+
+/* === VideoAnim section (Por qué confiarme...) ===
+   Gradiente claro de 3 tonos no coincide con selectores anteriores. */
+:root[data-theme="dark"] section[style*="linear-gradient(175deg, #FDFCFA 0%, #F5EEE5 55%, #FBF8F4 100%)"] {
+  background: linear-gradient(175deg, var(--bg) 0%, var(--bg-elevated) 55%, var(--surface) 100%) !important;
+}
+:root[data-theme="dark"] section[style*="linear-gradient(175deg, #FDFCFA 0%, #F5EEE5 55%, #FBF8F4 100%)"] h2,
+:root[data-theme="dark"] section[style*="linear-gradient(175deg, #FDFCFA 0%, #F5EEE5 55%, #FBF8F4 100%)"] h3 {
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] section[style*="linear-gradient(175deg, #FDFCFA 0%, #F5EEE5 55%, #FBF8F4 100%)"] p,
+:root[data-theme="dark"] section[style*="linear-gradient(175deg, #FDFCFA 0%, #F5EEE5 55%, #FBF8F4 100%)"] div {
+  color: inherit;
+}
+
+/* Cards laterales de VideoAnim (rgba 255,253,250,0.9) */
+:root[data-theme="dark"] [style*="rgba(255,253,250,0.9)"],
+:root[data-theme="dark"] [style*="rgba(255, 253, 250, 0.9)"],
+:root[data-theme="dark"] [style*="rgba(255,253,250,0.95)"],
+:root[data-theme="dark"] [style*="rgba(255, 253, 250, 0.95)"] {
+  background: rgba(31, 24, 18, 0.85) !important;
+  color: var(--text) !important;
+}
+
+/* ============================================================
+   Galería 3D — modal de detalle (portaleado a document.body).
+   El backdrop centra el card en TODAS las pantallas. Reglas en
+   globals.css (HMR fiable) y con !important para ganar al <style jsx>. */
+/* El detalle del procedimiento. Antes desenfocaba el fondo y dejaba que la
+   página siguiera desplazándose por detrás, así que el panel "se iba" al
+   hacer scroll. Ahora el fondo queda limpio (solo un velo sobrio para dar
+   foco) y el scroll de la página se bloquea mientras está abierto: el panel
+   se queda quieto donde está. Pensado para crecer: cuando tenga más
+   información, el que desplaza es el panel, no la página. */
+.g3d-detail-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  background: rgba(20, 16, 12, 0.55) !important;
+  animation: g3d-backdrop-fade 0.25s ease;
+  overscroll-behavior: contain;
+}
+/* Bloquea el scroll de la página mientras el detalle está abierto. */
+body.g3d-detail-abierto {
+  overflow: hidden;
+}
+@keyframes g3d-backdrop-fade { from { opacity: 0; } to { opacity: 1; } }
+/* El card del modal: anula cualquier posicionamiento heredado del
+   diseño anterior (era absolute/fixed). Ahora es un flex-child centrado. */
+.g3d-detail-backdrop .g3d-detail {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+/* === FORMULARIO DE CONTACTO DEL FOOTER ===
+   En móvil las dos columnas dejaban campos de ~140px, donde no cabe ni un
+   correo. Pasa a una sola columna, y el Sí/No de "¿estás registrado?" se
+   centra en vez de estirarse a lo ancho. */
+@media (max-width: 640px) {
+  .footer-form {
+    grid-template-columns: 1fr !important;
+  }
+  .footer-registered {
+    justify-self: center;
+    width: fit-content;
+  }
+}
+
+/* Feature items y counters (gradientes claros con 2 hex) */
+:root[data-theme="dark"] [style*="linear-gradient(135deg, #FFFBF7, #F4EBE0)"],
+:root[data-theme="dark"] [style*="linear-gradient(145deg, #FFFBF7, #F0E5D8)"] {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-soft) 100%) !important;
+  border-color: var(--border) !important;
+}
+
+/* === JM Watermark en /procedimientos ===
+   El logo es oscuro sobre fondo claro. En dark mode el opacity 0.05
+   queda invisible. Lo invertimos a blanco y subimos un poco la opacidad. */
+:root[data-theme="dark"] .proc-jm-watermark {
+  filter: brightness(0) invert(1) saturate(0.4) !important;
+  opacity: 0.07 !important;
+}
+
+/* === Galería 3D — modal de detalle del procedimiento === */
+:root[data-theme="dark"] .g3d-detail {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] .g3d-detail h1,
+:root[data-theme="dark"] .g3d-detail h2,
+:root[data-theme="dark"] .g3d-detail h3,
+:root[data-theme="dark"] .g3d-detail h4 {
+  color: var(--text) !important;
+}
+:root[data-theme="dark"] .g3d-detail p,
+:root[data-theme="dark"] .g3d-detail span {
+  color: var(--text-soft) !important;
+}
+/* Botón "← Back" y "x" del modal Galeria3D — secundarios pero visibles */
+:root[data-theme="dark"] .g3d-detail button[style*="rgba(176,137,104,0.08)"] {
+  background: rgba(232, 201, 160, 0.2) !important;
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+}
+:root[data-theme="dark"] .g3d-detail button[style*="rgba(176,137,104,0.08)"]:hover {
+  background: rgba(232, 201, 160, 0.32) !important;
+}
+
+/* Botón principal "Saber más sobre el procedimiento": en vez de ghost
+   apagado, lo hacemos un botón SÓLIDO con color (era lo que se veía gris).
+   Aplica en ambos temas para que siempre tenga presencia. */
+.g3d-detail .btn-ghost-app {
+  background: linear-gradient(135deg, #B08968, #C9AD8D) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  box-shadow: 0 6px 18px rgba(176, 137, 104, 0.3) !important;
+}
+.g3d-detail .btn-ghost-app:hover {
+  background: linear-gradient(135deg, #A0724E, #B89A7C) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-2px);
+}
+.g3d-detail .btn-ghost-app i {
+  color: #FFFFFF !important;
+}
+:root[data-theme="dark"] .g3d-detail .btn-ghost-app {
+  background: linear-gradient(135deg, var(--brand), var(--brand-soft)) !important;
+  color: var(--bg) !important;
+}
+:root[data-theme="dark"] .g3d-detail .btn-ghost-app i {
+  color: var(--bg) !important;
+}
