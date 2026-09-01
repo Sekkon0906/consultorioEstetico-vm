@@ -224,3 +224,72 @@
 :root[data-theme="dark"] .text-\[\#2B2B2B\] {
   color: var(--text) !important;
 }
+
+/* ============================================================
+   ESTADOS DE COLOR EN MODO OSCURO
+   Los chips de estado (cita confirmada, atendida, cancelada,
+   pendiente) usan pasteles con texto oscuro encima. El par es
+   coherente, así que en modo oscuro SE LEEN — pero cantan como
+   bloques brillantes sobre el fondo grafito, y rompen la calma
+   del tema.
+
+   Aquí se les da versión oscura conservando el matiz, que es lo
+   que comunica: verde sigue siendo verde (atendida), azul azul
+   (confirmada), rojo rojo (cancelada). Se oscurece el fondo y se
+   aclara el texto, manteniendo el contraste entre ambos.
+============================================================ */
+
+/* Verde — atendida / éxito */
+:root[data-theme="dark"] [style*="#E8F5E9"],
+:root[data-theme="dark"] [style*="#EEF7EE"],
+:root[data-theme="dark"] [style*="#EAF6EC"] {
+  background-color: #16301F !important;
+  color: #A7DDB8 !important;
+  border-color: #2C5A3C !important;
+}
+
+/* Azul — confirmada / informativo */
+:root[data-theme="dark"] [style*="#E3F2FD"] {
+  background-color: #14293D !important;
+  color: #9FC9EE !important;
+  border-color: #2A4C6D !important;
+}
+
+/* Rojo / rosa — cancelada, error, alerta */
+:root[data-theme="dark"] [style*="#FCE4EC"],
+:root[data-theme="dark"] [style*="#FCEAEA"],
+:root[data-theme="dark"] [style*="#FBEAEA"],
+:root[data-theme="dark"] [style*="#F7E4E1"],
+:root[data-theme="dark"] [style*="#FFF3EF"] {
+  background-color: #38201F !important;
+  color: #EDA9A2 !important;
+  border-color: #5E332F !important;
+}
+
+/* Ámbar / durazno — pendiente, aviso */
+:root[data-theme="dark"] [style*="#FFF8E1"],
+:root[data-theme="dark"] [style*="#FDE8D8"],
+:root[data-theme="dark"] [style*="#FCEFE3"],
+:root[data-theme="dark"] [style*="#FFF6E9"] {
+  background-color: #33291A !important;
+  color: #E0BE86 !important;
+  border-color: #56452B !important;
+}
+
+/* Morado — categorías y etiquetas sueltas */
+:root[data-theme="dark"] [style*="#EDE0F0"] {
+  background-color: #2B1F33 !important;
+  color: #C9A9D6 !important;
+  border-color: #46345190 !important;
+}
+
+/* Cremas casi blancos que se usaban como superficie de tarjeta */
+:root[data-theme="dark"] [style*="#FFFCF8"],
+:root[data-theme="dark"] [style*="#FDFBF8"],
+:root[data-theme="dark"] [style*="#FAF7F2"],
+:root[data-theme="dark"] [style*="#F8F5F0"],
+:root[data-theme="dark"] [style*="#F6F4EF"],
+:root[data-theme="dark"] [style*="#F8F9FA"] {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+}

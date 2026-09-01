@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabaseClient";
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function LoginForm({ setErr }: Props) {
+  const t = useTranslations("loginPage");
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,8 +22,8 @@ export default function LoginForm({ setErr }: Props) {
 
   const errors = useMemo(() => {
     const e: Record<string, string> = {};
-    if (!/^\S+@\S+\.\S+$/.test(email)) e.email = "Correo no válido";
-    if (!password) e.password = "Ingresa tu contraseña";
+    if (!/^\S+@\S+\.\S+$/.test(email)) e.email = t("correoInvalido");
+    if (!password) e.password = t("passwordVacia");
     return e;
   }, [email, password]);
 
@@ -30,14 +32,14 @@ export default function LoginForm({ setErr }: Props) {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched(true);
-    if (!isValid) { setErr("Revisa los campos marcados."); return; }
+    if (!isValid) { setErr(t("revisaCampos")); return; }
     setLoading(true);
     setErr(null);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
       setErr(error.message === "Invalid login credentials"
-        ? "Correo o contraseña incorrectos."
+        ? t("credencialesMal")
         : error.message);
       return;
     }
@@ -49,7 +51,7 @@ export default function LoginForm({ setErr }: Props) {
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
-    if (error) setErr("Error al autenticar con Google: " + error.message);
+    if (error) setErr(t("errorGoogle"));
   };
 
   return (
@@ -85,7 +87,7 @@ export default function LoginForm({ setErr }: Props) {
             className={`form-control rounded-start-3 shadow-sm ${touched && errors.password ? "is-invalid" : ""}`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Tu contraseña"
+            placeholder={t("passwordPlaceholder")}
             style={{ borderColor: PALETTE.border, backgroundColor: PALETTE.surface }}
           />
           <button
@@ -107,11 +109,11 @@ export default function LoginForm({ setErr }: Props) {
         whileHover={{ scale: loading ? 1 : 1.03, y: loading ? 0 : -2 }}
         whileTap={{ scale: 0.97 }}
       >
-        {loading ? "Entrando…" : "Entrar"}
+        {loading ? t("entrando") : t("entrar")}
       </motion.button>
 
       <div className="mt-3 d-flex flex-column align-items-center gap-2">
-        <p style={{ color: PALETTE.text, fontSize: "0.9rem" }}>O entra con:</p>
+        <p style={{ color: PALETTE.text, fontSize: "0.9rem" }}>{t("oEntraCon")}</p>
         <motion.button
           type="button"
           onClick={handleGoogle}

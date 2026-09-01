@@ -37,7 +37,12 @@
     "kicker": "Medicina estética · Ibagué",
     "title1": "Tu mejor versión",
     "title2": "empieza con",
-    "rotator": ["armonía.", "autenticidad.", "belleza natural.", "confianza."],
+    "rotator": [
+      "armonía.",
+      "autenticidad.",
+      "belleza natural.",
+      "confianza."
+    ],
     "subtitle": "Tratamientos personalizados con tecnología de última generación. Resultados naturales que resaltan tu esencia, en manos de la Dra. Vanessa Medina.",
     "ctaPrimary": "Agendar cita",
     "ctaSecondary": "Conoce los procedimientos",
@@ -72,10 +77,22 @@
       "subtitle": "Atención cercana, técnicas seguras y resultados que cuidan tu esencia.",
       "distinguishTitle": "Lo que me distingue",
       "features": [
-        { "title": "Tecnología HydraFacial", "desc": "Con certificación internacional" },
-        { "title": "Productos premium", "desc": "Grado médico avanzado" },
-        { "title": "Mínimo dolor", "desc": "Rápida recuperación" },
-        { "title": "Atención personalizada", "desc": "Un plan hecho para ti" }
+        {
+          "title": "Tecnología HydraFacial",
+          "desc": "Con certificación internacional"
+        },
+        {
+          "title": "Productos premium",
+          "desc": "Grado médico avanzado"
+        },
+        {
+          "title": "Mínimo dolor",
+          "desc": "Rápida recuperación"
+        },
+        {
+          "title": "Atención personalizada",
+          "desc": "Un plan hecho para ti"
+        }
       ],
       "iframeTitle": "Presentación",
       "watchVideo": "Ver presentación",
@@ -114,7 +131,14 @@
       "submit": "Enviar comentario",
       "submitting": "Enviando..."
     },
-    "ratingLabels": ["", "Muy malo", "Malo", "Regular", "Bueno", "Excelente"],
+    "ratingLabels": [
+      "",
+      "Muy malo",
+      "Malo",
+      "Regular",
+      "Bueno",
+      "Excelente"
+    ],
     "messages": {
       "completeFields": "Completa todos los campos.",
       "sent": "Comentario enviado. Será visible una vez aprobado por la doctora."
@@ -347,8 +371,29 @@
     "warningLoginRequired": "Debes iniciar sesión para agendar una cita.",
     "closeWarning": "Cerrar aviso",
     "calendar": {
-      "months": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-      "weekdaysShort": ["L", "M", "X", "J", "V", "S", "D"],
+      "months": [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre"
+      ],
+      "weekdaysShort": [
+        "L",
+        "M",
+        "X",
+        "J",
+        "V",
+        "S",
+        "D"
+      ],
       "hoursAvailable": "Horas disponibles",
       "pickDay": "Selecciona un día",
       "pickDayHint": "Elige un día en el calendario",
@@ -572,5 +617,23 @@
         "signed": "Consentimiento firmado"
       }
     }
+  },
+  "loginPage": {
+    "titulo": "Iniciar sesión",
+    "correo": "Correo electrónico",
+    "correoPlaceholder": "tucorreo@ejemplo.com",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Tu contraseña",
+    "entrar": "Entrar",
+    "entrando": "Entrando…",
+    "oEntraCon": "O entra con:",
+    "correoInvalido": "Correo no válido",
+    "passwordVacia": "Ingresa tu contraseña",
+    "revisaCampos": "Revisa los campos marcados.",
+    "credencialesMal": "Correo o contraseña incorrectos.",
+    "errorGoogle": "No se pudo entrar con Google.",
+    "olvidePassword": "¿Olvidaste tu contraseña?",
+    "sinCuenta": "¿No tienes cuenta?",
+    "registrate": "Regístrate"
   }
 }
