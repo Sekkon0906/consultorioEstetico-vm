@@ -19,25 +19,80 @@ informado con firma digital.
 
 ## Estructura
 
+La regla: **`app/` son solo rutas de Next.js; `src/` es todo lo demás.**
+
 ```
-app/                     # Next.js (App Router)
-  page.tsx               # Home
-  doctora/ consultorio/  # Páginas públicas
-  procedimientos/        # Listado + detalle [id]
-  testimonios/           # Testimonios + comentarios
-  agendar/               # Flujo de cita (calendario → datos → pago)
-  perfil/                # Editar info y "Mis citas agendadas"
-  administrar/           # Panel admin (horarios, citas, procedimientos,
-                         #  testimonios, formación, analítica)
+app/                       RUTAS — cada carpeta es una URL
+  page.tsx                   /               inicio
+  doctora/  consultorio/     páginas públicas
+  procedimientos/            listado y detalle [id]
+  testimonios/  agendar/     testimonios y flujo de reserva
+  login/  register/  recuperar/
+  perfil/                    citas del paciente y edición de datos
+  legal/                     privacidad, términos, cookies, aviso
+  administrar/               PANEL (solo admin)
+  api/                       3 rutas de servidor: correos de cita
+  actions/                   server actions (cambio de idioma)
+  estilos/                   CSS por dominio (ver abajo)
+  globals.css                punto de entrada: solo ordena los @import
+
+src/                       TODO LO DEMÁS
+  components/                componentes compartidos
+    ui/                        Button, ButtonLink — sistema de botones
+  context/                   AuthContext
+  lib/                       utilidades
+    sesion.ts                  único sitio que sabe de dónde sale el token
+    apiCliente.ts              capa HTTP compartida
+  services/                  clientes de la API por dominio
+  types/                     tipos del dominio
+  i18n/request.ts            configuración de next-intl
+
+server/                    BACKEND (Express)
   src/
-    components/          # Navbar, Footer, Galeria3D, VideoAnim, Firma...
-    context/AuthContext  # Sesión Supabase
-    lib/                 # supabaseClient, api
-  services/              # Acceso a datos (Supabase) por dominio
-server/
-  src/                   # API Express (rutas, middlewares, lib)
-  sql/indexes.sql        # Índices recomendados (ejecutar en Supabase)
+    routes/                  13 módulos, 60 endpoints
+    services/  middlewares/  lib/  ia/
+  sql/
+    schema/                  000_baseline.sql — el esquema completo
+    migraciones/             001-004, en orden
+    datos/                   contenido del sitio, en SQL
+  scripts/                   migración de datos operativos
+  pruebas/                   pruebas de integración
+
+docs/                      documentación
+  vault/                     notas para Obsidian (arquitectura, API, ...)
+messages/                  es.json / en.json
+public/                    estáticos servidos tal cual
 ```
+
+### Los estilos
+
+`globals.css` es solo el punto de entrada. El contenido está en `app/estilos/`
+partido por dominio: `01-tokens`, `02-tema-oscuro`, `03-compatibilidad`,
+`04-galeria`, `05-admin`, `06-responsive`.
+
+> **El orden de los `@import` importa.** Reproduce el que tenían cuando era un
+> solo archivo: la cascada de CSS depende de él y reordenarlos cambia qué
+> regla gana sin que salte ningún error.
+
+### Qué hace cada archivo de la raíz
+
+Casi todos están ahí porque **su herramienta los exige en la raíz**, no por
+desorden:
+
+| Archivo | Quién lo exige |
+|---|---|
+| `package.json` · `package-lock.json` | npm |
+| `tsconfig.json` | TypeScript |
+| `next.config.ts` · `next-env.d.ts` | Next.js |
+| `postcss.config.mjs` | PostCSS / Tailwind |
+| `eslint.config.mjs` | ESLint |
+| `vercel.json` | Vercel |
+| `instrumentation.ts` | Next.js — Sentry en servidor y edge |
+| `instrumentation-client.ts` | Next.js — Sentry en el navegador |
+| `.env.example` | Plantilla de variables **del frontend** |
+
+El backend tiene su propia plantilla en `server/.env.example`: son dos
+conjuntos de variables distintos y cada uno vive junto a lo que configura.
 
 ## Requisitos
 

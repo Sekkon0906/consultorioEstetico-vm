@@ -1,6 +1,6 @@
 const createNextIntlPlugin = require("next-intl/plugin");
 const { withSentryConfig } = require("@sentry/nextjs");
-const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -81,7 +81,9 @@ const sentryWebpackPluginOptions = {
   tunnelRoute: "/monitoring",
   // Reducir bundle size: oculta nombres de archivos source
   hideSourceMaps: true,
-  disableLogger: true,
+  // Antes era `disableLogger: true`, deprecado y avisado en cada build.
+  // Hace lo mismo: quita las llamadas de depuración de Sentry del bundle.
+  webpack: { treeshake: { removeDebugLogging: true } },
 };
 
 module.exports = withSentryConfig(withNextIntl(nextConfig), sentryWebpackPluginOptions);

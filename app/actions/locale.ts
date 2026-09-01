@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { LOCALES, LOCALE_COOKIE, type Locale } from "../../i18n/request";
+import { LOCALES, LOCALE_COOKIE, type Locale } from "@/i18n/request";
 
 /**
  * Server action para cambiar el idioma. Guarda el locale en una cookie
