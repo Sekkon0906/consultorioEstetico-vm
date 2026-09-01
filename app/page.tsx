@@ -246,32 +246,22 @@ export default function HomePage() {
               justify flex-start → también junto al gap central.
             Mismo gap horizontal que las imágenes para que se respete
             el ritmo visual. */}
+        {/* Un solo botón: el mapa embebido ya trae su propio "Abrir en
+            Maps", así que el segundo botón (que apuntaba al mismo lugar)
+            era redundante. Queda solo el que lleva a contenido real. */}
         <div
           className="home-loc-grid home-loc-ctas"
           style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "1.5rem",
+            display: "flex",
+            justifyContent: "center",
             width: "92%",
             maxWidth: 1180,
             margin: "1.5rem auto 0",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <a
-              href="https://www.google.com/maps?q=Carrera+5ta+%2311-24,+Torre+Empresarial,+Consultorio+502,+Ibagué,+Tolima"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-ghost-app"
-            >
-              <i className="fas fa-map-marker-alt" /> {th("location.viewMaps")}
-            </a>
-          </div>
-          <div style={{ display: "flex", justifyContent: "flex-start" }}>
-            <Link href="/consultorio" className="btn-ghost-app">
-              <i className="fas fa-clinic-medical" /> {th("location.viewClinic")}
-            </Link>
-          </div>
+          <Link href="/consultorio" className="btn-ghost-app">
+            <i className="fas fa-clinic-medical" /> {th("location.viewClinic")}
+          </Link>
         </div>
 
         <style>{`

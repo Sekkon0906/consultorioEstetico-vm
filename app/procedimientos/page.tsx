@@ -980,6 +980,14 @@ function FeaturedCarousel({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: direction * -40 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            drag={total > 1 ? "x" : false}
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(_e, info) => {
+              // Deslizar con el dedo: no eran solo las flechas.
+              if (info.offset.x < -60) next();
+              else if (info.offset.x > 60) prev();
+            }}
             className="featured-grid"
             style={{
               display: "grid",
@@ -1140,7 +1148,7 @@ function FeaturedCarousel({
                 <Link
                   href={`/procedimientos/${item.id}`}
                   className="btn-ghost-app"
-                  style={{ padding: "0.55rem 1.2rem", fontSize: "0.84rem" }}
+                  style={{ padding: "0.6rem 1.2rem", fontSize: "0.86rem" }}
                 >
                   {t("featured.ctaInfo")}
                   <ArrowRight size={14} />

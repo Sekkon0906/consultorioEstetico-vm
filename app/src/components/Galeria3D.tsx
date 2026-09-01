@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
@@ -25,6 +25,25 @@ export default function Galeria3D() {
   const [selected, setSelected] = useState<number | null>(null);
   const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
+
+  // Carrusel deslizable de móvil: puntos VISIBLES (a diferencia de la
+  // versión anterior, que los ocultaba) sincronizados con la posición real
+  // del scroll — así se siente "vivo" como la rueda de escritorio, sin el
+  // volteo de tarjeta que escondía la interacción.
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [gridIdx, setGridIdx] = useState(0);
+  const onGridScroll = () => {
+    const el = gridRef.current;
+    if (!el) return;
+    const cardWidth = el.scrollWidth / tratamientos.length;
+    setGridIdx(Math.round(el.scrollLeft / cardWidth));
+  };
+  const goToGridCard = (i: number) => {
+    const el = gridRef.current;
+    if (!el) return;
+    const cardWidth = el.scrollWidth / tratamientos.length;
+    el.scrollTo({ left: i * cardWidth, behavior: "smooth" });
+  };
 
   // Marca que estamos en cliente — usado para gates de elementos puramente
   // visuales (partículas) que pueden divergir en hidratación si calculamos
@@ -58,8 +77,14 @@ export default function Galeria3D() {
 
   // Rotación continua: la rueda gira en sentido contrario al anterior
   // (cards entran por la derecha y se desplazan hacia la izquierda).
+  //
+  // Solo corre en escritorio: la rueda 3D está oculta por CSS en móvil
+  // (< 821px, ver globals.css), pero sin este guard el requestAnimationFrame
+  // seguía disparando un setState en cada cuadro para animar algo que nadie
+  // veía — gasto de batería/CPU puro en celular.
   useEffect(() => {
     if (isPaused || selected !== null) return;
+    if (typeof window !== "undefined" && window.innerWidth <= 820) return;
     let frame: number;
     const animate = () => {
       setRotation((prev) => prev + 0.04);
@@ -465,38 +490,56 @@ export default function Galeria3D() {
         )}
       </div>
 
-      {/* === CUADRÍCULA MINIMALISTA (solo móvil) ===
-          Reemplaza el carrusel de tarjetas que se volteaban al tocar: esa
-          interacción quedaba escondida (sin indicador de que se podía tocar)
-          y a primera vista se veía plana. Aquí cada tarjeta es solo foto +
-          nombre + insignia si aplica, con una entrada suave al hacer scroll,
-          y toca directo al mismo modal de detalle que usa la rueda de
-          escritorio — una sola interfaz de detalle, no dos. */}
+      {/* === CARRUSEL DESLIZABLE (solo móvil) ===
+          Segunda vuelta: la cuadrícula de 2 columnas se veía "plana" a
+          primera vista (4 tarjetas estáticas a la vez). Esto se desliza con
+          el dedo, con puntos VISIBLES que muestran la posición — a
+          diferencia del carrusel de volteo anterior, que los ocultaba a
+          propósito. Toca una tarjeta y abre el mismo modal que usa la
+          rueda de escritorio. */}
       {selected === null && tratamientos.length > 0 && (
-        <div className="g3d-grid-wrap">
-          {tratamientos.map((tr, i) => (
-            <motion.button
-              key={tr.id}
-              type="button"
-              className="g3d-grid-card"
-              onClick={() => setSelected(tr.id)}
-              aria-label={tr.nombre}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45, delay: Math.min(i, 4) * 0.06, ease: "easeOut" }}
-              whileTap={{ scale: 0.97 }}
-            >
-              <img src={tr.imagen || undefined} alt={tr.nombre} loading="lazy" />
-              <span className="g3d-grid-veil" aria-hidden="true" />
-              {(tr.enPromocion || tr.destacado) && (
-                <span className={`g3d-grid-badge ${tr.enPromocion ? "promo" : "destacado"}`}>
-                  ★ {tr.enPromocion ? t("badgePromo") : t("badgeDestacado")}
-                </span>
-              )}
-              <span className="g3d-grid-name">{tr.nombre}</span>
-            </motion.button>
-          ))}
+        <div className="g3d-grid-wrap-outer">
+          <div className="g3d-grid-wrap" ref={gridRef} onScroll={onGridScroll}>
+            {tratamientos.map((tr, i) => (
+              <motion.button
+                key={tr.id}
+                type="button"
+                className="g3d-grid-card"
+                onClick={() => setSelected(tr.id)}
+                aria-label={tr.nombre}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.4, delay: Math.min(i, 4) * 0.05, ease: "easeOut" }}
+                whileTap={{ scale: 0.96 }}
+              >
+                <img src={tr.imagen || undefined} alt={tr.nombre} loading="lazy" />
+                <span className="g3d-grid-veil" aria-hidden="true" />
+                {(tr.enPromocion || tr.destacado) && (
+                  <span className={`g3d-grid-badge ${tr.enPromocion ? "promo" : "destacado"}`}>
+                    ★ {tr.enPromocion ? t("badgePromo") : t("badgeDestacado")}
+                  </span>
+                )}
+                <span className="g3d-grid-name">{tr.nombre}</span>
+              </motion.button>
+            ))}
+          </div>
+
+          {tratamientos.length > 1 && (
+            <div className="g3d-grid-dots" role="tablist" aria-label={t("subtitle")}>
+              {tratamientos.map((tr, i) => (
+                <button
+                  key={tr.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === gridIdx}
+                  aria-label={tr.nombre}
+                  onClick={() => goToGridCard(i)}
+                  className={`g3d-grid-dot ${i === gridIdx ? "is-active" : ""}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 

@@ -132,9 +132,9 @@ html, body {
 :root[data-theme="dark"] .proc-page {
   background: linear-gradient(180deg, #14100C 0%, #1F1812 100%) !important;
 }
-/* Cuadrícula minimalista de la Galería 3D: SOLO visible en móvil. En
+/* Carrusel deslizable de la Galería 3D: SOLO visible en móvil. En
    desktop manda la rueda 3D, así que se oculta por defecto. */
-.g3d-grid-wrap { display: none; }
+.g3d-grid-wrap-outer { display: none; }
 
 /* La toolbar sticky debe pegarse JUSTO debajo del navbar (sticky en top:0),
    no en top:0 (colisionaba). Lo ponemos aquí en globals (HMR fiable) con
@@ -1160,22 +1160,35 @@ html, body {
   }
   .g3d-stage { overflow: hidden !important; }
 
-  /* ===== Cuadrícula minimalista de procedimientos (móvil) =====
-     2 columnas fijas, sin carrusel ni volteo. Cada card es solo foto +
-     nombre + insignia; toca abre el mismo modal de detalle que usa la
-     rueda de escritorio (no hay una segunda interfaz de "detalle" que
-     mantener). Reemplaza la rueda 3D en celular. */
-  .g3d-stage .g3d-grid-wrap {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.7rem;
+  /* ===== Carrusel deslizable de procedimientos (móvil) =====
+     Segunda vuelta: la cuadrícula estática de 2 columnas se veía plana
+     (4 tarjetas quietas a la vez). Esto se desliza con el dedo
+     (scroll-snap), tarjetas más pequeñas (~44% ancho → se insinúa la
+     siguiente), y puntos VISIBLES que muestran la posición — a
+     diferencia del carrusel de volteo original, que los ocultaba. Toca
+     una tarjeta y abre el mismo modal que usa la rueda de escritorio.
+     Reemplaza la rueda 3D en celular. */
+  .g3d-stage .g3d-grid-wrap-outer {
+    display: block !important;
     position: relative;
     z-index: 4;
     margin-top: 1.4rem;
-    padding: 0 1rem;
   }
+  .g3d-stage .g3d-grid-wrap {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    gap: 0.6rem;
+    padding: 0 1rem 0.3rem;
+  }
+  .g3d-stage .g3d-grid-wrap::-webkit-scrollbar { display: none; }
   .g3d-stage .g3d-grid-card {
     position: relative;
+    flex: 0 0 44%;
+    scroll-snap-align: start;
     aspect-ratio: 3 / 4;
     border-radius: 14px;
     overflow: hidden;
@@ -1233,6 +1246,25 @@ html, body {
   .g3d-stage .g3d-grid-badge.destacado {
     background: linear-gradient(135deg, #F7D680, #FFE6B3);
     color: #6B4419;
+  }
+  .g3d-stage .g3d-grid-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 0.8rem;
+  }
+  .g3d-stage .g3d-grid-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 100px;
+    border: none;
+    padding: 0;
+    background: rgba(232, 201, 160, 0.35);
+    transition: width 0.3s cubic-bezier(0.16,1,0.3,1), background 0.3s;
+  }
+  .g3d-stage .g3d-grid-dot.is-active {
+    width: 18px;
+    background: linear-gradient(90deg, #E8C9A0, #F2DDB8);
   }
 
   /* 8. Formación Continua — timeline rota en móvil.
