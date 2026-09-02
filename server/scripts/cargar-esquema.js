@@ -35,6 +35,7 @@ const ESQUEMA = [
   ...(SIN_AUTH_PROPIA ? [] : ["migraciones/002_auth_propia.sql"]),
   "migraciones/003_auditoria_ia.sql",
   "migraciones/004_integraciones_ia.sql",
+  "migraciones/005_vista_resumen.sql",
   "indexes.sql",
 ];
 

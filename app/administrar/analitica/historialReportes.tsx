@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { getReportesApi } from "@/services/analiticaApi";
 
 interface Reporte {
   id: string; mes: number; anio: number;
@@ -20,24 +20,19 @@ export default function HistorialReportes() {
   useEffect(() => {
     (async () => {
       try {
-        const { data, error } = await supabase
-          .from("reportes")
-          .select("*")
-          .order("creado_en", { ascending: false });
-        if (!error && data) {
-          setReportes(
-            data.map((r: any) => ({
-              id: r.id,
-              mes: r.mes,
-              anio: r.anio,
-              fechaGeneracion: r.creado_en,
-              totalOnline: r.total_online ?? 0,
-              totalConsultorio: r.total_consultorio ?? 0,
-              totalEsperado: r.total_esperado ?? 0,
-              archivoURL: r.archivo_url,
-            }))
-          );
-        }
+        const data = await getReportesApi();
+        setReportes(
+          data.map((r) => ({
+            id: r.id,
+            mes: r.mes,
+            anio: r.anio,
+            fechaGeneracion: r.fechaGeneracion,
+            totalOnline: r.totalOnline,
+            totalConsultorio: r.totalConsultorio,
+            totalEsperado: r.totalEsperado,
+            archivoURL: r.archivoUrl ?? undefined,
+          }))
+        );
       } catch (e) {
         console.error(e);
       } finally {

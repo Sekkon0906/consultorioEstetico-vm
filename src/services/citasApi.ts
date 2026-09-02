@@ -45,14 +45,28 @@ export async function createCitaApi(
 
 export async function updateCitaApi(
   id: string,
-  payload: Partial<Omit<Cita, "id" | "fechaCreacion">>
+  // El backend (PUT /citas/:id) solo acepta snake_case en su lista blanca:
+  // fecha, hora, estado, nota, motivo_cancelacion, metodo_pago,
+  // tipo_pago_consultorio, tipo_pago_online, pagado, monto, monto_pagado,
+  // monto_restante.
+  payload: Record<string, unknown>
 ): Promise<void> {
-  // El backend acepta camelCase y snake_case; se manda tal cual.
   await apiAuth(`/citas/${id}`, { method: "PUT", body: JSON.stringify(payload) });
 }
 
 export async function deleteCitaApi(id: string): Promise<void> {
   await apiAuth(`/citas/${id}`, { method: "DELETE" });
+}
+
+/** Confirma el pago de una cita — admin. */
+export async function confirmarPagoCitaApi(
+  id: string,
+  datos: { monto: number; monto_pagado: number; metodo_pago?: string; tipo_pago_consultorio?: string }
+): Promise<void> {
+  await apiAuth(`/citas/${id}/confirmar-pago`, {
+    method: "POST",
+    body: JSON.stringify(datos),
+  });
 }
 
 // ── Bloqueos de hora por fecha ──────────────────────────────────────────────

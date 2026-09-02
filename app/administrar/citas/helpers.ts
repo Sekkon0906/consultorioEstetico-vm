@@ -1,12 +1,21 @@
-import { supabase } from "@/lib/supabaseClient";
-import { obtenerToken } from "@/lib/sesion";
+/**
+ * Helpers del panel de citas (admin).
+ *
+ * Antes hablaba con Supabase directo: entre otras cosas leía el listado
+ * completo de citas —con nombres, teléfonos y correos— usando la anon key.
+ * Ahora pasa por la API propia, donde verifyToken/requireRole deciden.
+ */
+
+import { apiAuth } from "@/lib/apiCliente";
+import { confirmarPagoCitaApi, updateCitaApi } from "@/services/citasApi";
+import { proponerReagendaApi } from "@/services/reagendasApi";
 import { notificarCambioEstado } from "@/services/notifyApi";
 
 export type EstadoCita = "pendiente" | "confirmada" | "atendida" | "cancelada";
 
 export interface Cita {
-  id: number;
-  userId: number;
+  id: string;
+  userId: string;
   nombres: string;
   apellidos: string;
   telefono: string;
@@ -34,179 +43,55 @@ export interface Cita {
   consentimientoPdf: string | null;
 }
 
-const CITA_COLUMNS =
-  "id, user_id, nombres, apellidos, telefono, correo, procedimiento, tipo_cita, nota, fecha, hora, estado, pagado, monto, monto_pagado, monto_restante, metodo_pago, tipo_pago_consultorio, tipo_pago_online, creada_por, creado_en, motivo_cancelacion, consentimiento_firmado, firma_url, firma_fecha, consentimiento_pdf";
-
-function mapCita(row: Record<string, unknown>): Cita {
-  return {
-    id: row.id as number,
-    userId: row.user_id as number,
-    nombres: (row.nombres as string) || "",
-    apellidos: (row.apellidos as string) || "",
-    telefono: (row.telefono as string) || "",
-    correo: (row.correo as string) || "",
-    procedimiento: (row.procedimiento as string) || "",
-    tipoCita: (row.tipo_cita as Cita["tipoCita"]) || "valoracion",
-    nota: (row.nota as string) || null,
-    fecha: (row.fecha as string) || "",
-    hora: (row.hora as string) || "",
-    estado: (row.estado as EstadoCita) || "pendiente",
-    pagado: !!row.pagado,
-    monto: (row.monto as number) ?? null,
-    montoPagado: (row.monto_pagado as number) ?? null,
-    montoRestante: (row.monto_restante as number) ?? null,
-    metodoPago: (row.metodo_pago as Cita["metodoPago"]) ?? null,
-    tipoPagoConsultorio: (row.tipo_pago_consultorio as Cita["tipoPagoConsultorio"]) ?? null,
-    tipoPagoOnline: (row.tipo_pago_online as Cita["tipoPagoOnline"]) ?? null,
-    creadaPor: (row.creada_por as Cita["creadaPor"]) || "usuario",
-    fechaCreacion: (row.creado_en as string) || "",
-    motivoCancelacion: (row.motivo_cancelacion as string) || null,
-    consentimientoFirmado: !!row.consentimiento_firmado,
-    firmaUrl: (row.firma_url as string) || null,
-    firmaFecha: (row.firma_fecha as string) || null,
-    consentimientoPdf: (row.consentimiento_pdf as string) || null,
-    qrCita: null,
-  };
+/** GET citas por día. La API devuelve todas (rol admin); el filtro por estado
+ *  se aplica aquí porque el panel cambia de estado sin recargar. */
+export async function getCitasByDayAPI(fecha: string, estado?: string): Promise<Cita[]> {
+  const citas = await apiAuth<Cita[]>(`/citas?fecha=${encodeURIComponent(fecha)}`, { clave: "citas" });
+  const lista = estado && estado !== "todos" ? citas.filter((c) => c.estado === estado) : citas;
+  return ordenarCitasPorHora(lista);
 }
 
-/** GET citas por dia */
-export async function getCitasByDayAPI(
-  fecha: string,
-  estado?: string
-): Promise<Cita[]> {
-  let query = supabase
-    .from("citas")
-    .select(CITA_COLUMNS)
-    .eq("fecha", fecha)
-    .order("hora", { ascending: true });
-
-  if (estado && estado !== "todos") {
-    query = query.eq("estado", estado);
-  }
-
-  const { data, error } = await query;
-  if (error) throw new Error(error.message);
-  return (data ?? []).map(mapCita);
-}
-
-/** GET todas las citas */
+/** GET todas las citas. */
 export async function getCitasAPI(): Promise<Cita[]> {
-  const { data, error } = await supabase
-    .from("citas")
-    .select(CITA_COLUMNS)
-    .order("fecha", { ascending: true })
-    .order("hora", { ascending: true });
-
-  if (error) throw new Error(error.message);
-  return (data ?? []).map(mapCita);
+  return apiAuth<Cita[]>("/citas", { clave: "citas" });
 }
 
-export async function confirmarCitaAPI(id: number): Promise<void> {
-  const { error } = await supabase
-    .from("citas")
-    .update({ estado: "confirmada", actualizado_en: new Date().toISOString() })
-    .eq("id", id);
-  if (error) throw new Error(error.message);
+export async function confirmarCitaAPI(id: string): Promise<void> {
+  await updateCitaApi(id, { estado: "confirmada" });
   void notificarCambioEstado(id); // avisa al paciente (best-effort)
 }
 
-export async function cancelarCitaAPI(id: number, motivo: string): Promise<void> {
-  const { error } = await supabase
-    .from("citas")
-    .update({
-      estado: "cancelada",
-      motivo_cancelacion: motivo,
-      actualizado_en: new Date().toISOString(),
-    })
-    .eq("id", id);
-  if (error) throw new Error(error.message);
-  void notificarCambioEstado(id); // avisa al paciente (best-effort)
+export async function cancelarCitaAPI(id: string, motivo: string): Promise<void> {
+  await updateCitaApi(id, { estado: "cancelada", motivo_cancelacion: motivo });
+  void notificarCambioEstado(id);
 }
 
 export async function updateCitaAPI(
-  id: number,
+  id: string,
   updates: Partial<Record<string, unknown>>
 ): Promise<void> {
-  const allowed: Record<string, string> = {
-    fecha: "fecha",
-    hora: "hora",
-    estado: "estado",
-    nota: "nota",
-    motivo_cancelacion: "motivo_cancelacion",
-    metodo_pago: "metodo_pago",
-    tipo_pago_consultorio: "tipo_pago_consultorio",
-    tipo_pago_online: "tipo_pago_online",
-    pagado: "pagado",
-    monto: "monto",
-    monto_pagado: "monto_pagado",
-    monto_restante: "monto_restante",
-  };
-
-  const dbUpdates: Record<string, unknown> = {
-    actualizado_en: new Date().toISOString(),
-  };
-
-  for (const [key, col] of Object.entries(allowed)) {
-    if (updates[key] !== undefined) {
-      dbUpdates[col] = updates[key];
-    }
-  }
-
-  const { error } = await supabase.from("citas").update(dbUpdates).eq("id", id);
-  if (error) throw new Error(error.message);
+  await updateCitaApi(id, updates as Record<string, unknown>);
 }
 
 /**
- * Solicitar reagenda al cliente (pt 10).
- * El admin/doctora NO mueve la cita directamente: crea una solicitud en
- * `reagendas` para que el cliente la confirme. Reusa la misma tabla que
- * usa el backend (cita_id, user_id, nueva_fecha, nueva_hora, motivo).
+ * La doctora propone mover una cita. NO la mueve directamente: crea una
+ * solicitud en `reagendas` para que el paciente la confirme.
+ * `userId` se conserva en la firma por compatibilidad; el backend lo saca de
+ * la propia cita.
  */
 export async function solicitarReagendaAPI(
-  citaId: number,
-  userId: number,
+  citaId: string,
+  _userId: string,
   nuevaFecha: string,
   nuevaHora: string,
   motivo: string
-): Promise<{ id: number }> {
-  const { data, error } = await supabase
-    .from("reagendas")
-    .insert({
-      cita_id: citaId,
-      user_id: userId,
-      nueva_fecha: nuevaFecha,
-      nueva_hora: nuevaHora,
-      motivo: motivo || "",
-      estado: "pendiente",
-    })
-    .select("id")
-    .single();
-  if (error) throw new Error(error.message);
-
-  // Notifica al paciente por email (best-effort, no rompe el flujo si falla).
-  try {
-    const token = await obtenerToken();
-    if (token) {
-      await fetch("/api/reagenda/notify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ reagendaId: data.id }),
-      });
-    }
-  } catch (e) {
-    // Silenciar: el email es complementario, la reagenda ya quedó creada.
-    console.warn("[reagenda] email no enviado:", e);
-  }
-
-  return { id: data.id as number };
+): Promise<{ id: string }> {
+  const id = await proponerReagendaApi({ citaId, nuevaFecha, nuevaHora, motivo });
+  return { id };
 }
 
-/** Confirmar pago de cita */
 export async function confirmarPagoCitaAPI(
-  id: number,
+  id: string,
   datos: {
     monto: number;
     monto_pagado: number;
@@ -214,28 +99,7 @@ export async function confirmarPagoCitaAPI(
     tipo_pago_consultorio?: string;
   }
 ): Promise<void> {
-  const montoPagado = datos.monto_pagado ?? 0;
-  const pagado = montoPagado >= datos.monto;
-
-  const updateData: Record<string, unknown> = {
-    pagado,
-    monto: datos.monto,
-    monto_pagado: montoPagado,
-    metodo_pago: datos.metodo_pago || "Consultorio",
-    tipo_pago_consultorio: datos.tipo_pago_consultorio || null,
-    estado: pagado ? "atendida" : "confirmada",
-    actualizado_en: new Date().toISOString(),
-  };
-
-  // Try with monto_restante first, if fails retry without it (generated column)
-  let { error } = await supabase.from("citas").update({ ...updateData, monto_restante: Math.max(datos.monto - montoPagado, 0) }).eq("id", id);
-
-  if (error && error.message.includes("monto_restante")) {
-    const res = await supabase.from("citas").update(updateData).eq("id", id);
-    error = res.error;
-  }
-
-  if (error) throw new Error(error.message);
+  await confirmarPagoCitaApi(id, datos);
 }
 
 export function formatCurrency(value: number): string {
@@ -243,11 +107,9 @@ export function formatCurrency(value: number): string {
 }
 
 export function ordenarCitasPorHora(citas: Cita[], asc = true): Cita[] {
-  return [...citas].sort((a, b) => {
-    return asc
-      ? parseHora(a.hora) - parseHora(b.hora)
-      : parseHora(b.hora) - parseHora(a.hora);
-  });
+  return [...citas].sort((a, b) =>
+    asc ? parseHora(a.hora) - parseHora(b.hora) : parseHora(b.hora) - parseHora(a.hora)
+  );
 }
 
 function parseHora(hora: string): number {

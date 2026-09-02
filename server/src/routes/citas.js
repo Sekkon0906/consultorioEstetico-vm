@@ -39,6 +39,7 @@ function mapCita(row) {
     qrCita:                 row.qr_url || null,
     consentimientoFirmado: !!row.consentimiento_firmado,
     firmaUrl:              row.firma_url || null,
+    firmaFecha:            row.firma_fecha || null,
     consentimientoPdf:     row.consentimiento_pdf || null,
   };
 }
@@ -56,7 +57,8 @@ router.get("/", verifyToken, async (req, res) => {
                       pagado, monto, monto_pagado, monto_restante,
                       metodo_pago, tipo_pago_consultorio, tipo_pago_online,
                       creada_por, creado_en, motivo_cancelacion,
-                      qr_url, consentimiento_firmado, firma_url, consentimiento_pdf
+                      qr_url, consentimiento_firmado, firma_url, firma_fecha,
+                      consentimiento_pdf
                FROM citas`;
     const values = [];
     const conditions = [];
