@@ -31,8 +31,14 @@ personales. Que sea un proyecto independiente.
 ### No necesita el dominio
 1. **Migrar los ~30 archivos del frontend que aún usan Supabase.** El grueso
    del trabajo.
-2. Crear la base en Neon/Railway y correr los SQL.
+2. Crear la base en **Neon** (capa gratuita permanente: 0.5 GB + 100 h de
+   cómputo/mes, sin tarjeta) y correr los SQL. Railway no tiene plan gratuito
+   permanente — su plan Hobby son 5 USD/mes.
 3. Copiar los archivos de Storage a R2 y actualizar las URLs guardadas.
+   **Automatizado:** `server/scripts/migrar-storage-a-r2.js` (simulacro por
+   defecto; `--apply` para ejecutar). Copia los buckets a R2 conservando la
+   ruta y reescribe en una transacción cada columna de la base que guarda una
+   URL de Storage.
 4. Sacar los videos de la cuenta personal de YouTube.
 5. Favicon adaptado a modo oscuro *(bloqueado: hace falta el archivo del logo,
    que vive en Supabase y no es descargable desde el entorno de desarrollo)*.
