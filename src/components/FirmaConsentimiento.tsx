@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, X, Download } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { supabase } from "@/lib/supabaseClient";
+import { apiAuth } from "@/lib/apiCliente";
 import jsPDF from "jspdf";
 
 interface Props {
@@ -238,24 +238,19 @@ export default function FirmaConsentimiento(props: Props) {
     try {
       var firmaDataUrl = c.toDataURL("image/png");
       var blob = await (await fetch(firmaDataUrl)).blob();
-      var fileName = "firma_" + props.citaId + "_" + Date.now() + ".png";
-      var upRes = await supabase.storage.from("ConsultorioImagenes").upload("firmas/" + fileName, blob, { contentType: "image/png", upsert: true });
-      if (upRes.error) throw new Error(upRes.error.message);
-      var firmaUrl = "https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/ConsultorioImagenes/firmas/" + fileName;
 
-      // Generate PDF
+      // El PDF se arma aquí; el servidor solo lo guarda y marca la cita.
       var pdf = generarPDFConsentimiento(
         props.pacienteNombre, props.pacienteApellidos || "", props.pacienteTelefono || "",
         props.pacienteCorreo || "", props.procedimiento, props.fecha, props.hora || "", firmaDataUrl
       );
       var pdfBlob = pdf.output("blob");
-      var pdfName = "consentimiento_" + props.citaId + "_" + Date.now() + ".pdf";
-      var pdfUpRes = await supabase.storage.from("ConsultorioImagenes").upload("consentimientos/" + pdfName, pdfBlob, { contentType: "application/pdf", upsert: true });
-      if (pdfUpRes.error) throw new Error(pdfUpRes.error.message);
-      var pdfUrl = "https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/ConsultorioImagenes/consentimientos/" + pdfName;
 
-      // Update cita
-      await supabase.from("citas").update({ consentimiento_firmado: true, firma_url: firmaUrl, firma_fecha: new Date().toISOString(), consentimiento_pdf: pdfUrl }).eq("id", props.citaId);
+      var fd = new FormData();
+      fd.append("firma", blob, "firma.png");
+      fd.append("pdf", pdfBlob, "consentimiento.pdf");
+
+      await apiAuth(`/citas/${props.citaId}/consentimiento`, { method: "POST", body: fd });
 
       setStep("listo");
       if (props.onFirmado) props.onFirmado();

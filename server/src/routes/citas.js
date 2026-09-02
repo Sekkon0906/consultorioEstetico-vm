@@ -1,8 +1,15 @@
 const express     = require("express");
 const router      = express.Router();
+const multer      = require("multer");
 const { pool }    = require("../lib/db");
 const verifyToken = require("../middlewares/verifyToken");
 const requireRole = require("../middlewares/requireRole");
+const almacenamiento = require("../lib/almacenamiento");
+
+const subirConsentimiento = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024 },
+});
 
 // BD snake_case → frontend camelCase
 function mapCita(row) {
@@ -218,6 +225,62 @@ router.post("/:id/confirmar-pago", verifyToken, requireRole(["admin", "developer
     return res.status(500).json({ ok: false, error: "Error al confirmar pago" });
   }
 });
+
+// POST /citas/:id/consentimiento — el paciente (o admin) sube su firma + el PDF
+// El PDF se genera en el navegador con jsPDF y llega ya armado. El servidor
+// solo comprueba la propiedad de la cita, guarda los dos archivos en R2 y
+// marca la cita.
+router.post(
+  "/:id/consentimiento",
+  verifyToken,
+  subirConsentimiento.fields([{ name: "firma", maxCount: 1 }, { name: "pdf", maxCount: 1 }]),
+  async (req, res) => {
+    try {
+      if (!almacenamiento.estaConfigurado()) {
+        return res.status(503).json({ ok: false, error: "El almacenamiento no está configurado." });
+      }
+      const { id } = req.params;
+      const firma = req.files?.firma?.[0];
+      const pdf = req.files?.pdf?.[0];
+      if (!firma || !pdf) {
+        return res.status(400).json({ ok: false, error: "Faltan los archivos 'firma' y 'pdf'." });
+      }
+
+      const { rows } = await pool.query("SELECT user_id FROM citas WHERE id = $1 LIMIT 1", [id]);
+      if (!rows.length) return res.status(404).json({ ok: false, error: "Cita no encontrada" });
+      if (req.user.rol !== "admin" && rows[0].user_id !== req.user.id) {
+        return res.status(403).json({ ok: false, error: "Esta cita no es tuya" });
+      }
+
+      const [rFirma, rPdf] = await Promise.all([
+        almacenamiento.subirArchivo(firma.buffer, {
+          carpeta: "firmas", tipoMime: firma.mimetype || "image/png", nombreOriginal: "firma.png",
+        }),
+        almacenamiento.subirArchivo(pdf.buffer, {
+          carpeta: "consentimientos", tipoMime: pdf.mimetype || "application/pdf", nombreOriginal: "consentimiento.pdf",
+        }),
+      ]);
+      if (!rFirma.ok) return res.status(400).json(rFirma);
+      if (!rPdf.ok) return res.status(400).json(rPdf);
+
+      await pool.query(
+        `UPDATE citas
+            SET consentimiento_firmado = true,
+                firma_url = $1,
+                consentimiento_pdf = $2,
+                firma_fecha = NOW(),
+                actualizado_en = NOW()
+          WHERE id = $3`,
+        [rFirma.url, rPdf.url, id]
+      );
+
+      return res.json({ ok: true, firmaUrl: rFirma.url, consentimientoPdf: rPdf.url });
+    } catch (err) {
+      console.error("Error POST /citas/:id/consentimiento:", err);
+      return res.status(500).json({ ok: false, error: "Error al guardar el consentimiento" });
+    }
+  }
+);
 
 // DELETE /citas/:id — admin
 router.delete("/:id", verifyToken, requireRole(["admin", "ayudante", "developer"]), async (req, res) => {

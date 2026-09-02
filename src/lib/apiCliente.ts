@@ -36,8 +36,12 @@ interface Opciones extends RequestInit {
 export async function apiFetch<T>(ruta: string, opciones: Opciones = {}): Promise<T> {
   const { clave = "data", autenticado = false, headers, ...resto } = opciones;
 
+  // Con FormData el navegador pone el Content-Type (con el boundary): fijarlo a
+  // mano rompe la subida.
+  const esFormData = typeof FormData !== "undefined" && resto.body instanceof FormData;
+
   const cabeceras: Record<string, string> = {
-    "Content-Type": "application/json",
+    ...(esFormData ? {} : { "Content-Type": "application/json" }),
     ...(headers as Record<string, string> | undefined),
   };
 
