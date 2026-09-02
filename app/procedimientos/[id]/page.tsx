@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { FaCalendarCheck, FaArrowLeft, FaPlay, FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
 import { useTranslations } from "next-intl";
-import { supabase } from "@/lib/supabaseClient";
+import { getProcedimientoByIdApi, getGaleriaProcedimientoApi } from "@/services/procedimientosApi";
 
 function formatPrecio(precio: string | number): string {
   if (typeof precio === "number") return precio.toLocaleString("es-CO");
@@ -17,7 +17,7 @@ function formatPrecio(precio: string | number): string {
   });
 }
 
-interface Proc { id: string; nombre: string; descripcion: string; descripcion_completa: string; precio: string; imagen: string; categoria: string; duracion_min: number | null; }
+interface Proc { id: string; nombre: string; descripcion: string; descCompleta: string; precio: string; imagen: string; categoria: string; duracionMin: number | null; }
 interface MediaItem { id: string; tipo: string; url: string; titulo: string; descripcion: string; }
 
 export default function ProcedimientoPage() {
@@ -35,17 +35,31 @@ export default function ProcedimientoPage() {
     if (!id) return;
     setLoading(true);
 
-    // Query Supabase directly - no API dependency
     Promise.all([
-      supabase.from("procedimientos").select("id, nombre, descripcion, descripcion_completa, precio, imagen, categoria, duracion_min").eq("id", id).single(),
-      supabase.from("procedimiento_galeria").select("id, tipo, url, titulo, descripcion, orden").eq("procedimiento_id", id).order("orden", { ascending: true }),
-    ]).then(([procRes, galRes]) => {
-      if (!procRes.error && procRes.data) {
-        setProc(procRes.data as Proc);
+      getProcedimientoByIdApi(id),
+      getGaleriaProcedimientoApi(id).catch(() => []),
+    ]).then(([procData, galData]) => {
+      if (procData) {
+        setProc({
+          id: String(procData.id),
+          nombre: procData.nombre,
+          descripcion: procData.desc,
+          descCompleta: procData.descCompleta || "",
+          precio: procData.precio,
+          imagen: procData.imagen,
+          categoria: procData.categoria,
+          duracionMin: procData.duracionMin ?? null,
+        });
       }
-      if (!galRes.error && galRes.data) {
-        setGaleria(galRes.data.map((g: any) => ({ id: String(g.id), tipo: g.tipo || "imagen", url: g.url, titulo: g.titulo || "", descripcion: g.descripcion || "" })));
-      }
+      setGaleria(
+        (galData || []).map((g) => ({
+          id: String(g.id),
+          tipo: g.tipo || "imagen",
+          url: g.url,
+          titulo: g.titulo || "",
+          descripcion: g.descripcion || "",
+        }))
+      );
     }).catch((e) => console.error("Error:", e)).finally(() => setLoading(false));
   }, [id]);
 
@@ -68,7 +82,7 @@ export default function ProcedimientoPage() {
     </div>
   );
 
-  const descDetalle = proc.descripcion_completa || proc.descripcion;
+  const descDetalle = proc.descCompleta || proc.descripcion;
 
   return (
     <main style={{ minHeight: "100vh", background: "linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%)" }}>
@@ -126,10 +140,10 @@ export default function ProcedimientoPage() {
 
             {/* 2. Info chips (duración, seguridad, cuidado) */}
             <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2.5rem" }}>
-              {proc.duracion_min && (
+              {proc.duracionMin && (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem 1.1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
                   <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.9rem", flexShrink: 0 }}><i className="fas fa-clock" /></div>
-                  <div><div style={{ fontSize: "0.74rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("approxDuration")}</div><div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)" }}>{proc.duracion_min} {t("minutes")}</div></div>
+                  <div><div style={{ fontSize: "0.74rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("approxDuration")}</div><div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)" }}>{proc.duracionMin} {t("minutes")}</div></div>
                 </div>
               )}
               <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem 1.1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
