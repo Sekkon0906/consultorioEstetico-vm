@@ -14,7 +14,7 @@ export type RolUsuario =
 
 // Usuario "ligero" que suele viajar en la sesión (auth/google, etc.)
 export interface SessionUser {
-  id: number;
+  id: string; // uuid — usuarios.id
   nombres: string;
   apellidos: string;
   email: string;
@@ -58,8 +58,8 @@ export type CreadorCita = "usuario" | "doctora";
 
 // Cita tal como se usa en el front (BD real + campos de UI)
 export interface Cita {
-  id: number;
-  userId: number;
+  id: string;    // uuid — citas.id
+  userId: string; // uuid — citas.user_id
 
   nombres: string;
   apellidos: string;
@@ -119,7 +119,7 @@ export interface MediaItem {
 
 // Mapea la tabla `procedimientos` + galería opcional en el front
 export interface Procedimiento {
-  id: number;
+  id: string;
   nombre: string;
   desc: string;
   descCompleta?: string;
@@ -151,7 +151,7 @@ export interface Procedimiento {
 // ============================================================
 
 export interface Testimonio {
-  id: number;
+  id: string; // uuid
   nombre: string;
   texto: string;
   video: string;
@@ -166,7 +166,7 @@ export interface Testimonio {
 // ============================================================
 
 export interface Charla {
-  id: number;
+  id: string;
   titulo: string;
   descripcion: string;
   detalle: string;
@@ -181,7 +181,7 @@ export interface Charla {
 // ============================================================
 
 export interface BloqueoHora {
-  id: number;
+  id: string; // uuid — bloqueos_horas.id
   fechaISO: string; // YYYY-MM-DD
   hora: string; // "08:30 AM"
   motivo: string;

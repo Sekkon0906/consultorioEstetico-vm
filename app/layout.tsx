@@ -140,8 +140,8 @@ export default async function RootLayout({
     <html lang={locale} suppressHydrationWarning className={`${montserrat.variable} ${playfair.variable}`}>
       <head>
         {/* Preconnect a orígenes críticos para acelerar LCP */}
-        <link rel="preconnect" href="https://ibpkihfjripvizismhsk.supabase.co" />
-        <link rel="dns-prefetch" href="https://ibpkihfjripvizismhsk.supabase.co" />
+        <link rel="preconnect" href="https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev" />
+        <link rel="dns-prefetch" href="https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev" />
         <link rel="preconnect" href="https://lh3.googleusercontent.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.google.com" />
         {/* Theme color para barra del navegador en móvil */}

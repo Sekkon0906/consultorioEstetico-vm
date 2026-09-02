@@ -86,7 +86,7 @@ export default function Navbar() {
       { label: t("testimonials"), href: "/testimonios",    grupo: "servicios" },
       { label: t("book"),         href: "/agendar",        grupo: "accion"    },
     ];
-    if (user?.rol === "admin" || user?.rol === "developer")
+    if (user?.rol === "admin")
       base.push({ label: t("admin"), href: "/administrar", grupo: "accion" });
     return base;
   }, [user?.rol, t]);

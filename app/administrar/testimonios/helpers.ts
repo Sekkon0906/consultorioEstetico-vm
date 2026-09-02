@@ -9,14 +9,14 @@ import {
 /**
  *  Activa un testimonio en la BD real
  */
-export async function activarTestimonio(id: number): Promise<void> {
+export async function activarTestimonio(id: string): Promise<void> {
   await activarTestimonioApi(id);
 }
 
 /**
  *  Desactiva un testimonio en la BD real
  */
-export async function desactivarTestimonio(id: number): Promise<void> {
+export async function desactivarTestimonio(id: string): Promise<void> {
   await desactivarTestimonioApi(id);
 }
 

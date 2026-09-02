@@ -115,6 +115,65 @@ router.get("/:id/galeria", async (req, res) => {
   }
 });
 
+// ── Galería de un procedimiento (admin) ─────────────────────────────────────
+
+// POST /procedimientos/:id/galeria — añade una imagen o video
+router.post("/:id/galeria", verifyToken, requireRole(["admin", "developer"]), async (req, res) => {
+  try {
+    const { tipo = "imagen", url, titulo = "" } = req.body || {};
+    if (!url) return res.status(400).json({ ok: false, error: "'url' es obligatoria" });
+
+    const { rows: ord } = await pool.query(
+      "SELECT COALESCE(MAX(orden), -1) + 1 AS siguiente FROM procedimiento_galeria WHERE procedimiento_id = $1",
+      [req.params.id]
+    );
+    const { rows } = await pool.query(
+      `INSERT INTO procedimiento_galeria (procedimiento_id, tipo, url, titulo, orden)
+       VALUES ($1,$2,$3,$4,$5)
+       RETURNING id, tipo, url, titulo, descripcion, orden`,
+      [req.params.id, tipo, url, titulo, ord[0].siguiente]
+    );
+    return res.status(201).json({ ok: true, item: rows[0] });
+  } catch (err) {
+    console.error("Error POST /procedimientos/:id/galeria:", err);
+    return res.status(500).json({ ok: false, error: "Error al añadir a la galería" });
+  }
+});
+
+// PUT /procedimientos/:id/galeria/orden — reordena { orden: [{id, orden}, …] }
+router.put("/:id/galeria/orden", verifyToken, requireRole(["admin", "developer"]), async (req, res) => {
+  const cliente = await pool.connect();
+  try {
+    const items = Array.isArray(req.body?.orden) ? req.body.orden : [];
+    await cliente.query("BEGIN");
+    for (const it of items) {
+      await cliente.query(
+        "UPDATE procedimiento_galeria SET orden = $1 WHERE id = $2 AND procedimiento_id = $3",
+        [it.orden, it.id, req.params.id]
+      );
+    }
+    await cliente.query("COMMIT");
+    return res.json({ ok: true });
+  } catch (err) {
+    await cliente.query("ROLLBACK").catch(() => {});
+    console.error("Error PUT /procedimientos/:id/galeria/orden:", err);
+    return res.status(500).json({ ok: false, error: "Error al reordenar" });
+  } finally {
+    cliente.release();
+  }
+});
+
+// DELETE /procedimientos/galeria/:itemId — elimina un elemento
+router.delete("/galeria/:itemId", verifyToken, requireRole(["admin", "developer"]), async (req, res) => {
+  try {
+    await pool.query("DELETE FROM procedimiento_galeria WHERE id = $1", [req.params.itemId]);
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("Error DELETE /procedimientos/galeria/:itemId:", err);
+    return res.status(500).json({ ok: false, error: "Error al eliminar el elemento" });
+  }
+});
+
 // POST /procedimientos — admin
 router.post("/", verifyToken, requireRole(["admin", "developer"]), async (req, res) => {
   try {

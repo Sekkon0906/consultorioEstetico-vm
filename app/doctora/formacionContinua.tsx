@@ -4,11 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
-import { supabase } from "@/lib/supabaseClient";
+import { getCharlasApi } from "@/services/charlasApi";
 import { X, ChevronLeft, ChevronRight, Calendar, ImageIcon, Stethoscope } from "lucide-react";
 
 interface Charla {
-  id: number;
+  id: string;
   titulo: string;
   descripcion: string;
   detalle?: string;
@@ -461,24 +461,17 @@ export default function FormacionContinua() {
   useEffect(() => {
     async function fetchCharlas() {
       try {
-        // Una sola consulta con la galería embebida (evita N+1)
-        const { data, error } = await supabase
-          .from("charlas")
-          .select("id, titulo, descripcion, detalle, imagen, fecha, charla_galeria(url, orden)")
-          .order("fecha", { ascending: false, nullsFirst: false })
-          .order("creado_en", { ascending: false });
-
-        if (error) throw new Error(error.message);
-
-        const charlasConGaleria = (data ?? []).map((c: Record<string, unknown>) => {
-          const { charla_galeria, ...rest } = c as { charla_galeria?: { url: string; orden: number }[] };
-          const galeria = (charla_galeria ?? [])
-            .slice()
-            .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
-            .map((g) => g.url);
-          return { ...rest, galeria } as Charla;
-        });
-
+        // GET /charlas ya trae la galería agregada y ordenada por el backend.
+        const data = await getCharlasApi();
+        const charlasConGaleria: Charla[] = data.map((c) => ({
+          id: String(c.id),
+          titulo: c.titulo,
+          descripcion: c.descripcion,
+          detalle: c.detalle ?? undefined,
+          imagen: c.imagen ?? "",
+          fecha: c.fecha ?? undefined,
+          galeria: (c.galeria ?? []).map((g) => g.url),
+        }));
         setCharlas(charlasConGaleria);
       } catch (err) {
         console.error("Error cargando charlas:", err);

@@ -60,8 +60,20 @@ function responderSesion(res, resultado) {
 // ── Registro ────────────────────────────────────────────────────────────────
 router.post("/registro", async (req, res) => {
   try {
-    const { email, password, nombres, apellidos, telefono } = req.body || {};
-    const r = await auth.registrar({ email, password, nombres, apellidos, telefono });
+    const {
+      email, password, nombres, apellidos, telefono,
+      edad, genero,
+      antecedentes, antecedentesDescripcion,
+      alergias, alergiasDescripcion,
+      medicamentos, medicamentosDescripcion,
+    } = req.body || {};
+    const r = await auth.registrar({
+      email, password, nombres, apellidos, telefono,
+      edad, genero,
+      antecedentes, antecedentesDescripcion,
+      alergias, alergiasDescripcion,
+      medicamentos, medicamentosDescripcion,
+    });
     if (!r.ok) return res.status(400).json(r);
     // No se inicia sesión automáticamente: primero hay que verificar el correo.
     return res.status(201).json({

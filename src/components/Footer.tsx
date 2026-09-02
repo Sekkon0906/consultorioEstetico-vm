@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { supabase } from "@/lib/supabaseClient";
+import { getProcedimientosApi } from "@/services/procedimientosApi";
 
 interface ProcItem { nombre: string; categoria: string; }
 
@@ -19,8 +19,9 @@ export default function Footer() {
   const [warning, setWarning] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.from("procedimientos").select("nombre, categoria").order("categoria").order("nombre")
-      .then(({ data }) => { if (data) setProcs(data as ProcItem[]); });
+    getProcedimientosApi()
+      .then((lista) => setProcs(lista.map((p) => ({ nombre: p.nombre, categoria: p.categoria }))))
+      .catch((err) => console.error("Error cargando procedimientos:", err));
   }, []);
 
   const grouped = procs.reduce<Record<string, string[]>>((acc, p) => {

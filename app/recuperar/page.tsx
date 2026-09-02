@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { solicitarRecuperacion } from "@/lib/sesion";
 
 export default function RecuperarPage() {
   const [email, setEmail] = useState("");
@@ -19,19 +19,18 @@ export default function RecuperarPage() {
       return;
     }
     setSending(true);
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-      email,
-      { redirectTo: `${window.location.origin}/login` }
-    );
-    setSending(false);
-    if (resetError) {
+    try {
+      // Responde igual exista o no la cuenta: no revela qué correos hay.
+      await solicitarRecuperacion(email);
+      setOk(true);
+      setTimeout(() => router.push("/login"), 4000);
+    } catch {
       setError(
         "No se pudo enviar el enlace. Verifica el correo e inténtalo de nuevo."
       );
-      return;
+    } finally {
+      setSending(false);
     }
-    setOk(true);
-    setTimeout(() => router.push("/login"), 4000);
   };
 
   return (

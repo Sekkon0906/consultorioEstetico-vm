@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/lib/supabaseClient";
+import {
+  getBloqueosGlobalesApi,
+  addBloqueoGlobalApi,
+  removeBloqueoGlobalApi,
+  getBloqueosPorFechaApi,
+  createBloqueoHoraApi,
+  deleteBloqueoHoraByFechaApi,
+  getCitasByDayApi,
+} from "@/services/citasApi";
 
 const HORAS_BASE = [
   "08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM","10:30 AM",
@@ -32,19 +40,25 @@ export default function HorariosHabilitados() {
   useEffect(() => { cargarGlobales(); }, []);
 
   const cargarGlobales = async () => {
-    const { data } = await supabase.from("bloqueos_globales").select("hora");
-    if (data) setBloqueosGlobales(new Set(data.map((b: any) => b.hora)));
+    try {
+      const horas = await getBloqueosGlobalesApi();
+      setBloqueosGlobales(new Set(horas));
+    } catch (e) { console.error(e); }
   };
 
   const cargarDia = async (fecha: string) => {
     setLoadingDia(true);
     try {
-      const [bRes, cRes] = await Promise.all([
-        supabase.from("bloqueos_horas").select("hora").eq("fecha", fecha),
-        supabase.from("citas").select("hora, estado, nombres, procedimiento").eq("fecha", fecha),
+      const [bloqueos, citas] = await Promise.all([
+        getBloqueosPorFechaApi(fecha),
+        getCitasByDayApi(fecha),
       ]);
-      if (!bRes.error) setBloqueosHoras(new Set((bRes.data ?? []).map((b: any) => b.hora)));
-      if (!cRes.error) setCitasDelDia((cRes.data ?? []).filter((c: any) => c.estado !== "cancelada") as CitaHora[]);
+      setBloqueosHoras(new Set(bloqueos.map((b) => b.hora)));
+      setCitasDelDia(
+        citas
+          .filter((c) => c.estado !== "cancelada")
+          .map((c) => ({ hora: c.hora, estado: c.estado, nombres: c.nombres, procedimiento: c.procedimiento }))
+      );
     } catch (e) { console.error(e); }
     finally { setLoadingDia(false); }
   };
@@ -55,16 +69,16 @@ export default function HorariosHabilitados() {
     setConfirmAction(null);
     try {
       if (tipo === "bloquear" && selectedDate) {
-        await supabase.from("bloqueos_horas").insert({ fecha: selectedDate, hora, motivo: "Bloqueo manual" });
+        await createBloqueoHoraApi({ fechaISO: selectedDate, hora, motivo: "Bloqueo manual" });
         showToast(`${hora} bloqueada`); cargarDia(selectedDate);
       } else if (tipo === "desbloquear" && selectedDate) {
-        await supabase.from("bloqueos_horas").delete().eq("fecha", selectedDate).eq("hora", hora);
+        await deleteBloqueoHoraByFechaApi(selectedDate, hora);
         showToast(`${hora} desbloqueada`); cargarDia(selectedDate);
       } else if (tipo === "global_bloquear") {
-        await supabase.from("bloqueos_globales").insert({ hora, motivo: "Bloqueo global" });
+        await addBloqueoGlobalApi(hora, "Bloqueo global");
         showToast(`${hora} bloqueada globalmente`); cargarGlobales();
       } else if (tipo === "global_desbloquear") {
-        await supabase.from("bloqueos_globales").delete().eq("hora", hora);
+        await removeBloqueoGlobalApi(hora);
         showToast(`${hora} desbloqueada globalmente`); cargarGlobales();
       }
     } catch (e: any) { showToast("Error: " + e.message); }

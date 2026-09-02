@@ -5,26 +5,24 @@ import {
   useContext,
   useEffect,
   useState,
+  useCallback,
   ReactNode,
 } from "react";
-import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabaseClient";
-import { syncUserWithSupabase, getCurrentUser } from "@/lib/api";
+import { getCurrentUser } from "@/lib/api";
+import { cerrarSesion, recogerTokenDeUrl } from "@/lib/sesion";
 
 export interface AppUser {
-  id: number;
+  id: string;
   nombres: string;
   apellidos: string;
   email: string;
   telefono?: string;
-  rol: "usuario" | "admin" | "developer" | "ayudante";
+  rol: "usuario" | "admin";
   photo?: string | null;
 }
 
 interface AuthContextValue {
   user: AppUser | null;
-  supabaseUser: User | null;
-  session: Session | null;
   loading: boolean;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -32,8 +30,6 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
-  supabaseUser: null,
-  session: null,
   loading: true,
   logout: async () => {},
   refreshUser: async () => {},
@@ -41,100 +37,41 @@ const AuthContext = createContext<AuthContextValue>({
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
-  const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function syncUser(authUser: User | null): Promise<AppUser | null> {
-    if (!authUser) return null;
-    try {
-      const result = await syncUserWithSupabase();
-      if (!result.ok || !result.user) return null;
-
-      const appUser = result.user as unknown as AppUser;
-
-      // Si no tiene foto en la BD, usar la de Supabase Auth (Google avatar)
-      if (!appUser.photo && authUser.user_metadata?.avatar_url) {
-        appUser.photo = authUser.user_metadata.avatar_url as string;
-      }
-
-      return appUser;
-    } catch (err) {
-      console.error("Error sincronizando usuario:", err);
-      return null;
-    }
-  }
-
-  async function refreshUser() {
-    try {
-      const result = await getCurrentUser();
-      if (result.ok && result.user) {
-        const appUser = result.user as unknown as AppUser;
-        // Fallback a avatar de Supabase Auth
-        if (!appUser.photo && supabaseUser?.user_metadata?.avatar_url) {
-          appUser.photo = supabaseUser.user_metadata.avatar_url as string;
-        }
-        setUser(appUser);
-      }
-    } catch (err) {
-      console.error("Error recargando usuario:", err);
-    }
-  }
-
-  async function logout() {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSupabaseUser(null);
-    setSession(null);
-  }
-
-  useEffect(() => {
-    // Solo onAuthStateChange: dispara INITIAL_SESSION al suscribirse,
-    // así evitamos la race condition con getSession() que causaba el bug
-    // "hay que dar F5 para que aparezcan los datos".
-    let cancelled = false;
-    let inflight: Promise<void> | null = null;
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      // Serializamos las sincronizaciones para que no compitan entre eventos.
-      const run = async () => {
-        if (inflight) {
-          try {
-            await inflight;
-          } catch {
-            /* ignore */
-          }
-        }
-        if (cancelled) return;
-
-        setSession(newSession);
-        setSupabaseUser(newSession?.user ?? null);
-
-        if (newSession?.user) {
-          const appUser = await syncUser(newSession.user);
-          if (!cancelled) setUser(appUser);
-        } else {
-          if (!cancelled) setUser(null);
-        }
-
-        if (!cancelled) setLoading(false);
-      };
-
-      inflight = run();
-    });
-
-    return () => {
-      cancelled = true;
-      subscription.unsubscribe();
-    };
+  // Pregunta a la API por el perfil en sesión. `getCurrentUser` adjunta el
+  // token (y lo renueva con la cookie de refresh si hace falta), así que esto
+  // funciona igual en el primer render que tras iniciar sesión.
+  const cargar = useCallback(async () => {
+    const r = await getCurrentUser();
+    setUser(r.ok && r.user ? (r.user as unknown as AppUser) : null);
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    await cargar();
+  }, [cargar]);
+
+  const logout = useCallback(async () => {
+    await cerrarSesion();
+    setUser(null);
+  }, []);
+
+  useEffect(() => {
+    let cancelado = false;
+    (async () => {
+      // Al volver de Google, el access token llega en el fragmento de la URL
+      // (#access_token=…). Se recoge antes de pedir el perfil.
+      recogerTokenDeUrl();
+      await cargar();
+      if (!cancelado) setLoading(false);
+    })();
+    return () => {
+      cancelado = true;
+    };
+  }, [cargar]);
+
   return (
-    <AuthContext.Provider
-      value={{ user, supabaseUser, session, loading, logout, refreshUser }}
-    >
+    <AuthContext.Provider value={{ user, loading, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

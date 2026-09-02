@@ -38,7 +38,7 @@ export async function createTestimonioApi(
 
 /** PUT actualizar — admin. */
 export async function updateTestimonioApi(
-  id: number,
+  id: string,
   payload: Partial<Omit<Testimonio, "id" | "creadoEn">>
 ): Promise<Testimonio> {
   const actualizado = await apiAuth<Testimonio>(`/testimonios/${id}`, {
@@ -51,15 +51,15 @@ export async function updateTestimonioApi(
 }
 
 /** DELETE — admin. */
-export async function deleteTestimonioApi(id: number): Promise<void> {
+export async function deleteTestimonioApi(id: string): Promise<void> {
   await apiAuth(`/testimonios/${id}`, { method: "DELETE" });
   bustTestimoniosCache();
 }
 
-export async function activarTestimonioApi(id: number): Promise<Testimonio> {
+export async function activarTestimonioApi(id: string): Promise<Testimonio> {
   return updateTestimonioApi(id, { activo: true });
 }
 
-export async function desactivarTestimonioApi(id: number): Promise<Testimonio> {
+export async function desactivarTestimonioApi(id: string): Promise<Testimonio> {
   return updateTestimonioApi(id, { activo: false });
 }

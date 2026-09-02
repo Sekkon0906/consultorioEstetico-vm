@@ -22,7 +22,7 @@ export default function Galeria3D() {
   const [tratamientos, setTratamientos] = useState<Procedimiento[]>([]);
   const [rotation, setRotation] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [selected, setSelected] = useState<number | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
   const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
 

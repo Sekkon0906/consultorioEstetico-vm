@@ -75,3 +75,33 @@ export async function deleteProcedimientoApi(id: string | number): Promise<void>
   await apiAuth(`/procedimientos/${id}`, { method: "DELETE" });
   bustProcedimientosCache();
 }
+
+// ── Galería (admin) ─────────────────────────────────────────────────────────
+
+/** Añade una imagen o video a la galería de un procedimiento. */
+export async function addGaleriaItemApi(
+  procedimientoId: string | number,
+  payload: { tipo: "imagen" | "video"; url: string; titulo?: string }
+): Promise<{ id: number; tipo: string; url: string; titulo: string | null; orden: number }> {
+  return apiAuth(`/procedimientos/${procedimientoId}/galeria`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    clave: "item",
+  });
+}
+
+/** Elimina un elemento de la galería por su id. */
+export async function deleteGaleriaItemApi(itemId: number): Promise<void> {
+  await apiAuth(`/procedimientos/galeria/${itemId}`, { method: "DELETE" });
+}
+
+/** Reordena la galería: [{ id, orden }, …]. */
+export async function reordenarGaleriaApi(
+  procedimientoId: string | number,
+  orden: Array<{ id: number; orden: number }>
+): Promise<void> {
+  await apiAuth(`/procedimientos/${procedimientoId}/galeria/orden`, {
+    method: "PUT",
+    body: JSON.stringify({ orden }),
+  });
+}

@@ -1,4 +1,4 @@
-process.env.DATABASE_URL = "postgres://postgres:testpw@127.0.0.1:5432/auth_test";
+process.env.DATABASE_URL = process.env.DATABASE_URL || "postgres://postgres:testpw@127.0.0.1:5432/auth_test";
 process.env.JWT_SECRET   = "secreto-prueba";
 process.env.PORT         = "4601";
 require("../src/index.js");

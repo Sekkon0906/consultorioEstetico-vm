@@ -7,13 +7,15 @@ const {
   cabecerasSeguras, limiteLogin, limiteCorreo, limiteIa, limiteGeneral,
 } = require("./middlewares/proteccion");
 
-const authRoutes         = require("./routes/auth");
 const autenticacionRoutes = require("./routes/autenticacion");
 const usuariosRoutes     = require("./routes/usuarios");
 const procedimientosRoutes = require("./routes/procedimientos");
 const testimoniosRoutes  = require("./routes/testimonios");
 const citasRoutes        = require("./routes/citas");
 const bloqueosHorasRoutes = require("./routes/bloqueosHoras");
+const disponibilidadRoutes = require("./routes/disponibilidad");
+const comentariosRoutes  = require("./routes/comentarios");
+const uploadsRoutes      = require("./routes/uploads");
 const charlasRoutes      = require("./routes/charlas");
 const analyticsRoutes    = require("./routes/analytics");
 const reportesRoutes     = require("./routes/reportes");
@@ -59,7 +61,6 @@ app.get("/health", (_req, res) =>
 );
 
 // ── RUTAS ────────────────────────────────────────────────────
-app.use("/auth",           authRoutes);          // Supabase Auth (en retirada)
 // Límites específicos ANTES de montar la ruta: sin ellos, /auth2/login queda
 // abierto a probar contraseñas a discreción.
 app.use("/auth2/login",    limiteLogin);
@@ -72,6 +73,9 @@ app.use("/procedimientos", procedimientosRoutes);
 app.use("/testimonios",    testimoniosRoutes);
 app.use("/citas",          citasRoutes);
 app.use("/bloqueos-horas", bloqueosHorasRoutes);
+app.use("/disponibilidad", disponibilidadRoutes);
+app.use("/comentarios",    comentariosRoutes);
+app.use("/uploads",        uploadsRoutes);
 app.use("/charlas",        charlasRoutes);
 app.use("/analytics",      analyticsRoutes);
 app.use("/reportes",       reportesRoutes);

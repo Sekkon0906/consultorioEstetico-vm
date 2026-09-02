@@ -3,6 +3,7 @@ const router      = express.Router();
 const { pool }    = require("../lib/db");
 const verifyToken = require("../middlewares/verifyToken");
 const requireRole = require("../middlewares/requireRole");
+const correoCitas = require("../lib/correoCitas");
 
 // POST /citas/:id/solicitar-reagenda — usuario solicita reagendar
 router.post(
@@ -38,6 +39,126 @@ router.post(
     } catch (err) {
       console.error("Error POST solicitar-reagenda:", err);
       return res.status(500).json({ ok: false, error: "Error al solicitar reagenda" });
+    }
+  }
+);
+
+// POST /reagendas — la doctora propone mover una cita; el paciente confirma.
+// (Dirección opuesta a /citas/:id/solicitar-reagenda, que la pide el paciente.)
+router.post(
+  "/reagendas",
+  verifyToken,
+  requireRole(["admin", "ayudante", "developer"]),
+  async (req, res) => {
+    try {
+      const { citaId, cita_id, nuevaFecha, nueva_fecha, nuevaHora, nueva_hora, motivo } = req.body || {};
+      const cid = citaId ?? cita_id;
+      const nf  = nuevaFecha ?? nueva_fecha;
+      const nh  = nuevaHora ?? nueva_hora;
+      if (!cid || !nf || !nh) {
+        return res.status(400).json({ ok: false, error: "citaId, nuevaFecha y nuevaHora son obligatorios" });
+      }
+
+      const { rows: cita } = await pool.query(
+        "SELECT user_id, nombres, apellidos, correo, procedimiento FROM citas WHERE id = $1 LIMIT 1", [cid]
+      );
+      if (!cita.length) return res.status(404).json({ ok: false, error: "Cita no encontrada" });
+
+      const { rows } = await pool.query(
+        `INSERT INTO reagendas (cita_id, user_id, nueva_fecha, nueva_hora, motivo)
+         VALUES ($1,$2,$3,$4,$5) RETURNING id`,
+        [cid, cita[0].user_id, nf, nh, motivo || ""]
+      );
+
+      void correoCitas.avisarReagendaAPaciente({
+        correo: cita[0].correo,
+        nombres: cita[0].nombres,
+        apellidos: cita[0].apellidos,
+        procedimiento: cita[0].procedimiento,
+        nueva_fecha: nf,
+        nueva_hora: nh,
+        motivo,
+      });
+
+      return res.status(201).json({ ok: true, id: rows[0].id });
+    } catch (err) {
+      console.error("Error POST /reagendas:", err);
+      return res.status(500).json({ ok: false, error: "Error al crear la solicitud" });
+    }
+  }
+);
+
+// GET /reagendas/mias — el paciente ve las propuestas pendientes sobre sus citas
+router.get(
+  "/reagendas/mias",
+  verifyToken,
+  async (req, res) => {
+    try {
+      const { rows } = await pool.query(
+        `SELECT id, cita_id, nueva_fecha, nueva_hora, motivo, estado, creada_en
+           FROM reagendas
+          WHERE user_id = $1 AND estado = 'pendiente'
+          ORDER BY creada_en DESC`,
+        [req.user.id]
+      );
+      return res.json({ ok: true, reagendas: rows });
+    } catch (err) {
+      console.error("Error GET /reagendas/mias:", err);
+      return res.status(500).json({ ok: false, error: "Error al obtener tus solicitudes" });
+    }
+  }
+);
+
+// POST /reagendas/:id/aceptar — el paciente acepta: se mueve su cita
+router.post(
+  "/reagendas/:id/aceptar",
+  verifyToken,
+  async (req, res) => {
+    const cliente = await pool.connect();
+    try {
+      const { rows } = await cliente.query(
+        `SELECT r.id, r.cita_id, r.nueva_fecha, r.nueva_hora
+           FROM reagendas r
+          WHERE r.id = $1 AND r.user_id = $2 AND r.estado = 'pendiente'
+          LIMIT 1`,
+        [req.params.id, req.user.id]
+      );
+      if (!rows.length) return res.status(404).json({ ok: false, error: "Solicitud no encontrada" });
+      const re = rows[0];
+
+      await cliente.query("BEGIN");
+      await cliente.query(
+        "UPDATE citas SET fecha=$1, hora=$2, actualizado_en=NOW() WHERE id=$3",
+        [re.nueva_fecha, re.nueva_hora, re.cita_id]
+      );
+      await cliente.query("UPDATE reagendas SET estado='aprobada' WHERE id=$1", [re.id]);
+      await cliente.query("COMMIT");
+      return res.json({ ok: true });
+    } catch (err) {
+      await cliente.query("ROLLBACK").catch(() => {});
+      console.error("Error POST /reagendas/:id/aceptar:", err);
+      return res.status(500).json({ ok: false, error: "Error al aceptar la solicitud" });
+    } finally {
+      cliente.release();
+    }
+  }
+);
+
+// POST /reagendas/:id/rechazar-paciente — el paciente rechaza la propuesta
+router.post(
+  "/reagendas/:id/rechazar-paciente",
+  verifyToken,
+  async (req, res) => {
+    try {
+      const { rowCount } = await pool.query(
+        "UPDATE reagendas SET estado='rechazada' WHERE id=$1 AND user_id=$2 AND estado='pendiente'",
+        [req.params.id, req.user.id]
+      );
+      if (!rowCount) return res.status(404).json({ ok: false, error: "Solicitud no encontrada" });
+      return res.json({ ok: true });
+    } catch (err) {
+      console.error("Error POST /reagendas/:id/rechazar-paciente:", err);
+      return res.status(500).json({ ok: false, error: "Error al rechazar la solicitud" });
     }
   }
 );

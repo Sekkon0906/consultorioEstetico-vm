@@ -3,16 +3,24 @@
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/lib/supabaseClient";
-import { getProcedimientosApi, updateProcedimientoApi, deleteProcedimientoApi, bustProcedimientosCache } from "@/services/procedimientosApi";
+import {
+  getProcedimientosApi,
+  getGaleriaProcedimientoApi,
+  createProcedimientoApi,
+  updateProcedimientoApi,
+  deleteProcedimientoApi,
+  addGaleriaItemApi,
+  deleteGaleriaItemApi,
+  reordenarGaleriaApi,
+  bustProcedimientosCache,
+} from "@/services/procedimientosApi";
+import { subirImagenApi } from "@/services/uploadsApi";
 import type { Procedimiento } from "@/types/domain";
 import { Plus, Edit3, Trash2, X, ChevronUp, ChevronDown, Upload, Play, Star, ArrowLeft } from "lucide-react";
 
 type Cat = "Facial" | "Corporal" | "Capilar";
-const BUCKET = "procedimientos";
-const BURL = "https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/procedimientos";
 
-interface GalItem { id?: string; url: string; titulo: string; orden: number; tipo: string; }
+interface GalItem { id?: number | string; url: string; titulo: string; orden: number; tipo: string; }
 
 const emptyForm = {
   nombre: "",
@@ -54,17 +62,14 @@ export default function ProcedimientosList() {
   useEffect(function() { load(); }, [load]);
 
   const loadGal = async function(pid: string | number) {
-    var res = await supabase.from("procedimiento_galeria").select("id, url, titulo, orden, tipo").eq("procedimiento_id", pid).order("orden");
-    if (res.data) setGal(res.data as GalItem[]);
-    else setGal([]);
+    try {
+      var items = await getGaleriaProcedimientoApi(pid);
+      setGal(items.map((g) => ({ id: g.id, url: g.url, titulo: g.titulo || "", orden: g.orden, tipo: g.tipo })));
+    } catch { setGal([]); }
   };
 
-  var uploadFile = async function(file: File): Promise<string> {
-    var ext = file.name.split(".").pop();
-    var path = "proc_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5) + "." + ext;
-    var result = await supabase.storage.from(BUCKET).upload(path, file, { upsert: true, contentType: file.type });
-    if (result.error) throw new Error(result.error.message);
-    return BURL + "/" + path;
+  var uploadFile = function(file: File): Promise<string> {
+    return subirImagenApi(file, "procedimientos");
   };
 
   var handleMainImg = async function(e: React.ChangeEvent<HTMLInputElement>) {
@@ -87,28 +92,29 @@ export default function ProcedimientosList() {
     setErr(null);
     try {
       var url = await uploadFile(f);
-      var ord = gal.length;
-      var res = await supabase.from("procedimiento_galeria").insert({ procedimiento_id: actual.id, tipo: "imagen", url: url, titulo: "", orden: ord }).select().single();
-      if (res.error) throw new Error(res.error.message);
-      setGal(function(prev) { return [...prev, { id: res.data.id, url: url, titulo: "", orden: ord, tipo: "imagen" }]; });
+      var item = await addGaleriaItemApi(actual.id, { tipo: "imagen", url: url });
+      setGal(function(prev) { return [...prev, { id: item.id, url: url, titulo: "", orden: item.orden, tipo: "imagen" }]; });
       showToast("Imagen agregada a galeria");
     } catch (er: any) { setErr("Error: " + er.message); }
     finally { setUploadingGal(false); e.target.value = ""; }
   };
 
   var galRemove = async function(item: GalItem) {
-    if (item.id) await supabase.from("procedimiento_galeria").delete().eq("id", item.id);
+    if (typeof item.id === "number") await deleteGaleriaItemApi(item.id);
     setGal(function(prev) { return prev.filter(function(g) { return g.id !== item.id; }); });
   };
 
   var galMove = async function(i: number, dir: -1 | 1) {
     var j = i + dir;
-    if (j < 0 || j >= gal.length) return;
+    if (j < 0 || j >= gal.length || !actual) return;
     var updated = [...gal];
     var temp = updated[i]; updated[i] = updated[j]; updated[j] = temp;
     updated.forEach(function(g, idx) { g.orden = idx; });
     setGal(updated);
-    for (var g of updated) { if (g.id) await supabase.from("procedimiento_galeria").update({ orden: g.orden }).eq("id", g.id); }
+    var orden = updated
+      .filter(function(g) { return typeof g.id === "number"; })
+      .map(function(g) { return { id: g.id as number, orden: g.orden }; });
+    await reordenarGaleriaApi(actual.id, orden);
   };
 
   var handleSave = async function() {
@@ -116,30 +122,28 @@ export default function ProcedimientosList() {
     setSaving(true);
     setErr(null);
     try {
-      var dbPayload: Record<string, unknown> = {
+      // El backend (normalizeBody) acepta camelCase.
+      var payload = {
         nombre: form.nombre,
-        descripcion: form.desc,
-        descripcion_completa: form.descCompleta,
+        desc: form.desc,
+        descCompleta: form.descCompleta,
         precio: form.precio || "0",
         imagen: form.imagen,
         categoria: form.categoria,
         subcategoria: form.subcategoria?.trim() || null,
-        duracion_min: Number(form.duracionMin) || null,
+        duracionMin: Number(form.duracionMin) || null,
         destacado: form.destacado,
-        en_promocion: form.enPromocion,
-        precio_promocional: form.enPromocion ? (form.precioPromocional?.trim() || null) : null,
-        promocion_hasta: form.enPromocion ? (form.promocionHasta || null) : null,
-        mostrar_galeria_home: form.mostrarGaleriaHome,
-        mostrar_galeria_procedimientos: form.mostrarGaleriaProcedimientos,
-        actualizado_en: new Date().toISOString(),
-      };
+        enPromocion: form.enPromocion,
+        precioPromocional: form.enPromocion ? (form.precioPromocional?.trim() || null) : null,
+        promocionHasta: form.enPromocion ? (form.promocionHasta || null) : null,
+        mostrarGaleriaHome: form.mostrarGaleriaHome,
+        mostrarGaleriaProcedimientos: form.mostrarGaleriaProcedimientos,
+      } as unknown as Omit<Procedimiento, "id" | "galeria">;
 
       if (actual) {
-        var upRes = await supabase.from("procedimientos").update(dbPayload).eq("id", actual.id);
-        if (upRes.error) throw new Error(upRes.error.message);
+        await updateProcedimientoApi(actual.id, payload);
       } else {
-        var inRes = await supabase.from("procedimientos").insert(dbPayload);
-        if (inRes.error) throw new Error(inRes.error.message);
+        await createProcedimientoApi(payload);
       }
       showToast(actual ? "Procedimiento actualizado" : "Procedimiento creado");
       bustProcedimientosCache(); // refresca el caché público
@@ -151,8 +155,7 @@ export default function ProcedimientosList() {
 
   var handleDel = async function(id: string | number) {
     try {
-      await supabase.from("procedimientos").delete().eq("id", id);
-      bustProcedimientosCache();
+      await deleteProcedimientoApi(id);
       setDelId(null); load();
     } catch (e: any) { setErr(e.message); }
   };
@@ -436,10 +439,8 @@ export default function ProcedimientosList() {
                       var url = input?.value?.trim();
                       if (!url || !actual) return;
                       try {
-                        var ord = gal.length;
-                        var r = await supabase.from("procedimiento_galeria").insert({ procedimiento_id: actual.id, tipo: "video", url: url, titulo: "", orden: ord }).select().single();
-                        if (r.error) throw new Error(r.error.message);
-                        setGal(function(prev) { return [...prev, { id: r.data.id, url: url, titulo: "", orden: ord, tipo: "video" }]; });
+                        var it = await addGaleriaItemApi(actual.id, { tipo: "video", url: url });
+                        setGal(function(prev) { return [...prev, { id: it.id, url: url, titulo: "", orden: it.orden, tipo: "video" }]; });
                         input.value = "";
                         showToast("Video agregado");
                       } catch (e: any) { setErr(e.message); }

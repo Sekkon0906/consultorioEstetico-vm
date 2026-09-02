@@ -6,8 +6,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle, AlertCircle, XCircle, Loader } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { getMisCitasApi } from "@/services/citasApi";
+import {
+  getMisReagendasApi,
+  aceptarReagendaApi,
+  rechazarReagendaApi,
+} from "@/services/reagendasApi";
 import type { Cita } from "@/types/domain";
-import { supabase } from "@/lib/supabaseClient";
 
 // Trae jsPDF (pesado) consigo. Se usa solo cuando el paciente abre el
 // modal de firma, así que no debe formar parte de la carga inicial de "Mis citas".
@@ -16,8 +20,8 @@ const FirmaConsentimiento = dynamic(() => import("@/components/FirmaConsentimien
 });
 
 interface ReagendaPend {
-  id: number;
-  cita_id: number;
+  id: string;
+  cita_id: string;
   nueva_fecha: string;
   nueva_hora: string;
   motivo: string;
@@ -83,25 +87,24 @@ export default function CitasAgendadas() {
   const [ascendente, setAscendente] = useState(false);
   const [filtroEstado, setFiltroEstado] = useState("todos");
   const [error, setError] = useState<string | null>(null);
-  const [reagendas, setReagendas] = useState<Record<number, ReagendaPend>>({});
-  const [reagProcesando, setReagProcesando] = useState<number | null>(null);
+  const [reagendas, setReagendas] = useState<Record<string, ReagendaPend>>({});
+  const [reagProcesando, setReagProcesando] = useState<string | null>(null);
 
-  const cargarReagendas = async (ids: number[]) => {
-    if (ids.length === 0) { setReagendas({}); return; }
-    const { data } = await supabase
-      .from("reagendas")
-      .select("id, cita_id, nueva_fecha, nueva_hora, motivo, estado")
-      .in("cita_id", ids)
-      .eq("estado", "pendiente");
-    const map: Record<number, ReagendaPend> = {};
-    (data ?? []).forEach((r: any) => { map[r.cita_id] = r; });
-    setReagendas(map);
+  const cargarReagendas = async () => {
+    try {
+      const lista = await getMisReagendasApi();
+      const map: Record<string, ReagendaPend> = {};
+      lista.forEach((r) => { map[r.cita_id] = r; });
+      setReagendas(map);
+    } catch {
+      setReagendas({});
+    }
   };
 
   useEffect(() => {
     setLoading(true);
     getMisCitasApi()
-      .then((cs) => { setCitas(cs); return cargarReagendas(cs.map((c) => c.id)); })
+      .then((cs) => { setCitas(cs); return cargarReagendas(); })
       .catch(() => setError(t("errorLoad")))
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,12 +113,7 @@ export default function CitasAgendadas() {
   const aceptarReagenda = async (cita: Cita, r: ReagendaPend) => {
     setReagProcesando(r.id);
     try {
-      const { error: e1 } = await supabase
-        .from("citas")
-        .update({ fecha: r.nueva_fecha, hora: r.nueva_hora, actualizado_en: new Date().toISOString() })
-        .eq("id", cita.id);
-      if (e1) throw new Error(e1.message);
-      await supabase.from("reagendas").update({ estado: "aprobada" }).eq("id", r.id);
+      await aceptarReagendaApi(r.id);
       setCitas((prev) => prev.map((c) => c.id === cita.id ? { ...c, fecha: r.nueva_fecha, hora: r.nueva_hora } : c));
       setReagendas((prev) => { const n = { ...prev }; delete n[cita.id]; return n; });
     } catch {
@@ -128,7 +126,7 @@ export default function CitasAgendadas() {
   const rechazarReagenda = async (cita: Cita, r: ReagendaPend) => {
     setReagProcesando(r.id);
     try {
-      await supabase.from("reagendas").update({ estado: "rechazada" }).eq("id", r.id);
+      await rechazarReagendaApi(r.id);
       setReagendas((prev) => { const n = { ...prev }; delete n[cita.id]; return n; });
     } catch {
       setError(t("reagenda.errorReject"));
@@ -318,7 +316,7 @@ export default function CitasAgendadas() {
                     )}
 
                     {/* Consent signing button - only for confirmed citas */}
-                    {isConfirmada && !(cita as any).consentimiento_firmado && (
+                    {isConfirmada && !cita.consentimientoFirmado && (
                       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
                         <FirmaConsentimiento
                           citaId={cita.id}
@@ -326,13 +324,13 @@ export default function CitasAgendadas() {
                           procedimiento={cita.procedimiento}
                           fecha={cita.fecha}
                           onFirmado={() => {
-                            setCitas(prev => prev.map(c => c.id === cita.id ? { ...c, consentimiento_firmado: true } as any : c));
+                            setCitas(prev => prev.map(c => c.id === cita.id ? { ...c, consentimientoFirmado: true } : c));
                           }}
                         />
                       </div>
                     )}
 
-                    {(cita as any).consentimiento_firmado && (
+                    {cita.consentimientoFirmado && (
                       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
                         <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.82rem", fontWeight: 600, color: "#145A32", background: "#E8F5E9", padding: "0.5rem 1.2rem", borderRadius: 100 }}>
                           <CheckCircle size={14} /> {t("consent.signed")}

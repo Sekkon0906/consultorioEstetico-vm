@@ -3,7 +3,11 @@
 import { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
-import { supabase } from "@/lib/supabaseClient";
+import {
+  getResumenApi,
+  getCitasPorMesApi,
+  getRankingProcedimientosApi,
+} from "@/services/analiticaApi";
 import { CheckCircle, XCircle, Clock, Calendar, Users, Activity } from "lucide-react";
 
 var MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
@@ -17,42 +21,35 @@ export default function IngresosPage() {
   useEffect(function() {
     async function load() {
       try {
-        var hoy = new Date();
-        var hoyISO = hoy.toISOString().slice(0, 10);
-
-        // Citas
-        var res = await supabase.from("citas").select("id, estado, fecha, procedimiento, user_id");
-        var citas = res.data || [];
-
-        // Pacientes unicos registrados
-        var usersRes = await supabase.from("usuarios").select("id", { count: "exact", head: true });
-        var totalPacientes = usersRes.count || 0;
+        var [resumen, porMes, ranking] = await Promise.all([
+          getResumenApi(),
+          getCitasPorMesApi(6),
+          getRankingProcedimientosApi(),
+        ]);
 
         setStats({
-          totalCitas: citas.length,
-          atendidas: citas.filter(function(c: any) { return c.estado === "atendida"; }).length,
-          canceladas: citas.filter(function(c: any) { return c.estado === "cancelada"; }).length,
-          pendientes: citas.filter(function(c: any) { return c.estado === "pendiente" || c.estado === "confirmada"; }).length,
-          citasHoy: citas.filter(function(c: any) { return c.fecha === hoyISO; }).length,
-          pacientes: totalPacientes,
+          totalCitas: resumen.total_citas_historico,
+          atendidas: resumen.total_atendidas,
+          canceladas: resumen.total_canceladas,
+          pendientes: resumen.total_pendientes + resumen.total_confirmadas,
+          citasHoy: resumen.citas_hoy,
+          pacientes: resumen.usuarios_registrados,
         });
 
-        // Top procs
-        var procMap: Record<string, number> = {};
-        citas.forEach(function(c: any) { procMap[c.procedimiento] = (procMap[c.procedimiento] || 0) + 1; });
-        setTopProcs(Object.entries(procMap).map(function(e) { return { nombre: e[0], total: e[1] }; }).sort(function(a, b) { return b.total - a.total; }).slice(0, 6));
+        setTopProcs(
+          ranking
+            .filter(function(p) { return p.total_citas > 0; })
+            .map(function(p) { return { nombre: p.nombre, total: p.total_citas }; })
+            .slice(0, 6)
+        );
 
-        // Ultimos 6 meses
-        var mData: any[] = [];
-        for (var i = 5; i >= 0; i--) {
-          var d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
-          var m = d.getMonth(); var a = d.getFullYear();
-          var ini = a + "-" + String(m + 1).padStart(2, "0") + "-01";
-          var fin = a + "-" + String(m + 1).padStart(2, "0") + "-31";
-          var cm = citas.filter(function(c: any) { return c.fecha >= ini && c.fecha <= fin; });
-          mData.push({ mes: MESES[m], total: cm.length, atendidas: cm.filter(function(c: any) { return c.estado === "atendida"; }).length });
-        }
-        setCitasMes(mData);
+        // El backend devuelve los meses en orden descendente; se invierte para
+        // pintarlos de izquierda (más antiguo) a derecha (más reciente).
+        setCitasMes(
+          [...porMes].reverse().map(function(r) {
+            return { mes: MESES[(r.mes_num || 1) - 1], total: r.total_citas, atendidas: r.atendidas };
+          })
+        );
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     }
