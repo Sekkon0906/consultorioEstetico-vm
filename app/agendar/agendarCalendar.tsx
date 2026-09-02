@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
-import { supabase } from "@/lib/supabaseClient";
+import { getBloqueosGlobalesApi, getDisponibilidadApi } from "@/services/citasApi";
 
 const HORAS_BASE = ["08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","01:00 PM","01:30 PM","02:00 PM","02:30 PM","03:00 PM","03:30 PM","04:00 PM","04:30 PM","05:00 PM","05:30 PM","06:00 PM"];
 
@@ -60,9 +60,9 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
   const [horasKey, setHorasKey] = useState(0);
 
   useEffect(() => {
-    supabase.from("bloqueos_globales").select("hora").then(({ data }) => {
-      if (data) setBloqueosGlobales(new Set(data.map((b: any) => b.hora)));
-    });
+    getBloqueosGlobalesApi()
+      .then((horas) => setBloqueosGlobales(new Set(horas)))
+      .catch((e) => console.error("Error cargando bloqueos globales:", e));
   }, []);
 
   const generarDias = () => {
@@ -77,14 +77,9 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
   const cargarHoras = async (iso: string) => {
     setLoadingHoras(true);
     try {
-      const [bRes, cRes] = await Promise.all([
-        supabase.from("bloqueos_horas").select("hora").eq("fecha", iso),
-        supabase.from("citas").select("hora, estado").eq("fecha", iso),
-      ]);
-      const occ = new Set<string>();
+      const { globales, ocupadas } = await getDisponibilidadApi(iso);
+      const occ = new Set<string>([...globales, ...ocupadas]);
       bloqueosGlobales.forEach(h => occ.add(h));
-      if (!bRes.error) (bRes.data ?? []).forEach((b: any) => occ.add(b.hora));
-      if (!cRes.error) (cRes.data ?? []).filter((c: any) => c.estado !== "cancelada").forEach((c: any) => occ.add(c.hora));
       setHorasOcupadas(occ);
     } catch (e) { console.error(e); }
     finally { setLoadingHoras(false); setHorasKey(k => k + 1); }

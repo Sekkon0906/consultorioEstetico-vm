@@ -58,9 +58,8 @@ export type CreadorCita = "usuario" | "doctora";
 
 // Cita tal como se usa en el front (BD real + campos de UI)
 export interface Cita {
-  // TODO(migración Supabase, dominio citas): en la BD son uuid (string).
-  id: number;
-  userId: number;
+  id: string;    // uuid — citas.id
+  userId: string; // uuid — citas.user_id
 
   nombres: string;
   apellidos: string;
@@ -182,7 +181,7 @@ export interface Charla {
 // ============================================================
 
 export interface BloqueoHora {
-  id: number;
+  id: string; // uuid — bloqueos_horas.id
   fechaISO: string; // YYYY-MM-DD
   hora: string; // "08:30 AM"
   motivo: string;

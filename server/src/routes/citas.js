@@ -29,6 +29,10 @@ function mapCita(row) {
     creadaPor:           row.creada_por,
     fechaCreacion:       row.creado_en,
     motivoCancelacion:   row.motivo_cancelacion,
+    qrCita:                 row.qr_url || null,
+    consentimientoFirmado: !!row.consentimiento_firmado,
+    firmaUrl:              row.firma_url || null,
+    consentimientoPdf:     row.consentimiento_pdf || null,
   };
 }
 
@@ -36,13 +40,16 @@ function mapCita(row) {
 router.get("/", verifyToken, async (req, res) => {
   try {
     const { fecha } = req.query;
+    // ?mias=1 fuerza "solo las mías" aunque el rol sea admin (para /perfil).
+    const soloMias = req.query.mias === "1" || req.query.mias === "true";
     const { id: userId, rol } = req.user;
 
     let sql = `SELECT id, user_id, nombres, apellidos, telefono, correo,
                       procedimiento, tipo_cita, nota, fecha, hora, estado,
                       pagado, monto, monto_pagado, monto_restante,
                       metodo_pago, tipo_pago_consultorio, tipo_pago_online,
-                      creada_por, creado_en, motivo_cancelacion
+                      creada_por, creado_en, motivo_cancelacion,
+                      qr_url, consentimiento_firmado, firma_url, consentimiento_pdf
                FROM citas`;
     const values = [];
     const conditions = [];
@@ -51,7 +58,7 @@ router.get("/", verifyToken, async (req, res) => {
     // anterior, cualquier rol distinto de la cadena exacta "usuario" recibía
     // el listado completo: nombres, teléfonos y correos de todos los
     // pacientes. Así falla cerrado.
-    if (rol !== "admin") {
+    if (rol !== "admin" || soloMias) {
       conditions.push(`user_id = $${values.length + 1}`);
       values.push(userId);
     }
