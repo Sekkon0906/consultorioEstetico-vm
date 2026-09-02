@@ -4,6 +4,9 @@
 import * as Sentry from "@sentry/nextjs";
 import { getConsent } from "@/lib/cookieConsent";
 
+// Instrumenta las navegaciones del App Router (lo pide @sentry/nextjs v10+).
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
+
 const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 // Session Replay graba la interacción del usuario → cuenta como cookie/
