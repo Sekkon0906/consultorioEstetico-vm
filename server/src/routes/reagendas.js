@@ -3,6 +3,7 @@ const router      = express.Router();
 const { pool }    = require("../lib/db");
 const verifyToken = require("../middlewares/verifyToken");
 const requireRole = require("../middlewares/requireRole");
+const correoCitas = require("../lib/correoCitas");
 
 // POST /citas/:id/solicitar-reagenda — usuario solicita reagendar
 router.post(
@@ -59,7 +60,7 @@ router.post(
       }
 
       const { rows: cita } = await pool.query(
-        "SELECT user_id FROM citas WHERE id = $1 LIMIT 1", [cid]
+        "SELECT user_id, nombres, apellidos, correo, procedimiento FROM citas WHERE id = $1 LIMIT 1", [cid]
       );
       if (!cita.length) return res.status(404).json({ ok: false, error: "Cita no encontrada" });
 
@@ -68,6 +69,17 @@ router.post(
          VALUES ($1,$2,$3,$4,$5) RETURNING id`,
         [cid, cita[0].user_id, nf, nh, motivo || ""]
       );
+
+      void correoCitas.avisarReagendaAPaciente({
+        correo: cita[0].correo,
+        nombres: cita[0].nombres,
+        apellidos: cita[0].apellidos,
+        procedimiento: cita[0].procedimiento,
+        nueva_fecha: nf,
+        nueva_hora: nh,
+        motivo,
+      });
+
       return res.status(201).json({ ok: true, id: rows[0].id });
     } catch (err) {
       console.error("Error POST /reagendas:", err);

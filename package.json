@@ -19,8 +19,6 @@
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.4.0",
     "@sentry/nextjs": "^10.55.0",
-    "@supabase/ssr": "^0.9.0",
-    "@supabase/supabase-js": "^2.99.3",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
     "clsx": "^2.1.1",

@@ -9,7 +9,6 @@
 import { apiAuth } from "@/lib/apiCliente";
 import { confirmarPagoCitaApi, updateCitaApi } from "@/services/citasApi";
 import { proponerReagendaApi } from "@/services/reagendasApi";
-import { notificarCambioEstado } from "@/services/notifyApi";
 
 export type EstadoCita = "pendiente" | "confirmada" | "atendida" | "cancelada";
 
@@ -56,14 +55,13 @@ export async function getCitasAPI(): Promise<Cita[]> {
   return apiAuth<Cita[]>("/citas", { clave: "citas" });
 }
 
+// El backend avisa al paciente por correo cuando PUT /citas/:id cambia el estado.
 export async function confirmarCitaAPI(id: string): Promise<void> {
   await updateCitaApi(id, { estado: "confirmada" });
-  void notificarCambioEstado(id); // avisa al paciente (best-effort)
 }
 
 export async function cancelarCitaAPI(id: string, motivo: string): Promise<void> {
   await updateCitaApi(id, { estado: "cancelada", motivo_cancelacion: motivo });
-  void notificarCambioEstado(id);
 }
 
 export async function updateCitaAPI(

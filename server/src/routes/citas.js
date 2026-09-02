@@ -5,6 +5,7 @@ const { pool }    = require("../lib/db");
 const verifyToken = require("../middlewares/verifyToken");
 const requireRole = require("../middlewares/requireRole");
 const almacenamiento = require("../lib/almacenamiento");
+const correoCitas = require("../lib/correoCitas");
 
 const subirConsentimiento = multer({
   storage: multer.memoryStorage(),
@@ -133,6 +134,9 @@ router.post("/", verifyToken, requireRole(["usuario", "admin", "ayudante", "deve
        metPago, tipoPagoCons, tipoPagoOnl]
     );
 
+    // Aviso a la doctora (best-effort; no bloquea la creación).
+    void correoCitas.avisarNuevaCitaADoctora(rows[0]);
+
     return res.status(201).json({ ok: true, cita: mapCita(rows[0]) });
   } catch (err) {
     console.error("Error POST /citas:", err);
@@ -191,10 +195,16 @@ router.put("/:id", verifyToken, async (req, res) => {
     sets.push(`actualizado_en = NOW()`);
     values.push(id);
 
-    await pool.query(
-      `UPDATE citas SET ${sets.join(", ")} WHERE id = $${values.length}`,
+    const { rows: upd } = await pool.query(
+      `UPDATE citas SET ${sets.join(", ")} WHERE id = $${values.length}
+       RETURNING nombres, apellidos, correo, procedimiento, fecha, hora, estado, motivo_cancelacion`,
       values
     );
+
+    // Si cambió el estado, se avisa al paciente (best-effort).
+    if (req.body.estado !== undefined && upd.length) {
+      void correoCitas.avisarCambioEstadoAPaciente(upd[0]);
+    }
     return res.json({ ok: true });
   } catch (err) {
     console.error("Error PUT /citas/:id:", err);
@@ -283,6 +293,58 @@ router.post(
     }
   }
 );
+
+// POST /citas/recordatorios — cron: recordatorio 24 h antes de la cita.
+// Protegido por `Authorization: Bearer <CRON_SECRET>`. Lo llama la ruta de
+// Next app/api/reminders/send (que es a donde apunta el cron de Vercel).
+// ?dry=1 solo cuenta candidatos.
+function fechaMananaBogota() {
+  const ahora = new Date();
+  const bog = new Date(ahora.toLocaleString("en-US", { timeZone: "America/Bogota" }));
+  bog.setDate(bog.getDate() + 1);
+  return `${bog.getFullYear()}-${String(bog.getMonth() + 1).padStart(2, "0")}-${String(bog.getDate()).padStart(2, "0")}`;
+}
+
+router.post("/recordatorios", async (req, res) => {
+  const secreto = process.env.CRON_SECRET;
+  const auth = req.headers.authorization || "";
+  if (!secreto || auth !== `Bearer ${secreto}`) {
+    return res.status(401).json({ ok: false, error: "No autorizado" });
+  }
+
+  const dry = req.query.dry === "1";
+  const fecha = fechaMananaBogota();
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, nombres, apellidos, correo, telefono, procedimiento, fecha, hora, estado
+         FROM citas
+        WHERE fecha = $1
+          AND estado IN ('pendiente','confirmada')
+          AND recordatorio_enviado_en IS NULL`,
+      [fecha]
+    );
+
+    if (dry) {
+      return res.json({ ok: true, fecha, dry: true, total: rows.length });
+    }
+
+    let enviados = 0, fallidos = 0;
+    for (const c of rows) {
+      const r = await correoCitas.recordatorioAPaciente(c);
+      if (r.ok) {
+        await pool.query("UPDATE citas SET recordatorio_enviado_en = NOW() WHERE id = $1", [c.id]);
+        enviados++;
+      } else {
+        fallidos++;
+      }
+    }
+    return res.json({ ok: true, fecha, total: rows.length, enviados, fallidos });
+  } catch (err) {
+    console.error("Error POST /citas/recordatorios:", err);
+    return res.status(500).json({ ok: false, error: "Error al enviar recordatorios" });
+  }
+});
 
 // DELETE /citas/:id — admin
 router.delete("/:id", verifyToken, requireRole(["admin", "ayudante", "developer"]), async (req, res) => {

@@ -11,7 +11,6 @@
 
 import type { Cita, BloqueoHora } from "@/types/domain";
 import { apiFetch, apiAuth } from "@/lib/apiCliente";
-import { notificarNuevaCita } from "./notifyApi";
 
 // ── Citas ───────────────────────────────────────────────────────────────────
 
@@ -33,14 +32,12 @@ export async function getMisCitasApi(): Promise<Cita[]> {
 export async function createCitaApi(
   payload: Omit<Cita, "id" | "fechaCreacion">
 ): Promise<Cita> {
-  const cita = await apiAuth<Cita>("/citas", {
+  // El backend avisa a la doctora por correo dentro de POST /citas.
+  return apiAuth<Cita>("/citas", {
     method: "POST",
     body: JSON.stringify(payload),
     clave: "cita",
   });
-  // Aviso a la doctora (best-effort, no bloquea la creación).
-  void notificarNuevaCita(cita.id);
-  return cita;
 }
 
 export async function updateCitaApi(
