@@ -48,6 +48,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@neon/config": "^1.2.0",
+    "@neon/env": "^1.2.0",
     "@tailwindcss/postcss": "^4",
     "@types/dom-to-image": "^2.6.7",
     "@types/estree": "^1.0.8",
