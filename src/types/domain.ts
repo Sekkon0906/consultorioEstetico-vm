@@ -119,7 +119,7 @@ export interface MediaItem {
 
 // Mapea la tabla `procedimientos` + galería opcional en el front
 export interface Procedimiento {
-  id: number;
+  id: string;
   nombre: string;
   desc: string;
   descCompleta?: string;
@@ -151,7 +151,7 @@ export interface Procedimiento {
 // ============================================================
 
 export interface Testimonio {
-  id: number;
+  id: string; // uuid
   nombre: string;
   texto: string;
   video: string;
@@ -166,7 +166,7 @@ export interface Testimonio {
 // ============================================================
 
 export interface Charla {
-  id: number;
+  id: string;
   titulo: string;
   descripcion: string;
   detalle: string;

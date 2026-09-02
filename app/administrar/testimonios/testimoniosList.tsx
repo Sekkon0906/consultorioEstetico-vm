@@ -3,13 +3,22 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/lib/supabaseClient";
-import { getTestimoniosApi, deleteTestimonioApi, bustTestimoniosCache } from "@/services/testimoniosApi";
+import {
+  getTestimoniosApi,
+  createTestimonioApi,
+  updateTestimonioApi,
+  deleteTestimonioApi,
+  bustTestimoniosCache,
+} from "@/services/testimoniosApi";
+import {
+  getComentariosAdminApi,
+  aprobarComentarioApi,
+  eliminarComentarioApi,
+} from "@/services/comentariosApi";
+import { subirImagenApi } from "@/services/uploadsApi";
 import type { Testimonio } from "@/types/domain";
 import { Plus, Edit3, Trash2, X, Eye, EyeOff, Star, Upload, Play } from "lucide-react";
 
-var BUCKET = "testimonios";
-var BURL = "https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/testimonios";
 var emptyForm = { nombre: "", texto: "", video: "", thumb: "" };
 
 export default function TestimoniosList() {
@@ -20,7 +29,7 @@ export default function TestimoniosList() {
   var [saving, setSaving] = useState(false);
   var [upl, setUpl] = useState(false);
   var [err, setErr] = useState<string | null>(null);
-  var [delId, setDelId] = useState<number | null>(null);
+  var [delId, setDelId] = useState<string | null>(null);
   var [toast, setToast] = useState<string | null>(null);
   var [tab, setTab] = useState<"testimonios" | "comentarios">("testimonios");
   var [comentarios, setCom] = useState<any[]>([]);
@@ -30,25 +39,20 @@ export default function TestimoniosList() {
   useEffect(function() { load(); loadCom(); }, [load]);
 
   var loadCom = function() {
-    supabase.from("comentarios_pacientes").select("*").order("creado_en", { ascending: false })
-      .then(function(res) { if (res.data) setCom(res.data); });
+    getComentariosAdminApi().then(setCom).catch(function(e) { console.error(e); });
   };
 
   var toggleAprobado = async function(id: number, aprobado: boolean) {
-    await supabase.from("comentarios_pacientes").update({ aprobado: !aprobado }).eq("id", id);
+    await aprobarComentarioApi(id, !aprobado);
     loadCom();
   };
   var deleteCom = async function(id: number) {
-    await supabase.from("comentarios_pacientes").delete().eq("id", id);
+    await eliminarComentarioApi(id);
     loadCom();
   };
 
-  var uploadFile = async function(file: File): Promise<string> {
-    var ext = file.name.split(".").pop();
-    var path = "test_" + Date.now() + "_" + Math.random().toString(36).slice(2, 5) + "." + ext;
-    var result = await supabase.storage.from(BUCKET).upload(path, file, { upsert: true, contentType: file.type });
-    if (result.error) throw new Error(result.error.message);
-    return BURL + "/" + path;
+  var uploadFile = function(file: File): Promise<string> {
+    return subirImagenApi(file, "testimonios");
   };
 
   var handleThumb = async function(e: React.ChangeEvent<HTMLInputElement>) {
@@ -64,28 +68,23 @@ export default function TestimoniosList() {
     setSaving(true); setErr(null);
     try {
       if (actual) {
-        var upRes = await supabase.from("testimonios").update({ nombre: form.nombre, texto: form.texto, video: form.video, thumb: form.thumb, actualizado_en: new Date().toISOString() }).eq("id", actual.id);
-        if (upRes.error) throw new Error(upRes.error.message);
+        await updateTestimonioApi(actual.id, { nombre: form.nombre, texto: form.texto, video: form.video, thumb: form.thumb });
       } else {
-        var inRes = await supabase.from("testimonios").insert({ nombre: form.nombre, texto: form.texto, video: form.video, thumb: form.thumb, activo: true, destacado: false });
-        if (inRes.error) throw new Error(inRes.error.message);
+        await createTestimonioApi({ nombre: form.nombre, texto: form.texto, video: form.video, thumb: form.thumb, activo: true, destacado: false });
       }
       showToast(actual ? "Actualizado" : "Creado");
-      bustTestimoniosCache();
       load(); reset();
     } catch (e: any) { setErr(e.message); }
     finally { setSaving(false); }
   };
 
   var toggle = async function(t: Testimonio, campo: "activo" | "destacado") {
-    await supabase.from("testimonios").update({ [campo]: !t[campo] }).eq("id", t.id);
-    bustTestimoniosCache();
+    await updateTestimonioApi(t.id, { [campo]: !t[campo] });
     load();
   };
 
-  var handleDel = async function(id: number) {
-    await supabase.from("testimonios").delete().eq("id", id);
-    bustTestimoniosCache();
+  var handleDel = async function(id: string) {
+    await deleteTestimonioApi(id);
     setDelId(null); load();
   };
 

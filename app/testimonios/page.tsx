@@ -39,7 +39,7 @@ function tieneVideoValido(video: string | null | undefined): boolean {
 export default function TestimoniosPage() {
   const t = useTranslations("testimonios");
   var [testimonios, setTestimonios] = useState<Testimonio[]>([]);
-  var [videoActivo, setVideoActivo] = useState<number | null>(null);
+  var [videoActivo, setVideoActivo] = useState<string | null>(null);
 
   useEffect(function() {
     getTestimoniosApi().then(setTestimonios).catch(console.error);

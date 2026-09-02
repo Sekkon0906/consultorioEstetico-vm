@@ -139,6 +139,8 @@ router.put("/:id", verifyToken, requireRole(["admin", "developer"]), async (req,
 // DELETE /charlas/:id — admin
 router.delete("/:id", verifyToken, requireRole(["admin", "developer"]), async (req, res) => {
   try {
+    // La galería cuelga de la charla con una FK sin ON DELETE CASCADE.
+    await pool.query("DELETE FROM charla_galeria WHERE charla_id = $1", [req.params.id]);
     await pool.query("DELETE FROM charlas WHERE id = $1", [req.params.id]);
     return res.json({ ok: true });
   } catch (err) {

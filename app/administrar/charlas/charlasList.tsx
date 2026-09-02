@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Edit3, Trash2, Calendar } from "lucide-react";
-import { supabase } from "@/lib/supabaseClient";
+import { getCharlasApi, createCharlaApi, updateCharlaApi, deleteCharlaApi } from "@/services/charlasApi";
+import { subirImagenApi } from "@/services/uploadsApi";
 
 interface Charla {
-  id: number;
+  id: string;
   titulo: string;
   descripcion: string;
   detalle: string;
@@ -33,30 +34,22 @@ export default function CharlasList() {
   const [saving, setSaving] = useState(false);
   const [uploadingImg, setUploadingImg] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [confirmEliminarId, setConfirmEliminarId] = useState<number | null>(null);
+  const [confirmEliminarId, setConfirmEliminarId] = useState<string | null>(null);
 
   const loadCharlas = async () => {
     try {
-      // Una sola consulta con la galería embebida (PostgREST join) en vez de
-      // N+1 (antes: 1 query de charlas + 1 query de galería por cada charla).
-      const { data, error: err } = await supabase
-        .from("charlas")
-        .select("id, titulo, descripcion, detalle, imagen, fecha, creado_en, charla_galeria(url, orden)")
-        .order("fecha", { ascending: false, nullsFirst: false })
-        .order("creado_en", { ascending: false });
-
-      if (err) throw new Error(err.message);
-
-      const charlasConGaleria = (data ?? []).map((c: Record<string, unknown>) => {
-        const { charla_galeria, ...rest } = c as { charla_galeria?: { url: string; orden: number }[] };
-        const galeria = (charla_galeria ?? [])
-          .slice()
-          .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
-          .map((g) => g.url);
-        return { ...rest, galeria } as Charla;
-      });
-
-      setCharlas(charlasConGaleria);
+      const data = await getCharlasApi(); // ya trae la galería agregada
+      setCharlas(
+        data.map((c) => ({
+          id: String(c.id),
+          titulo: c.titulo,
+          descripcion: c.descripcion,
+          detalle: c.detalle ?? "",
+          imagen: c.imagen ?? "",
+          fecha: c.fecha ?? "",
+          galeria: (c.galeria ?? []).map((g) => g.url),
+        }))
+      );
     } catch (err) {
       console.error("Error cargando charlas:", err);
     }
@@ -66,19 +59,13 @@ export default function CharlasList() {
     loadCharlas();
   }, []);
 
-  /* -- Imagen principal -> Supabase Storage -- */
+  /* -- Imagen principal -> R2 -- */
   const handleImageUpload = async (file: File) => {
     setUploadingImg(true);
     setError(null);
     try {
-      const ext = file.name.split(".").pop();
-      const path = `${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("charlas")
-        .upload(path, file, { upsert: true, contentType: file.type });
-      if (upErr) throw new Error(upErr.message);
-      const { data } = supabase.storage.from("charlas").getPublicUrl(path);
-      setForm((prev) => ({ ...prev, imagen: data.publicUrl }));
+      const url = await subirImagenApi(file, "charlas");
+      setForm((prev) => ({ ...prev, imagen: url }));
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Error desconocido";
       setError("Error subiendo imagen: " + msg);
@@ -87,25 +74,13 @@ export default function CharlasList() {
     }
   };
 
-  /* -- Galeria -> Supabase Storage -- */
+  /* -- Galeria -> R2 -- */
   const handleGaleriaUpload = async (files: FileList | null) => {
     if (!files) return;
     for (const file of Array.from(files)) {
       try {
-        const ext = file.name.split(".").pop();
-        const path = `galeria/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error: upErr } = await supabase.storage
-          .from("charlas")
-          .upload(path, file, { upsert: true, contentType: file.type });
-        if (upErr) {
-          setError("Error subiendo galeria: " + upErr.message);
-          continue;
-        }
-        const { data } = supabase.storage.from("charlas").getPublicUrl(path);
-        setForm((prev) => ({
-          ...prev,
-          galeria: [...prev.galeria, data.publicUrl],
-        }));
+        const url = await subirImagenApi(file, "charlas");
+        setForm((prev) => ({ ...prev, galeria: [...prev.galeria, url] }));
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : "Error desconocido";
         setError("Error subiendo galeria: " + msg);
@@ -126,61 +101,19 @@ export default function CharlasList() {
     setSaving(true);
     setError(null);
     try {
+      const payload = {
+        titulo: form.titulo,
+        descripcion: form.descripcion,
+        detalle: form.detalle,
+        imagen: form.imagen || "",
+        fecha: form.fecha || null,
+        // El backend reemplaza charla_galeria entera con este array.
+        galeria: form.galeria,
+      };
       if (modo === "crear") {
-        const { data: newCharla, error: insertErr } = await supabase
-          .from("charlas")
-          .insert({
-            titulo: form.titulo,
-            descripcion: form.descripcion,
-            detalle: form.detalle,
-            imagen: form.imagen || "",
-            fecha: form.fecha || null,
-          })
-          .select()
-          .single();
-
-        if (insertErr) throw new Error(insertErr.message);
-
-        // Insertar galeria
-        if (form.galeria.length > 0 && newCharla) {
-          for (let i = 0; i < form.galeria.length; i++) {
-            await supabase.from("charla_galeria").insert({
-              charla_id: newCharla.id,
-              url: form.galeria[i],
-              tipo: "imagen",
-              orden: i,
-            });
-          }
-        }
+        await createCharlaApi(payload);
       } else if (actual) {
-        const { error: updateErr } = await supabase
-          .from("charlas")
-          .update({
-            titulo: form.titulo,
-            descripcion: form.descripcion,
-            detalle: form.detalle,
-            imagen: form.imagen || "",
-            fecha: form.fecha || null,
-            actualizado_en: new Date().toISOString(),
-          })
-          .eq("id", actual.id);
-
-        if (updateErr) throw new Error(updateErr.message);
-
-        // Reemplazar galeria
-        await supabase
-          .from("charla_galeria")
-          .delete()
-          .eq("charla_id", actual.id);
-
-        for (let i = 0; i < form.galeria.length; i++) {
-          await supabase.from("charla_galeria").insert({
-            charla_id: actual.id,
-            url: form.galeria[i],
-            tipo: "imagen",
-            orden: i,
-          });
-        }
+        await updateCharlaApi(actual.id, payload);
       }
       loadCharlas();
       resetForm();
@@ -193,14 +126,10 @@ export default function CharlasList() {
   };
 
   /* -- Eliminar -- */
-  const handleEliminar = async (id: number) => {
+  const handleEliminar = async (id: string) => {
     setConfirmEliminarId(null);
     try {
-      const { error: err } = await supabase
-        .from("charlas")
-        .delete()
-        .eq("id", id);
-      if (err) throw new Error(err.message);
+      await deleteCharlaApi(id);
       loadCharlas();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Error desconocido";
