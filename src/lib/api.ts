@@ -1,172 +1,48 @@
-import { supabase } from "./supabaseClient";
+/**
+ * Perfil del usuario y cliente HTTP heredado.
+ *
+ * Antes esto hablaba con Supabase directamente (leía la tabla `usuarios` con la
+ * anon key y decidía el rol en el cliente). Ahora pasa por la API propia:
+ * `GET/PUT /usuarios/me`, donde `verifyToken` valida la sesión y el rol sale de
+ * `admin_users` en el servidor, nunca del cliente.
+ */
 
-// La lista de correos admin ya NO vive aquí. Estaba empaquetada en el
-// JavaScript que recibe cualquier visitante, publicando exactamente qué
-// cuenta atacar para entrar al panel. El rol lo decide el servidor
-// consultando admin_users; el cliente solo lo lee de la respuesta.
+import { cabecerasAuth } from "./sesion";
 
-// ============================================================
-// AUTH helpers
-// ============================================================
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-export async function syncUserWithSupabase(): Promise<{
-  ok: boolean;
-  user: Record<string, unknown> | null;
-}> {
+type Resultado = { ok: boolean; user: Record<string, unknown> | null };
+
+/** El perfil del usuario en sesión (incluye ficha médica). */
+export async function getCurrentUser(): Promise<Resultado> {
   try {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const authUser = session?.user ?? null;
-
-    if (!authUser) return { ok: false, user: null };
-
-    const email = authUser.email ?? "";
-    const fullName =
-      (authUser.user_metadata?.full_name as string) ||
-      (authUser.user_metadata?.name as string) ||
-      "";
-    const photoURL = (authUser.user_metadata?.avatar_url as string) || null;
-    const [nombres, ...rest] = fullName.trim().split(" ");
-    const apellidos = rest.join(" ");
-
-    // Buscar usuario existente
-    const { data: existing, error: selErr } = await supabase
-      .from("usuarios")
-      .select("id, nombres, apellidos, rol, photo, telefono")
-      .eq("id", authUser.id)
-      .single();
-
-    if (existing && !selErr) {
-      return { ok: true, user: { ...existing, email } };
-    }
-
-    // Crear usuario nuevo
-    const { data: created, error: insErr } = await supabase
-      .from("usuarios")
-      .upsert(
-        {
-          id: authUser.id,
-          nombres: nombres || "Paciente",
-          apellidos: apellidos || "",
-          // `rol` no se envía: lo fija el trigger enforce_usuarios_rol en la
-          // base. Mandarlo desde el cliente era pedirle al navegador que
-          // declarara sus propios permisos.
-          photo: photoURL,
-        },
-        { onConflict: "id" }
-      )
-      .select("id, nombres, apellidos, rol, photo, telefono")
-      .single();
-
-    if (insErr) {
-      console.error("Error creando usuario:", insErr.message);
-      return { ok: false, user: null };
-    }
-
-    return { ok: true, user: { ...created, email } };
-  } catch (err) {
-    console.error("Error en syncUserWithSupabase:", err);
-    return { ok: false, user: null };
-  }
-}
-
-export async function getCurrentUser(): Promise<{
-  ok: boolean;
-  user: Record<string, unknown> | null;
-}> {
-  try {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const authUser = session?.user ?? null;
-
-    if (!authUser) return { ok: false, user: null };
-
-    const { data, error } = await supabase
-      .from("usuarios")
-      .select(
-        "id, nombres, apellidos, rol, photo, telefono, edad, genero, antecedentes, antecedentes_descripcion, alergias, alergias_descripcion, medicamentos, medicamentos_descripcion, creado_en"
-      )
-      .eq("id", authUser.id)
-      .single();
-
-    if (error || !data) return { ok: false, user: null };
-
-    return {
-      ok: true,
-      user: {
-        ...data,
-        email: authUser.email,
-        antecedentesDescripcion: data.antecedentes_descripcion,
-        alergiasDescripcion: data.alergias_descripcion,
-        medicamentosDescripcion: data.medicamentos_descripcion,
-        creadoEn: data.creado_en,
-      },
-    };
+    const res = await fetch(`${BASE_URL}/usuarios/me`, {
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...(await cabecerasAuth()) },
+    });
+    const body = await res.json().catch(() => null);
+    if (!res.ok || !body?.ok || !body.user) return { ok: false, user: null };
+    return { ok: true, user: body.user };
   } catch (err) {
     console.error("Error en getCurrentUser:", err);
     return { ok: false, user: null };
   }
 }
 
+/** Actualiza el perfil. Acepta camelCase; el backend mapea a las columnas. */
 export async function updateCurrentUser(
   updates: Record<string, unknown>
-): Promise<{ ok: boolean; user: Record<string, unknown> | null }> {
+): Promise<Resultado> {
   try {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const authUser = session?.user ?? null;
-
-    if (!authUser) return { ok: false, user: null };
-
-    const campoMap: Record<string, string> = {
-      nombres: "nombres",
-      apellidos: "apellidos",
-      telefono: "telefono",
-      edad: "edad",
-      genero: "genero",
-      photo: "photo",
-      antecedentes: "antecedentes",
-      antecedentesDescripcion: "antecedentes_descripcion",
-      alergias: "alergias",
-      alergiasDescripcion: "alergias_descripcion",
-      medicamentos: "medicamentos",
-      medicamentosDescripcion: "medicamentos_descripcion",
-    };
-
-    const dbUpdates: Record<string, unknown> = {
-      actualizado_en: new Date().toISOString(),
-    };
-    for (const [key, col] of Object.entries(campoMap)) {
-      if (updates[key] !== undefined) {
-        dbUpdates[col] = updates[key];
-      }
-    }
-
-    const { data, error } = await supabase
-      .from("usuarios")
-      .update(dbUpdates)
-      .eq("id", authUser.id)
-      .select(
-        "id, nombres, apellidos, rol, photo, telefono, edad, genero, antecedentes, antecedentes_descripcion, alergias, alergias_descripcion, medicamentos, medicamentos_descripcion, creado_en"
-      )
-      .single();
-
-    if (error || !data) return { ok: false, user: null };
-
-    return {
-      ok: true,
-      user: {
-        ...data,
-        email: authUser.email,
-        antecedentesDescripcion: data.antecedentes_descripcion,
-        alergiasDescripcion: data.alergias_descripcion,
-        medicamentosDescripcion: data.medicamentos_descripcion,
-        creadoEn: data.creado_en,
-      },
-    };
+    const res = await fetch(`${BASE_URL}/usuarios/me`, {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...(await cabecerasAuth()) },
+      body: JSON.stringify(updates),
+    });
+    const body = await res.json().catch(() => null);
+    if (!res.ok || !body?.ok || !body.user) return { ok: false, user: null };
+    return { ok: true, user: body.user };
   } catch (err) {
     console.error("Error en updateCurrentUser:", err);
     return { ok: false, user: null };
@@ -174,34 +50,15 @@ export async function updateCurrentUser(
 }
 
 // ============================================================
-// LEGACY api object - NO USAR para nuevas funcionalidades
+// Cliente HTTP heredado. Para nuevas funcionalidades usar
+// src/lib/apiCliente.ts (apiFetch / apiAuth).
 // ============================================================
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-async function getAuthHeaders(): Promise<HeadersInit> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  return {
-    "Content-Type": "application/json",
-    ...(session?.access_token
-      ? { Authorization: `Bearer ${session.access_token}` }
-      : {}),
-  };
-}
-
-async function request<T>(
-  method: string,
-  path: string,
-  body?: unknown
-): Promise<T> {
-  const headers = await getAuthHeaders();
-
+async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
-    headers,
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...(await cabecerasAuth()) },
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
 

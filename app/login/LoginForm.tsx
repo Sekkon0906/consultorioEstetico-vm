@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { supabase } from "@/lib/supabaseClient";
+import { useAuth } from "@/context/AuthContext";
+import { iniciarSesion, entrarConGoogle, estadoAuth } from "@/lib/sesion";
 import { PALETTE } from "./palette2";
 
 interface Props {
@@ -14,11 +15,21 @@ interface Props {
 export default function LoginForm({ setErr }: Props) {
   const t = useTranslations("loginPage");
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [touched, setTouched] = useState(false);
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleDisponible, setGoogleDisponible] = useState(false);
+
+  // El botón de Google solo se muestra si el servidor tiene OAuth configurado;
+  // si no, pulsarlo llevaría a una respuesta 503 en crudo.
+  useEffect(() => {
+    estadoAuth()
+      .then((r) => setGoogleDisponible(Boolean(r?.data?.google)))
+      .catch(() => setGoogleDisponible(false));
+  }, []);
 
   const errors = useMemo(() => {
     const e: Record<string, string> = {};
@@ -35,23 +46,20 @@ export default function LoginForm({ setErr }: Props) {
     if (!isValid) { setErr(t("revisaCampos")); return; }
     setLoading(true);
     setErr(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      setErr(error.message === "Invalid login credentials"
-        ? t("credencialesMal")
-        : error.message);
-      return;
+    try {
+      await iniciarSesion(email, password);
+      await refreshUser();
+      router.push("/perfil/editar_info");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : t("credencialesMal");
+      setErr(/incorrect|inválid|invalid/i.test(msg) ? t("credencialesMal") : msg);
+    } finally {
+      setLoading(false);
     }
-    router.push("/perfil/editar_info");
   };
 
-  const handleGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
-    if (error) setErr(t("errorGoogle"));
+  const handleGoogle = () => {
+    entrarConGoogle("/perfil/editar_info");
   };
 
   return (
@@ -112,6 +120,7 @@ export default function LoginForm({ setErr }: Props) {
         {loading ? t("entrando") : t("entrar")}
       </motion.button>
 
+      {googleDisponible && (
       <div className="mt-3 d-flex flex-column align-items-center gap-2">
         <p style={{ color: PALETTE.text, fontSize: "0.9rem" }}>{t("oEntraCon")}</p>
         <motion.button
@@ -141,6 +150,7 @@ export default function LoginForm({ setErr }: Props) {
           Continuar con Google
         </motion.button>
       </div>
+      )}
 
       <div className="mt-4 d-flex justify-content-between">
         <motion.button

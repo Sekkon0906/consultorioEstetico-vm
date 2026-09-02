@@ -11,20 +11,12 @@
  * Ahora todas preguntan aquí. El día del corte, apagar Supabase Auth es
  * cambiar este archivo y nada más.
  *
- * CÓMO CONVIVEN LOS DOS
- * Se intenta primero la sesión propia (/auth2) y, si no hay, la de Supabase.
- * Así se puede migrar pantalla por pantalla: quien ya entró con el login
- * nuevo usa el token nuevo, y quien tenía sesión de Supabase abierta la
- * conserva hasta que caduque. Nadie se queda fuera a mitad de la migración.
- *
  * DÓNDE VIVE EL TOKEN
  * El access token se guarda SOLO en memoria, no en localStorage: lo que está
  * en localStorage lo puede leer cualquier script que se cuele en la página.
  * Al recargar se pide uno nuevo con el refresh token, que viaja en una cookie
  * httpOnly — inaccesible para el JavaScript de la página por definición.
  */
-
-import { supabase } from "./supabaseClient";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -105,19 +97,8 @@ async function refrescar(): Promise<string | null> {
  */
 export async function obtenerToken(): Promise<string | null> {
   if (accessToken) return accessToken;
-
-  // 1. Sesión propia: ¿hay cookie de refresh válida?
-  const propio = await refrescar();
-  if (propio) return propio;
-
-  // 2. Supabase, mientras dure la transición. Cuando el login propio esté
-  //    activo para todos, este bloque se borra y con él la dependencia.
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    return session?.access_token ?? null;
-  } catch {
-    return null;
-  }
+  // ¿Hay cookie de refresh válida? Si no, no hay sesión.
+  return refrescar();
 }
 
 /** Cabeceras listas para una petición autenticada. */
@@ -138,7 +119,12 @@ export async function iniciarSesion(email: string, password: string) {
 }
 
 export async function registrar(datos: {
-  email: string; password: string; nombres?: string; apellidos?: string; telefono?: string;
+  email: string; password: string;
+  nombres?: string; apellidos?: string; telefono?: string;
+  edad?: number | string; genero?: string;
+  antecedentes?: string; antecedentesDescripcion?: string;
+  alergias?: string; alergiasDescripcion?: string;
+  medicamentos?: string; medicamentosDescripcion?: string;
 }) {
   return pedir<{ ok: boolean; usuario: UsuarioSesion; mensaje: string }>(
     "/auth2/registro",
@@ -154,8 +140,6 @@ export async function cerrarSesion() {
     // responde, igual se limpia lo local y se sale.
   }
   limpiarSesionLocal();
-  // También la de Supabase, mientras las dos convivan.
-  try { await supabase.auth.signOut(); } catch { /* puede no haberla */ }
 }
 
 export async function solicitarRecuperacion(email: string) {

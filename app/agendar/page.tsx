@@ -93,7 +93,9 @@ function AgendarPageContent() {
     if (!fecha || !usuario) return;
 
     const nuevaCita: CitaSinPagos = {
-      userId:        usuario.id,
+      // usuario.id es uuid (string); CitaSinPagos.userId aún se tipa number
+      // — se corrige al migrar el dominio de citas fuera de Supabase.
+      userId:        usuario.id as unknown as number,
       nombres:       formData.nombre,
       apellidos:     usuario.apellidos,
       telefono:      formData.telefono,

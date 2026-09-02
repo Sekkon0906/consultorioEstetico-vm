@@ -14,7 +14,7 @@ export type RolUsuario =
 
 // Usuario "ligero" que suele viajar en la sesión (auth/google, etc.)
 export interface SessionUser {
-  id: number;
+  id: string; // uuid — usuarios.id
   nombres: string;
   apellidos: string;
   email: string;
@@ -58,6 +58,7 @@ export type CreadorCita = "usuario" | "doctora";
 
 // Cita tal como se usa en el front (BD real + campos de UI)
 export interface Cita {
+  // TODO(migración Supabase, dominio citas): en la BD son uuid (string).
   id: number;
   userId: number;
 

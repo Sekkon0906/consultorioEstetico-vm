@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { PALETTE } from "./palette";
-import { supabase } from "@/lib/supabaseClient";
-import { syncUserWithSupabase, updateCurrentUser } from "@/lib/api";
+import { registrar } from "@/lib/sesion";
 
 interface Props {
   formData: any;
@@ -17,49 +16,28 @@ export default function Step3Exito({ formData }: Props) {
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
+    const listar = (xs: any[]) =>
+      Array.isArray(xs) ? xs.map((a: any) => a.value).join(", ") : "";
+
     async function crearCuenta() {
       try {
-        // 1. Crear cuenta en Supabase Auth
-        const { data, error } = await supabase.auth.signUp({
+        // Crea la cuenta y guarda la ficha médica en la misma operación. No
+        // inicia sesión: primero hay que confirmar el correo.
+        await registrar({
           email: formData.email.trim(),
           password: formData.password,
-          options: {
-            data: {
-              full_name: `${formData.nombres.trim()} ${formData.apellidos.trim()}`,
-              nombres: formData.nombres.trim(),
-              apellidos: formData.apellidos.trim(),
-            },
-          },
+          nombres: formData.nombres?.trim() || "",
+          apellidos: formData.apellidos?.trim() || "",
+          telefono: formData.telefono?.trim() || "",
+          edad: Number(formData.edad) || undefined,
+          genero: formData.genero || "Otro",
+          antecedentes: listar(formData.antecedentes),
+          antecedentesDescripcion: formData.antecedentesDescripcion || "",
+          alergias: listar(formData.alergias),
+          alergiasDescripcion: formData.alergiasDescripcion || "",
+          medicamentos: listar(formData.medicamentos),
+          medicamentosDescripcion: formData.medicamentosDescripcion || "",
         });
-
-        if (error) throw new Error(error.message);
-        if (!data.session && !data.user) {
-          // Supabase envió email de confirmación (si está activado)
-          setStatus("ok");
-          return;
-        }
-
-        // 2. Sincronizar con la tabla usuarios del backend
-        // Si hay sesión directamente (email confirmation desactivado)
-        if (data.session?.access_token) {
-          await syncUserWithSupabase();
-
-          // 3. Actualizar datos medicos en la tabla usuarios
-          await updateCurrentUser({
-            telefono: formData.telefono?.trim() || "",
-            edad: Number(formData.edad) || 0,
-            genero: formData.genero || "Otro",
-            antecedentes:
-              formData.antecedentes?.map((a: any) => a.value).join(", ") || "",
-            antecedentesDescripcion: formData.antecedentesDescripcion || "",
-            alergias:
-              formData.alergias?.map((a: any) => a.value).join(", ") || "",
-            alergiasDescripcion: formData.alergiasDescripcion || "",
-            medicamentos:
-              formData.medicamentos?.map((a: any) => a.value).join(", ") || "",
-            medicamentosDescripcion: formData.medicamentosDescripcion || "",
-          });
-        }
 
         setStatus("ok");
       } catch (err: any) {

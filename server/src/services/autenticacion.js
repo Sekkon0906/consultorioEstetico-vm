@@ -163,7 +163,16 @@ async function consumirTokenUnico(token, proposito) {
 
 // ── Registro e inicio de sesión con contraseña ──────────────────────────────
 
-async function registrar({ email, password, nombres, apellidos, telefono }) {
+async function registrar({
+  email, password, nombres, apellidos, telefono,
+  // Ficha médica del formulario de registro. Se guarda en el mismo INSERT que
+  // la cuenta: no hay sesión todavía (falta verificar el correo), así que no
+  // se puede escribir después con PUT /usuarios/me.
+  edad, genero,
+  antecedentes, antecedentesDescripcion,
+  alergias, alergiasDescripcion,
+  medicamentos, medicamentosDescripcion,
+}) {
   const correo = normalizarEmail(email);
   if (!correo.includes("@")) return { ok: false, error: "El correo no es válido." };
   if (!password || password.length < 8) {
@@ -175,12 +184,28 @@ async function registrar({ email, password, nombres, apellidos, telefono }) {
   );
   if (existe.length) return { ok: false, error: "Ya existe una cuenta con ese correo." };
 
+  // genero tiene un CHECK (Masculino|Femenino|Otro): cualquier otra cosa → null.
+  const generoValido = ["Masculino", "Femenino", "Otro"].includes(genero) ? genero : null;
+  const edadNum = Number.isFinite(Number(edad)) && Number(edad) > 0 ? Number(edad) : null;
+
   const hash = await argon2.hash(password, { type: argon2.argon2id });
   const { rows } = await pool.query(
-    `INSERT INTO usuarios (nombres, apellidos, email, password_hash, telefono, proveedor)
-     VALUES ($1, $2, $3, $4, $5, 'password')
+    `INSERT INTO usuarios (
+       nombres, apellidos, email, password_hash, telefono, proveedor,
+       edad, genero,
+       antecedentes, antecedentes_descripcion,
+       alergias, alergias_descripcion,
+       medicamentos, medicamentos_descripcion
+     )
+     VALUES ($1,$2,$3,$4,$5,'password',$6,$7,$8,$9,$10,$11,$12,$13)
      RETURNING id`,
-    [nombres || "", apellidos || "", correo, hash, telefono || null]
+    [
+      nombres || "", apellidos || "", correo, hash, telefono || null,
+      edadNum, generoValido,
+      antecedentes || "", antecedentesDescripcion || "",
+      alergias || "", alergiasDescripcion || "",
+      medicamentos || "", medicamentosDescripcion || "",
+    ]
   );
   const userId = rows[0].id;
 
