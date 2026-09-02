@@ -3,7 +3,11 @@
 import { useState, useEffect } from "react";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import { useLocale, useTranslations } from "next-intl";
-import { supabase } from "@/lib/supabaseClient";
+import {
+  getComentariosApi,
+  getElegibilidadComentarioApi,
+  crearComentarioApi,
+} from "@/services/comentariosApi";
 import { useAuth } from "@/context/AuthContext";
 
 interface Comentario {
@@ -33,19 +37,20 @@ export default function ComentariosClientes() {
   var [hoverStar, setHoverStar] = useState(0);
 
   useEffect(function() {
-    supabase.from("comentarios_pacientes").select("id, nombre, procedimiento, texto, puntuacion, creado_en")
-      .eq("aprobado", true).order("creado_en", { ascending: false }).limit(20)
-      .then(function(res) { if (res.data) setComentarios(res.data); setLoading(false); });
+    getComentariosApi()
+      .then(function(data) { setComentarios(data); })
+      .catch(function(e) { console.error("Error cargando comentarios:", e); })
+      .finally(function() { setLoading(false); });
   }, []);
 
   useEffect(function() {
     if (!user) return;
-    supabase.from("citas").select("procedimiento").eq("user_id", user.id).eq("estado", "atendida")
-      .then(function(res) {
-        if (res.data) setCitasAtendidas([...new Set(res.data.map(function(c: any) { return c.procedimiento; }))]);
-      });
-    supabase.from("comentarios_pacientes").select("id").eq("user_id", user.id).limit(1)
-      .then(function(res) { if (res.data && res.data.length > 0) setYaComento(true); });
+    getElegibilidadComentarioApi()
+      .then(function(r) {
+        setCitasAtendidas(r.procedimientos);
+        setYaComento(r.yaComento);
+      })
+      .catch(function(e) { console.error("Error comprobando elegibilidad:", e); });
   }, [user]);
 
   var nombreCompleto = user ? ((user.nombres || "") + " " + (user.apellidos || "")).trim() : "";
@@ -55,14 +60,10 @@ export default function ComentariosClientes() {
     if (!procSeleccionado || !texto.trim() || puntuacion === 0) { setMensaje(t("messages.completeFields")); return; }
     setEnviando(true); setMensaje(null);
     try {
-      var res = await supabase.from("comentarios_pacientes").insert({
-        user_id: user?.id || null, nombre: nombreCompleto, procedimiento: procSeleccionado,
-        texto: texto.trim(), puntuacion: puntuacion, aprobado: false,
-      });
-      if (res.error) throw new Error(res.error.message);
+      await crearComentarioApi({ procedimiento: procSeleccionado, texto: texto.trim(), puntuacion: puntuacion });
       setMensaje(t("messages.sent"));
       setTexto(""); setPuntuacion(0); setProcSeleccionado(""); setShowForm(false); setYaComento(true);
-    } catch (e: any) { setMensaje("Error: " + e.message); }
+    } catch (e: any) { setMensaje("Error: " + (e?.message || "")); }
     finally { setEnviando(false); }
   };
 
