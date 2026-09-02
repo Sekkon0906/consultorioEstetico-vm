@@ -25,26 +25,26 @@
 -- ============================================================================
 
 INSERT INTO procedimientos (id, nombre, descripcion, precio, imagen, categoria, duracion_min, destacado, descripcion_completa, subcategoria, en_promocion, precio_promocional, promocion_hasta, mostrar_galeria_home, mostrar_galeria_procedimientos) VALUES
-('302dd503-205b-4c15-b5e5-77058e8d64b7', 'ronron', 'rodolfo', '400000', 'https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/procedimientos/proc_1775435813675_5ag.png', 'Capilar', 45, 't', 'rodolfo hernandez de las prilla', NULL, 'f', NULL, NULL, 'f', 't')
+('302dd503-205b-4c15-b5e5-77058e8d64b7', 'ronron', 'rodolfo', '400000', 'https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/Procedimientos/proc_1775435813675_5ag.png', 'Capilar', 45, 't', 'rodolfo hernandez de las prilla', NULL, 'f', NULL, NULL, 'f', 't')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO procedimiento_galeria (procedimiento_id, tipo, url, titulo, descripcion, orden) VALUES
-('302dd503-205b-4c15-b5e5-77058e8d64b7', 'imagen', 'https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/procedimientos/proc_1775435826412_r2z.jpeg', '', '', 0),
-('302dd503-205b-4c15-b5e5-77058e8d64b7', 'imagen', 'https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/procedimientos/proc_1775435832115_37j.jpeg', '', '', 1),
-('302dd503-205b-4c15-b5e5-77058e8d64b7', 'imagen', 'https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/procedimientos/proc_1775435835319_gus.jpeg', '', '', 2),
+('302dd503-205b-4c15-b5e5-77058e8d64b7', 'imagen', 'https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/Procedimientos/proc_1775435826412_r2z.jpeg', '', '', 0),
+('302dd503-205b-4c15-b5e5-77058e8d64b7', 'imagen', 'https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/Procedimientos/proc_1775435832115_37j.jpeg', '', '', 1),
+('302dd503-205b-4c15-b5e5-77058e8d64b7', 'imagen', 'https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/Procedimientos/proc_1775435835319_gus.jpeg', '', '', 2),
 ('302dd503-205b-4c15-b5e5-77058e8d64b7', 'video', 'https://youtube.com/shorts/9kaV_avyPJo', '', '', 3);
 
 INSERT INTO charlas (id, titulo, descripcion, detalle, imagen, fecha) VALUES
 ('c8f20324-eed2-45be-abb9-6cd9ff93e707', 'a', 'a', 'a', '', '2321-02-20'),
-('d671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'salida pedagogica', 'asd', 'fghshgsdgsdfgsdgfdsgsdfgdsfgdsfgs', 'https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/charlas/1774752236213.jpeg', '2004-08-20')
+('d671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'salida pedagogica', 'asd', 'fghshgsdgsdfgsdgfdsgsdfgdsfgdsfgs', 'https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/Charlas/1774752236213.jpeg', '2004-08-20')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO charla_galeria (id, charla_id, url, tipo, orden) VALUES
-('45afe2b7-5aea-4b74-944f-14cd71ee0b5f', 'd671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/charlas/galeria/1774752270131_kjq0b7zlx2l.jpeg', 'imagen', 0),
-('081df61f-f3eb-44fe-afd2-91e7a336aabc', 'd671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/charlas/galeria/1774752270487_oeeizvyc0ql.png', 'imagen', 1),
-('018cb6bd-ed4d-4cca-9762-80c331cbfbf5', 'd671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/charlas/galeria/1774752271183_jh30z3izg8h.png', 'imagen', 2),
-('d017291f-24e8-44b9-a4ab-5b0a201fa5fe', 'd671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/charlas/galeria/1774752271743_819jwai785a.jpeg', 'imagen', 3),
-('f6fb8ae1-66fc-48e8-9621-3022a0d4ca81', 'd671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/charlas/galeria/1774752272090_4qfqtkt2w33.png', 'imagen', 4)
+('45afe2b7-5aea-4b74-944f-14cd71ee0b5f', 'd671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/Charlas/galeria/1774752270131_kjq0b7zlx2l.jpeg', 'imagen', 0),
+('081df61f-f3eb-44fe-afd2-91e7a336aabc', 'd671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/Charlas/galeria/1774752270487_oeeizvyc0ql.png', 'imagen', 1),
+('018cb6bd-ed4d-4cca-9762-80c331cbfbf5', 'd671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/Charlas/galeria/1774752271183_jh30z3izg8h.png', 'imagen', 2),
+('d017291f-24e8-44b9-a4ab-5b0a201fa5fe', 'd671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/Charlas/galeria/1774752271743_819jwai785a.jpeg', 'imagen', 3),
+('f6fb8ae1-66fc-48e8-9621-3022a0d4ca81', 'd671f6b1-6d53-4fb3-9040-7679dbb1eef8', 'https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/Charlas/galeria/1774752272090_4qfqtkt2w33.png', 'imagen', 4)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO bloqueos_horas (fecha, hora, motivo) VALUES

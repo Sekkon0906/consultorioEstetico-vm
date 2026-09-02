@@ -13,7 +13,7 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: "portrait",
     icons: [
       {
-        src: "https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/ConsultorioImagenes/logo/LogoJM.jpg",
+        src: "https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/ConsultorioImagenes/Logo/LogoJM.jpg",
         sizes: "512x512",
         type: "image/jpeg",
         purpose: "any",

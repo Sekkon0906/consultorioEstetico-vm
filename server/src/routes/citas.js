@@ -266,10 +266,10 @@ router.post(
 
       const [rFirma, rPdf] = await Promise.all([
         almacenamiento.subirArchivo(firma.buffer, {
-          carpeta: "firmas", tipoMime: firma.mimetype || "image/png", nombreOriginal: "firma.png",
+          carpeta: "ConsultorioImagenes/Firmas", tipoMime: firma.mimetype || "image/png", nombreOriginal: "firma.png",
         }),
         almacenamiento.subirArchivo(pdf.buffer, {
-          carpeta: "consentimientos", tipoMime: pdf.mimetype || "application/pdf", nombreOriginal: "consentimiento.pdf",
+          carpeta: "ConsultorioImagenes/Consentimientos", tipoMime: pdf.mimetype || "application/pdf", nombreOriginal: "consentimiento.pdf",
         }),
       ]);
       if (!rFirma.ok) return res.status(400).json(rFirma);

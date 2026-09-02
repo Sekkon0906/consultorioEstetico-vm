@@ -1,39 +1,42 @@
-// app/src/lib/imagenes.ts
-const B = "https://ibpkihfjripvizismhsk.supabase.co/storage/v1/object/public/ConsultorioImagenes";
+// src/lib/imagenes.ts
+// Imágenes públicas del sitio. Ahora se sirven desde Cloudflare R2.
+// El subdominio pub-*.r2.dev sale de R2 → bucket "consultorio" → Settings →
+// Public Development URL. Con dominio propio, cambiar solo esta constante.
+const B = "https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/ConsultorioImagenes";
 
 export const IMG = {
-  logo: `${B}/logo/LogoJM.jpg`,
+  logo: `${B}/Logo/LogoJM.jpg`,
 
   homeCarrusel: [
-    `${B}/imagenesPublicas/carrucel_home1.jpg`,
-    `${B}/imagenesPublicas/carrucel_home2.jpg`,
-    `${B}/imagenesPublicas/carrucel_home3.jpg`,
-    `${B}/imagenesPublicas/carrucel_home4.jpg`,
-    `${B}/imagenesPublicas/carrucel_home5.jpg`,
-    `${B}/imagenesPublicas/carrucel_home6.jpg`,
+    `${B}/ImagenesPublicas/carrucel_home1.jpg`,
+    `${B}/ImagenesPublicas/carrucel_home2.jpg`,
+    `${B}/ImagenesPublicas/carrucel_home3.jpg`,
+    `${B}/ImagenesPublicas/carrucel_home4.jpg`,
+    `${B}/ImagenesPublicas/carrucel_home5.jpg`,
+    `${B}/ImagenesPublicas/carrucel_home6.jpg`,
   ],
 
   drCarrusel: [
-    `${B}/imagenesPublicas/carrucel_dr1.jpg`,
-    `${B}/imagenesPublicas/carrucel_dr2.jpg`,
-    `${B}/imagenesPublicas/carrucel_dr3.jpg`,
-    `${B}/imagenesPublicas/carrucel_dr4.jpg`,
-    `${B}/imagenesPublicas/carrucel_dr5.jpg`,
+    `${B}/ImagenesPublicas/carrucel_dr1.jpg`,
+    `${B}/ImagenesPublicas/carrucel_dr2.jpg`,
+    `${B}/ImagenesPublicas/carrucel_dr3.jpg`,
+    `${B}/ImagenesPublicas/carrucel_dr4.jpg`,
+    `${B}/ImagenesPublicas/carrucel_dr5.jpg`,
   ],
 
-  previewVideo: `${B}/imagenesPublicas/preview_video.jpg`,
-  heroDoctora: `${B}/imagenesPublicas/doctora-hero.jpg`,
-  galeria3dBg: `${B}/imagenesPublicas/Galeriaa3D.jpg`,
+  previewVideo: `${B}/ImagenesPublicas/preview_video.jpg`,
+  heroDoctora: `${B}/ImagenesPublicas/doctora-hero.jpg`,
+  galeria3dBg: `${B}/ImagenesPublicas/Galeriaa3D.jpg`,
 
-  inspiracion: `${B}/personas/inspiracion_dr.jpg`,
-  doctora: `${B}/personas/doctora.jpg`,
+  inspiracion: `${B}/Personas/inspiracion_dr.jpg`,
+  doctora: `${B}/Personas/doctora.jpg`,
 
-  consultorioPrincipal: `${B}/lugar/consultorioPrinci.png`,
+  consultorioPrincipal: `${B}/Lugar/consultorioPrinci.png`,
   consultorioRelleno: [
-    `${B}/lugar/consultorioRelle1.png`,
-    `${B}/lugar/consultorioRelle2.png`,
-    `${B}/lugar/consultorioRelle3.png`,
-    `${B}/lugar/consultorioRelle4.png`,
-    `${B}/lugar/consultorioRelle5.png`,
+    `${B}/Lugar/consultorioRelle1.png`,
+    `${B}/Lugar/consultorioRelle2.png`,
+    `${B}/Lugar/consultorioRelle3.png`,
+    `${B}/Lugar/consultorioRelle4.png`,
+    `${B}/Lugar/consultorioRelle5.png`,
   ],
 };

@@ -41,18 +41,11 @@ const nextConfig = {
         hostname: "img.youtube.com",
       },
       {
-        // Cloudflare R2 (destino de las imágenes). El subdominio pub-*.r2.dev
-        // sale de R2 → bucket → Settings → Public Development URL. Con dominio
-        // propio, cambiar por ese host.
+        // Cloudflare R2 (todas las imágenes del sitio). El subdominio
+        // pub-*.r2.dev sale de R2 → bucket "consultorio" → Settings → Public
+        // Development URL. Con dominio propio, cambiar por ese host.
         protocol: "https",
         hostname: "pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev",
-      },
-      {
-        // Supabase Storage — todavía sirve las imágenes no migradas a R2.
-        // Se puede quitar cuando corra server/scripts/migrar-storage-a-r2.js.
-        protocol: "https",
-        hostname: "ibpkihfjripvizismhsk.supabase.co",
-        pathname: "/storage/v1/object/public/**",
       },
     ],
   },

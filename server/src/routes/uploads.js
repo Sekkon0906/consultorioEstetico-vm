@@ -19,10 +19,15 @@ const upload = multer({
   limits: { fileSize: 15 * 1024 * 1024 }, // 15 MB (los videos van por URL, no por aquí)
 });
 
-// Carpetas permitidas. Lo que no está en la lista, no entra.
-const CARPETAS = new Set([
-  "procedimientos", "testimonios", "charlas", "imagenesPublicas", "logo",
-]);
+// Clave del frontend → carpeta real en R2 (misma estructura que la bóveda
+// que se migró desde Supabase). Lo que no está en el mapa, no entra.
+const CARPETAS = {
+  procedimientos:   "Procedimientos",
+  testimonios:      "Testimonios",
+  charlas:          "Charlas",
+  imagenesPublicas: "ConsultorioImagenes/ImagenesPublicas",
+  logo:             "ConsultorioImagenes/Logo",
+};
 
 // POST /uploads/imagen — admin. Campo del formulario: "archivo".
 router.post(
@@ -39,13 +44,14 @@ router.post(
         return res.status(400).json({ ok: false, error: "No llegó ningún archivo (campo 'archivo')." });
       }
 
-      const carpeta = String(req.body.carpeta || "").trim();
-      if (!CARPETAS.has(carpeta)) {
-        return res.status(400).json({ ok: false, error: `Carpeta no permitida: '${carpeta}'` });
+      const clave = String(req.body.carpeta || "").trim();
+      const carpetaR2 = CARPETAS[clave];
+      if (!carpetaR2) {
+        return res.status(400).json({ ok: false, error: `Carpeta no permitida: '${clave}'` });
       }
 
       const r = await almacenamiento.subirArchivo(req.file.buffer, {
-        carpeta,
+        carpeta: carpetaR2,
         tipoMime: req.file.mimetype,
         nombreOriginal: req.file.originalname,
       });
