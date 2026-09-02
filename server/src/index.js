@@ -7,7 +7,6 @@ const {
   cabecerasSeguras, limiteLogin, limiteCorreo, limiteIa, limiteGeneral,
 } = require("./middlewares/proteccion");
 
-const authRoutes         = require("./routes/auth");
 const autenticacionRoutes = require("./routes/autenticacion");
 const usuariosRoutes     = require("./routes/usuarios");
 const procedimientosRoutes = require("./routes/procedimientos");
@@ -62,7 +61,6 @@ app.get("/health", (_req, res) =>
 );
 
 // ── RUTAS ────────────────────────────────────────────────────
-app.use("/auth",           authRoutes);          // Supabase Auth (en retirada)
 // Límites específicos ANTES de montar la ruta: sin ellos, /auth2/login queda
 // abierto a probar contraseñas a discreción.
 app.use("/auth2/login",    limiteLogin);

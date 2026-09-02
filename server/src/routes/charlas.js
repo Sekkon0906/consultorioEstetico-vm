@@ -3,47 +3,9 @@ const router       = express.Router();
 const { pool }     = require("../lib/db");
 const verifyToken  = require("../middlewares/verifyToken");
 const requireRole  = require("../middlewares/requireRole");
-const supabaseAdmin = require("../lib/supabaseAdmin");
-const multer       = require("multer");
 
-// multer en memoria — no guarda en disco
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });
-
-// ── Upload de imagen vía backend (evita error RLS 42P17) ───────────────
-// POST /charlas/upload-imagen
-router.post(
-  "/upload-imagen",
-  verifyToken,
-  requireRole(["admin", "developer"]),
-  upload.single("file"),
-  async (req, res) => {
-    try {
-      if (!req.file) return res.status(400).json({ ok: false, error: "No se recibió ningún archivo" });
-
-      const ext    = req.file.originalname.split(".").pop();
-      const bucket = req.query.bucket || "charlas";
-      const folder = req.query.folder || "";
-      const path   = folder
-        ? `${folder}/${Date.now()}.${ext}`
-        : `${Date.now()}.${ext}`;
-
-      const { error: upErr } = await supabaseAdmin.storage
-        .from(bucket)
-        .upload(path, req.file.buffer, {
-          contentType: req.file.mimetype,
-          upsert: true,
-        });
-
-      if (upErr) throw new Error(upErr.message);
-
-      const { data } = supabaseAdmin.storage.from(bucket).getPublicUrl(path);
-      return res.json({ ok: true, url: data.publicUrl });
-    } catch (err) {
-      console.error("Error upload-imagen:", err);
-      return res.status(500).json({ ok: false, error: err.message });
-    }
-  }
-);
+// La subida de imágenes de charlas va por POST /uploads/imagen (carpeta
+// "charlas"). El endpoint viejo /charlas/upload-imagen usaba Supabase Storage.
 
 // GET /charlas — público
 router.get("/", async (_req, res) => {
