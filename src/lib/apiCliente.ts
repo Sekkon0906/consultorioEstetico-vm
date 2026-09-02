@@ -42,9 +42,8 @@ export async function apiFetch<T>(ruta: string, opciones: Opciones = {}): Promis
   };
 
   if (autenticado) {
-    // Import dinámico: sesion.ts importa supabaseClient, y cargarlo siempre
-    // arrastraría el SDK de Supabase incluso en páginas públicas que no lo
-    // necesitan.
+    // Import dinámico: mantiene la lógica de sesión fuera del bundle de las
+    // páginas públicas que solo hacen lecturas sin token.
     const { cabecerasAuth } = await import("./sesion");
     Object.assign(cabeceras, await cabecerasAuth());
   }
