@@ -26,6 +26,7 @@ Ibagué (Tolima, Colombia). Hace dos cosas a la vez:
 - [[08 — Bitácora 2026-09-02]] — corte final de Supabase y reestructura de móvil
 - [[09 — Estudio de móvil]] — por qué el sitio se veía mal en un teléfono, medido
 - [[10 — Cosas por hacer]] — backlog vivo, por tipo de trabajo
+- [[11 — Bitácora 2026-09-03]] — bugs de móvil en producción, panel de admin y galería de confianza
 - `Decisiones/` — las elecciones caras de revertir, con su porqué
 
 ## Estado en una línea

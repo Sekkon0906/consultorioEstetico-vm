@@ -177,9 +177,21 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
       tener su equivalente en modo oscuro y claro. Hoy el **beige del modo
       claro se cuela en el modo oscuro** (ej. la sección "Conoce los
       procedimientos…": letras negras + beige que no pegan sobre fondo oscuro).
-- [ ] **F15 · Afinar el acento oscuro.** El "azul pastel" del modo oscuro gustó
-      — hacerlo un poco más claro/blanco y aplicarlo consistente en todo el
-      sitio.
+- [x] **F15 · Afinar el acento oscuro.** *(Cerrada 2026-09-03.)* Fuimos a
+      buscar el "azul pastel" del modo oscuro y **no existe**. La sección
+      "Nuestra ubicación" la pinta `02-tema-oscuro.css` con
+      `background-color: var(--bg-elevated)`, y ese token vale **`#1F1C22`**
+      (leído en el navegador, no en el código): un grafito con una pizca de
+      morado, del mismo ciruela que el tinte de las fotos. En toda la paleta
+      oscura no hay un solo azul.
+      **Por qué se leía como azul:** `#1F1C22` es el único tono *frío* de la
+      página; todo lo demás —el champán `#E8C9A0`, textos, botones— es cálido.
+      Un frío rodeado de cálidos se percibe azulado aunque no lo sea. Es
+      contraste simultáneo, no color.
+      **Decisión:** no se mete un azul nuevo. Se extiende el frío que ya
+      existe (`--bg-elevated`), que además encaja con el ciruela elegido para
+      las fotos. Meter un azul de verdad habría movido la marca del
+      nude/champán hacia lo clínico.
 - **Prerrequisito de F14/F15:** tokenizar los **~607 colores** escritos a mano
       en el CSS (ya estaba en el backlog).
 
