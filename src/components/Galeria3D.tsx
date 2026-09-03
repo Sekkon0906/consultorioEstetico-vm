@@ -989,9 +989,17 @@ export default function Galeria3D() {
           .g3d-wheel-anchor   { right: 22% !important; transform: translate(50%, -50%) !important; }
           .g3d-dots-wrap      { right: 22% !important; }
           .g3d-cta-wrap       { right: 22% !important; }
-          .g3d-detail         {
-            max-width: 70% !important;
-            width: auto !important;
+          /* El 70 % es para tablet, NO para el teléfono.
+             Este bloque es max-width: 1200px, así que también atrapaba al
+             móvil: en 375px el modal salía de 242 —el 65 % de la pantalla—
+             y el botón "Saber más sobre el procedimiento" se salía 91px por
+             la derecha. Se acota con min-width para que por debajo de 768
+             mande la regla de móvil, que usa min(92vw, 460px). */
+          @media (min-width: 768px) {
+            .g3d-detail {
+              max-width: 70% !important;
+              width: auto !important;
+            }
           }
         }
         @media (max-width: 980px) {
