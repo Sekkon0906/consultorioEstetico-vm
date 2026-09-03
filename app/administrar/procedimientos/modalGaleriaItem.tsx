@@ -81,14 +81,14 @@ export default function ModalGaleriaItem({
           {error && (
             <div
               className="mb-3 rounded px-3 py-2 text-sm flex items-center justify-between gap-2"
-              style={{ background: "#FDE8D8", color: "#922B21" }}
+              style={{ background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", color: "var(--danger)" }}
             >
               <span>{error}</span>
               <button
                 type="button"
                 onClick={() => setError(null)}
                 aria-label="Cerrar"
-                style={{ background: "none", border: "none", color: "#922B21", cursor: "pointer", fontWeight: 700 }}
+                style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontWeight: 700 }}
               >
                 Ã—
               </button>

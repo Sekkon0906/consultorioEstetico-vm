@@ -126,7 +126,7 @@ export default function ConfiguracionForm() {
       </header>
 
       {error && (
-        <div style={{ display: "flex", gap: 8, alignItems: "flex-start", background: "#F7E4E1", border: "1px solid #E0B4AC", color: "#A5352B", padding: "0.7rem 0.9rem", borderRadius: 8, marginBottom: "1.25rem", fontSize: "0.85rem" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "flex-start", background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", border: "1px solid #E0B4AC", color: "#A5352B", padding: "0.7rem 0.9rem", borderRadius: 8, marginBottom: "1.25rem", fontSize: "0.85rem" }}>
           <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 2 }} />
           <span>{error}</span>
         </div>

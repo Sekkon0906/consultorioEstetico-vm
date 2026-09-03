@@ -457,11 +457,11 @@ export default function CharlasList() {
                 </p>
               </div>
               <div className="admin-card-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                <motion.button whileTap={{ scale: 0.95 }} onClick={() => startEditar(c)} style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <motion.button aria-label="Editar charla" title="Editar charla" whileTap={{ scale: 0.95 }} onClick={() => startEditar(c)} style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Edit3 size={18} color="var(--text)" />
                 </motion.button>
-                <motion.button whileTap={{ scale: 0.95 }} onClick={() => setConfirmEliminarId(c.id)} style={{ width: 42, height: 42, borderRadius: 12, background: "#fff3ef", border: "1px solid #e4bfbf", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Trash2 size={18} color="#b02e2e" />
+                <motion.button aria-label="Eliminar charla" title="Eliminar charla" whileTap={{ scale: 0.95 }} onClick={() => setConfirmEliminarId(c.id)} style={{ width: 42, height: 42, borderRadius: 12, background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Trash2 size={18} color="var(--danger)" />
                 </motion.button>
               </div>
             </motion.div>

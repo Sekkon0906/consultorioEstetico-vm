@@ -105,7 +105,7 @@ export default function HorariosHabilitados() {
       if (cita.estado === "atendida") return { bg: "#E8F5E9", color: "#145A32", border: "#A0D8A8", label: `${cita.nombres} - ${cita.procedimiento}` };
       return { bg: "#EEF7EE", color: "var(--success)", border: "#A8D8B9", label: `${cita.nombres}` };
     }
-    if (esBloqueada(hora)) return { bg: "#FDE8D8", color: "#922B21", border: "#F0A898", label: "Bloqueada" };
+    if (esBloqueada(hora)) return { bg: "#FDE8D8", color: "var(--danger)", border: "#F0A898", label: "Bloqueada" };
     return { bg: "var(--surface-soft)", color: "var(--text)", border: "var(--border)", label: "Disponible" };
   };
 

@@ -281,8 +281,8 @@ export default function CitasAgendadas() {
       <AnimatePresence>{motivoModal && (
         <Overlay onClose={() => setMotivoModal(null)}>
           <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", textAlign: "center", marginBottom: "1rem" }}>Motivo de cancelación</h4>
-          <div className="admin-citas-motivo" style={{ background: "#FCE4EC", borderRadius: 14, padding: "1rem", textAlign: "center" }}>
-            <p style={{ fontSize: "0.9rem", color: "#7E1F1F", fontStyle: "italic", margin: 0 }}>{motivoModal.motivoCancelacion || "Sin motivo registrado"}</p>
+          <div className="admin-citas-motivo" style={{ background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", borderRadius: 14, padding: "1rem", textAlign: "center" }}>
+            <p style={{ fontSize: "0.9rem", color: "var(--danger)", fontStyle: "italic", margin: 0 }}>{motivoModal.motivoCancelacion || "Sin motivo registrado"}</p>
           </div>
           <div style={{ textAlign: "center", marginTop: "1.2rem" }}><BtnM label="Cerrar" bg="var(--surface-soft)" color="var(--text)" onClick={() => setMotivoModal(null)} /></div>
         </Overlay>

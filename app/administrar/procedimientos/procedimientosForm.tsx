@@ -97,14 +97,14 @@ const payload = {
       )}
       {err && (
         <div
-          style={{ background: "#FDE8D8", color: "#922B21", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.85rem", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}
+          style={{ background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", color: "var(--danger)", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.85rem", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}
         >
           <span>{err}</span>
           <button
             type="button"
             onClick={() => setErr(null)}
             aria-label="Cerrar"
-            style={{ background: "none", border: "none", color: "#922B21", cursor: "pointer", fontWeight: 700 }}
+            style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontWeight: 700 }}
           >
             ×
           </button>

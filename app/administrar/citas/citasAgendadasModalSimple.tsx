@@ -91,10 +91,12 @@ export default function CitasAgendadasModalSimple({
         <div className="flex items-center gap-3 mb-5">
           <button
             type="button"
+            aria-label="Volver"
+            title="Volver"
             onClick={onClose}
             className="p-2 rounded-full hover:[background:var(--surface-soft)] transition"
           >
-            <ArrowLeft size={20} className="[color:var(--text-soft)]" />
+            <ArrowLeft size={20} className="[color:var(--text-soft)]" aria-hidden="true" />
           </button>
           <h3 className="text-xl font-semibold [color:var(--brand)] tracking-wide">
             Detalle de cita #{cita.id}
