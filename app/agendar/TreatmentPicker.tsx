@@ -7,6 +7,8 @@ import { ChevronDown, Search, X, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { Procedimiento } from "@/types/domain";
 
+type Categoria = "Todas" | "Facial" | "Corporal" | "Capilar";
+
 interface Props {
   value: string;
   onChange: (val: string) => void;
@@ -30,7 +32,9 @@ export default function TreatmentPicker({
   const t = useTranslations("agendar.form");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [categoria, setCategoria] = useState<Categoria>("Todas");
   const inputRef = useRef<HTMLInputElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   // Auto focus al abrir + cleanup body scroll
   useEffect(() => {
@@ -49,19 +53,48 @@ export default function TreatmentPicker({
     };
   }, [open]);
 
-  // Reset query al cerrar
+  // Reset al cerrar
   useEffect(() => {
-    if (!open) setQuery("");
+    if (!open) {
+      setQuery("");
+      setCategoria("Todas");
+    }
+  }, [open]);
+
+  /**
+   * Al abrir, deja a la vista el procedimiento ya elegido.
+   *
+   * Antes esto pasaba solo, y mal: el navegador desplazaba la lista hasta el
+   * elemento seleccionado y la etiqueta pegajosa de la categoría ("FACIALES")
+   * quedaba justo encima, tapando media línea. Se veía como si el modal
+   * estuviera roto.
+   *
+   * Ahora se hace a propósito y con `block: "center"`, para que el elegido
+   * quede en mitad de la lista y no debajo de la etiqueta. El
+   * `scroll-margin-top` del CSS cubre el resto de casos.
+   */
+  useEffect(() => {
+    if (!open) return;
+    const id = requestAnimationFrame(() => {
+      bodyRef.current
+        ?.querySelector(".treatment-picker-item.is-selected")
+        ?.scrollIntoView({ block: "center" });
+    });
+    return () => cancelAnimationFrame(id);
   }, [open]);
 
   const grouped = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const filtered = q
-      ? procedimientos.filter((p) => {
-          const hay = `${p.nombre} ${p.categoria} ${p.subcategoria ?? ""} ${p.desc ?? ""}`.toLowerCase();
-          return hay.includes(q);
-        })
-      : procedimientos;
+    const filtered = procedimientos
+      // Filtro por categoría con un toque, sin escribir. Con ~20
+      // procedimientos en tres categorías, teclear para llegar a "Corporal"
+      // es más trabajo que tocar "Corporal".
+      .filter((p) => categoria === "Todas" || p.categoria === categoria)
+      .filter((p) => {
+        if (!q) return true;
+        const hay = `${p.nombre} ${p.categoria} ${p.subcategoria ?? ""} ${p.desc ?? ""}`.toLowerCase();
+        return hay.includes(q);
+      });
 
     const groups: Record<string, Procedimiento[]> = {
       Facial: [],
@@ -76,7 +109,7 @@ export default function TreatmentPicker({
       groups[k].sort((a, b) => a.nombre.localeCompare(b.nombre));
     }
     return groups;
-  }, [procedimientos, query]);
+  }, [procedimientos, query, categoria]);
 
   const totalFiltered = Object.values(grouped).reduce((a, g) => a + g.length, 0);
   const valid = procedimientos.find((p) => p.nombre === value);
@@ -128,7 +161,28 @@ export default function TreatmentPicker({
               </div>
             </div>
 
-            <div className="treatment-picker-body">
+            <div className="treatment-picker-chips" role="tablist" aria-label={t("procedure")}>
+              {(["Todas", "Facial", "Corporal", "Capilar"] as const).map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  role="tab"
+                  aria-selected={categoria === c}
+                  className={"treatment-picker-chip" + (categoria === c ? " is-active" : "")}
+                  onClick={() => setCategoria(c)}
+                >
+                  {c === "Todas"
+                    ? t("groupAll")
+                    : c === "Facial"
+                    ? t("groupFacial")
+                    : c === "Corporal"
+                    ? t("groupCorporal")
+                    : t("groupCapilar")}
+                </button>
+              ))}
+            </div>
+
+            <div className="treatment-picker-body" ref={bodyRef}>
               {totalFiltered === 0 ? (
                 <p className="treatment-picker-empty">{t("procedurePlaceholder")}</p>
               ) : (

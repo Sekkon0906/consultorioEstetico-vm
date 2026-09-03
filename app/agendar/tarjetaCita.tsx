@@ -5,6 +5,7 @@ import { Clock, CheckCircle2, FileText, Calendar, User, Phone, Mail, CreditCard 
 import { useLocale, useTranslations } from "next-intl";
 import type { Cita, EstadoCita } from "@/types/domain";
 import type { ReactNode } from "react";
+import { formatearFecha } from "@/lib/fechas";
 
 export type { Cita, EstadoCita };
 
@@ -38,7 +39,7 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
 
   const fmtFecha = (fecha: string): string => {
     try {
-      return new Date(fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      return formatearFecha(fecha, intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
     } catch { return fecha; }
   };
 
@@ -67,7 +68,7 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
       transition={{ duration: 0.5 }}
       style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}
     >
-      <div style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 16px 48px rgba(78,59,43,0.1)", overflow: "hidden" }}>
+      <div style={{ background: "var(--bg-elevated)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 16px 48px rgba(78,59,43,0.1)", overflow: "hidden" }}>
 
         {/* Top accent */}
         <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)" }} />

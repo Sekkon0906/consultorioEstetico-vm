@@ -115,12 +115,12 @@ export default function VideoAnim() {
       return () => clearTimeout(tmr);
     }, [startCount, value, delay]);
     return (
-      <div style={{ textAlign: "center", padding: "1rem 0.6rem", borderRadius: 14, background: "linear-gradient(145deg, #FFFBF7, #F0E5D8)", border: "1px solid rgba(176,137,104,0.14)", transition: "transform 0.35s, box-shadow 0.35s", position: "relative", overflow: "hidden", cursor: "default" }}
+      <div style={{ textAlign: "center", padding: "1rem 0.6rem", borderRadius: 14, background: "linear-gradient(145deg, var(--surface), var(--surface-soft))", border: "1px solid rgba(176,137,104,0.14)", transition: "transform 0.35s, box-shadow 0.35s", position: "relative", overflow: "hidden", cursor: "default" }}
         onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px) scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(176,137,104,0.16)"; }}
         onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
-        <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand), #D4A87A)", color: "white", fontSize: "0.75rem", marginBottom: 6 }}><i className={icon} /></div>
+        <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand), #D4A87A)", color: "var(--brand-contrast)", fontSize: "0.75rem", marginBottom: 6 }}><i className={icon} /></div>
         <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.7rem", fontWeight: 700, color: "var(--text)", lineHeight: 1 }}>{count}{suffix}</div>
-        <div style={{ fontSize: "0.7rem", fontWeight: 500, color: "#7A6554", marginTop: 3 }}>{label}</div>
+        <div style={{ fontSize: "0.7rem", fontWeight: 500, color: "var(--text-muted)", marginTop: 3 }}>{label}</div>
         <div style={{ position: "absolute", top: "-50%", left: "-50%", width: "200%", height: "200%", background: "linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.2) 50%, transparent 60%)", transform: "rotate(25deg)", animation: "va-shine 4s ease-in-out infinite", pointerEvents: "none" }} />
       </div>
     );
@@ -166,19 +166,25 @@ export default function VideoAnim() {
         <div className="va-3col" style={{ display: "grid", gridTemplateColumns: "250px minmax(0, 1fr) 250px", gap: "1.75rem", maxWidth: 1560, margin: "0 auto", padding: "0 1.5rem", position: "relative", zIndex: 1, alignItems: "center" }}>
 
           {/* LEFT - Features */}
-          <div className="dark-aware-card" ref={lft.ref} style={{ ...rs(lft.v, 0.15), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.2rem 1rem" }}>
+          <div className="dark-aware-card" ref={lft.ref} style={{ ...rs(lft.v, 0.15), background: "var(--bg-elevated)", backdropFilter: "blur(10px)", border: "1px solid var(--border)", borderRadius: 18, padding: "1.2rem 1rem" }}>
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.85rem", textAlign: "center" }}>{t("distinguishTitle")}</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               {features.map((f, i) => (
                 <div key={i} style={{
                   display: "flex", alignItems: "center", gap: "0.8rem", padding: "0.7rem 0.8rem", borderRadius: 12,
-                  background: "linear-gradient(135deg, #FFFBF7, #F4EBE0)", border: "1px solid rgba(176,137,104,0.12)",
+                  /* El fondo era un degradado claro quemado a mano mientras el
+                     título usaba `var(--text)`. En oscuro el texto pasa a
+                     crema y el fondo se quedaba claro: crema sobre crema, con
+                     los títulos invisibles y solo el subtítulo legible. Ahora
+                     el fondo también sigue al tema. */
+                  background: "linear-gradient(135deg, var(--surface), var(--surface-soft))",
+                  border: "1px solid var(--border)",
                   opacity: lft.v ? 1 : 0, transform: lft.v ? "translateX(0)" : "translateX(-20px)",
                   transition: `opacity 0.5s ease ${0.25 + i * 0.1}s, transform 0.5s ease ${0.25 + i * 0.1}s, box-shadow 0.3s`, cursor: "default",
                 }}
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateX(4px)"; e.currentTarget.style.boxShadow = "0 4px 14px rgba(176,137,104,0.1)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateX(0)"; e.currentTarget.style.boxShadow = ""; }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.8rem" }}><i className={f.icon} /></div>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--brand-contrast)", fontSize: "0.8rem" }}><i className={f.icon} /></div>
                   <div><div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text)" }}>{f.title}</div><div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 1 }}>{f.desc}</div></div>
                 </div>
               ))}
@@ -225,7 +231,7 @@ export default function VideoAnim() {
 
           {/* RIGHT - Counters */}
           <div className="dark-aware-card" ref={el => { rgt.ref.current = el; countersRef.current = el; }}
-            style={{ ...rs(rgt.v, 0.2), background: "rgba(255,253,250,0.9)", backdropFilter: "blur(10px)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 18, padding: "1.2rem 1rem" }}>
+            style={{ ...rs(rgt.v, 0.2), background: "var(--bg-elevated)", backdropFilter: "blur(10px)", border: "1px solid var(--border)", borderRadius: 18, padding: "1.2rem 1rem" }}>
             <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.85rem", textAlign: "center" }}>{t("experienceTitle")}</h3>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.7rem" }}>
               <Counter value={680} label={t("counters.patients")} suffix="+" icon="fas fa-users" delay={0} />

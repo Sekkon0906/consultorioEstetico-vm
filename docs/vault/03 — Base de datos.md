@@ -1,13 +1,13 @@
 ---
 tags: [proyecto, base-de-datos]
-actualizado: 2026-09-01
+actualizado: 2026-09-03
 ---
 
 # Base de datos
 
 Volver a [[00 — Consultorio Estético (índice)]]
 
-PostgreSQL 17. Hoy corre en Supabase, pero **el esquema completo está en el
+PostgreSQL 18, en Neon. **El esquema completo está en el
 repositorio** y se reconstruye idéntico en cualquier Postgres.
 
 ## Levantarla desde cero
@@ -86,9 +86,9 @@ No todo está en el código. Estas se cumplen aunque alguien escriba SQL a mano:
 
 ## Sobre RLS
 
-Las políticas RLS de Supabase están documentadas en
-`server/sql/schema/001_rls_solo_supabase.sql` pero **no hacen falta** en un
-Postgres propio: dependen de `auth.uid()`, que solo existe porque Supabase
+Las políticas RLS que usaba Supabase quedan documentadas en
+`server/sql/schema/001_rls_solo_supabase.sql` pero **no se aplican**: dependen
+de `auth.uid()`, que solo existía porque Supabase
 Auth lo inyecta. El backend se conecta con un rol que hace `BYPASSRLS`, así
 que **hoy lo que protege los datos es `verifyToken`/`requireRole` en la API**,
 no RLS. Ver [[05 — Seguridad]].

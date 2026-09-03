@@ -6,6 +6,7 @@ import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { getCharlasApi } from "@/services/charlasApi";
 import { X, ChevronLeft, ChevronRight, Calendar, ImageIcon, Stethoscope } from "lucide-react";
+import { formatearFecha, aFechaLocal } from "@/lib/fechas";
 
 interface Charla {
   id: string;
@@ -80,7 +81,7 @@ function CardItem({
           <div style={{
             position: "absolute", top: 9, right: 9,
             display: "flex", alignItems: "center", gap: 3,
-            background: "rgba(255,253,249,0.92)",
+            background: "var(--bg-elevated)",
             borderRadius: 20, padding: "3px 8px",
             fontSize: "0.62rem", color: "var(--brand-deep)", fontWeight: 700,
           }}>
@@ -133,13 +134,13 @@ function TimelineNode({
   const isLeft = index % 2 === 0;
 
   const fechaFmt = charla.fecha
-    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString(intlLocale, {
+    ? formatearFecha(charla.fecha, intlLocale, {
         year: "numeric", month: "long", day: "numeric",
       })
     : null;
 
   const anio = charla.fecha
-    ? new Date(charla.fecha + "T12:00:00").getFullYear()
+    ? aFechaLocal(charla.fecha)?.getFullYear()
     : null;
 
   return (
@@ -238,7 +239,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
   const next = () => setIdx(i => (i + 1) % total);
 
   const fechaFmt = charla.fecha
-    ? new Date(charla.fecha + "T12:00:00").toLocaleDateString(intlLocale, {
+    ? formatearFecha(charla.fecha, intlLocale, {
         year: "numeric", month: "long", day: "numeric",
       })
     : null;
@@ -374,7 +375,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                   position: "absolute", left: 10, top: "50%",
                   transform: "translateY(-50%)",
                   width: 36, height: 36, borderRadius: "50%",
-                  background: "rgba(255,253,249,0.9)", border: "none",
+                  background: "var(--bg-elevated)", border: "none",
                   cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                   boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
                 }}>
@@ -384,7 +385,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                   position: "absolute", right: 10, top: "50%",
                   transform: "translateY(-50%)",
                   width: 36, height: 36, borderRadius: "50%",
-                  background: "rgba(255,253,249,0.9)", border: "none",
+                  background: "var(--bg-elevated)", border: "none",
                   cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                   boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
                 }}>
@@ -486,7 +487,7 @@ export default function FormacionContinua() {
     return (
       <section style={{
         minHeight: "50vh", display: "flex", alignItems: "center",
-        justifyContent: "center", background: "#FBF8F4",
+        justifyContent: "center", background: "var(--bg)",
       }}>
         <motion.div
           animate={{ rotate: 360 }}
@@ -504,7 +505,7 @@ export default function FormacionContinua() {
     return (
       <section style={{
         minHeight: "40vh", display: "flex", alignItems: "center",
-        justifyContent: "center", background: "#FBF8F4",
+        justifyContent: "center", background: "var(--bg)",
       }}>
         <p style={{ color: "#8B7060", fontStyle: "italic", fontSize: "0.88rem" }}>
           {t("emptyState")}
@@ -516,7 +517,7 @@ export default function FormacionContinua() {
   return (
     <>
       <section className="dark-aware-section formacion-section" style={{
-        background: "linear-gradient(180deg, #F7EFE7 0%, #FBF8F4 100%)",
+        background: "linear-gradient(180deg, var(--surface-soft) 0%, var(--bg) 100%)",
         padding: "5rem 1.5rem 6rem",
         position: "relative",
         overflow: "hidden",

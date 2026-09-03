@@ -1,6 +1,6 @@
 ---
 tags: [proyecto, seguridad]
-actualizado: 2026-09-01
+actualizado: 2026-09-03
 ---
 
 # Seguridad
@@ -101,5 +101,11 @@ node pruebas/permisos.test.js        # 6  ← aislamiento entre pacientes
 ## Pendiente
 
 - Activar Sentry (instalado, sin configurar).
-- Rotar la clave de servicio de Supabase cuando se complete la migración.
+- **Rotar la contraseña de Neon y el token de R2.** Se pegaron en un chat
+  durante la migración del 2026-09-02. Es lo primero antes de que haya
+  pacientes reales.
+- **Crear el bucket privado de R2** (`R2_BUCKET_PRIVADO`). Sin él, los
+  consentimientos firmados se siguen guardando en el bucket público.
+- **Migrar los consentimientos firmados antes del 2026-09-03**, que tienen
+  guardada una URL pública en vez de una clave.
 - Restringir la clave de Google Maps por dominio (necesita el dominio).

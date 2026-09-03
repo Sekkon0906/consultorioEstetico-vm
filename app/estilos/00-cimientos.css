@@ -53,7 +53,37 @@
      `--gutter` es ese canal. `--content-max` es hasta dónde crece el
      contenido antes de quedarse centrado. */
   --gutter: 16px;
-  --content-max: 1200px;
+
+  /* ==========================
+     ANCHOS DE CONTENIDO
+     ==========================
+     Contados en el sitio: 14 `maxWidth` distintos en los componentes (780,
+     980, 1000, 1180, 1560, 920, 900…) más siete clases `max-w-*` de
+     Tailwind. En una sola página convivían 980, 1180 y 1280. Nadie eligió
+     esos números: son de haber escrito cada sección por separado.
+
+     El resultado que se ve es el que reporta el estudio — "el sitio deja
+     ~40 % del ancho vacío" — pero la conclusión NO es ensanchar todo. Una
+     línea de texto de 1400px es ilegible: el ojo pierde el renglón al
+     volver. Lo que hay es un reparto equivocado: la PROSA corre a lo ancho
+     y el CONTENIDO (tarjetas, formularios, carruseles) va comprimido.
+
+     Tres anchos, por función y no por página:
+
+       --ancho-texto      párrafos largos. En `ch`, no en píxeles: la medida
+                          que importa es cuántos caracteres caben, y eso
+                          depende de la fuente, no de la pantalla. 68 está
+                          dentro del rango cómodo (45–75).
+       --ancho-contenido  el caso normal: tarjetas, formularios, listados.
+       --ancho-amplio     galerías y carruseles, donde el ancho es el
+                          contenido. */
+  --ancho-texto: 68ch;
+  --ancho-contenido: 1200px;
+  --ancho-amplio: 1440px;
+
+  /* Nombre anterior de --ancho-contenido. Se conserva para no romper lo que
+     ya lo cita mientras se migra. */
+  --content-max: var(--ancho-contenido);
 
   /* ==========================
      ALTURA DE PANTALLA
@@ -223,7 +253,22 @@
    padding a ojo, sección por sección, a medida que se reescriben. */
 .contenido {
   width: 100%;
-  max-width: var(--content-max);
+  max-width: var(--ancho-contenido);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Para párrafos largos: se centra dentro de su contenedor y se queda en un
+   ancho legible aunque el bloque de alrededor sea mucho más ancho. */
+.contenido-texto {
+  max-width: var(--ancho-texto);
+  margin-inline: auto;
+}
+
+/* Galerías y carruseles: el ancho ES el contenido. */
+.contenido-amplio {
+  width: 100%;
+  max-width: var(--ancho-amplio);
   margin-inline: auto;
   padding-inline: var(--gutter);
 }

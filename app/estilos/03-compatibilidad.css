@@ -288,9 +288,36 @@
   animation: g3d-backdrop-fade 0.25s ease;
   overscroll-behavior: contain;
 }
-/* Bloquea el scroll de la página mientras el detalle está abierto. */
+/* Bloquea el scroll de la página mientras el detalle está abierto.
+   Va en <html> además de <body>: el elemento que desplaza esta página es el
+   raíz, así que ponerlo solo en <body> no bloqueaba nada y el fondo se
+   seguía moviendo detrás del modal — que es justo lo que se veía mal. */
+html.g3d-detail-abierto,
 body.g3d-detail-abierto {
   overflow: hidden;
+}
+
+/* El modal se da la vuelta al abrir, en vez de aparecer y ya.
+   La tarjeta que se toca en la rueda "gira" y enseña su reverso con la
+   información: la relación entre lo que se pulsó y lo que aparece queda
+   explícita, sin necesidad de que el fondo se mueva para insinuarla. */
+.g3d-detail-backdrop {
+  perspective: 1400px;
+}
+.g3d-detail-backdrop .g3d-detail {
+  animation: g3d-voltear 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+@keyframes g3d-voltear {
+  from { transform: rotateY(-92deg) scale(0.94); opacity: 0; }
+  60%  { opacity: 1; }
+  to   { transform: rotateY(0deg) scale(1); opacity: 1; }
+}
+/* Un giro de media vuelta es movimiento fuerte: quien pide menos, recibe
+   una aparición simple. */
+@media (prefers-reduced-motion: reduce) {
+  .g3d-detail-backdrop .g3d-detail { animation: g3d-backdrop-fade 0.2s ease both; }
 }
 @keyframes g3d-backdrop-fade { from { opacity: 0; } to { opacity: 1; } }
 /* El card del modal: anula cualquier posicionamiento heredado del

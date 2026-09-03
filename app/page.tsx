@@ -14,7 +14,7 @@ import dynamic from "next/dynamic";
 const Galeria3D = dynamic(() => import("@/components/Galeria3D"), {
   ssr: false,
   loading: () => (
-    <div style={{ minHeight: 600, display: "flex", alignItems: "center", justifyContent: "center", background: "#F6F4EF" }}>
+    <div style={{ minHeight: 600, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface)" }}>
       <div style={{ color: "#8B7060", fontSize: "0.9rem" }}>Cargando galería…</div>
     </div>
   ),
@@ -67,7 +67,11 @@ export default function HomePage() {
 
   const memoizedVideo = useMemo(() => <VideoAnim />, []);
 
-  const rotator = t.raw("rotator") as string[];
+  // Una sola palabra, fija. Antes rotaba entre cuatro cada 3,6 s, y eso
+  // obligaba a leer el titular varias veces: el sentido de la frase cambiaba
+  // mientras la leías. El array `rotator` se conserva en los mensajes por si
+  // se quiere volver, pero el hero usa una sola.
+  const palabraPintada = t("paintedWord");
 
   return (
     <>
@@ -126,7 +130,7 @@ export default function HomePage() {
               <span className="hero-fs-rotator">
                 {/* key={locale} fuerza remount al cambiar de idioma: sin eso
                     el componente conservaría la palabra del idioma anterior. */}
-                <PalabraPintada key={locale} palabras={rotator} />
+                <PalabraPintada key={locale} palabra={palabraPintada} />
               </span>
             </motion.h1>
 

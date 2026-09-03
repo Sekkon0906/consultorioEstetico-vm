@@ -46,7 +46,8 @@
     "subtitle": "Personalized treatments with state-of-the-art technology. Natural results that highlight your essence, in the hands of Dr. Vanessa Medina.",
     "ctaPrimary": "Book a visit",
     "ctaSecondary": "Explore treatments",
-    "imageAlt": "Dr. Vanessa Medina"
+    "imageAlt": "Dr. Vanessa Medina",
+    "paintedWord": "confidence."
   },
   "home": {
     "gallery": {
@@ -68,7 +69,9 @@
     },
     "gallery_a11y": {
       "close": "Close",
-      "goToCard": "Go to treatment {n}"
+      "goToCard": "Go to treatment {n}",
+      "prevCard": "Previous",
+      "nextCard": "Next"
     },
     "video": {
       "kicker": "About my practice",
@@ -221,6 +224,13 @@
         "Work area",
         "Entrance & natural light",
         "Ambience detail"
+      ],
+      "descriptions": [
+        "The bed and equipment sit around a single axis, so every procedure runs with the instruments within reach and without interruptions.",
+        "Panels and curtains separate the areas: you can get ready and recover without anyone else entering the space.",
+        "This is where products are prepared and instruments sterilised, on a surface kept apart from the bed.",
+        "The entrance opens onto a wide window: natural light is what best reveals the real tone of the skin.",
+        "Warm materials and indirect lighting aim to make the visit feel closer to a salon than to an operating room."
       ]
     },
     "map": {
@@ -416,6 +426,7 @@
       "appointmentTypeValue": "Consultation / Treatment",
       "procedure": "Treatment",
       "procedurePlaceholder": "Choose a treatment",
+      "groupAll": "All",
       "groupFacial": "Facial",
       "groupCorporal": "Body",
       "groupCapilar": "Hair",
@@ -521,6 +532,13 @@
       },
       "footerInfo": "Payment is made when you arrive at the clinic. Your details were sent to the doctor on WhatsApp.",
       "appointmentNumber": "Appointment #"
+    },
+    "gate": {
+      "title": "You need an account to confirm",
+      "subtitle": "We'll keep the day and time you picked. When you come back, you carry on from here.",
+      "login": "Sign in",
+      "register": "Create account",
+      "cancel": "Keep browsing"
     }
   },
   "perfil": {

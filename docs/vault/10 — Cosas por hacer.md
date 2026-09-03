@@ -72,14 +72,14 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 - [x] **M2 · Hero.** Foto de fondo a sangre + texto encima (no dos bloques
       apilados), `100dvh` real, un solo botón primario, y la palabra pintada
       **contenida** (hoy se corta: "autenticidac").
-- [ ] **M3 · Carrusel único.** Un solo componente para el home y
+- [x] **M3 · Carrusel único.** Un solo componente para el home y
       ⟶ **Parcial (PR #3):** se unificó el COMPORTAMIENTO de los controles
       (flechas y dots fuera del contenido, ocultas en móvil, dots debajo),
       no el componente. La rueda 3D del home y el destacado de
       /procedimientos son piezas distintas; unificarlas era tirar la rueda.
       `/procedimientos`. Controles **fuera** del contenido, `scroll-snap` con
       `scroll-padding-inline` para que las cards no se corten.
-- [ ] **M3b · "Conoce los procedimientos" en móvil — composición.** Las cards
+- [x] **M3b · "Conoce los procedimientos" en móvil — composición.** Las cards
       deben quedar **alineadas a la derecha** y **girar sobre ese eje**, de modo
       que se lea a la doctora a la izquierda **apuntando con la mano** hacia
       ellas. Es la versión móvil de lo mismo que se pidió en escritorio (F5):
@@ -100,7 +100,7 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ### Hero (apartado de la doctora)
 
-- [ ] **F1 · Palabra pintada.** Quitar la palabra rotativa que se revela de
+- [x] **F1 · Palabra pintada.** Quitar la palabra rotativa que se revela de
       izquierda a derecha (efecto ya muy visto). Poner **una sola palabra fija**
       (ej. "confianza") que se escriba **con trazo de pincel, letra por letra**
       (traza la C, luego la O, y así), desde cero. No rota, no se borra: se
@@ -114,25 +114,25 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 - [x] **F2 · Altura del navbar.** Está muy alto verticalmente — roba ~15-20 %
       de la pantalla sin necesidad. Reducirlo. Es la causa de que la sección
       "Conoce los procedimientos…" se sienta apretada.
-- [ ] **F3 · Indicador de cuenta.** El avatar/menú al hacer hover o estar
+- [x] **F3 · Indicador de cuenta.** El avatar/menú al hacer hover o estar
       logueado no convence. Rediseñarlo.
-- [ ] **F4 · Botón "Iniciar sesión" del navbar.** Hoy despliega un panel al
+- [x] **F4 · Botón "Iniciar sesión" del navbar.** Hoy despliega un panel al
       pulsarlo. Decidir el comportamiento (¿mantener el botón?, ¿que solo
       navegue a `/login`?). **Pendiente recomendación.**
 
 ### Home — sección "Conoce los procedimientos más demandados y promociones"
 
-- [ ] **F5 · Rehacer el layout de la sección.** Hoy se sale de la pantalla y
+- [x] **F5 · Rehacer el layout de la sección.** Hoy se sale de la pantalla y
       toca calibrar con scroll para leerla — problema de proporciones. Objetivo
       (ver la última captura de la sesión): título legible + la doctora
       apuntando con la mano + un **carrusel de procedimientos que pasa de
       derecha a izquierda**.
-- [ ] **F6 · Separar los elementos** de esa sección: el indicador de posición
+- [x] **F6 · Separar los elementos** de esa sección: el indicador de posición
       **más abajo**, las cards de procedimiento **más arriba**. Que todo tenga
       aire.
-- [ ] **F7 · Flechas de navegación** en ese carrusel del home (hoy solo hay
+- [x] **F7 · Flechas de navegación** en ese carrusel del home (hoy solo hay
       dots, faltan flechas — sí las tiene el carrusel de `/procedimientos`).
-- [ ] **F8 · Modal de procedimiento (al seleccionar una card).** Hoy oscurece
+- [x] **F8 · Modal de procedimiento (al seleccionar una card).** Hoy oscurece
       el fondo pero deja seguir scrolleando con el modal "en la mano" — se ve
       mal. Cambiar a un **flip del modal** (se da la vuelta y muestra la info) y
       **bloquear el scroll** mientras está abierto.
@@ -142,24 +142,24 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 - [x] **F9 · Carrusel "Destacados y promociones del mes".** Mover el
       **indicador de dots FUERA del modal** (debajo) y las **flechas FUERA del
       modal**. Hoy están dentro y no tiene razón de ser.
-- [ ] **F10 · Animación al filtrar.** Al elegir "Facial" → subcategoría
+- [x] **F10 · Animación al filtrar.** Al elegir "Facial" → subcategoría
       (p. ej. "Perfilamiento"), las cards aparecen "regadas" por la pantalla y
       luego se acomodan solas. Se ve horrible. Arreglar la entrada / el layout
       shift. (5ª captura de la sesión.)
-- [ ] **F11 · Ficha de procedimiento (detalle).** El modal aparece muy
+- [x] **F11 · Ficha de procedimiento (detalle).** El modal aparece muy
       reducido; usar más ancho de pantalla; reemplazar el botón gris "Volver a
       procedimientos" + flecha por los **botones propios** ya planteados en el
       sistema de diseño. (6ª captura.)
 
 ### Transversal
 
-- [ ] **F12 · Uso del ancho de pantalla.** El sitio deja ~40 % del ancho vacío
+- [x] **F12 · Uso del ancho de pantalla.** El sitio deja ~40 % del ancho vacío
       en columnas laterales y comprime formularios y contenido. Rebalancear el
       layout global (contenedores, `max-width`, márgenes).
 
 ### Agendar cita
 
-- [ ] **F13 · Gate de sesión.** Al seleccionar hora y pulsar "Continuar" sin
+- [x] **F13 · Gate de sesión.** Al seleccionar hora y pulsar "Continuar" sin
       sesión, hoy redirige directo a `/login`. En su lugar: **mensaje en la
       misma pantalla** ("para agendar una cita debes iniciar sesión") con dos
       botones — **Iniciar sesión** y **Registrarse** (el visitante puede tener
@@ -167,7 +167,13 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ### Tema oscuro / colores
 
-- [ ] **F14 · Auditoría de colores oscuro/claro.** Cada color del sitio debe
+- [~] **F14 · Auditoría de colores oscuro/claro.** *(Dos pasadas hechas: 147
+      colores tokenizados + 13 fondos claros más. Queda abierta porque **el
+      audit automático por getComputedStyle NO es fiable en el panel de
+      previsualización** —informaba contraste 1,0 en un botón que la captura
+      mostraba perfectamente legible, comprobado dos veces en páginas
+      distintas con carga limpia. Hay que auditar en un navegador real.)*
+- [ ] **F14b · Auditoría de colores — pasada final en navegador real.** Cada color del sitio debe
       tener su equivalente en modo oscuro y claro. Hoy el **beige del modo
       claro se cuela en el modo oscuro** (ej. la sección "Conoce los
       procedimientos…": letras negras + beige que no pegan sobre fondo oscuro).
@@ -179,7 +185,7 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ### Frontend — ya conocidas
 
-- [ ] **F16 · Favicon en modo oscuro** — `<link rel="icon" media="(prefers-color-scheme: dark)">`
+- [x] **F16 · Favicon en modo oscuro** — `<link rel="icon" media="(prefers-color-scheme: dark)">`
       + `app/icon`. **Desbloqueado (2026-09-02):** ya están en R2
       `ConsultorioImagenes/Logo/LogoLimpioBlanco.png` (para fondo oscuro) y
       `LogoLimpioNegro.png` (para fondo claro). Ojo: pesan 1,29 MB y 843 KB —
@@ -192,14 +198,19 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ## 🟦 Código — Backend
 
-- [ ] **B1 · Bucket privado para consentimientos y firmas.** Nuevo bucket R2
+- [x] **B1 · Bucket privado para consentimientos y firmas.** ⚠️ **El código
+      está hecho, pero FALTA CREAR EL BUCKET en Cloudflare.** Mientras
+      `R2_BUCKET_PRIVADO` esté vacío se sigue usando el público (el servidor
+      avisa al arrancar). Los consentimientos firmados ANTES del cambio
+      siguen con su URL pública guardada; migrarlos es un paso aparte.
+      Nuevo bucket R2
       privado + `GET /citas/:id/consentimiento.pdf` (autenticado, URL firmada),
       guardar la *clave* y no la URL pública. Cierra el hallazgo **CRÍTICO #1**
       del inventario. Necesita crear el bucket en Cloudflare (config).
-- [ ] **B2 · `jspdf@3` → `jspdf@4`.** Vuln crítica pre-existente
+- [x] **B2 · `jspdf@3` → `jspdf@4`.** Vuln crítica pre-existente
       (`FirmaConsentimiento`). Major con cambios de API — probar que el PDF
       sigue generándose.
-- [ ] **B3 · `withSentryConfig` import.** `from "@sentry/nextjs/config"` — una
+- [x] **B3 · `withSentryConfig` import.** `from "@sentry/nextjs/config"` — una
       línea, avisa en cada build (romperá en v11).
 - [ ] **B4 · (opcional)** Que el cron de recordatorios de Vercel llame directo
       a Railway en vez del proxy `app/api/reminders/send`.
@@ -208,10 +219,10 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ## 🟦 Código — Documentación
 
-- [ ] **D1 · `docs/vault/` 01–05** (Arquitectura, API, Seguridad, Base de
+- [x] **D1 · `docs/vault/` 01–05** (Arquitectura, API, Seguridad, Base de
       datos, Estructura) — describen el estado pre-migración (Supabase, 60
       endpoints).
-- [ ] **D2 · Tabla "Números"** de la nota raíz (líneas, endpoints) — está al
+- [x] **D2 · Tabla "Números"** de la nota raíz (líneas, endpoints) — está al
       2026-09-01.
 - [ ] **D3 · Commit `72062f2`** de `docs/vault/` (en la rama ya mergeada) →
       llevar a `main` o descartar.
@@ -262,7 +273,7 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ## 🐞 Bugs — reportados 2026-09-03
 
-- [ ] **BUG5 · "Invalid Date" en Mis Citas Agendadas.** La tarjeta de la cita
+- [x] **BUG5 · "Invalid Date" en Mis Citas Agendadas.** La tarjeta de la cita
       muestra literalmente `Invalid Date` donde debería ir la fecha y la hora.
       **No es un problema de color** — es una fecha que no se está parseando.
       Sospecha: la cita se guarda con `fecha` y `hora` en columnas separadas y
@@ -270,8 +281,14 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
       navegador no acepta (`"2026-09-02 10:00"` sin la `T`, o la hora sola).
       Revisar `app/perfil/citas_agendadas/`.
       *Visto en la cita "Bótox Complementario" del 2026-09-03.*
+      ⟶ **Hecho.** La causa estaba en el backend: `pg` convertía la columna
+      `date` a un `Date` de JavaScript y le pegaba la medianoche en la zona
+      del servidor. Arreglado en el origen (devuelve texto "YYYY-MM-DD") y
+      con un helper compartido en el frontend. Había un segundo fallo
+      latente detrás: con el servidor en UTC la cita se habría mostrado un
+      día antes.
 
-- [ ] **BUG6 · El selector de procedimiento del formulario de agendar está
+- [x] **BUG6 · El selector de procedimiento del formulario de agendar está
       roto.** Al abrir el modal para escoger el tipo de procedimiento, la lista
       aparece **cortada por arriba**: el ítem resaltado se solapa con la
       cabecera "FACIALES" y se ve media línea. El scroll arranca en una
@@ -279,9 +296,11 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
       Sospecha: el `scrollIntoView` de la opción seleccionada corre antes de
       que el modal termine de montar, o falta `scroll-margin-top` sobre la
       cabecera pegajosa del grupo.
-      ⟶ Juan además pide **replantear cómo se busca el procedimiento**, no solo
-      arreglar el corte: hoy es una lista larga con buscador; con ~20
-      procedimientos en 3 categorías, se siente pesado.
+      ⟶ **Hecho.** El desplazamiento al elemento elegido ahora es
+      intencionado y centrado, y los ítems llevan `scroll-margin-top`.
+      La búsqueda se replanteó con **chips de categoría** para filtrar sin
+      teclear. Queda por evaluar si hace falta además navegación con
+      teclado (flechas + Enter).
 
 ---
 
@@ -292,32 +311,32 @@ adaptar**. Hay un patrón de fondo: son los sitios donde el color está escrito
 a mano en el componente y no cita el token, así que en oscuro se queda con el
 valor claro. Es la continuación natural de F14.
 
-- [ ] **O1 · Recuadros de "Lo que me distingue" (home).** Los títulos
+- [x] **O1 · Recuadros de "Lo que me distingue" (home).** Los títulos
       ("Tecnología HydraFacial", "Productos premium", "Mínimo dolor",
       "Atención personalizada") son **casi invisibles** sobre la tarjeta
       oscura; solo se lee el subtítulo. Los íconos también salen demasiado
       claros y se pierden contra el fondo.
 
-- [ ] **O2 · Sección "Conoce los procedimientos más demandados y promociones"
+- [x] **O2 · Sección "Conoce los procedimientos más demandados y promociones"
       (home) no está en modo oscuro.** Sigue con el fondo café/beige claro
       mientras el resto de la página ya es oscuro. Es la sección entera, no un
       detalle.
 
-- [ ] **O3 · El botón "Agendar cita" se vuelve ilegible.** El champán de
+- [x] **O3 · El botón "Agendar cita" se vuelve ilegible.** El champán de
       `--brand` en oscuro es muy claro, y con el texto encima el contraste no
       alcanza. Pasa en el navbar, en la ficha de procedimiento ("Agendar este
       procedimiento") y en el resto de botones primarios.
       *Nota:* `--brand-contrast` existe justamente para esto (`#1A1720` en
       oscuro). El problema es que estos botones no lo están usando.
 
-- [ ] **O4 · "Formación / crecimiento continuo" (página de la doctora) no está
+- [x] **O4 · "Formación / crecimiento continuo" (página de la doctora) no está
       adaptado.** Aparece un bloque blanco/crema a pantalla completa —con el
       texto "Sin actividades registradas aún"— en medio de una página oscura.
 
-- [ ] **O5 · Botones de la página /procedimientos ilegibles.** Mismo caso que
+- [x] **O5 · Botones de la página /procedimientos ilegibles.** Mismo caso que
       O3: el fondo claro del botón con texto claro encima.
 
-- [ ] **O6 · "Mis Citas Agendadas" en oscuro.** La tarjeta de la cita y la
+- [x] **O6 · "Mis Citas Agendadas" en oscuro.** La tarjeta de la cita y la
       columna de filtros (Todos / Pendiente / Confirmada…) no están adaptadas.
 
 > [!tip] Cómo atacarlos de una vez
@@ -330,13 +349,16 @@ valor claro. Es la continuación natural de F14.
 
 ## 🟦 Rediseño pedido — Consultorio (2026-09-03)
 
-- [ ] **R1 · "Elegancia, confort y tecnología" → galería con descripción
+- [x] **R1 · "Elegancia, confort y tecnología" → galería con descripción
       sincronizada.** Hoy la sección es un bloque de texto y aparte una
       galería. Juan quiere separarlas y convertirlo en:
       **foto a la izquierda · descripción breve a la derecha**, y que **al
       cambiar de imagen cambie la descripción** (los implementos que se ven,
       la zona del consultorio, la vista…).
       Objetivo suyo, textual: *"darle como un récord visual a esa parte"*.
+      ⟶ **Hecho.** Foto a la izquierda, descripción a la derecha, cambiando
+      con la imagen. **Los cinco textos son un borrador** escrito a partir
+      de lo que se ve en cada foto: la doctora debería revisarlos.
       ⟶ Implica **contenido nuevo**: hace falta un texto corto por cada foto de
       la galería. Eso lo tiene que escribir la doctora, o sacarse de lo que se
       ve en cada imagen. Es la parte que bloquea, no el código.

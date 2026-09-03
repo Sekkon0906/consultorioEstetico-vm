@@ -46,7 +46,8 @@
     "subtitle": "Tratamientos personalizados con tecnología de última generación. Resultados naturales que resaltan tu esencia, en manos de la Dra. Vanessa Medina.",
     "ctaPrimary": "Agendar cita",
     "ctaSecondary": "Conoce los procedimientos",
-    "imageAlt": "Dra. Vanessa Medina"
+    "imageAlt": "Dra. Vanessa Medina",
+    "paintedWord": "confianza."
   },
   "home": {
     "gallery": {
@@ -68,7 +69,9 @@
     },
     "gallery_a11y": {
       "close": "Cerrar",
-      "goToCard": "Ir al tratamiento {n}"
+      "goToCard": "Ir al tratamiento {n}",
+      "prevCard": "Anterior",
+      "nextCard": "Siguiente"
     },
     "video": {
       "kicker": "Sobre mi práctica",
@@ -221,6 +224,13 @@
         "Zona de trabajo",
         "Acceso y luz natural",
         "Detalle de ambiente"
+      ],
+      "descriptions": [
+        "La camilla y el equipo se disponen alrededor de un mismo eje para que cada procedimiento se haga con el instrumental a la mano y sin interrupciones.",
+        "Paneles y cortinas separan las zonas: puedes prepararte y recuperarte sin que nadie más entre en el espacio.",
+        "Aquí se preparan los productos y se esterilizan los instrumentos, en una superficie separada de la camilla.",
+        "La entrada da a una ventana amplia: la luz natural es la que mejor deja valorar el tono real de la piel.",
+        "Los materiales cálidos y la iluminación indirecta buscan que la consulta se sienta más cerca de un salón que de un quirófano."
       ]
     },
     "map": {
@@ -416,6 +426,7 @@
       "appointmentTypeValue": "Valoración / Procedimiento",
       "procedure": "Procedimiento",
       "procedurePlaceholder": "Selecciona un procedimiento",
+      "groupAll": "Todas",
       "groupFacial": "Faciales",
       "groupCorporal": "Corporales",
       "groupCapilar": "Capilares",
@@ -521,6 +532,13 @@
       },
       "footerInfo": "El pago se realizará al asistir al consultorio. La información fue enviada por WhatsApp a la doctora.",
       "appointmentNumber": "Número de cita: #"
+    },
+    "gate": {
+      "title": "Necesitas una cuenta para confirmar",
+      "subtitle": "Guardamos el día y la hora que elegiste. Al volver, sigues justo desde aquí.",
+      "login": "Iniciar sesión",
+      "register": "Crear cuenta",
+      "cancel": "Seguir mirando"
     }
   },
   "perfil": {

@@ -1,6 +1,6 @@
 ---
 tags: [proyecto, api]
-actualizado: 2026-09-01
+actualizado: 2026-09-03
 ---
 
 # API
@@ -30,8 +30,9 @@ Todos públicos por naturaleza, pero con límite de intentos: 10 por cuarto de
 hora en login y registro (solo cuentan los fallidos), 5 por hora en los que
 envían correo.
 
-### `/auth` — Supabase (1, en retirada)
-`POST /callback` — sincroniza el usuario de Supabase con `usuarios`.
+### `/auth` — retirada
+Existió mientras convivieron los dos sistemas de login. Ya no está: la
+autenticación es toda `/auth2`.
 
 ### `/citas` (5)
 | Endpoint | Acceso | Nota |

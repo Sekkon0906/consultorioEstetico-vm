@@ -201,7 +201,7 @@ export default function ConfiguracionForm() {
       {/* Barra de guardado fija */}
       <div
         style={{
-          position: "sticky", bottom: 0, background: "rgba(251,247,242,0.96)",
+          position: "sticky", bottom: 0, background: "var(--bg-elevated)",
           backdropFilter: "blur(8px)", borderTop: "1px solid var(--border-strong)",
           padding: "0.85rem 0", marginTop: "1rem",
           display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",

@@ -161,10 +161,12 @@
 ============================================================ */
 
 @media (max-width: 767px) {
-  /* 1. Logo más pequeño */
+  /* En móvil el logo también sube —de 32 a 42 de alto— y la barra sigue en
+     56px: el elemento más alto es la hamburguesa con sus 46, así que hasta
+     ahí no cuesta nada. */
   .navbar-logo img {
-    width: 44px !important;
-    height: 32px !important;
+    width: 58px !important;
+    height: 42px !important;
     object-fit: contain !important;
   }
   /* La barra fija se queda en 56px (era 62). Es el alto que importa: la
@@ -951,11 +953,51 @@
   padding: 0.5rem 0;
   z-index: 2;
 }
+/* Chips de categoría: filtrar con un toque en vez de escribir. Con ~20
+   procedimientos, llegar a "Corporal" tecleando es más trabajo que tocarlo. */
+.treatment-picker-chips {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0 1.2rem 0.6rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border);
+}
+.treatment-picker-chips::-webkit-scrollbar { display: none; }
+.treatment-picker-chip {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--btn-radio);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-soft);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--mov-rapido), color var(--mov-rapido),
+              border-color var(--mov-rapido);
+}
+.treatment-picker-chip.is-active {
+  background: var(--brand);
+  /* El token que existe justamente para esto: en oscuro --brand es champán
+     claro, y un texto blanco encima no se lee. */
+  color: var(--brand-contrast);
+  border-color: var(--brand);
+}
+
 .treatment-picker-item {
   display: flex;
   align-items: center;
   gap: 0.8rem;
   width: 100%;
+  /* La etiqueta de categoría es `sticky` dentro de esta misma lista. Sin
+     reservarle sitio, al desplazar un elemento a la vista —al abrir el
+     modal con un procedimiento ya elegido— la etiqueta le quedaba justo
+     encima y tapaba media línea: parecía que el selector estaba roto. */
+  scroll-margin-top: 3rem;
+  scroll-margin-bottom: 0.8rem;
   padding: 0.7rem 0.8rem;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -2535,11 +2577,20 @@ footer a:hover i {
 
 /* Los dos ejes explícitos, en la proporción original 75×55. Con `height:
    auto` la altura la decidía la imagen, y era ella —no el padding— la que
-   marcaba el alto de toda la barra. */
+   marcaba el alto de toda la barra.
+
+   El logo se agranda de 48 a 64 de alto, pero la barra NO crece: se le
+   quita al padding lo que gana la imagen. Antes el problema era el revés
+   —una imagen de 96px estirando la barra a 128— y la respuesta no es un
+   logo pequeño, es que el alto lo decida la barra y no la imagen. */
 .navbar-logo img {
-  width: 66px;
-  height: 48px;
+  width: 88px;
+  height: 64px;
   object-fit: contain;
+}
+.navbar-container {
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 /* === CENTRO: MENÚ === */
@@ -3925,3 +3976,181 @@ a:hover {
   text-decoration: underline;
 }
 
+
+/* ============================================================
+   GALERÍA DEL CONSULTORIO — foto + descripción sincronizada
+   ============================================================
+   La galería iba sola y el texto del espacio vivía en un bloque aparte,
+   arriba, sin relación con lo que estabas mirando. Ahora la descripción
+   acompaña a la foto y cambia con ella: cada imagen cuenta qué es esa
+   zona, en vez de ser una foto bonita sin contexto. */
+.consultorio-showcase-fila {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .consultorio-showcase-fila {
+    /* La foto manda; el texto acompaña. */
+    grid-template-columns: 1.35fr 1fr;
+    gap: 2rem;
+  }
+}
+
+.consultorio-showcase-info {
+  padding: 0 var(--gutter);
+}
+@media (min-width: 768px) {
+  .consultorio-showcase-info { padding: 0; }
+}
+
+.consultorio-showcase-info-num {
+  display: block;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--brand);
+  opacity: 0.45;
+  margin-bottom: 0.4rem;
+}
+.consultorio-showcase-info-titulo {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.6rem;
+}
+.consultorio-showcase-info-texto {
+  color: var(--text-soft);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin: 0;
+  /* Reserva el alto del texto más largo para que la fila no dé un salto
+     al cambiar de foto. */
+  min-height: 5.5rem;
+}
+
+/* Entrada del texto al cambiar de foto. Animación CSS reiniciada por el
+   `key` de React: llega siempre a su estado final, a diferencia de un
+   AnimatePresence, que no monta el contenido nuevo hasta terminar la
+   salida del anterior. */
+.consultorio-showcase-info-anim {
+  animation: consultorio-info-entra var(--mov-normal) var(--mov-curva) both;
+}
+@keyframes consultorio-info-entra {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .consultorio-showcase-info-anim { animation: none; }
+}
+
+/* Flechas del carrusel del home, junto a los dots.
+   El carrusel de /procedimientos ya tenía flechas y este no: solo se podía
+   avanzar apuntando al punto exacto, un blanco de 8px. Van dentro de la
+   misma píldora que los dots para no tapar las tarjetas de la rueda. */
+.g3d-flecha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin: -7px 0;          /* no engorda la píldora */
+  border: none;
+  background: none;
+  color: var(--brand-deep);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  transition: background var(--mov-rapido), color var(--mov-rapido);
+}
+.g3d-flecha:hover,
+.g3d-flecha:focus-visible {
+  background: var(--surface-soft);
+  color: var(--brand);
+}
+
+/* Entrada de las tarjetas de procedimiento al filtrar.
+   Corta y sin escalonar. Antes era `layout` de framer con un retardo por
+   índice: `layout` anima cada tarjeta desde su posición ANTERIOR, y como al
+   filtrar cambia la rejilla entera, cada una salía volando desde donde
+   estaba otra. Eso es lo que se veía como "cards regadas que se acomodan
+   solas". Filtrar es una acción de precisión: la rejilla se recoloca de
+   golpe y las tarjetas solo aparecen. */
+.proc-card-entra {
+  animation: proc-card-aparece 0.22s ease-out both;
+}
+@keyframes proc-card-aparece {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .proc-card-entra { animation: none; }
+}
+
+/* ============================================================
+   MENÚ DE CUENTA — rediseño
+   ============================================================
+   Antes eran tres botones de ancho completo en tres colores (suave,
+   primario y rojo) para lo que es una lista de navegación: tres pesos
+   visuales compitiendo obligan a leerlos todos para elegir uno. Ahora
+   todas las opciones pesan igual y solo cerrar sesión se separa, porque
+   es la única que no lleva a ninguna parte. */
+.profile-menu-id {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-align: left;
+  padding: 0.2rem 0.4rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.4rem;
+}
+.profile-menu-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text);
+  line-height: 1.2;
+  /* El nombre y el correo pueden ser largos; el menú no debe estirarse. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.profile-menu-email {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-menu-lista {
+  display: flex;
+  flex-direction: column;
+}
+.profile-menu-item {
+  text-align: left;
+  padding: 0.6rem 0.55rem;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background var(--mov-rapido), color var(--mov-rapido);
+}
+.profile-menu-item:hover,
+.profile-menu-item:focus-visible {
+  background: var(--surface-soft);
+}
+.profile-menu-item-salir {
+  color: var(--danger);
+  margin-top: 0.35rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 10px 10px;
+}

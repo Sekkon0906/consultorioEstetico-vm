@@ -31,9 +31,11 @@ const path = require("path");
 const {
   S3Client,
   PutObjectCommand,
+  GetObjectCommand,
   DeleteObjectCommand,
   HeadObjectCommand,
 } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 function estaConfigurado() {
   return Boolean(
@@ -101,6 +103,90 @@ function construirRuta(carpeta, tipoMime, nombreOriginal = "") {
  * @param {{carpeta: string, tipoMime: string, nombreOriginal?: string}} opciones
  * @returns {Promise<{ok: boolean, url?: string, clave?: string, error?: string}>}
  */
+/**
+ * Bucket para archivos que NO puede ver cualquiera: consentimientos
+ * firmados y firmas de pacientes.
+ *
+ * El bucket normal es público —sus URLs se sirven tal cual desde r2.dev— y
+ * eso está bien para fotos de procedimientos, que es material de vitrina.
+ * Un consentimiento médico firmado no lo es: lleva el nombre del paciente,
+ * su documento y su firma. Si vive en un bucket público, cualquiera con la
+ * URL lo abre, y esa URL viaja por correo, por el historial del navegador
+ * y por los registros de cualquier intermediario.
+ *
+ * Si `R2_BUCKET_PRIVADO` no está configurado se usa el bucket normal, para
+ * no romper el flujo en producción, pero se avisa: eso es una situación
+ * temporal, no el estado deseado.
+ */
+function bucketPrivado() {
+  return process.env.R2_BUCKET_PRIVADO || process.env.R2_BUCKET;
+}
+
+let avisadoBucketPrivado = false;
+function avisarSiFaltaBucketPrivado() {
+  if (avisadoBucketPrivado) return;
+  if (!process.env.R2_BUCKET_PRIVADO) {
+    console.warn(
+      "[almacenamiento] R2_BUCKET_PRIVADO no está configurado: los " +
+      "consentimientos firmados se guardan en el bucket PÚBLICO. " +
+      "Crea un bucket privado en Cloudflare R2 y defínelo antes de que " +
+      "haya pacientes reales."
+    );
+    avisadoBucketPrivado = true;
+  }
+}
+
+/**
+ * Sube un archivo privado y devuelve SOLO la clave, nunca una URL.
+ *
+ * Guardar la clave y no la URL es deliberado: obliga a pasar por
+ * `urlFirmada()`, que caduca, en vez de dejar una dirección permanente
+ * escrita en la base de datos que funcione para siempre y para cualquiera.
+ */
+async function subirArchivoPrivado(contenido, { carpeta, tipoMime, nombreOriginal }) {
+  const cliente = getCliente();
+  if (!cliente) return { ok: false, error: "El almacenamiento no está configurado en el servidor." };
+  if (!TIPOS_PERMITIDOS.has(tipoMime)) {
+    return { ok: false, error: `Tipo de archivo no permitido: ${tipoMime}` };
+  }
+  if (!Buffer.isBuffer(contenido) || contenido.length === 0) {
+    return { ok: false, error: "El archivo llegó vacío." };
+  }
+  avisarSiFaltaBucketPrivado();
+  const clave = construirRuta(carpeta, tipoMime, nombreOriginal);
+  try {
+    await cliente.send(new PutObjectCommand({
+      Bucket: bucketPrivado(),
+      Key: clave,
+      Body: contenido,
+      ContentType: tipoMime,
+      // Sin caché pública: es un documento personal, no un recurso estático.
+      CacheControl: "private, no-store",
+    }));
+    return { ok: true, clave };
+  } catch (err) {
+    console.error("[almacenamiento] Falló la subida privada:", err);
+    return { ok: false, error: String(err && err.message) };
+  }
+}
+
+/**
+ * URL temporal para leer un archivo privado.
+ *
+ * Diez minutos por defecto: suficiente para abrir o descargar el PDF, poco
+ * para que la dirección siga sirviendo si acaba en el historial, en un
+ * reenvío de correo o en el registro de un proxy.
+ */
+async function urlFirmada(clave, segundos = 600) {
+  const cliente = getCliente();
+  if (!cliente) return null;
+  return getSignedUrl(
+    cliente,
+    new GetObjectCommand({ Bucket: bucketPrivado(), Key: clave }),
+    { expiresIn: segundos }
+  );
+}
+
 async function subirArchivo(contenido, { carpeta, tipoMime, nombreOriginal }) {
   const cliente = getCliente();
   if (!cliente) return { ok: false, error: "El almacenamiento no está configurado en el servidor." };
@@ -175,6 +261,8 @@ function claveDesdeUrl(url) {
 module.exports = {
   estaConfigurado,
   subirArchivo,
+  subirArchivoPrivado,
+  urlFirmada,
   borrarArchivo,
   existeArchivo,
   urlPublica,

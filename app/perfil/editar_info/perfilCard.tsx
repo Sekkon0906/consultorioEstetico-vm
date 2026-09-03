@@ -23,13 +23,13 @@ export default function PerfilCard() {
 
   return (
     <motion.div className="dark-aware-card" initial={{ y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-      style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", overflow: "hidden" }}>
+      style={{ background: "var(--bg-elevated)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", overflow: "hidden" }}>
 
       <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)" }} />
 
       <div style={{ padding: "2rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1.5rem" }}>
-          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "1.2rem", fontWeight: 700, flexShrink: 0, boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}>
+          <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--brand-contrast)", fontSize: "1.2rem", fontWeight: 700, flexShrink: 0, boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}>
             {initial || "?"}
           </div>
           <div>

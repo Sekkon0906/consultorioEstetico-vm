@@ -32,8 +32,18 @@ export default function Galeria3D() {
   // navega a otra página con el detalle abierto.
   useEffect(() => {
     if (selected === null) return;
+    // En <html>, no en <body>. El elemento que desplaza la página aquí es
+    // el raíz —se comprobó cuando un `overflow-x: clip` en <html> dejó el
+    // sitio entero sin scroll—, así que `body { overflow: hidden }` no
+    // bloqueaba nada y se seguía desplazando el fondo con el detalle
+    // abierto. Se marcan los dos: cuesta lo mismo y cubre cualquier
+    // navegador donde el que desplace sea el otro.
+    document.documentElement.classList.add("g3d-detail-abierto");
     document.body.classList.add("g3d-detail-abierto");
-    return () => document.body.classList.remove("g3d-detail-abierto");
+    return () => {
+      document.documentElement.classList.remove("g3d-detail-abierto");
+      document.body.classList.remove("g3d-detail-abierto");
+    };
   }, [selected]);
 
   // Cerrar con Escape: es un panel modal, y sin esto solo se cierra con clic.
@@ -234,7 +244,7 @@ export default function Galeria3D() {
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(180deg, rgba(58,42,26,0.32) 0%, rgba(58,42,26,0) 18%, rgba(58,42,26,0) 78%, rgba(58,42,26,0.35) 100%), linear-gradient(90deg, rgba(58,42,26,0) 0%, rgba(58,42,26,0) 45%, rgba(58,42,26,0.18) 70%, rgba(58,42,26,0.35) 100%)",
+            "linear-gradient(180deg, rgba(var(--foto-tinte), 0.32) 0%, rgba(var(--foto-tinte), 0) 18%, rgba(var(--foto-tinte), 0) 78%, rgba(var(--foto-tinte), 0.35) 100%), linear-gradient(90deg, rgba(var(--foto-tinte), 0) 0%, rgba(var(--foto-tinte), 0) 45%, rgba(var(--foto-tinte), 0.18) 70%, rgba(var(--foto-tinte), 0.35) 100%)",
           zIndex: 1,
         }}
       />
@@ -336,7 +346,13 @@ export default function Galeria3D() {
         className="g3d-wheel-anchor"
         style={{
           position: "absolute",
-          top: "63%",
+          /* Sube del 63 % al 55 %.
+             Medido en 1440×900: entre el final del título y el principio de
+             la rueda había 160px muertos, y entre la rueda y los dots solo
+             22 — los dos elementos que hay que distinguir estaban pegados y
+             el aire sobraba donde no hacía falta. Subir la rueda reparte esa
+             holgura al lado correcto. */
+          top: "55%",
           right: "30%",
           transform: "translate(50%, -50%)",
           zIndex: 3,
@@ -493,7 +509,7 @@ export default function Galeria3D() {
                         bottom: 0,
                         height: "45%",
                         background:
-                          "linear-gradient(180deg, transparent 0%, rgba(30,20,10,0) 30%, rgba(30,20,10,0.55) 100%)",
+                          "linear-gradient(180deg, transparent 0%, rgba(var(--foto-tinte), 0) 30%, rgba(var(--foto-tinte), 0.55) 100%)",
                         pointerEvents: "none",
                       }}
                     />
@@ -505,12 +521,12 @@ export default function Galeria3D() {
                         right: 12,
                         bottom: 12,
                         padding: "0.55rem 0.8rem",
-                        background: "rgba(255, 253, 249, 0.94)",
+                        background: "var(--bg-elevated)",
                         backdropFilter: "blur(8px)",
                         WebkitBackdropFilter: "blur(8px)",
-                        border: "1px solid rgba(201,173,141,0.4)",
+                        border: "1px solid var(--border-strong)",
                         borderRadius: 12,
-                        boxShadow: "0 4px 12px rgba(58,42,26,0.22)",
+                        boxShadow: "0 4px 12px rgba(var(--foto-tinte), 0.22)",
                       }}
                     >
                       <p
@@ -599,7 +615,9 @@ export default function Galeria3D() {
           className="g3d-dots-wrap"
           style={{
             position: "absolute",
-            bottom: "19%",
+            /* Baja del 19 % al 14 %: separa el indicador de posición de las
+               tarjetas, que es lo que pedía el rediseño. */
+            bottom: "14%",
             right: "30%",
             transform: "translateX(50%)",
             zIndex: 5,
@@ -611,13 +629,26 @@ export default function Galeria3D() {
               display: "flex",
               gap: 8,
               padding: "0.45rem 0.85rem",
-              background: "rgba(255, 253, 249, 0.9)",
+              background: "var(--bg-elevated)",
               backdropFilter: "blur(10px)",
-              border: "1px solid rgba(255, 235, 215, 0.5)",
+              border: "1px solid var(--border)",
               borderRadius: 100,
               boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
             }}
           >
+            {/* Flechas junto a los dots.
+                El carrusel de /procedimientos las tiene y este no: solo se
+                podía avanzar apuntando al punto exacto, que en escritorio es
+                un blanco de 8px. Van pegadas a los dots y no flotando sobre
+                la rueda, para no tapar las tarjetas. */}
+            <button
+              type="button"
+              onClick={() => goToCard((frontIndex - 1 + tratamientos.length) % tratamientos.length)}
+              aria-label={ta("prevCard")}
+              className="g3d-flecha"
+            >
+              ‹
+            </button>
             {tratamientos.map((_, i) => (
               <button
                 key={i}
@@ -639,6 +670,14 @@ export default function Galeria3D() {
                 }}
               />
             ))}
+            <button
+              type="button"
+              onClick={() => goToCard((frontIndex + 1) % tratamientos.length)}
+              aria-label={ta("nextCard")}
+              className="g3d-flecha"
+            >
+              ›
+            </button>
           </div>
         </div>
       )}
@@ -667,7 +706,7 @@ export default function Galeria3D() {
               padding: "0.75rem 1.8rem",
               borderRadius: 100,
               background: "linear-gradient(135deg, var(--brand), var(--brand-soft))",
-              color: "#FFFFFF",
+              color: "var(--brand-contrast)",
               border: "none",
               fontWeight: 600,
               fontSize: "0.95rem",
@@ -702,13 +741,17 @@ export default function Galeria3D() {
             maxWidth: "92vw",
             maxHeight: "88vh",
             overflowY: "auto",
-            border: "1px solid rgba(201,173,141,0.4)",
+            border: "1px solid var(--border-strong)",
             borderRadius: 24,
             boxShadow:
               "0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(176,137,104,0.08)",
             padding: "2.5rem 2.2rem 2.2rem",
             position: "relative",
-            animation: "g3d-detail-in 0.5s cubic-bezier(0.16,1,0.3,1)",
+            /* La animación de apertura NO se declara aquí.
+               Estaba en línea, y el estilo en línea le gana a la hoja: eso
+               impedía que `prefers-reduced-motion` la anulara. Vive en
+               03-compatibilidad.css junto al backdrop, que es quien pone la
+               perspectiva del volteo. */
             display: "flex",
             flexDirection: "column",
             gap: "1.4rem",
@@ -800,7 +843,7 @@ export default function Galeria3D() {
                 overflow: "hidden",
                 boxShadow:
                   "0 12px 32px rgba(176,137,104,0.28), 0 0 0 1px rgba(176,137,104,0.12)",
-                background: "#F5EEE5",
+                background: "var(--surface-soft)",
               }}
             >
               <img
@@ -894,10 +937,10 @@ export default function Galeria3D() {
           0%   { transform: translate(-50%, -50%) rotate(0deg); }
           100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
-        @keyframes g3d-detail-in {
-          0%   { opacity: 0; transform: translate(50%, -50%) scale(0.94); }
-          100% { opacity: 1; transform: translate(50%, -50%) scale(1); }
-        }
+        /* Aquí estaban las keyframes g3d-detail-in. El modal ahora se
+           voltea (g3d-voltear, en 03-compatibilidad.css) y aquellas
+           llevaban un translate heredado de cuando el panel era absolute;
+           hoy es un hijo flex centrado y ese desplazamiento sobraba. */
         .g3d-card {
           box-shadow:
             0 14px 32px rgba(0, 0, 0, 0.3),
@@ -921,10 +964,15 @@ export default function Galeria3D() {
         /* El reset global de enlaces (color inherit important) pisaba el
            color del pill dejándolo invisible. El botón es sólido champagne
            con texto BLANCO forzado para ganarle al reset. */
+        /* Antes era blanco fijo con !important. En claro --brand es café
+           oscuro y el blanco funcionaba; en oscuro --brand es champán claro
+           y el botón quedaba blanco sobre champán, ilegible.
+           --brand-contrast es exactamente ese par: blanco en claro, casi
+           negro en oscuro. */
         .g3d-cta-pill,
         .g3d-cta-pill i,
         .g3d-cta-pill span {
-          color: #FFFFFF !important;
+          color: var(--brand-contrast) !important;
         }
         .g3d-cta-pill:hover,
         .g3d-cta-pill:focus-visible {
@@ -959,7 +1007,7 @@ export default function Galeria3D() {
           .g3d-stage          { background-position: 30% top !important; aspect-ratio: auto !important; height: auto !important; min-height: auto !important; padding: 4.5rem 0 3rem !important; overflow: hidden !important; }
           .g3d-overlay        {
             background:
-              linear-gradient(180deg, rgba(58,42,26,0.62) 0%, rgba(58,42,26,0.42) 35%, rgba(58,42,26,0.62) 100%) !important;
+              linear-gradient(180deg, rgba(var(--foto-tinte), 0.62) 0%, rgba(var(--foto-tinte), 0.42) 35%, rgba(var(--foto-tinte), 0.62) 100%) !important;
           }
           /* Título centrado con flujo normal (antes iba superpuesto a la
              derecha sobre la foto, alineado a la derecha — se veía forzado
@@ -976,14 +1024,21 @@ export default function Galeria3D() {
             padding: 0 !important;
             text-align: center !important;
           }
-          /* Rueda 3D escalada, alineada con el bloque de texto (debajo). */
+          /* Rueda 3D escalada y anclada a la DERECHA.
+             El origen del escalado importa: con transform-origin en el
+             centro, un scale(0.6) encoge la rueda hacia su propio centro y
+             la despega del borde derecho ~20 % de su ancho. Es decir, el
+             bloque estaba alineado a la derecha en el layout pero se veía
+             corrido hacia el medio — justo lo contrario de lo que se busca,
+             que es que las tarjetas caigan donde la doctora señala con la
+             mano. Anclando el origen a la derecha, encoger no la mueve. */
           .g3d-wheel-anchor   {
             position: relative !important;
             top: auto !important;
             right: auto !important;
             margin: 0.5rem 0 0 auto !important;
             transform: scale(0.6) !important;
-            transform-origin: center center !important;
+            transform-origin: right center !important;
             height: 270px !important;
             display: flex !important;
             align-items: center !important;
@@ -1015,7 +1070,7 @@ export default function Galeria3D() {
         }
         @media (max-width: 480px) {
           .g3d-title-wrap h1, .g3d-title-wrap h2 { font-size: 1.3rem !important; }
-          .g3d-wheel-anchor { transform: scale(0.52) !important; height: 230px !important; }
+          .g3d-wheel-anchor { transform: scale(0.52) !important; transform-origin: right center !important; height: 230px !important; }
         }
         @media (max-width: 768px) {
           /* El modal va por globals.css. Aquí solo apilamos imagen + texto. */

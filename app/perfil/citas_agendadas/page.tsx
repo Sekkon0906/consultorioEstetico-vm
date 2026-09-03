@@ -12,6 +12,7 @@ import {
   rechazarReagendaApi,
 } from "@/services/reagendasApi";
 import type { Cita } from "@/types/domain";
+import { formatearFecha } from "@/lib/fechas";
 
 // Trae jsPDF (pesado) consigo. Se usa solo cuando el paciente abre el
 // modal de firma, así que no debe formar parte de la carga inicial de "Mis citas".
@@ -55,7 +56,7 @@ function ProgressBar({ estado, t }: { estado: string; t: ReturnType<typeof useTr
               <motion.div
                 initial={{ scale: 0.8 }}
                 animate={{ scale: active ? 1 : 0.8 }}
-                style={{ width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", fontWeight: 700, color: active ? "white" : "#9B8575", background: active ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border)", transition: "all 0.4s", boxShadow: active ? "0 2px 8px rgba(176,137,104,0.3)" : "none" }}>
+                style={{ width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", fontWeight: 700, color: active ? "var(--brand-contrast)" : "#9B8575", background: active ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border)", transition: "all 0.4s", boxShadow: active ? "0 2px 8px rgba(176,137,104,0.3)" : "none" }}>
                 {active ? <CheckCircle size={14} /> : i + 1}
               </motion.div>
               <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
@@ -76,11 +77,9 @@ export default function CitasAgendadas() {
   const intlLocale = locale === "en" ? "en-US" : "es-CO";
   const currencyLocale = intlLocale;
 
-  function formatFecha(fecha: string): string {
-    try {
-      return new Date(fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "short", year: "numeric", month: "short", day: "numeric" });
-    } catch { return fecha; }
-  }
+  // Ver src/lib/fechas.ts: por qué se ancla al mediodía y por qué el
+  // try/catch de antes no protegía nada.
+  const formatFecha = (fecha: string) => formatearFecha(fecha, intlLocale);
 
   const [citas, setCitas] = useState<Cita[]>([]);
   const [loading, setLoading] = useState(true);
@@ -152,7 +151,7 @@ export default function CitasAgendadas() {
   }), [citas]);
 
   if (loading) return <div style={{ display: "flex", justifyContent: "center", padding: "5rem 0" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
-  if (error) return <div style={{ textAlign: "center", padding: "3rem" }}><p style={{ color: "#7E1F1F" }}>{error}</p><button onClick={() => window.location.reload()} style={{ marginTop: "1rem", padding: "0.6rem 2rem", borderRadius: 100, background: "var(--brand)", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("retry")}</button></div>;
+  if (error) return <div style={{ textAlign: "center", padding: "3rem" }}><p style={{ color: "#7E1F1F" }}>{error}</p><button onClick={() => window.location.reload()} style={{ marginTop: "1rem", padding: "0.6rem 2rem", borderRadius: 100, background: "var(--brand)", color: "var(--brand-contrast)", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("retry")}</button></div>;
 
   return (
     <div className="dark-aware-section citas-page" style={{ maxWidth: 1180, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
@@ -211,7 +210,7 @@ export default function CitasAgendadas() {
                 <motion.div key={cita.id}
                   initial={{ y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.4, delay: i * 0.04 }}
-                  style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(8px)", borderRadius: 20, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 4px 16px rgba(78,59,43,0.06)", overflow: "hidden", transition: "box-shadow 0.3s" }}
+                  style={{ background: "var(--bg-elevated)", backdropFilter: "blur(8px)", borderRadius: 20, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 4px 16px rgba(78,59,43,0.06)", overflow: "hidden", transition: "box-shadow 0.3s" }}
                   onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(78,59,43,0.1)"; }}
                   onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(78,59,43,0.06)"; }}
                 >

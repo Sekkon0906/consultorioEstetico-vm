@@ -239,7 +239,10 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`navbar navbar-container py-3 ${desplazado ? "is-scrolled" : ""}`}
+      /* Sin `py-3`: las utilidades de Bootstrap llevan !important, así que
+         esa clase le ganaba a cualquier padding nuestro y la barra volvía a
+         crecer al agrandar el logo. El alto se decide en .navbar-container. */
+      className={`navbar navbar-container ${desplazado ? "is-scrolled" : ""}`}
       style={{ backgroundColor: "#FFFFFF", position: "sticky", top: 0, zIndex: 1000 }}
     >
       <div
@@ -367,13 +370,20 @@ export default function Navbar() {
             </motion.div>
           </button>
 
-          {/* PERFIL DESKTOP */}
+          {/* PERFIL DESKTOP
+              El botón de "Iniciar sesión" NAVEGA a /login; no despliega un
+              panel. Decidido así a propósito: un desplegable que solo
+              contiene "entrar" y "registrarse" añade un paso para llegar a
+              una página a la que ibas de todos modos, es incoherente con el
+              CTA de al lado —"Agendar cita" navega— y en móvil no hay sitio
+              para desplegarlo. El desplegable se reserva para cuando SÍ hay
+              sesión, que es cuando hay varias acciones distintas que ofrecer. */}
           {loading ? null : !user ? (
             <motion.button
               onClick={() => router.push("/login")}
               className="btn rounded-pill px-4 py-2 d-none d-md-inline-flex align-items-center gap-2"
               style={{ border: "1.5px solid var(--brand)", color: "var(--brand-deep)", backgroundColor: "var(--surface)", fontWeight: 600 }}
-              whileHover={{ scale: 1.05, backgroundColor: "var(--brand)", color: "#fff", boxShadow: "0 6px 18px rgba(176,137,104,0.35)" }}
+              whileHover={{ scale: 1.05, backgroundColor: "var(--brand)", color: "var(--brand-contrast)", boxShadow: "0 6px 18px rgba(176,137,104,0.35)" }}
               whileTap={{ scale: 0.96 }}
               transition={{ type: "spring", stiffness: 320, damping: 20 }}
             >
@@ -383,8 +393,15 @@ export default function Navbar() {
             <>
               <motion.button
                 onClick={() => setMenuOpen((p) => !p)}
-                className={`user-button d-none d-md-flex align-items-center border-0 bg-white rounded-pill shadow-sm px-2 py-1 ${pathname.startsWith("/perfil") ? "is-active-route" : ""}`}
-                style={{ position: "relative" }}
+                /* Sin `bg-white`: es una clase de Bootstrap con el blanco
+                   fijo, así que en modo oscuro el botón de la cuenta se
+                   quedaba blanco sobre la barra oscura. El fondo sale del
+                   token, como el resto. */
+                className={`user-button d-none d-md-flex align-items-center border-0 rounded-pill shadow-sm px-2 py-1 ${pathname.startsWith("/perfil") ? "is-active-route" : ""}`}
+                style={{ position: "relative", background: "var(--bg-elevated)" }}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                aria-label={t("profileAlt")}
               >
                 <Avatar
                   src={userPhoto}
@@ -412,52 +429,60 @@ export default function Navbar() {
                     transition={{ type: "spring", damping: 22, stiffness: 320, mass: 0.6 }}
                     className="profile-menu position-absolute rounded-4 p-3"
                     style={{
-                      top: "110%", right: 0, minWidth: "260px", zIndex: 100,
-                      textAlign: "center",
+                      top: "110%", right: 0, minWidth: "248px", zIndex: 100,
                       transformOrigin: "top right",
                     }}
                   >
-                    <button
-                      type="button"
-                      className="profile-menu-close"
-                      onClick={() => setMenuOpen(false)}
-                      aria-label="Cerrar"
-                    >
-                      <X size={18} strokeWidth={2.2} />
-                    </button>
+                    {/* Rediseño del indicador de cuenta.
+                        Antes: un avatar de 70px repetido (ya está en el
+                        botón que abre el menú), el nombre y el correo
+                        centrados, y TRES botones de ancho completo en tres
+                        colores distintos —suave, primario y rojo— para lo
+                        que es una lista de navegación. Tres pesos visuales
+                        compitiendo obligan a leerlos todos para elegir uno.
+                        Y una X para cerrar, en un menú que ya se cierra al
+                        pulsar fuera o con Escape.
 
-                    <div className="text-center mb-3" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                        Ahora: la identidad arriba, alineada a la izquierda y
+                        con el avatar pequeño; debajo una lista donde todas
+                        las opciones pesan igual; y cerrar sesión separada por
+                        una línea, porque es la única que no lleva a ninguna
+                        parte. */}
+                    <div className="profile-menu-id">
                       <Avatar
                         src={userPhoto}
-                        alt={t("profileAlt")}
+                        alt=""
                         fallback={avatarFallback}
                         className="profile-menu-avatar"
-                        style={{ width: 70, height: 70, borderRadius: "50%", marginBottom: "0.4rem" }}
+                        style={{ width: 38, height: 38, borderRadius: "50%", flexShrink: 0 }}
                       />
-                      <div className="profile-menu-name">
-                        {user.nombres}
+                      <div style={{ minWidth: 0 }}>
+                        <div className="profile-menu-name">{user.nombres}</div>
+                        <div className="profile-menu-email">{user.email}</div>
                       </div>
-                      <div className="profile-menu-email">{user.email}</div>
                     </div>
 
-                    <div className="d-grid gap-2">
+                    <div className="profile-menu-lista" role="menu">
                       <button
                         type="button"
-                        className="profile-menu-btn profile-menu-btn-soft"
-                        onClick={() => { setMenuOpen(false); router.push("/perfil/editar_info"); }}
-                      >
-                        {t("editProfile")}
-                      </button>
-                      <button
-                        type="button"
-                        className="profile-menu-btn profile-menu-btn-primary"
+                        role="menuitem"
+                        className="profile-menu-item"
                         onClick={() => { setMenuOpen(false); router.push("/perfil/citas_agendadas"); }}
                       >
                         {t("myAppointments")}
                       </button>
                       <button
                         type="button"
-                        className="profile-menu-btn profile-menu-btn-danger mt-2"
+                        role="menuitem"
+                        className="profile-menu-item"
+                        onClick={() => { setMenuOpen(false); router.push("/perfil/editar_info"); }}
+                      >
+                        {t("editProfile")}
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="profile-menu-item profile-menu-item-salir"
                         onClick={requestLogout}
                       >
                         {t("logout")}

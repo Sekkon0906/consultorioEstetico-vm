@@ -170,9 +170,16 @@ h1, h2, h3 {
 /* === NAVBAR EN MODO OSCURO ===
    Reglas con !important para asegurar el contraste blanco sobre el
    fondo oscuro del navbar, independiente de inline styles o cache. */
-:root[data-theme="dark"] .navbar-menu a,
-:root[data-theme="dark"] .navbar-menu a:visited,
-:root[data-theme="dark"] .navbar-menu li a {
+/* `:not(.navbar-cta)` es la parte importante.
+   "Agendar cita" no es un enlace más de la fila: es un botón con fondo
+   propio, y en oscuro ese fondo es el champán claro de --brand. Esta regla
+   lo pintaba de blanco por ser descendiente de .navbar-menu, y ganaba por
+   especificidad al `color: var(--brand-contrast)` que el propio botón ya
+   pedía. Resultado: blanco sobre champán, contraste 1,0 — el texto
+   desaparecía por completo. */
+:root[data-theme="dark"] .navbar-menu a:not(.navbar-cta),
+:root[data-theme="dark"] .navbar-menu a:visited:not(.navbar-cta),
+:root[data-theme="dark"] .navbar-menu li a:not(.navbar-cta) {
   color: #FFFFFF !important;
 }
 :root[data-theme="dark"] .navbar-menu a.navbar-link-active {

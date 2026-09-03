@@ -49,7 +49,7 @@ export default function FotoPerfil({ photo, email }: Props) {
           overflow: "hidden",
           border: `4px solid ${PALETTE.main}`,
           boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-          backgroundColor: "#f8f9fa",
+          backgroundColor: "var(--surface)",
         }}
       >
         <Image

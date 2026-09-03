@@ -11,6 +11,7 @@ import {
   deleteBloqueoHoraByFechaApi,
   getCitasByDayApi,
 } from "@/services/citasApi";
+import { aISOLocal } from "@/lib/fechas";
 
 const HORAS_BASE = [
   "08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM","10:30 AM",
@@ -203,7 +204,7 @@ export default function HorariosHabilitados() {
                       const global = esGlobal(hora);
                       const bloqueada = esBloqueada(hora);
                       // Check if hour is past for today
-                      const esHoy = selectedDate === new Date().toISOString().slice(0, 10);
+                      const esHoy = selectedDate === aISOLocal(new Date());
                       const horaPasada = esHoy && (() => {
                         const [hStr] = hora.split(":");
                         let h = parseInt(hStr);
@@ -272,7 +273,7 @@ export default function HorariosHabilitados() {
               </p>
               <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
                 <button onClick={() => setConfirmAction(null)} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, border: "1px solid var(--border)", background: "transparent", color: "var(--text)", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
-                <button onClick={ejecutarAccion} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, background: "var(--brand)", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>Confirmar</button>
+                <button onClick={ejecutarAccion} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, background: "var(--brand)", color: "var(--brand-contrast)", border: "none", fontWeight: 600, cursor: "pointer" }}>Confirmar</button>
               </div>
             </motion.div>
           </motion.div>

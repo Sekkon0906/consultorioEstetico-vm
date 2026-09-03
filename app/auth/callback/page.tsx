@@ -47,7 +47,7 @@ export default function AuthCallbackPage() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#FAF7F2",
+        backgroundColor: "var(--bg)",
       }}
     >
       <div className="absolute inset-0 z-0">

@@ -8,6 +8,7 @@ import { PALETTE } from "./palette";
 import Button from "@/components/ui/Button";
 import type { Cita, MetodoPago, TipoPagoConsultorio, TipoPagoOnline } from "@/types/domain";
 import { createCitaApi } from "@/services/citasApi";
+import { formatearFecha } from "@/lib/fechas";
 
 export type CrearCitaPayload = Omit<Cita, "id" | "fechaCreacion">;
 export type CitaSinPagos = Omit<CrearCitaPayload, "metodoPago" | "tipoPagoConsultorio" | "tipoPagoOnline" | "estado">;
@@ -50,7 +51,7 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
       };
       const nuevaCita = await createCitaApi(payload);
 
-      const fechaH = new Date(citaData.fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      const fechaH = formatearFecha(citaData.fecha, intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
       const tipoPagoLocalizado = isEfectivo ? t("cash") : t("card");
       const lineas = [
         t("whatsapp.title"),
@@ -75,7 +76,7 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
 
   return (
     <motion.div key="pago" initial={{ y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.5 }} style={{ maxWidth: 620, margin: "0 auto" }}>
-      <div className="agendar-pago-card dark-aware-card" style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", padding: "2.5rem 2rem", textAlign: "center" }}>
+      <div className="agendar-pago-card dark-aware-card" style={{ background: "var(--bg-elevated)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", padding: "2.5rem 2rem", textAlign: "center" }}>
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem" }}>{t("title")}</h2>
         <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, var(--brand), #C9AD8D)", borderRadius: 2, margin: "0 auto 1.5rem" }} />
 
@@ -84,7 +85,7 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
           <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "0.5rem 1rem", fontSize: "0.9rem", color: "#5A4A3A" }}>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.patient")}</span><span>{citaData.nombres} {citaData.apellidos || ""}</span>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.procedure")}</span><span>{citaData.procedimiento}</span>
-            <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.date")}</span><span>{new Date(citaData.fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
+            <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.date")}</span><span>{formatearFecha(citaData.fecha, intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.time")}</span><span>{citaData.hora}</span>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.phone")}</span><span>{citaData.telefono || t("summary.notSpecified")}</span>
           </div>

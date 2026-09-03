@@ -1,6 +1,6 @@
 ---
 tags: [proyecto, arquitectura]
-actualizado: 2026-09-01
+actualizado: 2026-09-03
 ---
 
 # Arquitectura
@@ -20,13 +20,14 @@ Navegador
    │
    └─→ Express 4 (Railway)          la API: 60 endpoints
           │
-          └─→ PostgreSQL 17         hoy en Supabase, migrable
+          └─→ PostgreSQL 18         en Neon (serverless)
 ```
 
 La decisión de fondo: **el backend habla con Postgres por SQL directo**
-(`pg.Pool`), nunca a través del SDK de Supabase. Eso es lo que hace que
-migrar la base sea cambiar `DATABASE_URL` y nada más — Postgres sigue siendo
-Postgres en cualquier proveedor.
+(`pg.Pool`), nunca a través del SDK de un proveedor. Eso fue lo que hizo que
+migrar de Supabase a Neon (2026-09-02) fuera cambiar `DATABASE_URL` y poco
+más — Postgres sigue siendo Postgres en cualquier proveedor. Ver
+[[06 — Migración fuera de Supabase]].
 
 ## Piezas y por qué están
 
@@ -41,23 +42,21 @@ Postgres en cualquier proveedor.
 | **Resend** | Correos | Notificaciones y recuperación de contraseña |
 | **Sentry** | Errores en producción | Instalado, falta activarlo |
 
-## Autenticación: dos sistemas conviviendo
+## Autenticación: propia
 
-Hay **dos** a propósito, mientras dura la migración:
+`/auth2` — JWT de acceso de 15 min + refresh rotativo de 30 días en cookie
+`httpOnly`, contraseñas con argon2id, y Google OAuth.
 
-- `/auth` → Supabase Auth. Lo que usa el frontend hoy.
-- `/auth2` → propia. JWT + argon2id + Google OAuth. Ya funciona, sin usar aún.
+Durante la migración convivieron dos sistemas a propósito (`verifyToken`
+aceptaba token propio y de Supabase), para poder migrar pantalla por
+pantalla en vez de cortar el acceso de golpe: cortar el login de la doctora
+en un solo despliegue es como se pierde el acceso al panel un lunes por la
+mañana. Terminada la migración, quedó solo el propio.
 
-`verifyToken` acepta **los dos tipos de token**: prueba primero el propio
-(verificación local de firma, sin salir a red) y cae al de Supabase. Eso
-permite migrar pantalla por pantalla en vez de cortar el acceso de golpe —
-cortar el login de la doctora en un solo despliegue es como se pierde el
-acceso al panel un lunes por la mañana.
-
-El frontend pregunta el token en un solo sitio: `src/lib/sesion.ts`. Antes
-había nueve llamadas sueltas a `supabase.auth.getSession()`, y con eso
-cambiar de proveedor obligaba a tocar nueve archivos y arriesgarse a olvidar
-uno.
+El frontend pregunta el token en **un solo sitio**: `src/lib/sesion.ts`.
+Antes había nueve llamadas sueltas al SDK, y con eso cambiar de proveedor
+obligaba a tocar nueve archivos y arriesgarse a olvidar uno. Esa
+centralización es la razón de que el corte final fuera barato.
 
 ## Dónde vive cada dato sensible
 
@@ -70,14 +69,15 @@ uno.
 | Access token (navegador) | **solo en memoria** | Nunca en localStorage |
 | Refresh token (navegador) | Cookie `httpOnly` | El JS de la página no la lee |
 
-## Lo que aún ata a Supabase
+## Lo que ata a Supabase
 
-**30 archivos del frontend** todavía lo usan. Separados por tipo:
+**Nada.** Cero importaciones del SDK, cero llamadas, el paquete fuera de los
+dos `package.json`. Se verificó el 2026-09-02.
 
-- **~8 solo para autenticación** → migración mecánica con `sesion.ts`.
-- **~15 para datos o archivos** → necesitan que el endpoint de la API exista
-  y devuelva los mismos campos. Ya migrados: procedimientos, testimonios,
-  notificaciones.
+Lo que sí queda del pasado: los consentimientos firmados **antes** del
+2026-09-03 tienen guardada una URL pública completa en vez de una clave, y
+siguen en el bucket público. Migrarlos es un paso aparte, anotado en
+[[10 — Cosas por hacer]].
 - El resto son utilidades que arrastran el import.
 
 Ver [[06 — Migración fuera de Supabase]].
