@@ -91,7 +91,7 @@ export default function IngresosPage() {
             {topProcs.map(function(p, i) {
               var pct = stats.totalCitas > 0 ? Math.round((p.total / stats.totalCitas) * 100) : 0;
               return (
-                <motion.div key={p.nombre} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+                <motion.div key={p.nombre} initial={{ x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                   style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "0.5rem 0.8rem", borderRadius: 12, background: i % 2 === 0 ? "var(--surface-soft)" : "transparent", marginBottom: "0.3rem" }}>
                   <span style={{ width: 22, height: 22, borderRadius: 6, background: "var(--brand)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.68rem", fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
                   <div style={{ flex: 1 }}>
@@ -111,7 +111,7 @@ export default function IngresosPage() {
 
 function KPI(props: { icon: React.ReactNode; label: string; value: number; color: string }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+    <motion.div initial={{ y: 10 }} animate={{ opacity: 1, y: 0 }}
       style={{ background: "var(--surface)", borderRadius: 16, border: "1px solid var(--border)", padding: "1rem", display: "flex", alignItems: "center", gap: "0.8rem" }}>
       <div style={{ width: 36, height: 36, borderRadius: 10, background: props.color + "18", display: "flex", alignItems: "center", justifyContent: "center", color: props.color, flexShrink: 0 }}>{props.icon}</div>
       <div>

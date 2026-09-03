@@ -37,7 +37,6 @@ export default function HomePage() {
   const imagenes = IMG.homeCarrusel;
 
   const [imagenActual, setImagenActual] = useState(0);
-  const [heroVisible, setHeroVisible] = useState(false);
   const router = useRouter();
   const [officeZooming, setOfficeZooming] = useState(false);
 
@@ -58,10 +57,13 @@ export default function HomePage() {
     return () => clearInterval(intervalo);
   }, [imagenes.length]);
 
-  useEffect(() => {
-    const t = setTimeout(() => setHeroVisible(true), 80);
-    return () => clearTimeout(t);
-  }, []);
+  // Aquí había un `heroVisible` que arrancaba en false y a los 80ms pasaba
+  // a true; todo el hero se pintaba con `opacity: heroVisible ? 1 : 0`. El
+  // temporizador existía solo para evitar un parpadeo, pero convertía el
+  // texto principal del sitio en algo que solo se ve SI el JS corre, se
+  // hidrata y framer llega a animar. Cuando algo de esa cadena se atasca,
+  // queda la foto sola: la "pantalla fantasma" del estudio de móvil. El
+  // parpadeo lo evita `initial` de framer, que no necesita temporizador.
 
   const memoizedVideo = useMemo(() => <VideoAnim />, []);
 
@@ -100,14 +102,14 @@ export default function HomePage() {
         <div className="hero-fs-content">
           <motion.div
             className="hero-fs-text"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: heroVisible ? 1 : 0 }}
+            initial={false}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
           >
             <motion.span
               className="hero-fs-kicker"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 12 }}
+              initial={{ y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.05 }}
             >
               {t("kicker")}
@@ -115,8 +117,8 @@ export default function HomePage() {
 
             <motion.h1
               className="hero-fs-title"
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 18 }}
+              initial={{ y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.18 }}
             >
               {t("title1")} <br /> {t("title2")}
@@ -130,8 +132,8 @@ export default function HomePage() {
 
             <motion.p
               className="hero-fs-sub"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
+              initial={{ y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.4 }}
             >
               {t("subtitle")}
@@ -139,8 +141,8 @@ export default function HomePage() {
 
             <motion.div
               className="hero-fs-cta"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
+              initial={{ y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.55 }}
             >
               <Link href="/agendar" className="hero-fs-btn hero-fs-btn-primary">
@@ -255,7 +257,7 @@ export default function HomePage() {
             </motion.div>
             <motion.div
               aria-hidden="true"
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: officeZooming ? 1 : 0 }}
               transition={{ duration: 0.3 }}
               style={{

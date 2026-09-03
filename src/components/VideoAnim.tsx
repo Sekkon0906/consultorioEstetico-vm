@@ -6,6 +6,24 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { IMG } from "@/lib/imagenes";
 
+/**
+ * Revela la sección al entrar en pantalla.
+ *
+ * Lleva red de seguridad, y no es teórica: esta sección se quedaba en
+ * blanco —titular y texto en `opacity: 0` sobre fondo claro— cuando el
+ * observador no llegaba a disparar. Es la "pantalla fantasma" del estudio
+ * de móvil.
+ *
+ * El observador puede no disparar por varios motivos: que el umbral no se
+ * alcance nunca porque la sección es más alta que la ventana, que el
+ * elemento esté en un contenedor con `overflow` que hace de raíz, o
+ * simplemente que el hilo principal esté ocupado en la carga. Y como esto
+ * decide si el CONTENIDO se ve —no un adorno—, no puede depender de que
+ * todo salga bien.
+ *
+ * Pasado el plazo, se revela igual. Si el observador dispara antes, mejor;
+ * si no, el usuario lee la sección en vez de mirar un hueco.
+ */
 function useReveal(t = 0.15) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [v, setV] = useState(false);
@@ -14,7 +32,8 @@ function useReveal(t = 0.15) {
     if (!el) return;
     const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setV(true); o.disconnect(); } }, { threshold: t });
     o.observe(el);
-    return () => o.disconnect();
+    const respaldo = setTimeout(() => { setV(true); o.disconnect(); }, 1200);
+    return () => { clearTimeout(respaldo); o.disconnect(); };
   }, [t]);
   return { ref, v };
 }

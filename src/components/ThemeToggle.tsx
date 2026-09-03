@@ -66,7 +66,7 @@ export default function ThemeToggle() {
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={key + String(active)}
-            initial={{ opacity: 0, scale: 0.7 }}
+            initial={{ scale: 0.7 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.7 }}
             transition={{ duration: 0.18 }}

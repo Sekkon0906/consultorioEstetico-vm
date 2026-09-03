@@ -30,7 +30,7 @@ export default function CitasAgendadasCard({
   return (
     <motion.div
       className="admin-cita-card"
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       style={{

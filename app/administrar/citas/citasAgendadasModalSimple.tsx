@@ -76,7 +76,7 @@ export default function CitasAgendadasModalSimple({
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
+      initial={false}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-[9999]"
@@ -207,7 +207,7 @@ export default function CitasAgendadasModalSimple({
         <AnimatePresence>
           {confirmPrompt && (
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 flex justify-center items-center bg-black/40 z-[10000]"

@@ -281,7 +281,7 @@ export default function FirmaConsentimiento(props: Props) {
   var modalContent = (
     <AnimatePresence>
       {showModal && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        <motion.div initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
           style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 99999, padding: "1.5rem" }}
           onClick={cerrar}>
@@ -294,7 +294,7 @@ export default function FirmaConsentimiento(props: Props) {
 
               <div style={{ padding: "2rem 2rem 2.5rem" }}>
                 {step === "intro" && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div initial={false} animate={{ opacity: 1 }}>
                     <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
                       <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem", boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}><FileText size={22} color="white" /></div>
                       <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#2A1C12", marginBottom: "0.8rem" }}>{t("title")}</h3>
@@ -310,7 +310,7 @@ export default function FirmaConsentimiento(props: Props) {
                 )}
 
                 {step === "firma" && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div initial={false} animate={{ opacity: 1 }}>
                     <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.3rem", textAlign: "center" }}>{t("drawTitle")}</h3>
                     <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", textAlign: "center", marginBottom: "1rem" }}>{t("drawHint")}</p>
                     <div className="firma-canvas-wrap dark-aware-keep" style={{ border: "2px dashed rgba(176,137,104,0.3)", borderRadius: 16, overflow: "hidden", marginBottom: "1rem", background: "white" }}>
@@ -338,7 +338,7 @@ export default function FirmaConsentimiento(props: Props) {
                 )}
 
                 {step === "listo" && (
-                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: "center" }}>
+                  <motion.div initial={{ scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: "center" }}>
                     <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#E8F5E9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>

@@ -124,7 +124,7 @@ function AgendarPageContent() {
           {step === 1 && (
             <motion.div
               key="calendar"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.5 }}
@@ -204,7 +204,7 @@ function AgendarPageContent() {
           {step === 4 && citaCreada && (
             <motion.div
               key="confirmacion"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.5 }}

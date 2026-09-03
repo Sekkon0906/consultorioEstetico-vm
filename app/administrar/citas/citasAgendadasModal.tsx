@@ -50,7 +50,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
   const estadoColor: Record<string, string> = { pendiente: "var(--brand)", confirmada: "var(--success)", atendida: "#1B4F72", cancelada: "#922B21" };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+    <motion.div initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <motion.div initial={{ scale: 0.92, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 30 }}
@@ -67,7 +67,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
             <span style={{ background: estadoColor[cita.estado] ?? "#aaa", color: "white", padding: "0.3rem 0.9rem", borderRadius: 100, fontSize: "0.75rem", fontWeight: 600, textTransform: "capitalize" }}>{cita.estado}</span>
           </div>
 
-          {error && <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} style={{ background: "#FDE8D8", color: "#922B21", padding: "0.6rem 1rem", borderRadius: 12, marginBottom: "1rem", fontSize: "0.85rem" }}>{error}</motion.div>}
+          {error && <motion.div initial={{ y: -8 }} animate={{ opacity: 1, y: 0 }} style={{ background: "#FDE8D8", color: "#922B21", padding: "0.6rem 1rem", borderRadius: 12, marginBottom: "1rem", fontSize: "0.85rem" }}>{error}</motion.div>}
 
           {/* Patient */}
           <div style={{ background: "var(--surface-soft)", borderRadius: 14, padding: "1rem", marginBottom: "0.8rem" }}>
@@ -164,7 +164,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
 
               {/* Summary */}
               {montoNum > 0 && pagoNum > 0 && (
-                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} style={{ overflow: "hidden" }}>
+                <motion.div initial={{ height: 0 }} animate={{ opacity: 1, height: "auto" }} style={{ overflow: "hidden" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", marginBottom: 6 }}>
                     <span style={{ color: "var(--text-soft)" }}>Pagado: <strong>${pagadoTotal.toLocaleString("es-CO")}</strong></span>
                     {restante > 0 && <span style={{ color: "var(--brand)", fontWeight: 600 }}>Restante: ${restante.toLocaleString("es-CO")}</span>}
@@ -175,7 +175,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
                       style={{ height: "100%", background: devolucion > 0 ? "linear-gradient(90deg, #43A047, #66BB6A)" : "linear-gradient(90deg, #8B6A4B, #B08968)", borderRadius: 4 }} />
                   </div>
                   {devolucion > 0 && (
-                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ fontSize: "0.82rem", color: "#2E7D32", fontWeight: 600, marginTop: 6, textAlign: "center", background: "#E8F5E9", padding: "0.5rem", borderRadius: 10 }}>
+                    <motion.p initial={false} animate={{ opacity: 1 }} style={{ fontSize: "0.82rem", color: "#2E7D32", fontWeight: 600, marginTop: 6, textAlign: "center", background: "#E8F5E9", padding: "0.5rem", borderRadius: 10 }}>
                       Debe devolver ${devolucion.toLocaleString("es-CO")} al cliente
                     </motion.p>
                   )}
@@ -213,7 +213,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
       {/* Confirm sub-modal */}
       <AnimatePresence>
         {showConfirm && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          <motion.div initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}
             onClick={() => setShowConfirm(false)}>
             <motion.div initial={{ scale: 0.85, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.85, y: 20 }}

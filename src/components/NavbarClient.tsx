@@ -406,7 +406,7 @@ export default function Navbar() {
                 {menuOpen && (
                   <motion.div
                     key="perfil-menu"
-                    initial={{ opacity: 0, y: -8, scale: 0.92 }}
+                    initial={{ y: -8, scale: 0.92 }}
                     animate={{ opacity: 1, y: 12, scale: 1 }}
                     exit={{ opacity: 0, y: -6, scale: 0.94 }}
                     transition={{ type: "spring", damping: 22, stiffness: 320, mass: 0.6 }}
@@ -536,7 +536,7 @@ export default function Navbar() {
         {confirmLogout && (
           <motion.div
             key="logout-confirm"
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
@@ -548,7 +548,7 @@ export default function Navbar() {
             }}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
@@ -588,7 +588,7 @@ export default function Navbar() {
         {mobileOpen && (
           <motion.div
             key="backdrop"
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}

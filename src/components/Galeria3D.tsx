@@ -262,7 +262,7 @@ export default function Galeria3D() {
         }}
       >
       <motion.div
-        initial={{ opacity: 0, y: -12 }}
+        initial={{ y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
       >
@@ -555,7 +555,7 @@ export default function Galeria3D() {
                 className="g3d-grid-card"
                 onClick={() => setSelected(tr.id)}
                 aria-label={tr.nombre}
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.4, delay: Math.min(i, 4) * 0.05, ease: "easeOut" }}

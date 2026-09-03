@@ -22,6 +22,12 @@ if (SENTRY_DSN) {
 
   Sentry.init({
     dsn: SENTRY_DSN,
+    // Solo en producción. Antes solo se ETIQUETABA el entorno, pero se
+    // enviaba igual: un error de compilación mientras alguien programa en
+    // su portátil llegaba al mismo proyecto que los de la doctora, gastaba
+    // cupo del plan gratuito y mandaba correo de alerta. Los errores de
+    // desarrollo ya se ven en la terminal y en la consola del navegador.
+    enabled: process.env.NODE_ENV === "production",
     // Sample muy bajo en performance para no llenar el cupo gratuito
     tracesSampleRate: 0.1,
     // Replay solo cuando hay error — útil para depurar UX

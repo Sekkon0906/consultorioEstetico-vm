@@ -25,6 +25,10 @@ function iniciarSentry() {
   if (!SENTRY_DSN) return;
   Sentry.init({
     dsn: SENTRY_DSN,
+    // Igual que en el cliente: en desarrollo no se envía nada. El entorno
+    // se etiquetaba pero el evento salía igual, y los errores del dev
+    // server acababan en el proyecto de producción.
+    enabled: process.env.NODE_ENV === "production",
     // Muestreo bajo para no agotar el cupo gratuito.
     tracesSampleRate: 0.1,
     environment: process.env.NODE_ENV,

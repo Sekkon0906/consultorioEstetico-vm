@@ -32,7 +32,7 @@ function CardItem({
   const t = useTranslations("doctora.formacion");
   return (
     <motion.div
-      initial={{ opacity: 0, x: fromLeft ? -40 : 40 }}
+      initial={{ x: fromLeft ? -40 : 40 }}
       animate={inView ? { opacity: 1, x: 0 } : {}}
       transition={{ duration: 0.55, ease: "easeOut", delay: 0.15 }}
       whileHover={{ y: -5, boxShadow: "0 20px 50px rgba(78,59,43,0.14)" }}
@@ -160,7 +160,7 @@ function TimelineNode({
         ) : (
           anio && (
             <motion.span
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ delay: 0.4 }}
               style={{
@@ -200,7 +200,7 @@ function TimelineNode({
         ) : (
           anio && (
             <motion.span
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ delay: 0.4 }}
               style={{
@@ -249,7 +249,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
+      initial={false}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       style={{
@@ -339,7 +339,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
             <AnimatePresence mode="wait">
               <motion.div
                 key={idx}
-                initial={{ opacity: 0 }}
+                initial={false}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
@@ -532,7 +532,7 @@ export default function FormacionContinua() {
 
         {/* Título */}
         <motion.div
-          initial={{ opacity: 0, y: -16 }}
+          initial={{ y: -16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.55 }}
@@ -595,7 +595,7 @@ export default function FormacionContinua() {
         </div>
 
         <motion.p
-          initial={{ opacity: 0 }}
+          initial={false}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           style={{

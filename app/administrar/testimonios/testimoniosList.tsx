@@ -105,7 +105,7 @@ export default function TestimoniosList() {
         </button>
       </div>
 
-      {toast && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ background: "#E8F5E9", color: "#145A32", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", textAlign: "center" }}>{toast}</motion.div>}
+      {toast && <motion.div initial={false} animate={{ opacity: 1 }} style={{ background: "#E8F5E9", color: "#145A32", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", textAlign: "center" }}>{toast}</motion.div>}
       {err && <div style={{ background: "#FDE8D8", color: "#922B21", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", display: "flex", justifyContent: "space-between" }}>{err}<button onClick={function() { setErr(null); }} style={{ background: "none", border: "none", cursor: "pointer" }}><X size={13} /></button></div>}
 
       {/* ===== COMENTARIOS TAB ===== */}
@@ -156,7 +156,7 @@ export default function TestimoniosList() {
 
           <AnimatePresence>
             {modo === "form" && (
-              <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} style={{ background: "var(--surface)", borderRadius: 20, border: "1px solid var(--border)", padding: "1.8rem", marginBottom: "1.5rem" }}>
+              <motion.div initial={{ y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} style={{ background: "var(--surface)", borderRadius: 20, border: "1px solid var(--border)", padding: "1.8rem", marginBottom: "1.5rem" }}>
                 <h4 style={{ fontWeight: 700, color: "var(--text)", marginBottom: "1.2rem" }}>{actual ? "Editar" : "Nuevo"} testimonio</h4>
                 <div style={{ marginBottom: "0.8rem" }}><Lbl>Nombre del paciente *</Lbl><input style={IS} value={form.nombre} onChange={function(e) { setForm({ ...form, nombre: e.target.value }); }} placeholder="Maria Lopez" /></div>
                 <div style={{ marginBottom: "0.8rem" }}><Lbl>Testimonio *</Lbl><textarea style={{ ...IS, resize: "vertical" as const }} value={form.texto} onChange={function(e) { setForm({ ...form, texto: e.target.value }); }} rows={3} placeholder="La experiencia fue increible..." /></div>
@@ -185,7 +185,7 @@ export default function TestimoniosList() {
             <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
               {list.map(function(t, i) {
                 return (
-                  <motion.div key={t.id} className="admin-card" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }} style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem", opacity: t.activo ? 1 : 0.5 }}>
+                  <motion.div key={t.id} className="admin-card" initial={{ y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }} style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem", opacity: t.activo ? 1 : 0.5 }}>
                     {t.thumb ? <Image src={t.thumb} alt="" width={72} height={72} quality={70} style={{ width: 72, height: 72, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 72, height: 72, borderRadius: 14, background: "var(--border)", flexShrink: 0 }} />}
                     <div className="admin-card-body" style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 7 }}><span style={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }}>{t.nombre}</span>{t.video && <Play size={16} color="var(--brand)" />}</div>

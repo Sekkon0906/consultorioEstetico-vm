@@ -16,7 +16,7 @@ export default function VisionMision() {
       <div className="container text-center">
         <motion.h3
           className="fw-bold mb-5"
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
@@ -32,7 +32,7 @@ export default function VisionMision() {
           <div className="col-12 col-md-6">
             <motion.div
               whileHover={{ scale: 1.03 }}
-              initial={{ opacity: 0, x: -80 }}
+              initial={{ x: -80 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.9, ease: "easeOut" }}
               viewport={{ once: true }}
@@ -66,7 +66,7 @@ export default function VisionMision() {
           <div className="col-12 col-md-6">
             <motion.div
               whileHover={{ scale: 1.03 }}
-              initial={{ opacity: 0, x: 80 }}
+              initial={{ x: 80 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.9, ease: "easeOut" }}
               viewport={{ once: true }}

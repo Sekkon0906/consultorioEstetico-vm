@@ -22,7 +22,7 @@ export default function PerfilCard() {
   const initial = (nombres || "").charAt(0).toUpperCase() + (apellidos || "").charAt(0).toUpperCase();
 
   return (
-    <motion.div className="dark-aware-card" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+    <motion.div className="dark-aware-card" initial={{ y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
       style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 12px 40px rgba(78,59,43,0.08)", overflow: "hidden" }}>
 
       <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)" }} />
@@ -40,7 +40,7 @@ export default function PerfilCard() {
 
         <AnimatePresence>
           {message && (
-            <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+            <motion.div initial={{ y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
               style={{ padding: "0.7rem 1rem", borderRadius: 12, marginBottom: "1rem", fontSize: "0.88rem", textAlign: "center",
                 background: message.includes("Error") || message.includes("error") ? "#FDE8D8" : "#E8F5E9",
                 color: message.includes("Error") || message.includes("error") ? "#922B21" : "#145A32",

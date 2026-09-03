@@ -104,7 +104,7 @@ export default function AgendarForm({
   return (
     <motion.div
       key="panel-form"
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -40 }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
@@ -142,7 +142,7 @@ export default function AgendarForm({
 
         {usuario && esPrimeraCita && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="text-sm rounded-lg p-3 mx-auto max-w-lg bg-[#E8E1D4] border border-[#E0D3C0]"
@@ -171,7 +171,7 @@ export default function AgendarForm({
               borderColor: "#E0CDB5",
               color: DARK_PALETTE.textSoft,
             }}
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ y: 15 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <h3

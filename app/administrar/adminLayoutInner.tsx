@@ -89,7 +89,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
             <motion.div
               className="fixed inset-x-0 bottom-0 bg-black/35 backdrop-blur-sm z-40"
               style={{ top: TOP_OFFSET }}
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setSidebarOpen(false)}
             />
             <motion.aside
@@ -137,7 +137,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
         </header>
         <main className="flex-1 p-4 sm:p-6 overflow-y-auto [background:var(--surface)]">
           <motion.div
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            initial={{ y: 8 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }} className="admin-responsive max-w-6xl mx-auto"
           >
             {children}
