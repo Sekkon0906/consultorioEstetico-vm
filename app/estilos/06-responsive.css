@@ -4090,3 +4090,67 @@ a:hover {
 @media (prefers-reduced-motion: reduce) {
   .proc-card-entra { animation: none; }
 }
+
+/* ============================================================
+   MENÚ DE CUENTA — rediseño
+   ============================================================
+   Antes eran tres botones de ancho completo en tres colores (suave,
+   primario y rojo) para lo que es una lista de navegación: tres pesos
+   visuales compitiendo obligan a leerlos todos para elegir uno. Ahora
+   todas las opciones pesan igual y solo cerrar sesión se separa, porque
+   es la única que no lleva a ninguna parte. */
+.profile-menu-id {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-align: left;
+  padding: 0.2rem 0.4rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.4rem;
+}
+.profile-menu-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text);
+  line-height: 1.2;
+  /* El nombre y el correo pueden ser largos; el menú no debe estirarse. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.profile-menu-email {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-menu-lista {
+  display: flex;
+  flex-direction: column;
+}
+.profile-menu-item {
+  text-align: left;
+  padding: 0.6rem 0.55rem;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background var(--mov-rapido), color var(--mov-rapido);
+}
+.profile-menu-item:hover,
+.profile-menu-item:focus-visible {
+  background: var(--surface-soft);
+}
+.profile-menu-item-salir {
+  color: var(--danger);
+  margin-top: 0.35rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 10px 10px;
+}

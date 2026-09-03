@@ -346,7 +346,13 @@ export default function Galeria3D() {
         className="g3d-wheel-anchor"
         style={{
           position: "absolute",
-          top: "63%",
+          /* Sube del 63 % al 55 %.
+             Medido en 1440×900: entre el final del título y el principio de
+             la rueda había 160px muertos, y entre la rueda y los dots solo
+             22 — los dos elementos que hay que distinguir estaban pegados y
+             el aire sobraba donde no hacía falta. Subir la rueda reparte esa
+             holgura al lado correcto. */
+          top: "55%",
           right: "30%",
           transform: "translate(50%, -50%)",
           zIndex: 3,
@@ -609,7 +615,9 @@ export default function Galeria3D() {
           className="g3d-dots-wrap"
           style={{
             position: "absolute",
-            bottom: "19%",
+            /* Baja del 19 % al 14 %: separa el indicador de posición de las
+               tarjetas, que es lo que pedía el rediseño. */
+            bottom: "14%",
             right: "30%",
             transform: "translateX(50%)",
             zIndex: 5,
@@ -1016,14 +1024,21 @@ export default function Galeria3D() {
             padding: 0 !important;
             text-align: center !important;
           }
-          /* Rueda 3D escalada, alineada con el bloque de texto (debajo). */
+          /* Rueda 3D escalada y anclada a la DERECHA.
+             El origen del escalado importa: con transform-origin en el
+             centro, un scale(0.6) encoge la rueda hacia su propio centro y
+             la despega del borde derecho ~20 % de su ancho. Es decir, el
+             bloque estaba alineado a la derecha en el layout pero se veía
+             corrido hacia el medio — justo lo contrario de lo que se busca,
+             que es que las tarjetas caigan donde la doctora señala con la
+             mano. Anclando el origen a la derecha, encoger no la mueve. */
           .g3d-wheel-anchor   {
             position: relative !important;
             top: auto !important;
             right: auto !important;
             margin: 0.5rem 0 0 auto !important;
             transform: scale(0.6) !important;
-            transform-origin: center center !important;
+            transform-origin: right center !important;
             height: 270px !important;
             display: flex !important;
             align-items: center !important;
@@ -1055,7 +1070,7 @@ export default function Galeria3D() {
         }
         @media (max-width: 480px) {
           .g3d-title-wrap h1, .g3d-title-wrap h2 { font-size: 1.3rem !important; }
-          .g3d-wheel-anchor { transform: scale(0.52) !important; height: 230px !important; }
+          .g3d-wheel-anchor { transform: scale(0.52) !important; transform-origin: right center !important; height: 230px !important; }
         }
         @media (max-width: 768px) {
           /* El modal va por globals.css. Aquí solo apilamos imagen + texto. */
