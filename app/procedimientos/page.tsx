@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
-import { Search, X, ArrowRight, Sparkles, Calendar, ChevronLeft, ChevronRight, Star, ChevronDown, Check, ArrowUpDown } from "lucide-react";
+import { Search, X, Sparkles, Calendar, ChevronLeft, ChevronRight, Star, ChevronDown, Check, ArrowUpDown } from "lucide-react";
 
 import type { Procedimiento } from "@/types/domain";
 import { getProcedimientosApi } from "@/services/procedimientosApi";
@@ -895,21 +895,10 @@ export default function ProcedimientosPage() {
           0%, 100% { box-shadow: 0 4px 12px rgba(224, 138, 74, 0.4); }
           50% { box-shadow: 0 6px 18px rgba(224, 138, 74, 0.65); }
         }
-        .proc-card-arrow {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, var(--brand), var(--brand-soft));
-          color: #FFF;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: transform var(--mov-normal) ease, box-shadow var(--mov-normal) ease;
-        }
-        .proc-card:hover .proc-card-arrow {
-          transform: translateX(2px);
-          box-shadow: 0 4px 12px rgba(176, 137, 104, 0.35);
-        }
+        /* Aquí vivía .proc-card-arrow, el circulito con la flecha en la
+           esquina de cada tarjeta. Se quitó: no era un botón —no se podía
+           pulsar por separado, la tarjeta entera es el enlace— así que
+           prometía una acción propia que no existía. */
 
         @media (max-width: 640px) {
           .proc-toolbar-inner { gap: 0.75rem; }
@@ -1168,6 +1157,7 @@ function FeaturedCarousel({
               >
                 <Link
                   href={`/agendar?proc=${encodeURIComponent(item.nombre)}`}
+                  className="btn-accion"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -1175,20 +1165,14 @@ function FeaturedCarousel({
                     padding: "0.6rem 1.2rem",
                     borderRadius: 100,
                     background: "linear-gradient(135deg, var(--brand), var(--brand-soft))",
-                    color: "#FFF",
+                    /* Era "#FFF": blanco sobre el champán claro del modo
+                       oscuro no se lee. --brand-contrast es el par del
+                       fondo de marca en los dos temas. */
+                    color: "var(--brand-contrast)",
                     fontWeight: 600,
                     textDecoration: "none",
                     boxShadow: "0 6px 18px rgba(176, 137, 104, 0.28)",
-                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
                     fontSize: "0.86rem",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow = "0 10px 22px rgba(176, 137, 104, 0.38)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "";
-                    e.currentTarget.style.boxShadow = "0 6px 18px rgba(176, 137, 104, 0.28)";
                   }}
                 >
                   <Calendar size={14} />
@@ -1200,7 +1184,6 @@ function FeaturedCarousel({
                   style={{ padding: "0.6rem 1.2rem", fontSize: "0.86rem" }}
                 >
                   {t("featured.ctaInfo")}
-                  <ArrowRight size={14} />
                 </Link>
               </div>
             </div>
@@ -1415,9 +1398,7 @@ function ProcCard({
             ) : (
               <span />
             )}
-            <span className="proc-card-arrow" aria-label={t("viewMore")}>
-              <ArrowRight size={16} />
-            </span>
+
           </div>
         </div>
       </Link>

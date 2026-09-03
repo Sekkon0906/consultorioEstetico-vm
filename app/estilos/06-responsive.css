@@ -4042,7 +4042,18 @@ a:hover {
   .consultorio-showcase-fila {
     /* La foto manda; el texto acompaña. */
     grid-template-columns: 1.35fr 1fr;
-    gap: 2rem;
+    gap: 2.6rem;
+  }
+}
+/* En pantallas anchas la galería se queda corta si respeta el ancho de
+   contenido: es la sección donde el ancho ES el contenido. */
+@media (min-width: 1024px) {
+  .consultorio-showcase {
+    max-width: var(--ancho-amplio) !important;
+  }
+  .consultorio-showcase-fila {
+    grid-template-columns: 1.55fr 1fr;
+    gap: 3rem;
   }
 }
 
@@ -4056,7 +4067,7 @@ a:hover {
 .consultorio-showcase-info-num {
   display: block;
   font-family: "Playfair Display", Georgia, serif;
-  font-size: 2.4rem;
+  font-size: clamp(2.4rem, 4vw, 3.4rem);
   line-height: 1;
   color: var(--brand);
   opacity: 0.45;
@@ -4064,15 +4075,18 @@ a:hover {
 }
 .consultorio-showcase-info-titulo {
   font-family: "Playfair Display", Georgia, serif;
-  font-size: 1.35rem;
+  /* Crece con la pantalla: a 1440px un título de 1,35rem al lado de una
+     foto de 800px de ancho se lee como un pie de imagen, no como el título
+     de la zona que estás mirando. */
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
   font-weight: 700;
   color: var(--text);
   margin: 0 0 0.6rem;
 }
 .consultorio-showcase-info-texto {
   color: var(--text-soft);
-  font-size: 0.95rem;
-  line-height: 1.65;
+  font-size: clamp(0.95rem, 1.15vw, 1.12rem);
+  line-height: 1.7;
   margin: 0;
   /* Reserva el alto del texto más largo para que la fila no dé un salto
      al cambiar de foto. */
@@ -4201,4 +4215,84 @@ a:hover {
   padding-top: 0.7rem;
   border-top: 1px solid var(--border);
   border-radius: 0 0 10px 10px;
+}
+
+/* Marcadores de posición del formulario de contacto.
+   Sin regla propia heredan el color del texto y quedan igual de oscuros que
+   lo escrito, así que no se distingue lo que es un ejemplo de lo que ya
+   escribiste. */
+.footer-form input::placeholder,
+.footer-form textarea::placeholder,
+.footer-form select {
+  color: var(--text-muted);
+  opacity: 1; /* Firefox los aclara por su cuenta */
+}
+
+/* ============================================================
+   BOTÓN DE ACCIÓN PRINCIPAL — .btn-accion
+   ============================================================
+   El "Agendar este procedimiento" era un degradado con una sombra grande y
+   nada más: no respondía al cursor ni al toque, así que no se sentía
+   pulsable. Un botón tiene que acusar recibo.
+
+   Tres cosas, todas baratas y todas compuestas por el navegador (transform
+   y opacity, no layout), que es lo que hace que se sienta inmediato:
+
+     · al pasar el cursor sube 1px y la sombra se abre — insinúa relieve;
+     · al pulsar baja y se encoge un 2 % — el dedo "hunde" el botón;
+     · un brillo cruza la superficie al entrar el cursor.
+
+   La curva es la del sistema (--mov-curva): arranca rápido y frena suave,
+   que es como se mueven las cosas con masa. Y la duración es corta a
+   propósito: por encima de ~200ms una respuesta al toque deja de leerse
+   como reacción y empieza a leerse como espera. */
+.btn-accion {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    transform 160ms var(--mov-curva),
+    box-shadow 160ms var(--mov-curva),
+    filter 160ms var(--mov-curva);
+  will-change: transform;
+}
+.btn-accion::after {
+  /* El brillo. Va en un pseudo-elemento para no tocar el fondo del botón,
+     que es un degradado con su propio significado de marca. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent 65%
+  );
+  transform: translateX(-120%);
+  transition: transform 620ms var(--mov-curva);
+}
+.btn-accion:hover,
+.btn-accion:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(176, 137, 104, 0.42);
+  filter: saturate(1.06);
+}
+.btn-accion:hover::after,
+.btn-accion:focus-visible::after {
+  transform: translateX(120%);
+}
+.btn-accion:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 3px 12px rgba(176, 137, 104, 0.3);
+  transition-duration: 90ms;   /* el hundido responde antes que el rebote */
+}
+/* Quien pide menos movimiento conserva el cambio de sombra —que sigue
+   diciendo "esto responde"— pero sin desplazamiento ni brillo. */
+@media (prefers-reduced-motion: reduce) {
+  .btn-accion,
+  .btn-accion::after {
+    transition: box-shadow 120ms ease;
+    transform: none !important;
+  }
 }
