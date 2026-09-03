@@ -71,6 +71,19 @@
      primera; el que sí, la pisa. */
   --alto-pantalla: 100dvh;
 
+  /* Lo que ocupa la cabecera entera (topbar + navbar) en la primera
+     pantalla, antes de que la topbar se vaya con el scroll. Una sección
+     "de pantalla completa" que empiece debajo de ella y mida
+     `--alto-pantalla` se sale por abajo justo esos píxeles: es lo que
+     dejaba el titular del hero fuera de vista.
+
+       min-height: calc(var(--alto-pantalla) - var(--cabecera-h));
+
+     Va aquí y no a ojo en cada sección porque cambia con el breakpoint y
+     porque, si mañana la cabecera cambia de alto, esto tiene que cambiar
+     con ella. */
+  --cabecera-h: 96px;   /* topbar 40 + navbar 56 */
+
   /* ==========================
      TEXTO SOBRE FOTO
      ==========================
@@ -191,7 +204,10 @@
 */
 
 @media (min-width: 768px) {
-  :root { --gutter: 24px; }
+  :root {
+    --gutter: 24px;
+    --cabecera-h: 104px;   /* topbar 24 + navbar 80 */
+  }
 }
 
 @media (min-width: 1024px) {

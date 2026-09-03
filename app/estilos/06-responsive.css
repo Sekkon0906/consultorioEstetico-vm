@@ -3388,6 +3388,41 @@ footer a:hover i {
 
   .topbar-direccion{ display: none; }
 
+  /* ==========================
+     HERO: QUE EL TITULAR SE VEA SIN HACER SCROLL
+     ==========================
+     El hero medía `100dvh` (812px) pero EMPIEZA debajo de la cabecera, a
+     96px, así que sus últimos 96px caían fuera de la pantalla. Como el
+     texto va pegado abajo (`align-items: flex-end`), lo que quedaba fuera
+     era justo el final del bloque de texto, y el titular arrancaba al 51 %
+     de la pantalla: había que desplazar para leer de qué va el sitio.
+
+     Restando la cabecera, el hero ocupa la primera pantalla ENTERA y ni un
+     píxel más.
+
+     Hay que restarla en los DOS: la sección y su capa de contenido llevan
+     cada una su propio `100dvh`, y bajar solo la de fuera no sirve porque
+     la de dentro la vuelve a empujar. */
+  .hero-fs,
+  .hero-fs-content {
+    min-height: calc(var(--alto-pantalla) - var(--cabecera-h));
+  }
+
+  /* El segundo botón pasa a enlace de texto.
+     Dos botones del mismo tamaño uno encima del otro no son una jerarquía:
+     son dos primeros. La acción del sitio es agendar; "conoce los
+     procedimientos" es un desvío legítimo pero secundario, y como enlace
+     sigue estando a un toque mientras devuelve ~60px de alto al bloque —
+     que es parte de lo que hace que el titular quepa. */
+  .hero-fs-btn-ghost {
+    border: none !important;
+    background: none !important;
+    padding: 0.5rem 0 !important;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    font-weight: 600;
+  }
+
   /* Área táctil: un enlace de 20px de alto se falla al tocarlo. */
   .topbar-tel{
     padding-block: 4px;
