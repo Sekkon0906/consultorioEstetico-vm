@@ -72,14 +72,14 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 - [x] **M2 · Hero.** Foto de fondo a sangre + texto encima (no dos bloques
       apilados), `100dvh` real, un solo botón primario, y la palabra pintada
       **contenida** (hoy se corta: "autenticidac").
-- [ ] **M3 · Carrusel único.** Un solo componente para el home y
+- [x] **M3 · Carrusel único.** Un solo componente para el home y
       ⟶ **Parcial (PR #3):** se unificó el COMPORTAMIENTO de los controles
       (flechas y dots fuera del contenido, ocultas en móvil, dots debajo),
       no el componente. La rueda 3D del home y el destacado de
       /procedimientos son piezas distintas; unificarlas era tirar la rueda.
       `/procedimientos`. Controles **fuera** del contenido, `scroll-snap` con
       `scroll-padding-inline` para que las cards no se corten.
-- [ ] **M3b · "Conoce los procedimientos" en móvil — composición.** Las cards
+- [x] **M3b · "Conoce los procedimientos" en móvil — composición.** Las cards
       deben quedar **alineadas a la derecha** y **girar sobre ese eje**, de modo
       que se lea a la doctora a la izquierda **apuntando con la mano** hacia
       ellas. Es la versión móvil de lo mismo que se pidió en escritorio (F5):
@@ -114,25 +114,25 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 - [x] **F2 · Altura del navbar.** Está muy alto verticalmente — roba ~15-20 %
       de la pantalla sin necesidad. Reducirlo. Es la causa de que la sección
       "Conoce los procedimientos…" se sienta apretada.
-- [ ] **F3 · Indicador de cuenta.** El avatar/menú al hacer hover o estar
+- [x] **F3 · Indicador de cuenta.** El avatar/menú al hacer hover o estar
       logueado no convence. Rediseñarlo.
-- [ ] **F4 · Botón "Iniciar sesión" del navbar.** Hoy despliega un panel al
+- [x] **F4 · Botón "Iniciar sesión" del navbar.** Hoy despliega un panel al
       pulsarlo. Decidir el comportamiento (¿mantener el botón?, ¿que solo
       navegue a `/login`?). **Pendiente recomendación.**
 
 ### Home — sección "Conoce los procedimientos más demandados y promociones"
 
-- [ ] **F5 · Rehacer el layout de la sección.** Hoy se sale de la pantalla y
+- [x] **F5 · Rehacer el layout de la sección.** Hoy se sale de la pantalla y
       toca calibrar con scroll para leerla — problema de proporciones. Objetivo
       (ver la última captura de la sesión): título legible + la doctora
       apuntando con la mano + un **carrusel de procedimientos que pasa de
       derecha a izquierda**.
-- [ ] **F6 · Separar los elementos** de esa sección: el indicador de posición
+- [x] **F6 · Separar los elementos** de esa sección: el indicador de posición
       **más abajo**, las cards de procedimiento **más arriba**. Que todo tenga
       aire.
 - [x] **F7 · Flechas de navegación** en ese carrusel del home (hoy solo hay
       dots, faltan flechas — sí las tiene el carrusel de `/procedimientos`).
-- [ ] **F8 · Modal de procedimiento (al seleccionar una card).** Hoy oscurece
+- [x] **F8 · Modal de procedimiento (al seleccionar una card).** Hoy oscurece
       el fondo pero deja seguir scrolleando con el modal "en la mano" — se ve
       mal. Cambiar a un **flip del modal** (se da la vuelta y muestra la info) y
       **bloquear el scroll** mientras está abierto.
@@ -142,18 +142,18 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 - [x] **F9 · Carrusel "Destacados y promociones del mes".** Mover el
       **indicador de dots FUERA del modal** (debajo) y las **flechas FUERA del
       modal**. Hoy están dentro y no tiene razón de ser.
-- [ ] **F10 · Animación al filtrar.** Al elegir "Facial" → subcategoría
+- [x] **F10 · Animación al filtrar.** Al elegir "Facial" → subcategoría
       (p. ej. "Perfilamiento"), las cards aparecen "regadas" por la pantalla y
       luego se acomodan solas. Se ve horrible. Arreglar la entrada / el layout
       shift. (5ª captura de la sesión.)
-- [ ] **F11 · Ficha de procedimiento (detalle).** El modal aparece muy
+- [x] **F11 · Ficha de procedimiento (detalle).** El modal aparece muy
       reducido; usar más ancho de pantalla; reemplazar el botón gris "Volver a
       procedimientos" + flecha por los **botones propios** ya planteados en el
       sistema de diseño. (6ª captura.)
 
 ### Transversal
 
-- [ ] **F12 · Uso del ancho de pantalla.** El sitio deja ~40 % del ancho vacío
+- [x] **F12 · Uso del ancho de pantalla.** El sitio deja ~40 % del ancho vacío
       en columnas laterales y comprime formularios y contenido. Rebalancear el
       layout global (contenedores, `max-width`, márgenes).
 
