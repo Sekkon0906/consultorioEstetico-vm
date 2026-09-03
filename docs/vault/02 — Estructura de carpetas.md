@@ -1,6 +1,6 @@
 ---
 tags: [proyecto, estructura]
-actualizado: 2026-09-01
+actualizado: 2026-09-03
 ---
 
 # Estructura de carpetas
@@ -38,7 +38,7 @@ src/                        TODO LO DEMÁS
   lib/                        utilidades
     sesion.ts                   ÚNICO sitio que sabe de dónde sale el token
     apiCliente.ts               capa HTTP compartida
-    cache.ts  imagenes.ts  supabaseClient.ts
+    cache.ts  imagenes.ts  sesion.ts  apiCliente.ts  fechas.ts
   services/                   clientes de la API por dominio
   types/                      tipos del dominio
 
@@ -48,7 +48,7 @@ server/                     BACKEND
     routes/                   13 módulos, 60 endpoints
     services/                 autenticacion.js
     middlewares/              verifyToken, requireRole, proteccion
-    lib/                      db, correo, almacenamiento, roles, supabaseAdmin
+    lib/                      db, correo, almacenamiento, roles, jwt
     ia/                       herramientas.js — catálogo del copiloto
   sql/
     schema/                   000_baseline.sql — el esquema completo

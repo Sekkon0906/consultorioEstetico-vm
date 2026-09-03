@@ -100,7 +100,7 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ### Hero (apartado de la doctora)
 
-- [ ] **F1 · Palabra pintada.** Quitar la palabra rotativa que se revela de
+- [x] **F1 · Palabra pintada.** Quitar la palabra rotativa que se revela de
       izquierda a derecha (efecto ya muy visto). Poner **una sola palabra fija**
       (ej. "confianza") que se escriba **con trazo de pincel, letra por letra**
       (traza la C, luego la O, y así), desde cero. No rota, no se borra: se
@@ -167,7 +167,13 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ### Tema oscuro / colores
 
-- [ ] **F14 · Auditoría de colores oscuro/claro.** Cada color del sitio debe
+- [~] **F14 · Auditoría de colores oscuro/claro.** *(Dos pasadas hechas: 147
+      colores tokenizados + 13 fondos claros más. Queda abierta porque **el
+      audit automático por getComputedStyle NO es fiable en el panel de
+      previsualización** —informaba contraste 1,0 en un botón que la captura
+      mostraba perfectamente legible, comprobado dos veces en páginas
+      distintas con carga limpia. Hay que auditar en un navegador real.)*
+- [ ] **F14b · Auditoría de colores — pasada final en navegador real.** Cada color del sitio debe
       tener su equivalente en modo oscuro y claro. Hoy el **beige del modo
       claro se cuela en el modo oscuro** (ej. la sección "Conoce los
       procedimientos…": letras negras + beige que no pegan sobre fondo oscuro).
@@ -213,10 +219,10 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ## 🟦 Código — Documentación
 
-- [ ] **D1 · `docs/vault/` 01–05** (Arquitectura, API, Seguridad, Base de
+- [x] **D1 · `docs/vault/` 01–05** (Arquitectura, API, Seguridad, Base de
       datos, Estructura) — describen el estado pre-migración (Supabase, 60
       endpoints).
-- [ ] **D2 · Tabla "Números"** de la nota raíz (líneas, endpoints) — está al
+- [x] **D2 · Tabla "Números"** de la nota raíz (líneas, endpoints) — está al
       2026-09-01.
 - [ ] **D3 · Commit `72062f2`** de `docs/vault/` (en la rama ya mergeada) →
       llevar a `main` o descartar.
