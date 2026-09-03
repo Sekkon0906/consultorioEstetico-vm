@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { IMG } from "@/lib/imagenes";
+import { getGaleriaConfianzaApi, type FotoConfianza } from "@/services/galeriaConfianzaApi";
 
 /**
  * Revela la sección al entrar en pantalla.
@@ -92,7 +93,21 @@ function ParticleCanvas() {
 
 export default function VideoAnim() {
   const t = useTranslations("home.video");
-  const [videoActivo, setVideoActivo] = useState(false);
+  const [fotos, setFotos] = useState<FotoConfianza[]>([]);
+  const [fotoIdx, setFotoIdx] = useState(0);
+  const fotoActiva = fotos[fotoIdx];
+
+  // La galería la administra la doctora desde el panel. Si la petición
+  // falla, `fotos` se queda vacío y el marco cae a la miniatura de siempre:
+  // una sección sin fotos es peor que una sección con una.
+  useEffect(() => {
+    let vivo = true;
+    getGaleriaConfianzaApi()
+      .then((r) => { if (vivo) setFotos(r); })
+      .catch(() => {});
+    return () => { vivo = false; };
+  }, []);
+
   const [startCount, setStartCount] = useState(false);
   const countersRef = useRef<HTMLDivElement | null>(null);
   const hdr = useReveal(); const vid = useReveal(0.1); const lft = useReveal(); const rgt = useReveal();
@@ -191,42 +206,63 @@ export default function VideoAnim() {
             </div>
           </div>
 
-          {/* CENTER - Video */}
+          {/* CENTRO — Galería de confianza.
+              Aquí había un vídeo de presentación. La doctora reportó que
+              grabarlo se estaba complicando, así que el bloque pasa a fotos
+              que ella misma administra desde el panel: bioseguridad,
+              esterilización y los equipos con los que trabaja.
+
+              La miniatura del vídeo se conserva como PRIMERA foto —es la
+              que abre la sección hoy y funciona— y el resto van apareciendo
+              detrás. Si la galería viniera vacía, se cae a esa imagen: la
+              sección nunca queda en blanco. */}
           <div className="va-video-col" ref={vid.ref} style={{ ...rs(vid.v, 0.08), position: "relative" }}>
             <div style={{ position: "absolute", top: "50%", left: "50%", width: "115%", height: "140%", background: "radial-gradient(ellipse, rgba(176,137,104,0.14) 0%, transparent 65%)", filter: "blur(45px)", animation: "va-glow 4s ease-in-out infinite", pointerEvents: "none", zIndex: 0, transform: "translate(-50%,-50%)" }} />
-            <div onClick={() => setVideoActivo(true)} className="va-marco" style={{
-              position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 20, overflow: "hidden", cursor: "pointer", zIndex: 1,
-              boxShadow: "0 20px 55px rgba(58,42,26,0.18), 0 0 0 1px rgba(176,137,104,0.12)", transition: "transform 0.4s, box-shadow 0.4s",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 28px 65px rgba(58,42,26,0.22)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 20px 55px rgba(58,42,26,0.18)"; }}>
-              {videoActivo ? (
-                <iframe src="https://www.youtube.com/embed/pBkwUM0IpTE?autoplay=1&modestbranding=1&rel=0" title={t("iframeTitle")} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 20 }} />
-              ) : (
-                <>
-                  {/* La miniatura trae una lista de 15 procedimientos quemada
-                      en la propia imagen. En un marco 16:9 de 375px de ancho
-                      esa lista se corta a media palabra ("Manejo de cicatrice",
-                      "Manejo de estria") y encima le cae el botón encima: se
-                      lee peor que si no estuviera. Además es texto que ni
-                      Google ni un lector de pantalla pueden leer.
 
-                      En móvil el encuadre se corre al lado de la doctora, así
-                      que la lista queda FUERA del marco en vez de cortada. No
-                      se pierde nada: esos mismos procedimientos están, como
-                      texto de verdad, en /procedimientos. Lo correcto de raíz
-                      es una miniatura sin texto encima — eso depende de una
-                      imagen nueva, no del código. */}
-                  <Image src={IMG.previewVideo} alt={t("iframeTitle")} fill sizes="(max-width: 1024px) 100vw, 960px" quality={80} className="va-poster" style={{ objectFit: "cover" }} />
-                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.32) 100%)" }} />
-                  <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 2 }}>
-                    <div style={{ position: "absolute", top: "50%", left: "50%", width: 90, height: 90, borderRadius: "50%", background: "rgba(176,137,104,0.2)", animation: "va-pulse 2.2s ease-out infinite", transform: "translate(-50%,-50%)" }} />
-                    <div style={{ position: "relative", width: 68, height: 68, borderRadius: "50%", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", border: "2px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "1.4rem", transition: "all 0.3s" }}><i className="fas fa-play" style={{ marginLeft: 3 }} /></div>
-                  </div>
-                  <div style={{ position: "absolute", bottom: 18, left: "50%", transform: "translateX(-50%)", fontSize: "0.75rem", fontWeight: 600, color: "white", background: "rgba(0,0,0,0.35)", backdropFilter: "blur(6px)", padding: "0.3rem 1rem", borderRadius: 100, zIndex: 2 }}>{t("watchVideo")}</div>
-                </>
+            <div className="va-marco" style={{
+              position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 20, overflow: "hidden", zIndex: 1,
+              boxShadow: "0 20px 55px rgba(58,42,26,0.18), 0 0 0 1px rgba(176,137,104,0.12)",
+            }}>
+              <Image
+                key={fotoActiva?.url || IMG.previewVideo}
+                src={fotoActiva?.url || IMG.previewVideo}
+                alt={fotoActiva?.titulo || t("iframeTitle")}
+                fill
+                sizes="(max-width: 1024px) 100vw, 960px"
+                quality={80}
+                className="va-poster va-poster-entra"
+                style={{ objectFit: "cover" }}
+              />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.05) 45%, rgba(0,0,0,0.62) 100%)" }} />
+
+              {/* El pie de foto es lo que convierte la galería en
+                  información y no en decoración: dice QUÉ estás mirando. */}
+              {(fotoActiva?.titulo || fotoActiva?.descripcion) && (
+                <div className="va-pie">
+                  {fotoActiva?.titulo && <span className="va-pie-titulo">{fotoActiva.titulo}</span>}
+                  {fotoActiva?.descripcion && <span className="va-pie-texto">{fotoActiva.descripcion}</span>}
+                </div>
               )}
             </div>
+
+            {/* Miniaturas: solo si hay más de una foto. Con una sola, una
+                fila de puntos sería una promesa vacía. */}
+            {fotos.length > 1 && (
+              <div className="va-miniaturas">
+                {fotos.map((fo, i) => (
+                  <button
+                    key={fo.id}
+                    type="button"
+                    onClick={() => setFotoIdx(i)}
+                    aria-label={fo.titulo || `Foto ${i + 1}`}
+                    aria-current={i === fotoIdx}
+                    className={`va-miniatura ${i === fotoIdx ? "is-activa" : ""}`}
+                  >
+                    <Image src={fo.url} alt="" fill sizes="88px" quality={55} style={{ objectFit: "cover" }} />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* RIGHT - Counters */}

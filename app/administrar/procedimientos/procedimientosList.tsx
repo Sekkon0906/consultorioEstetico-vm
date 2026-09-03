@@ -197,7 +197,7 @@ export default function ProcedimientosList() {
       </div>
 
       {toast && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ background: "#E8F5E9", color: "#145A32", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", textAlign: "center" }}>{toast}</motion.div>}
-      {err && <div style={{ background: "#FDE8D8", color: "#922B21", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", display: "flex", justifyContent: "space-between" }}>{err}<button onClick={function() { setErr(null); }} style={{ background: "none", border: "none", cursor: "pointer" }}><X size={13} /></button></div>}
+      {err && <div style={{ background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", color: "var(--danger)", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", display: "flex", justifyContent: "space-between" }}>{err}<button aria-label="Cerrar aviso" onClick={function() { setErr(null); }} style={{ background: "none", border: "none", cursor: "pointer" }}><X size={13} /></button></div>}
 
       <AnimatePresence>
         {modo === "form" && (
@@ -384,7 +384,7 @@ export default function ProcedimientosList() {
                 {form.imagen && (
                   <div style={{ position: "relative" }}>
                     <Image src={form.imagen} alt="" width={120} height={80} quality={70} style={{ height: 80, width: 120, borderRadius: 10, objectFit: "cover", border: "2px solid var(--brand)" }} />
-                    <button onClick={function() { setForm({ ...form, imagen: "" }); }} style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#C62828", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={10} /></button>
+                    <button aria-label="Quitar imagen" title="Quitar imagen" onClick={function() { setForm({ ...form, imagen: "" }); }} style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#C62828", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={10} /></button>
                   </div>
                 )}
                 <label style={{ padding: "0.5rem 1.2rem", borderRadius: 12, border: "1px dashed var(--brand)", cursor: uploading ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: uploading ? 0.6 : 1 }}>
@@ -428,7 +428,7 @@ export default function ProcedimientosList() {
                       <div key={g.id || "v" + i} style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.4rem" }}>
                         <Play size={14} color="var(--brand)" />
                         <span style={{ flex: 1, fontSize: "0.78rem", color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.url}</span>
-                        <button onClick={function() { galRemove(g); }} style={{ width: 20, height: 20, borderRadius: "50%", background: "#FDE8D8", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} color="#C62828" /></button>
+                        <button onClick={function() { galRemove(g); }} style={{ width: 20, height: 20, borderRadius: "50%", background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} color="#C62828" /></button>
                       </div>
                     );
                   })}
@@ -502,11 +502,11 @@ export default function ProcedimientosList() {
                           </div>
                           <span className="admin-card-price" style={{ fontSize: "1.1rem", color: "var(--brand)", fontWeight: 700, whiteSpace: "nowrap" }}>${Number(p.precio).toLocaleString("es-CO")}</span>
                           <div className="admin-card-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                            <motion.button whileTap={{ scale: 0.95 }} onClick={function() { startEdit(p); }} style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Edit3 size={18} color="var(--text)" /></motion.button>
+                            <motion.button aria-label="Editar procedimiento" title="Editar procedimiento" whileTap={{ scale: 0.95 }} onClick={function() { startEdit(p); }} style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Edit3 size={18} color="var(--text)" /></motion.button>
                             {delId === p.id ? (
                               <><button onClick={function() { handleDel(p.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#C62828", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>Sí</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--border)", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
                             ) : (
-                              <motion.button whileTap={{ scale: 0.95 }} onClick={function() { setDelId(p.id); }} style={{ width: 42, height: 42, borderRadius: 12, background: "#fff3ef", border: "1px solid #e4bfbf", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={18} color="#b02e2e" /></motion.button>
+                              <motion.button whileTap={{ scale: 0.95 }} onClick={function() { setDelId(p.id); }} style={{ width: 42, height: 42, borderRadius: 12, background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", border: "1px solid #e4bfbf", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Trash2 size={18} color="#b02e2e" /></motion.button>
                             )}
                           </div>
                         </motion.div>

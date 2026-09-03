@@ -5,12 +5,24 @@ const verifyToken = require("../middlewares/verifyToken");
 const requireRole = require("../middlewares/requireRole");
 
 // Mapea BD snake_case → frontend camelCase
-function mapUsuario(row, email) {
+/**
+ * @param rolReal  El rol que resolvió `verifyToken` a partir de
+ *   `admin_users`. Se pasa aparte a propósito: la columna `usuarios.rol`
+ *   que viene en `row` NO es la autoridad —el propio usuario puede
+ *   editarla desde su perfil— y devolverla aquí rompía el panel de
+ *   administración. `verifyToken` resolvía bien el rol y autorizaba los
+ *   endpoints, pero `/usuarios/me` respondía con el valor de la columna,
+ *   así que el frontend (que decide con `user.rol === "admin"`) nunca veía
+ *   al administrador y el enlace "Administrar" no aparecía. Peor: al
+ *   recargar la página se perdía el rol, porque esta es la ruta que
+ *   AuthContext usa para rehidratar la sesión.
+ */
+function mapUsuario(row, email, rolReal) {
   return {
     id:                      row.id,
     nombres:                 row.nombres,
     apellidos:               row.apellidos,
-    rol:                     row.rol,
+    rol:                     rolReal ?? row.rol,
     photo:                   row.photo,
     telefono:                row.telefono,
     edad:                    row.edad,
@@ -38,7 +50,7 @@ router.get("/me", verifyToken, async (req, res) => {
       [req.user.id]
     );
     if (!rows.length) return res.status(404).json({ ok: false, error: "Usuario no encontrado" });
-    return res.json({ ok: true, user: mapUsuario(rows[0], req.user.email) });
+    return res.json({ ok: true, user: mapUsuario(rows[0], req.user.email, req.user.rol) });
   } catch (err) {
     console.error("Error GET /usuarios/me:", err);
     return res.status(500).json({ ok: false, error: "Error al obtener perfil" });
@@ -97,7 +109,7 @@ router.put("/me", verifyToken, async (req, res) => {
       valores
     );
 
-    return res.json({ ok: true, user: mapUsuario(rows[0], req.user.email) });
+    return res.json({ ok: true, user: mapUsuario(rows[0], req.user.email, req.user.rol) });
   } catch (err) {
     console.error("Error PUT /usuarios/me:", err);
     return res.status(500).json({ ok: false, error: "Error al actualizar perfil" });

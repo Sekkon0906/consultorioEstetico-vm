@@ -234,11 +234,11 @@ export default function ProcedimientoPage() {
             <section className="proc-detail-price-row" style={{ display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap", padding: "1.8rem 2rem", background: "var(--bg-elevated)", borderRadius: 18, border: "1px solid var(--border)", marginBottom: "2.5rem" }}>
               <div style={{ flex: "1 1 auto", minWidth: 0 }}>
                 <p style={{ fontSize: "0.74rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 700, marginBottom: "0.3rem" }}>{t("standardPrice")}</p>
-                <p style={{ fontFamily: "'Playfair Display', serif", fontSize: "2.2rem", fontWeight: 700, color: "#FFFFFF", lineHeight: 1, marginBottom: "0.3rem" }}>${formatPrecio(proc.precio)}</p>
+                <p style={{ fontFamily: "'Playfair Display', serif", fontSize: "2.2rem", fontWeight: 700, color: "var(--text)", lineHeight: 1, marginBottom: "0.3rem" }}>${formatPrecio(proc.precio)}</p>
                 <small style={{ fontSize: "0.74rem", color: "var(--text-muted)" }}>{t("priceNote")}</small>
               </div>
               <Link href={`/agendar?proc=${encodeURIComponent(proc.nombre)}`}
-                className="proc-detail-cta"
+                className="proc-detail-cta btn-accion"
                 style={{ display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "var(--brand-contrast)", padding: "1rem 2.4rem", borderRadius: 100, fontWeight: 700, fontSize: "1rem", textDecoration: "none", boxShadow: "0 6px 22px rgba(176,137,104,0.35)", whiteSpace: "nowrap", maxWidth: "100%", boxSizing: "border-box" }}>
                 <FaCalendarCheck /> {t("bookCta")}
               </Link>

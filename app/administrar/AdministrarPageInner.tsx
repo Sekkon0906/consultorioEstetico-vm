@@ -17,6 +17,7 @@ const CitasAgendadas      = dynamic(() => import("./citas/citasAgendadas"), { lo
 const ProcedimientosList  = dynamic(() => import("./procedimientos/procedimientosList"), { loading: () => CARGANDO });
 const TestimoniosList     = dynamic(() => import("./testimonios/testimoniosList"), { loading: () => CARGANDO });
 const CharlasList         = dynamic(() => import("./charlas/charlasList"), { loading: () => CARGANDO });
+const GaleriaConfianza    = dynamic(() => import("./galeria/galeriaConfianzaList"), { loading: () => CARGANDO });
 const Ingresos            = dynamic(() => import("./analitica/ingresos"), { loading: () => CARGANDO });
 const ConfiguracionForm   = dynamic(() => import("./configuracion/configuracionForm"), { loading: () => CARGANDO });
 const CopilotoChat        = dynamic(() => import("./copiloto/copilotoChat"), { loading: () => CARGANDO });
@@ -58,6 +59,7 @@ export default function AdministrarPageInner() {
         {selected === "procedimientos" && <ProcedimientosList />}
         {selected === "testimonios" && <TestimoniosList />}
         {selected === "charlas" && <CharlasList />}
+        {selected === "galeria" && <GaleriaConfianza />}
         {selected === "ingresos" && <Ingresos />}
         {selected === "configuracion" && <ConfiguracionForm />}
         {selected === "copiloto" && <CopilotoChat />}

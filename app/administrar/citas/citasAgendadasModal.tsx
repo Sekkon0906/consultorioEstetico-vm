@@ -63,12 +63,12 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
 
           {/* Header */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-            <button onClick={onClose} style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><ArrowLeft size={16} /></button>
+            <button aria-label="Volver" title="Volver" onClick={onClose} style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><ArrowLeft size={16} /></button>
             <h4 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "var(--text)", margin: 0, fontSize: "1.2rem" }}>Facturacion</h4>
             <span style={{ background: estadoColor[cita.estado] ?? "#aaa", color: "white", padding: "0.3rem 0.9rem", borderRadius: 100, fontSize: "0.75rem", fontWeight: 600, textTransform: "capitalize" }}>{cita.estado}</span>
           </div>
 
-          {error && <motion.div initial={{ y: -8 }} animate={{ opacity: 1, y: 0 }} style={{ background: "#FDE8D8", color: "#922B21", padding: "0.6rem 1rem", borderRadius: 12, marginBottom: "1rem", fontSize: "0.85rem" }}>{error}</motion.div>}
+          {error && <motion.div initial={{ y: -8 }} animate={{ opacity: 1, y: 0 }} style={{ background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", color: "var(--danger)", padding: "0.6rem 1rem", borderRadius: 12, marginBottom: "1rem", fontSize: "0.85rem" }}>{error}</motion.div>}
 
           {/* Patient */}
           <div style={{ background: "var(--surface-soft)", borderRadius: 14, padding: "1rem", marginBottom: "0.8rem" }}>

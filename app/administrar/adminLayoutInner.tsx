@@ -39,6 +39,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
     { id: "procedimientos", label: "Procedimientos" },
     { id: "testimonios",    label: "Testimonios" },
     { id: "charlas",        label: "Formación" },
+    { id: "galeria",        label: "Galería de confianza" },
     { id: "ingresos",       label: "Analítica" },
     { id: "configuracion",  label: "Información general" },
     { id: "copiloto",       label: "Asistente" },

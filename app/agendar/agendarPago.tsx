@@ -81,15 +81,15 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
         <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, var(--brand), #C9AD8D)", borderRadius: 2, margin: "0 auto 1.5rem" }} />
 
         {/* Resumen */}
-        <div className="pago-summary-box" style={{ textAlign: "left", background: "linear-gradient(145deg, #FFFBF7, #F0E5D8)", borderRadius: 16, padding: "1.5rem", border: "1px solid rgba(176,137,104,0.12)", marginBottom: "1.5rem" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "0.5rem 1rem", fontSize: "0.9rem", color: "#5A4A3A" }}>
+        <div className="pago-summary-box" style={{ textAlign: "left", background: "linear-gradient(145deg, var(--surface), var(--surface-soft))", borderRadius: 16, padding: "1.5rem", border: "1px solid rgba(176,137,104,0.12)", marginBottom: "1.5rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "0.5rem 1rem", fontSize: "0.9rem", color: "var(--text-soft)" }}>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.patient")}</span><span>{citaData.nombres} {citaData.apellidos || ""}</span>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.procedure")}</span><span>{citaData.procedimiento}</span>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.date")}</span><span>{formatearFecha(citaData.fecha, intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.time")}</span><span>{citaData.hora}</span>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.phone")}</span><span>{citaData.telefono || t("summary.notSpecified")}</span>
           </div>
-          {citaData.nota && <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "1px solid rgba(176,137,104,0.15)" }}><span style={{ fontWeight: 600, color: "var(--text)", fontSize: "0.9rem" }}>{t("summary.noteLabel")}</span><span style={{ fontSize: "0.9rem", color: "#5A4A3A" }}>{citaData.nota}</span></div>}
+          {citaData.nota && <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "1px solid rgba(176,137,104,0.15)" }}><span style={{ fontWeight: 600, color: "var(--text)", fontSize: "0.9rem" }}>{t("summary.noteLabel")}</span><span style={{ fontSize: "0.9rem", color: "var(--text-soft)" }}>{citaData.nota}</span></div>}
         </div>
 
         {/* Toggle Efectivo / Tarjeta */}

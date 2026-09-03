@@ -301,3 +301,28 @@
        return r.width > 0 && r.right > innerWidth + 1;
      })
 */
+
+/* ==========================
+   LA BARRA DE DESPLAZAMIENTO
+   ==========================
+   Se oculta a petición: la nativa de Windows es una franja gris con dos
+   flechas que rompe la calma del resto del diseño, sobre todo sobre las
+   secciones oscuras a sangre.
+
+   `scrollbar-width: none` y el pseudo-elemento de WebKit la esconden SIN
+   desactivar el desplazamiento: la rueda, el dedo, las flechas del teclado
+   y Re/Av Pág siguen funcionando igual. Es solo el dibujo lo que se va.
+
+   Lo que se pierde es la señal de "cuánto queda". En una página larga eso
+   importa, así que si algún día molesta, la alternativa no es devolver la
+   nativa sino pintar una barra propia, fina y del color de la marca. */
+html {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* Edge antiguo */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;                  /* Chrome, Safari, Edge */
+}

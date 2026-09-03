@@ -72,9 +72,14 @@ export default function Footer() {
     setWarning(null);
   };
 
+  /* El texto era `--footer-text`, que es el crema pensado para el fondo
+     OSCURO del pie. Pero estos campos tienen fondo `--surface-soft`, que es
+     crema también: crema sobre crema. Por eso no se leía ni lo que
+     escribías ni los marcadores de posición. El campo es una superficie
+     clara, así que su texto es el texto normal. */
   const inputStyle: React.CSSProperties = {
-    background: "var(--surface-soft)", border: "1px solid rgba(176,137,104,0.4)",
-    color: "var(--footer-text)", borderRadius: 12, padding: "0.7rem 1rem", fontSize: "0.9rem",
+    background: "var(--surface-soft)", border: "1px solid var(--border-strong)",
+    color: "var(--text)", borderRadius: 12, padding: "0.7rem 1rem", fontSize: "0.9rem",
     outline: "none", width: "100%", transition: "border-color 0.3s",
   };
 
@@ -105,10 +110,10 @@ export default function Footer() {
           <form onSubmit={handleSubmit} className="footer-form" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", maxWidth: 650, margin: "0 auto" }}>
             <input name="name" value={formData.name} onChange={handleChange} placeholder={t("form.name")} required style={inputStyle}
               onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
-              onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
+              onBlur={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; }} />
             <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder={t("form.email")} required style={inputStyle}
               onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
-              onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
+              onBlur={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; }} />
 
             {/* Procedure selector */}
             <div style={{ gridColumn: "1 / -1", position: "relative" }}>
@@ -138,7 +143,7 @@ export default function Footer() {
 
             <input name="phone" value={formData.phone} onChange={handleChange} placeholder={t("form.phone")} style={inputStyle}
               onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
-              onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
+              onBlur={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; }} />
 
             {/* ¿Ya está registrado? Ocupa el hueco que dejaba el teléfono.
                 Son dos botones y no un <select> porque con dos opciones un
@@ -190,7 +195,7 @@ export default function Footer() {
             <textarea name="message" value={formData.message} onChange={handleChange} rows={3} placeholder={t("form.message")} required
               style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
               onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
-              onBlur={e => { e.currentTarget.style.borderColor = "rgba(176,137,104,0.4)"; }} />
+              onBlur={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; }} />
 
             <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
               <input name="terms" type="checkbox" checked={formData.terms} onChange={handleChange} style={{ accentColor: "var(--brand)" }} />
