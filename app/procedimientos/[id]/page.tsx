@@ -78,7 +78,7 @@ export default function ProcedimientoPage() {
   if (!proc) return (
     <div style={{ minHeight: "var(--alto-pantalla, 100vh)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--bg)", color: "var(--text)", gap: "1rem" }}>
       <p style={{ fontSize: "1.5rem", fontWeight: 600 }}>{t("notFound")}</p>
-      <button onClick={() => router.push("/procedimientos")} style={{ padding: "0.7rem 2rem", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "var(--brand-contrast)", border: "none", borderRadius: 100, fontWeight: 600, cursor: "pointer" }}>{t("back2")}</button>
+      <button onClick={() => router.push("/procedimientos")} style={{ padding: "var(--btn-pad-md)", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "var(--brand-contrast)", border: "none", borderRadius: "var(--btn-radio)", fontWeight: 600, cursor: "pointer" }}>{t("back2")}</button>
     </div>
   );
 
@@ -106,10 +106,32 @@ export default function ProcedimientoPage() {
           .proc-detail-body { padding: 1.25rem 1rem 1.75rem !important; }
         }
       `}</style>
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
+      {/* Ancho de contenido, no un 1000 suelto. La rejilla de la que se
+          llega usa el ancho amplio, así que al abrir una ficha la página
+          parecía encogerse. El texto largo de dentro se limita aparte. */}
+      <div style={{ maxWidth: "var(--ancho-contenido)", margin: "0 auto", padding: "2rem var(--gutter) 4rem" }}>
 
         <motion.div initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
-          <Link href="/procedimientos" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--text-soft)", fontSize: "0.88rem", fontWeight: 600, textDecoration: "none", marginBottom: "1.5rem", padding: "0.5rem 1rem", borderRadius: 100, border: "1px solid var(--border)", background: "var(--surface)" }}>
+          {/* Antes era una píldora gris con borde y flecha, del mismo peso
+              visual que el botón de agendar. Volver atrás es una acción
+              secundaria: compite por la atención con la única que importa
+              en esta página. Pasa a enlace de texto, con la geometría del
+              sistema (--btn-*) en lugar de medidas propias. */}
+          <Link
+            href="/procedimientos"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              color: "var(--brand-deep)",
+              fontSize: "var(--btn-txt-sm)",
+              fontWeight: "var(--btn-peso)" as never,
+              textDecoration: "none",
+              marginBottom: "1.5rem",
+              padding: "var(--btn-pad-sm)",
+              paddingLeft: 0,
+            }}
+          >
             <FaArrowLeft style={{ fontSize: "0.75rem" }} /> {t("back")}
           </Link>
         </motion.div>

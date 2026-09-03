@@ -4072,3 +4072,21 @@ a:hover {
   background: var(--surface-soft);
   color: var(--brand);
 }
+
+/* Entrada de las tarjetas de procedimiento al filtrar.
+   Corta y sin escalonar. Antes era `layout` de framer con un retardo por
+   índice: `layout` anima cada tarjeta desde su posición ANTERIOR, y como al
+   filtrar cambia la rejilla entera, cada una salía volando desde donde
+   estaba otra. Eso es lo que se veía como "cards regadas que se acomodan
+   solas". Filtrar es una acción de precisión: la rejilla se recoloca de
+   golpe y las tarjetas solo aparecen. */
+.proc-card-entra {
+  animation: proc-card-aparece 0.22s ease-out both;
+}
+@keyframes proc-card-aparece {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .proc-card-entra { animation: none; }
+}

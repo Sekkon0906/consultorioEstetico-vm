@@ -32,8 +32,18 @@ export default function Galeria3D() {
   // navega a otra página con el detalle abierto.
   useEffect(() => {
     if (selected === null) return;
+    // En <html>, no en <body>. El elemento que desplaza la página aquí es
+    // el raíz —se comprobó cuando un `overflow-x: clip` en <html> dejó el
+    // sitio entero sin scroll—, así que `body { overflow: hidden }` no
+    // bloqueaba nada y se seguía desplazando el fondo con el detalle
+    // abierto. Se marcan los dos: cuesta lo mismo y cubre cualquier
+    // navegador donde el que desplace sea el otro.
+    document.documentElement.classList.add("g3d-detail-abierto");
     document.body.classList.add("g3d-detail-abierto");
-    return () => document.body.classList.remove("g3d-detail-abierto");
+    return () => {
+      document.documentElement.classList.remove("g3d-detail-abierto");
+      document.body.classList.remove("g3d-detail-abierto");
+    };
   }, [selected]);
 
   // Cerrar con Escape: es un panel modal, y sin esto solo se cierra con clic.
@@ -729,7 +739,11 @@ export default function Galeria3D() {
               "0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(176,137,104,0.08)",
             padding: "2.5rem 2.2rem 2.2rem",
             position: "relative",
-            animation: "g3d-detail-in 0.5s cubic-bezier(0.16,1,0.3,1)",
+            /* La animación de apertura NO se declara aquí.
+               Estaba en línea, y el estilo en línea le gana a la hoja: eso
+               impedía que `prefers-reduced-motion` la anulara. Vive en
+               03-compatibilidad.css junto al backdrop, que es quien pone la
+               perspectiva del volteo. */
             display: "flex",
             flexDirection: "column",
             gap: "1.4rem",
@@ -915,10 +929,10 @@ export default function Galeria3D() {
           0%   { transform: translate(-50%, -50%) rotate(0deg); }
           100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
-        @keyframes g3d-detail-in {
-          0%   { opacity: 0; transform: translate(50%, -50%) scale(0.94); }
-          100% { opacity: 1; transform: translate(50%, -50%) scale(1); }
-        }
+        /* Aquí estaban las keyframes g3d-detail-in. El modal ahora se
+           voltea (g3d-voltear, en 03-compatibilidad.css) y aquellas
+           llevaban un translate heredado de cuando el panel era absolute;
+           hoy es un hijo flex centrado y ese desplazamiento sobraba. */
         .g3d-card {
           box-shadow:
             0 14px 32px rgba(0, 0, 0, 0.3),

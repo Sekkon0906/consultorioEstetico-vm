@@ -183,7 +183,7 @@ export default function ProcedimientosPage() {
           zIndex: 1,
           textAlign: "center",
           padding: "4rem 1.5rem 2rem",
-          maxWidth: 980,
+          maxWidth: "var(--ancho-contenido)",
           margin: "0 auto",
         }}
       >
@@ -215,7 +215,7 @@ export default function ProcedimientosPage() {
             color: "var(--text-soft)",
             fontSize: "clamp(0.95rem, 1.1vw, 1.1rem)",
             lineHeight: 1.6,
-            maxWidth: 720,
+            maxWidth: "var(--ancho-texto)",
             margin: "1rem auto 0",
           }}
         >
@@ -380,23 +380,24 @@ export default function ProcedimientosPage() {
                 t={t}
               />
             ) : (
-              <motion.div
-                className="proc-grid"
-                layout
-                transition={{ layout: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
-              >
-                <AnimatePresence mode="popLayout">
-                  {filtered.map((p, i) => (
-                    <ProcCard
-                      key={p.id}
-                      procedimiento={p}
-                      index={i}
-                      intlLocale={intlLocale}
-                      t={t}
-                    />
-                  ))}
-                </AnimatePresence>
-              </motion.div>
+              /* Ni `layout` en la rejilla ni AnimatePresence alrededor.
+                 Los dos existían para suavizar el filtrado y hacían lo
+                 contrario: `layout` animaba la posición de cada tarjeta
+                 desde donde estaba la anterior, y `popLayout` mantenía las
+                 salientes ocupando sitio mientras se iban. Juntos daban el
+                 revoloteo. Ahora la rejilla se recoloca de inmediato y cada
+                 tarjeta entra con una animación CSS de 0,22 s. */
+              <div className="proc-grid">
+                {filtered.map((p, i) => (
+                  <ProcCard
+                    key={p.id}
+                    procedimiento={p}
+                    index={i}
+                    intlLocale={intlLocale}
+                    t={t}
+                  />
+                ))}
+              </div>
             )}
 
             <p
@@ -478,7 +479,7 @@ export default function ProcedimientosPage() {
           .proc-toolbar-sticky { top: 58px; }
         }
         .proc-toolbar-inner {
-          max-width: 1280px;
+          max-width: var(--ancho-amplio);
           margin: 0 auto;
           display: flex;
           gap: 1rem;
@@ -571,7 +572,7 @@ export default function ProcedimientosPage() {
         /* Barra secundaria de subcategorías + sort — aparece animada
            cuando hay categoría seleccionada. */
         .proc-subbar {
-          max-width: 1280px;
+          max-width: var(--ancho-amplio);
           margin: 0 auto;
           padding: 0.75rem 0 0;
           display: flex;
@@ -744,6 +745,14 @@ export default function ProcedimientosPage() {
             0 0 0 1px rgba(255, 200, 100, 0.3),
             0 0 30px rgba(255, 200, 100, 0.22);
           animation: proc-card-glow 3.6s ease-in-out infinite;
+        }
+        /* Las destacadas llevan un brillo permanente, y la propiedad
+           animation es de reemplazo, no de suma: declarar el brillo borraba
+           la animación de entrada. Se declaran juntas, separadas por coma. */
+        .proc-card.is-featured.proc-card-entra {
+          animation:
+            proc-card-aparece 0.22s ease-out both,
+            proc-card-glow 3.6s ease-in-out infinite;
         }
         .proc-card.is-featured:hover {
           box-shadow:
@@ -972,7 +981,7 @@ function FeaturedCarousel({
       style={{
         position: "relative",
         zIndex: 1,
-        maxWidth: 1180,
+        maxWidth: "var(--ancho-amplio)",
         margin: "0 auto 3rem",
         padding: "0 1.5rem",
       }}
@@ -1336,17 +1345,18 @@ function ProcCard({
   // entero desaparece. Arrancando solo desplazada, lo peor que pasa es que
   // aparezca 18px más abajo — se lee igual.
   return (
-    <motion.div
-      layout
-      initial={{ y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.96 }}
-      transition={{
-        duration: 0.45,
-        ease: [0.22, 1, 0.36, 1],
-        delay: Math.min(index * 0.04, 0.4),
-      }}
-      className={`proc-card ${procedimiento.destacado ? "is-featured" : ""}`}
+    /* Sin framer: entrada por CSS.
+       Esto era `layout` + `exit` + un retardo escalonado por índice, y es
+       exactamente lo que producía el efecto de "cards regadas que luego se
+       acomodan solas". `layout` mide la posición ANTERIOR de cada tarjeta y
+       la anima hasta la nueva; al filtrar, la rejilla cambia entera, así que
+       cada tarjeta salía volando desde donde estaba la que ocupaba su hueco
+       antes. Y el escalonado sumaba hasta 0,4 s de goteo encima.
+       Filtrar es una acción de precisión: la respuesta debe ser inmediata.
+       La rejilla se recoloca de golpe y las tarjetas solo aparecen. */
+    <div
+      key={procedimiento.id}
+      className={`proc-card proc-card-entra ${procedimiento.destacado ? "is-featured" : ""}`}
     >
       <Link
         href={`/procedimientos/${procedimiento.id}`}
@@ -1411,7 +1421,7 @@ function ProcCard({
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }
 
