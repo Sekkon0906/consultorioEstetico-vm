@@ -22,10 +22,10 @@
    sitio, en lugar de parchear sección por sección.
 ========================== */
 :root {
-  --nav-h: 62px;
+  --nav-h: 56px;
 }
-@media (min-width: 821px) {
-  :root { --nav-h: 84px; }
+@media (min-width: 768px) {
+  :root { --nav-h: 80px; }
 }
 
 [id],

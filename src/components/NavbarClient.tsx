@@ -190,20 +190,6 @@ export default function Navbar() {
     // re-mida cuando cambian las etiquetas (cambio de idioma).
   }, [pathname, menuItems, loading, user]);
 
-  /* === SECCIÓN ACTUAL (pt 22) === */
-  const currentSection = useMemo(() => {
-    const exact = menuItems.find((i) => i.href === pathname);
-    if (exact) return exact.label;
-    const prefix = menuItems
-      .filter((i) => i.href !== "/" && pathname.startsWith(i.href))
-      .sort((a, b) => b.href.length - a.href.length)[0];
-    if (prefix) return prefix.label;
-    if (pathname.startsWith("/perfil")) return t("profileSection");
-    if (pathname.startsWith("/legal")) return t("legalSection");
-    if (pathname.startsWith("/login") || pathname.startsWith("/register"))
-      return "Acceso";
-    return "Inicio";
-  }, [pathname, menuItems, t]);
 
   /* === LOGOUT === */
   const requestLogout = () => {
@@ -269,38 +255,22 @@ export default function Navbar() {
               width={75}
               height={55}
               priority
-              className="me-2"
-              style={{ width: "auto", height: "auto" }}
+              className="me-2 navbar-logo-img"
+              /* Antes iba `width: auto; height: auto` en línea, y el estilo
+                 en línea le gana a la hoja: la imagen se pintaba a su
+                 tamaño intrínseco, 96px de alto, y ella sola estiraba la
+                 navbar de escritorio hasta 128px. La medida se decide ahora
+                 en CSS (.navbar-logo img), que es donde puede cambiar por
+                 breakpoint. Se dan los dos ejes para conservar la
+                 proporción 75×55 y no disparar el aviso de next/image. */
             />
           </Link>
-          {/* Solo en móvil. En escritorio el menú está a la vista y el
-              subrayado ya indica dónde estás, así que repetirlo aquí solo
-              robaba ancho a los enlaces. En móvil el menú va colapsado
-              detrás de la hamburguesa y no hay otra pista de ubicación.
-              Se recorta con ellipsis para no empujar la hamburguesa. */}
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={currentSection}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 8 }}
-              transition={{ duration: 0.25 }}
-              className="d-inline-block d-md-none"
-              style={{
-                fontWeight: 600,
-                fontSize: "0.88rem",
-                color: "var(--text-muted)",
-                borderLeft: "1px solid var(--border)",
-                paddingLeft: "0.6rem",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                maxWidth: "38vw",
-              }}
-            >
-              {currentSection}
-            </motion.span>
-          </AnimatePresence>
+          {/* Aquí iba la "sección actual" ("Inicio", "Procedimientos"…) en
+              móvil. Se quitó: la página ya dice en qué sección estás —con
+              su propio titular, a pantalla completa— así que era la misma
+              información dos veces, y en 375px se comía hasta un 38 % del
+              ancho de la barra por repetirla. Ese ancho es lo que ahora
+              deja respirar al logo y a la hamburguesa. */}
         </div>
 
         {/* MENÚ DESKTOP */}

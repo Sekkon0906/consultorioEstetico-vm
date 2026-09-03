@@ -140,9 +140,16 @@
 
      El filtro además hunde un punto la foto (menos saturación, algo menos
      de brillo, un poco más de contraste) para que el texto champán encima
-     tenga de dónde despegarse. */
-  --foto-tinte: 23, 21, 26;              /* #17151A — el grafito de --bg */
-  --foto-filtro: saturate(0.90) contrast(1.06) brightness(0.86);
+     tenga de dónde despegarse.
+
+     El tinte es CIRUELA, no el grafito puro de --bg: un matiz morado muy
+     leve en las sombras. Elegido comparando los tres ambientes sobre la
+     foto real del hero. Cumple lo de arriba —no es café, así que el
+     champán sigue siendo el único acento cálido— y además respeta los
+     tonos de piel, que es donde el grafito puro se ve algo apagado y
+     donde el verde profundo directamente los vuelve grisáceos. */
+  --foto-tinte: 30, 22, 34;              /* ciruela muy oscuro */
+  --foto-filtro: saturate(0.95) contrast(1.05) brightness(0.88);
   --foto-velo-suave:  rgba(var(--foto-tinte), 0.22);
   --foto-velo-medio:  rgba(var(--foto-tinte), 0.68);
   --foto-velo-fuerte: rgba(var(--foto-tinte), 0.88);
@@ -165,21 +172,20 @@
    de arriba por uno de estos. Están escritos con los valores completos a
    propósito, para poder copiarlos tal cual.
 
-   1. GRAFITO  (el activo) — neutro, el champán es el único color cálido.
-        --foto-tinte: 23, 21, 26;
-        --foto-filtro: saturate(0.90) contrast(1.06) brightness(0.86);
-
-   2. CIRUELA — un matiz morado muy leve en las sombras. Más "clínica de
-      estética premium", menos frío que el grafito puro. Es el que mejor
-      combina con el champán #E8C9A0 si te parece que el grafito se ve
-      apagado.
+   1. CIRUELA  (el activo) — un matiz morado muy leve en las sombras.
+      Menos frío que el grafito puro y respeta los tonos de piel.
         --foto-tinte: 30, 22, 34;
         --foto-filtro: saturate(0.95) contrast(1.05) brightness(0.88);
 
-   3. VERDE PROFUNDO — verde muy oscuro casi negro. Es el acento que ya te
-      gustó en "Nuestra ubicación". El más distinto de la competencia, y
-      el más arriesgado: hay que revisar que los tonos de piel no se vayan
-      a verde en las fotos de procedimientos.
+   2. GRAFITO — el neutro puro, el mismo #17151A de --bg. Más sobrio;
+      sobre retratos se ve un punto apagado comparado con el ciruela.
+        --foto-tinte: 23, 21, 26;
+        --foto-filtro: saturate(0.90) contrast(1.06) brightness(0.86);
+
+   3. VERDE PROFUNDO — verde muy oscuro casi negro. Es el acento de
+      "Nuestra ubicación" y el más distinto de la competencia, pero se
+      descartó para fotos: vuelve grisácea la piel en los retratos, y en
+      las fotos de procedimiento eso es justo lo que no puede pasar.
         --foto-tinte: 18, 30, 26;
         --foto-filtro: saturate(0.88) contrast(1.08) brightness(0.85);
 */

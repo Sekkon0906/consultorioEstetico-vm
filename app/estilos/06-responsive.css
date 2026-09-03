@@ -167,16 +167,23 @@
     height: 32px !important;
     object-fit: contain !important;
   }
-  .navbar-container { padding: 0.5rem 0 !important; }
+  /* La barra fija se queda en 56px (era 62). Es el alto que importa: la
+     topbar se va con el scroll, la navbar es sticky y esos píxeles se
+     pierden en TODA la página. 56 sobre 812 son 6,9 %, que es el objetivo
+     del estudio.
 
-  /* 7. Texto del breadcrumb (currentSection) truncado para no romper */
-  .navbar-container > div > div:first-child > span {
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.82rem !important;
+     Sin padding y con `min-height`: el contenido más alto de la barra es
+     la hamburguesa, 46px, y ese alto NO se toca — 44px es el mínimo para
+     que un dedo acierte. Con padding encima se sumaba a los 46 y la barra
+     acababa en 71px. Dejando que `min-height` haga el trabajo, la
+     hamburguesa conserva su área táctil y la barra su altura. */
+  .navbar-container {
+    padding: 0 !important;
+    min-height: 56px;
   }
+
+  /* Aquí se truncaba la "sección actual" con ellipsis. Ya no existe: la
+     página dice en qué sección estás con su propio titular. */
 
   /* Mobile sidebar: footer fijo abajo con controles + logout */
   .mobile-sidebar-footer {
@@ -2525,9 +2532,13 @@ footer a:hover i {
   filter: brightness(1.08);
 }
 
+/* Los dos ejes explícitos, en la proporción original 75×55. Con `height:
+   auto` la altura la decidía la imagen, y era ella —no el padding— la que
+   marcaba el alto de toda la barra. */
 .navbar-logo img {
-  width: 56px;
-  height: auto;
+  width: 66px;
+  height: 48px;
+  object-fit: contain;
 }
 
 /* === CENTRO: MENÚ === */
@@ -2748,9 +2759,10 @@ footer a:hover i {
     padding: 0.8rem 1rem;
   }
 
-  .navbar-logo img {
-    width: 60px;
-  }
+  /* Aquí había un `.navbar-logo img { width: 60px }`. Regla muerta: el
+     bloque de 767px de arriba ya fija 44×32 con !important, así que nunca
+     llegaba a aplicarse, y además tocaba un solo eje —rompiendo la
+     proporción— si algún día ganaba. */
 
   .navbar-menu {
     gap: 0.8rem;
@@ -3339,9 +3351,48 @@ footer a:hover i {
   .topbar-track{ --dur: 32s; --gap: clamp(20px, 6vw, 48px); }
 }
 
-@media (max-width: 576px){
+/* ==========================
+   TOPBAR EN MÓVIL: SIN MARQUESINA
+   ==========================
+   La pista mide 743px desplazándose dentro de 375. El resultado es que
+   la información SOLO se puede leer a media palabra ("…02. Ibagué –
+   Tolima."), y encima obliga a esperar a que pase. Una marquesina
+   funciona en escritorio, donde cabe entera y es decoración; en un
+   teléfono es un obstáculo.
+
+   Debajo de 768 se para la animación y se reparte lo que de verdad sirve
+   ahí: el teléfono (tocable) y las redes. La dirección se va — está en el
+   pie y en "Nuestra ubicación", con mapa, que es donde alguien la busca.
+
+   Fase 1 del estudio de móvil. */
+@media (max-width: 767px){
   .topbar{ font-size:.85rem; }
-  .topbar-track{ --dur: 36s; --gap: clamp(16px, 7vw, 40px); }
+
+  .topbar-marquee{
+    height: auto;
+    /* El desvanecido de los bordes existía para que el texto entrara y
+       saliera suave. Sin movimiento solo recortaría los extremos. */
+    -webkit-mask-image: none;
+            mask-image: none;
+  }
+
+  .topbar-track{
+    animation: none;
+    position: static;
+    transform: none;
+    justify-content: space-between;
+    width: 100%;
+    padding-inline: var(--gutter);
+    gap: 0;
+  }
+
+  .topbar-direccion{ display: none; }
+
+  /* Área táctil: un enlace de 20px de alto se falla al tocarlo. */
+  .topbar-tel{
+    padding-block: 4px;
+    text-decoration: none;
+  }
 }
 
 /* Accesibilidad: si el usuario prefiere menos movimiento, mostrar
