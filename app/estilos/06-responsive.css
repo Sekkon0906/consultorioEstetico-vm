@@ -219,9 +219,9 @@
     inset: 0;
     background: linear-gradient(
       180deg,
-      rgba(0,0,0,0.18) 0%,
-      rgba(0,0,0,0.42) 45%,
-      rgba(0,0,0,0.82) 100%
+      var(--foto-velo-suave) 0%,
+      var(--foto-velo-medio) 45%,
+      var(--foto-velo-fuerte) 100%
     );
     pointer-events: none;
     z-index: 1;
@@ -1784,12 +1784,15 @@ body {
 .hero-fs-overlay {
   position: absolute;
   inset: 0;
+  /* El matiz sale de --foto-tinte (00-cimientos.css), no de un café fijo:
+     así la foto acompaña al tema en vez de quedarse marrón cuando el
+     resto de la página ya es grafito. */
   background:
     linear-gradient(90deg,
-      rgba(58, 42, 26, 0.0) 0%,
-      rgba(58, 42, 26, 0.10) 35%,
-      rgba(28, 20, 12, 0.55) 70%,
-      rgba(28, 20, 12, 0.75) 100%),
+      rgba(var(--foto-tinte), 0) 0%,
+      var(--foto-velo-suave) 35%,
+      var(--foto-velo-medio) 70%,
+      var(--foto-velo-fuerte) 100%),
     linear-gradient(180deg,
       rgba(0, 0, 0, 0.18) 0%,
       rgba(0, 0, 0, 0) 30%);

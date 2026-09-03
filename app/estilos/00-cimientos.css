@@ -90,6 +90,100 @@
   --sombra-sobre-foto: 0 4px 20px rgba(0, 0, 0, 0.75);
 }
 
+
+/* ==========================
+   LAS FOTOS TAMBIÉN CAMBIAN CON EL TEMA
+   ==========================
+   Hasta ahora las imágenes eran lo único que no se enteraba del tema: el
+   velo del hero estaba quemado en `rgba(58, 42, 26, …)`, un café, así que
+   en modo oscuro la foto seguía tirando a marrón mientras el resto de la
+   página ya era grafito. Se notaba como "la foto no es de esta página".
+
+   Son dos capas y las dos se controlan desde aquí:
+
+     --foto-filtro   se aplica a la <img>. Cambia la foto en sí.
+     --foto-velo-*   el degradado que va encima. Le da el matiz.
+
+   Por qué DOS mecanismos y no solo uno: el filtro sirve para hundir o
+   levantar la foto entera (que no compita con el texto), y el velo para
+   teñirla hacia la paleta. Con solo filtro la foto se ve lavada; con solo
+   velo, la foto sigue "brillando" más que la página.
+
+   La alternativa habría sido tener dos versiones de cada foto en R2, una
+   clara y una oscura. Da más control, pero obliga a la doctora a editar
+   cada imagen dos veces y duplica el almacenamiento. Esto es gratis, es
+   instantáneo y se ajusta cambiando un número. Si alguna foto concreta
+   pide su propia versión (el hero, quizá), se puede hacer para esa sola
+   con <picture> sin tocar este sistema.
+
+   PARA JUGAR CON LOS COLORES: cambia solo el hex de --foto-tinte. Todo lo
+   demás se deriva de él. Los tres ambientes probados están abajo. */
+
+:root {
+  /* --- Claro: champán cálido, el mismo matiz que --brand ---
+     La foto se deja casi intacta (la calidez ya está en la imagen) y el
+     velo solo la ancla al beige de la página. */
+  --foto-tinte: 58, 42, 26;              /* #3A2A1A — el café de --text */
+  --foto-filtro: saturate(1.04) contrast(1.02);
+  --foto-velo-suave:  rgba(var(--foto-tinte), 0.10);
+  --foto-velo-medio:  rgba(var(--foto-tinte), 0.55);
+  --foto-velo-fuerte: rgba(var(--foto-tinte), 0.75);
+}
+
+:root[data-theme="dark"] {
+  /* --- Oscuro: grafito neutro, NO café ---
+     Esto es deliberado y es el punto entero. La paleta oscura se diseñó
+     con base grafito neutra justo para que el champán sea el único acento
+     cálido; si el velo de las fotos sigue siendo café, la foto vuelve a
+     meter el marrón por la puerta de atrás y se pierde el contraste que
+     hace que se lea como marca de lujo.
+
+     El filtro además hunde un punto la foto (menos saturación, algo menos
+     de brillo, un poco más de contraste) para que el texto champán encima
+     tenga de dónde despegarse. */
+  --foto-tinte: 23, 21, 26;              /* #17151A — el grafito de --bg */
+  --foto-filtro: saturate(0.90) contrast(1.06) brightness(0.86);
+  --foto-velo-suave:  rgba(var(--foto-tinte), 0.22);
+  --foto-velo-medio:  rgba(var(--foto-tinte), 0.68);
+  --foto-velo-fuerte: rgba(var(--foto-tinte), 0.88);
+}
+
+/* Quien pida menos movimiento no pide menos color, pero una transición de
+   filtro en una imagen a pantalla completa es cara: se deja solo donde el
+   navegador puede componerla barato. */
+.foto-tematica,
+.hero-fs-bg img,
+.hero-fs-bg video {
+  filter: var(--foto-filtro);
+  transition: filter var(--mov-normal) ease;
+}
+
+/* ==========================
+   LOS TRES AMBIENTES PROBADOS
+   ==========================
+   Para cambiar de ambiente, sustituye el bloque `:root[data-theme="dark"]`
+   de arriba por uno de estos. Están escritos con los valores completos a
+   propósito, para poder copiarlos tal cual.
+
+   1. GRAFITO  (el activo) — neutro, el champán es el único color cálido.
+        --foto-tinte: 23, 21, 26;
+        --foto-filtro: saturate(0.90) contrast(1.06) brightness(0.86);
+
+   2. CIRUELA — un matiz morado muy leve en las sombras. Más "clínica de
+      estética premium", menos frío que el grafito puro. Es el que mejor
+      combina con el champán #E8C9A0 si te parece que el grafito se ve
+      apagado.
+        --foto-tinte: 30, 22, 34;
+        --foto-filtro: saturate(0.95) contrast(1.05) brightness(0.88);
+
+   3. VERDE PROFUNDO — verde muy oscuro casi negro. Es el acento que ya te
+      gustó en "Nuestra ubicación". El más distinto de la competencia, y
+      el más arriesgado: hay que revisar que los tonos de piel no se vayan
+      a verde en las fotos de procedimientos.
+        --foto-tinte: 18, 30, 26;
+        --foto-filtro: saturate(0.88) contrast(1.08) brightness(0.85);
+*/
+
 @media (min-width: 768px) {
   :root { --gutter: 24px; }
 }
