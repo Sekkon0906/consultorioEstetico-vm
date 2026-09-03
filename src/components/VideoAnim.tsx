@@ -188,7 +188,7 @@ export default function VideoAnim() {
           {/* CENTER - Video */}
           <div className="va-video-col" ref={vid.ref} style={{ ...rs(vid.v, 0.08), position: "relative" }}>
             <div style={{ position: "absolute", top: "50%", left: "50%", width: "115%", height: "140%", background: "radial-gradient(ellipse, rgba(176,137,104,0.14) 0%, transparent 65%)", filter: "blur(45px)", animation: "va-glow 4s ease-in-out infinite", pointerEvents: "none", zIndex: 0, transform: "translate(-50%,-50%)" }} />
-            <div onClick={() => setVideoActivo(true)} style={{
+            <div onClick={() => setVideoActivo(true)} className="va-marco" style={{
               position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 20, overflow: "hidden", cursor: "pointer", zIndex: 1,
               boxShadow: "0 20px 55px rgba(58,42,26,0.18), 0 0 0 1px rgba(176,137,104,0.12)", transition: "transform 0.4s, box-shadow 0.4s",
             }}
@@ -198,7 +198,20 @@ export default function VideoAnim() {
                 <iframe src="https://www.youtube.com/embed/pBkwUM0IpTE?autoplay=1&modestbranding=1&rel=0" title={t("iframeTitle")} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 20 }} />
               ) : (
                 <>
-                  <Image src={IMG.previewVideo} alt={t("iframeTitle")} fill sizes="(max-width: 1024px) 100vw, 960px" quality={80} style={{ objectFit: "cover" }} />
+                  {/* La miniatura trae una lista de 15 procedimientos quemada
+                      en la propia imagen. En un marco 16:9 de 375px de ancho
+                      esa lista se corta a media palabra ("Manejo de cicatrice",
+                      "Manejo de estria") y encima le cae el botón encima: se
+                      lee peor que si no estuviera. Además es texto que ni
+                      Google ni un lector de pantalla pueden leer.
+
+                      En móvil el encuadre se corre al lado de la doctora, así
+                      que la lista queda FUERA del marco en vez de cortada. No
+                      se pierde nada: esos mismos procedimientos están, como
+                      texto de verdad, en /procedimientos. Lo correcto de raíz
+                      es una miniatura sin texto encima — eso depende de una
+                      imagen nueva, no del código. */}
+                  <Image src={IMG.previewVideo} alt={t("iframeTitle")} fill sizes="(max-width: 1024px) 100vw, 960px" quality={80} className="va-poster" style={{ objectFit: "cover" }} />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.32) 100%)" }} />
                   <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 2 }}>
                     <div style={{ position: "absolute", top: "50%", left: "50%", width: 90, height: 90, borderRadius: "50%", background: "rgba(176,137,104,0.2)", animation: "va-pulse 2.2s ease-out infinite", transform: "translate(-50%,-50%)" }} />

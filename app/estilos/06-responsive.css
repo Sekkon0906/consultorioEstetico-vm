@@ -258,9 +258,10 @@
     order: -1 !important;
     padding-top: 0 !important;
   }
-  .videoanim-section .va-video-col > div:last-child {
-    padding-top: 60% !important;
-  }
+  /* Era `.va-video-col > div:last-child`, un selector posicional que pisaba
+     por especificidad cualquier regla escrita con la clase del elemento.
+     Ahora el marco tiene clase propia (.va-marco) y la medida se decide
+     ahí abajo, en un solo sitio. */
   .videoanim-section h2 {
     font-size: 1.5rem !important;
   }
@@ -3387,6 +3388,20 @@ footer a:hover i {
   }
 
   .topbar-direccion{ display: none; }
+
+  /* Miniatura del vídeo. La lista de procedimientos va quemada en la propia
+     imagen, en su mitad derecha, y a 375px se lee cortada a media palabra.
+     No basta con mover el encuadre: la imagen ya es panorámica, así que en
+     un marco 16:9 `cover` apenas recorta a los lados y la lista sigue
+     entrando. Estrechando el marco a 4:5 sí hay recorte lateral, y con el
+     encuadre corrido a la izquierda lo que queda es la doctora — que es lo
+     que una miniatura de vídeo tiene que enseñar. Ver VideoAnim.tsx. */
+  .va-marco {
+    padding-top: 125% !important;
+  }
+  .va-poster {
+    object-position: 8% center !important;
+  }
 
   /* ==========================
      HERO: QUE EL TITULAR SE VEA SIN HACER SCROLL
