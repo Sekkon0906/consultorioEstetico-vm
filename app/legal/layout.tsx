@@ -8,7 +8,7 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
   return (
     <main
       style={{
-        minHeight: "100vh",
+        minHeight: "var(--alto-pantalla, 100vh)",
         background: "var(--bg)",
         padding: "3rem 1.25rem 4rem",
       }}

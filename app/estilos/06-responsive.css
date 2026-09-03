@@ -2039,7 +2039,11 @@ body {
 .hero-home {
   display: flex;
   flex-direction: column;
+  /* `100vh` en móvil incluye la barra del navegador: el hero medía más que
+     la pantalla visible y el titular quedaba fuera. Ver `--alto-pantalla`
+     en 00-cimientos.css. */
   min-height: 100vh;
+  min-height: var(--alto-pantalla);
   background: linear-gradient(180deg, #f7eee6 0%, #fff7f0 60%, #ffffff 100%);
 }
 

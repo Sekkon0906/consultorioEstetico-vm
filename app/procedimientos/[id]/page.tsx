@@ -74,9 +74,9 @@ export default function ProcedimientoPage() {
     return () => window.removeEventListener("keydown", h);
   }, [modalIndex, galeria.length]);
 
-  if (loading) return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
+  if (loading) return <div style={{ minHeight: "var(--alto-pantalla, 100vh)", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
   if (!proc) return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--bg)", color: "var(--text)", gap: "1rem" }}>
+    <div style={{ minHeight: "var(--alto-pantalla, 100vh)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--bg)", color: "var(--text)", gap: "1rem" }}>
       <p style={{ fontSize: "1.5rem", fontWeight: 600 }}>{t("notFound")}</p>
       <button onClick={() => router.push("/procedimientos")} style={{ padding: "0.7rem 2rem", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", border: "none", borderRadius: 100, fontWeight: 600, cursor: "pointer" }}>{t("back2")}</button>
     </div>
@@ -85,7 +85,7 @@ export default function ProcedimientoPage() {
   const descDetalle = proc.descCompleta || proc.descripcion;
 
   return (
-    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%)" }}>
+    <main style={{ minHeight: "var(--alto-pantalla, 100vh)", background: "linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%)" }}>
       <style>{`
         @media (max-width: 820px) {
           .proc-detail-hero { height: 280px !important; }

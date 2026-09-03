@@ -48,7 +48,7 @@ export default function TestimoniosPage() {
   var activos = testimonios.filter(function(t) { return t.activo; }).sort(function(a, b) { return new Date(b.creadoEn).getTime() - new Date(a.creadoEn).getTime(); });
 
   return (
-    <main className="dark-aware-section testimonios-page" style={{ minHeight: "100vh", background: "linear-gradient(180deg, #FAF7F2 0%, #F5EEE5 100%)" }}>
+    <main className="dark-aware-section testimonios-page" style={{ minHeight: "var(--alto-pantalla, 100vh)", background: "linear-gradient(180deg, #FAF7F2 0%, #F5EEE5 100%)" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "4rem 1.5rem 3rem" }}>
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
           <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--brand)", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("badge")}</span>

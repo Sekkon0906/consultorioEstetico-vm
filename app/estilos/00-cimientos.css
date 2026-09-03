@@ -1,0 +1,124 @@
+/* ============================================================
+   CIMIENTOS — la capa de la que dependen las demás
+   ============================================================
+
+   El estudio de móvil (bóveda: "08 — Estudio de móvil") midió por qué
+   cada arreglo visual rompía otra cosa: el sitio está escrito
+   desktop-first y móvil se corrige "hacia abajo" apilando excepciones.
+   38 `max-width` contra 2 `min-width`, 23 breakpoints distintos y 442
+   `!important` — cada excepción necesitaba más especificidad que la
+   anterior. El 78 % del CSS son overrides responsive.
+
+   Este archivo no arregla ninguna pantalla. Define las medidas que las
+   demás capas citan, para que dejen de inventarse una cada vez. Va
+   primero en globals.css: solo declara tokens, así que no compite en la
+   cascada con nadie.
+============================================================ */
+
+
+/* ==========================
+   ESCALA DE BREAKPOINTS
+   ==========================
+   Cuatro, no veintitrés. Los 23 actuales (380, 420, 480, 520, 576, 600,
+   640, 700, 767, 768, 820, 900, 980, 991, 992, 1024, 1200, 1280…) no los
+   eligió nadie: son de haber escrito cada sección en un momento distinto,
+   y son la razón de que un cambio en "móvil" se vea en un teléfono y no
+   en el de al lado.
+
+     480px   móvil chico
+     768px   tablet
+     1024px  portátil
+     1280px  escritorio
+
+   CSS todavía no deja usar variables dentro de `@media`, así que esto no
+   se puede imponer técnicamente: es la convención. **Todo CSS nuevo usa
+   solo estos cuatro valores, y en `min-width`.** Los `max-width` viejos se
+   van convirtiendo a medida que se reescribe cada sección (fases 1–5), no
+   de golpe: mover un `max-width: 820px` a 768 cambia qué ve una pantalla
+   de 800px, y eso no es un refactor mecánico sino un cambio de diseño que
+   hay que mirar pantalla por pantalla.
+*/
+
+
+:root {
+  /* ==========================
+     CANAL LATERAL Y ANCHO DE CONTENIDO
+     ==========================
+     Hoy hay un solo `container-fluid` con `padding: 17.4px` y
+     `max-width: none`. De ahí que las cards de los carruseles sangren
+     fuera del viewport y se vean cortadas por ambos lados: nadie define
+     el canal lateral de forma consistente, así que cada sección se
+     inventa el suyo.
+
+     `--gutter` es ese canal. `--content-max` es hasta dónde crece el
+     contenido antes de quedarse centrado. */
+  --gutter: 16px;
+  --content-max: 1200px;
+
+  /* ==========================
+     ALTURA DE PANTALLA
+     ==========================
+     En móvil `100vh` incluye la barra del navegador, así que una sección
+     "de pantalla completa" mide MÁS que la pantalla visible y lo de abajo
+     queda cortado. Es la causa exacta de que en el hero la foto se coma la
+     pantalla y el titular quede fuera.
+
+     `100dvh` es la altura dinámica real. Se usa con `100vh` como línea
+     previa para navegadores que no la soportan:
+       min-height: 100vh;
+       min-height: var(--alto-pantalla);
+     El navegador que no entienda `dvh` ignora la segunda y se queda con la
+     primera; el que sí, la pisa. */
+  --alto-pantalla: 100dvh;
+}
+
+@media (min-width: 768px) {
+  :root { --gutter: 24px; }
+}
+
+@media (min-width: 1024px) {
+  :root { --gutter: 32px; }
+}
+
+
+/* ==========================
+   CONTENEDOR
+   ==========================
+   Una sola clase para "esto es contenido de página": canal lateral a los
+   lados y centrado cuando sobra ancho. Sustituye al `container-fluid` con
+   padding a ojo, sección por sección, a medida que se reescriben. */
+.contenido {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Una sección a sangre (foto de fondo, carrusel) que no quiere el canal
+   lateral pero sí que su TEXTO lo respete. */
+.contenido-sangrado {
+  width: 100%;
+  margin-inline: auto;
+}
+.contenido-sangrado > * {
+  padding-inline: var(--gutter);
+}
+
+
+/* ==========================
+   SOBRE EL DESBORDE HORIZONTAL
+   ==========================
+   Aquí estuvo un `html { overflow-x: clip }` como red de seguridad contra
+   el scroll lateral. Se quitó: el `overflow` del elemento raíz se propaga
+   al viewport, y con `clip` la página se quedó sin scroll vertical
+   (`scrollTo` no movía nada). `hidden` tampoco sirve — crea un contenedor
+   de scroll y rompe el `position: sticky` del navbar.
+
+   No hay atajo: cuando aparezca scroll lateral hay que encontrar el
+   elemento que se pasa y arreglarlo. La consulta está en el estudio de
+   móvil de la bóveda:
+     [...document.querySelectorAll('*')].filter(el => {
+       const r = el.getBoundingClientRect();
+       return r.width > 0 && r.right > innerWidth + 1;
+     })
+*/

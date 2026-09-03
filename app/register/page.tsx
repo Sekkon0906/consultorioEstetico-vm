@@ -111,7 +111,7 @@ function RegisterPageContent() {
       className="py-5"
       style={{
         background: `linear-gradient(180deg,#FAF9F7 0%,#F1E9E0 100%)`,
-        minHeight: "100vh",
+        minHeight: "var(--alto-pantalla, 100vh)",
         display: "flex",
         alignItems: "center",
       }}

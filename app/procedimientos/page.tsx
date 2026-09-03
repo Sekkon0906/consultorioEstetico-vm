@@ -416,6 +416,7 @@ export default function ProcedimientosPage() {
         .proc-page {
           position: relative;
           min-height: 100vh;
+          min-height: var(--alto-pantalla);
           background: linear-gradient(180deg, #FBF9F5 0%, #F4ECDF 100%);
           overflow-x: hidden;
         }
