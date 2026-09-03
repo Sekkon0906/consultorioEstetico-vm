@@ -3495,6 +3495,9 @@ footer a:hover i {
      entrando. Estrechando el marco a 4:5 sí hay recorte lateral, y con el
      encuadre corrido a la izquierda lo que queda es la doctora — que es lo
      que una miniatura de vídeo tiene que enseñar. Ver VideoAnim.tsx. */
+  /* 4:5 en móvil: la foto de portada sigue llevando la lista de
+     procedimientos quemada en la imagen, y en 16:9 se leía cortada. Cuando
+     la doctora la reemplace por una sin texto, esto puede volver a 16:9. */
   .va-marco {
     padding-top: 125% !important;
   }
@@ -4295,4 +4298,89 @@ a:hover {
     transition: box-shadow 120ms ease;
     transform: none !important;
   }
+}
+
+/* ============================================================
+   GALERÍA DE "POR QUÉ CONFIARME"
+   ============================================================
+   Sustituye al vídeo de presentación. Muestra bioseguridad, esterilización
+   y equipos; las fotos las administra la doctora desde el panel. */
+
+/* El pie dice QUÉ se está mirando: es lo que separa una galería que informa
+   de una que solo decora. Va sobre el degradado inferior de la foto, con el
+   token de texto sobre imagen — que no sigue al tema, porque la foto es
+   oscura en claro y en oscuro. */
+.va-pie {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 1rem 1.2rem;
+  color: var(--texto-sobre-foto);
+  text-shadow: var(--sombra-sobre-foto);
+}
+.va-pie-titulo {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(1rem, 1.6vw, 1.3rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+.va-pie-texto {
+  font-size: clamp(0.78rem, 1vw, 0.92rem);
+  line-height: 1.45;
+  opacity: 0.92;
+}
+
+/* Cada foto entra con un fundido corto. La `key` de React cambia con la
+   URL, así que el elemento se recrea y la animación se reinicia sola: no
+   hace falta orquestarla desde JavaScript, que es como se atascaba antes. */
+.va-poster-entra {
+  animation: va-foto-entra 320ms var(--mov-curva) both;
+}
+@keyframes va-foto-entra {
+  from { opacity: 0; transform: scale(1.02); }
+  to   { opacity: 1; transform: none; }
+}
+
+.va-miniaturas {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+  scrollbar-width: none;
+}
+.va-miniaturas::-webkit-scrollbar { display: none; }
+
+.va-miniatura {
+  position: relative;
+  flex: 0 0 auto;
+  width: 88px;
+  height: 62px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  background: var(--surface-soft);
+  opacity: 0.62;
+  transition: opacity var(--mov-rapido), border-color var(--mov-rapido),
+              transform var(--mov-rapido);
+}
+.va-miniatura:hover,
+.va-miniatura:focus-visible {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+.va-miniatura.is-activa {
+  opacity: 1;
+  border-color: var(--brand);
+}
+@media (prefers-reduced-motion: reduce) {
+  .va-poster-entra { animation: none; }
+  .va-miniatura { transition: opacity var(--mov-rapido); transform: none !important; }
 }
