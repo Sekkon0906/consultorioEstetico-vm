@@ -1,90 +1,74 @@
 ---
-tags: [proyecto, migracion]
-actualizado: 2026-09-01
+tags: [proyecto, migracion, historico]
+actualizado: 2026-09-02
 ---
 
 # Migración fuera de Supabase
 
 Volver a [[00 — Consultorio Estético (índice)]]
 
-**Objetivo:** que la plataforma no dependa de Supabase ni de cuentas
-personales. Que sea un proyecto independiente.
+> [!success] Terminada el 2026-09-02
+> Supabase ya no interviene en nada: 0 importaciones del SDK, 0 llamadas, el
+> paquete fuera de los dos `package.json`. Esta nota se queda como **historia**
+> — el porqué de cada decisión, que no está en el `git log`.
 
-## Qué reemplaza a qué
+**El objetivo era:** que la plataforma no dependiera de Supabase ni de cuentas
+personales. Un proyecto independiente.
 
-| Hoy lo hace Supabase | Lo reemplaza | Estado |
+## Qué reemplazó a qué
+
+| Antes lo hacía Supabase | Lo hace ahora | Dónde vive |
 |---|---|---|
-| Base de datos | Neon o Postgres de Railway | Esquema y contenido **ya versionados** |
-| Inicio de sesión | Auth propia (`/auth2`) + Google OAuth | **Código listo**, falta activar |
-| Correos | Resend | **Código listo**, falta dominio |
-| Imágenes y archivos | Cloudflare R2 | **Código listo**, falta configurar |
+| Base de datos | **Neon** (Postgres 18) | `server/src/db.js`, `pg.Pool` |
+| Inicio de sesión | **Auth propia** + Google OAuth | `/auth2`, `src/lib/sesion.ts` |
+| Correos | **Resend** | `server/src/lib/correo.js` |
+| Imágenes y archivos | **Cloudflare R2** | `server/src/routes/uploads.js` |
 
-## Lo que falta y de qué depende
+## Por qué se pudo hacer sin reescribir medio proyecto
 
-### Solo necesita el dominio (minutos cada uno)
-1. Verificar el dominio en Resend con SPF, DKIM y DMARC. *Es lo que más tarda
-   por propagación de DNS — conviene empezar por ahí.*
-2. Registrar `<API_URL>/auth2/google/callback` en Google Cloud Console.
-3. Restringir la clave de Google Maps por referente.
-4. Subdominio para el bucket R2 (opcional; sirve la URL de `r2.dev`).
+Las tres decisiones que lo hicieron barato, tomadas antes de empezar:
 
-### No necesita el dominio
-1. **Migrar los ~30 archivos del frontend que aún usan Supabase.** El grueso
-   del trabajo.
-2. Crear la base en **Neon** (capa gratuita permanente: 0.5 GB + 100 h de
-   cómputo/mes, sin tarjeta) y correr los SQL. Railway no tiene plan gratuito
-   permanente — su plan Hobby son 5 USD/mes.
-3. Copiar los archivos de Storage a R2 y actualizar las URLs guardadas.
-   **Automatizado:** `server/scripts/migrar-storage-a-r2.js` (simulacro por
-   defecto; `--apply` para ejecutar). Copia los buckets a R2 conservando la
-   ruta y reescribe en una transacción cada columna de la base que guarda una
-   URL de Storage.
-4. Sacar los videos de la cuenta personal de YouTube.
-5. Favicon adaptado a modo oscuro *(bloqueado: hace falta el archivo del logo,
-   que vive en Supabase y no es descargable desde el entorno de desarrollo)*.
+1. **Postgres en cualquier proveedor**, no una base propietaria. Postgres sigue
+   siendo Postgres: migrar fue cambiar una variable de entorno, no traducir
+   consultas.
+2. **El backend nunca usó el SDK de Supabase para datos**, solo SQL directo con
+   `pg`. Es lo que convirtió "migrar la base" en un trámite.
+3. **Los datos de pacientes nunca fueron al repositorio.** Se movieron base a
+   base, en una transacción, verificando que los conteos coincidieran. Ver
+   [[05 — Seguridad]].
 
-## Los archivos que aún atan a Supabase
+## Lo que sí costó
 
-| Tipo | Cuántos | Dificultad |
-|---|---|---|
-| Solo autenticación | ~8 | Mecánica: cambiar a `sesion.ts` |
-| Datos o archivos | ~15 | Necesitan endpoint con los mismos campos |
+- **El frontend.** ~38 archivos usaban Supabase, la mayoría solo para leer la
+  sesión. El patrón fue siempre el mismo: comprobar que el endpoint devuelve
+  **todos** los campos que el frontend lee (`procedimientos` devolvía 8 de 15,
+  y por eso el frontend lo esquivaba), reescribir con `apiFetch`/`apiAuth`,
+  typecheck y build.
+- **Los dos sistemas de login convivieron** durante la migración en vez de
+  cortar de golpe. Cortarle el acceso al panel a la doctora en un despliegue es
+  como se pierde un lunes. Ver la decisión 002 en la bóveda de Obsidian.
+- **No había `psql` en el entorno**, así que el esquema se carga con un script
+  propio que usa el cliente `pg` del backend: `server/scripts/cargar-esquema.js`.
 
-**Ya migrados:** `procedimientosApi`, `testimoniosApi`, `notifyApi` — libres
-de Supabase por completo.
+## Trampas que costaron tiempo, por si vuelven
 
-> [!tip] El patrón para migrar un servicio
-> 1. Comprobar que el endpoint de la API devuelve **todos** los campos que el
->    frontend lee. `procedimientos` devolvía 8 de 15, y por eso el frontend lo
->    esquivaba.
-> 2. Reescribir el servicio usando `apiFetch`/`apiAuth`.
-> 3. Typecheck y build.
+- `CREATE OR REPLACE VIEW` **solo deja añadir columnas al final**. Intentar
+  intercalarlas falla con `cannot change name of view column`.
+- Neon da dos cadenas de conexión: la *pooled* y la directa. **El DDL necesita
+  la directa** — hay que quitarle el `-pooler.` al host.
+- Las carpetas de R2 están en PascalCase (`ConsultorioImagenes/Logo`). El
+  mapeo vive en `server/src/routes/uploads.js`.
 
-## El día del corte
+## Lo que quedó pendiente al terminar
 
-```bash
-# 1. Crear la base nueva y levantar el esquema (ver 03 — Base de datos)
+No es de la migración en sí, pero salió de ella. Todo está en
+[[10 — Cosas por hacer]]:
 
-# 2. Migrar los datos de pacientes, base a base — nunca por Git
-export ORIGEN='postgres://...'   # Supabase
-export DESTINO='postgres://...'  # la nueva
-./server/scripts/migrar-datos-operativos.sh
-
-# 3. Apuntar DATABASE_URL del backend a la base nueva
-# 4. Dejar Supabase en SOLO LECTURA unas semanas antes de darlo de baja
-```
-
-El script verifica que los conteos coincidan en ambas bases antes de dar por
-buena la migración, e importa en una transacción: o entra todo, o nada.
-
-## Decisiones tomadas
-
-- **Postgres en cualquier proveedor**, no una base propietaria. Postgres sigue
-  siendo Postgres: eso elimina el riesgo de reescritura.
-- **El backend nunca usa el SDK de Supabase para datos**, solo SQL directo.
-  Es lo que hace que migrar sea cambiar una variable.
-- **Los dos sistemas de login conviven** en vez de cortar de golpe. Cortar el
-  acceso de la doctora al panel en un despliegue es como se pierde un lunes.
-- **Los datos de pacientes nunca van al repositorio.** Hoy es teórico (las
-  citas que había eran todas de prueba), pero el patrón queda montado antes
-  de que haya pacientes reales.
+- **DEP1 · Rotar credenciales.** La contraseña de Neon y el token de R2 se
+  pegaron en un chat durante la migración. **Antes de que haya pacientes
+  reales.**
+- **B1 · Bucket privado para consentimientos y firmas.** Hoy van al bucket
+  público. Es el punto más delicado que queda.
+- **C1 · Verificar el dominio en Resend** (SPF/DKIM/DMARC). Es lo que más
+  tarda por propagación de DNS.
+- **E1 · Sacar los videos de la cuenta personal de YouTube.**

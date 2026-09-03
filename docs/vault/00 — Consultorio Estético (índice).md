@@ -1,6 +1,6 @@
 ---
 tags: [proyecto, indice]
-actualizado: 2026-09-01
+actualizado: 2026-09-02
 ---
 
 # Consultorio Estético — Dra. Julieth Vanessa Medina Orjuela
@@ -21,30 +21,38 @@ Ibagué (Tolima, Colombia). Hace dos cosas a la vez:
 - [[03 — Base de datos]] — tablas, reglas y cómo levantarla
 - [[04 — API]] — endpoints y quién puede llamarlos
 - [[05 — Seguridad]] — qué protege qué
-- [[06 — Migración fuera de Supabase]] — el plan y en qué punto va
-- [[07 — Bitácora 2026-09-01]] — todo lo que se hizo ese día y por qué
+- [[06 — Migración fuera de Supabase]] — **terminada**; queda como historia
+- [[07 — Bitácora 2026-09-01]] — el día de la migración
+- [[08 — Bitácora 2026-09-02]] — corte final de Supabase y reestructura de móvil
+- [[09 — Estudio de móvil]] — por qué el sitio se veía mal en un teléfono, medido
+- [[10 — Cosas por hacer]] — backlog vivo, por tipo de trabajo
 
 ## Estado en una línea
 
-Funcionando en producción (Vercel + Railway), con la base de datos todavía en
-Supabase pero ya **versionada por completo en el repositorio**: se reconstruye
-idéntica en cualquier Postgres con un comando.
+Funcionando en producción (Vercel + Railway) sobre **infraestructura propia**:
+Postgres en Neon, archivos en Cloudflare R2, autenticación propia con Google
+OAuth, correos por Resend. **Supabase ya no interviene en nada.**
 
 ## Números
 
+Contados el 2026-09-02.
+
 | | |
 |---|---|
-| Frontend | ~20.500 líneas (TypeScript/React) |
-| Backend | ~3.560 líneas (Node/Express) |
-| Estilos | ~4.880 líneas (CSS) |
-| Esquema y datos | ~1.130 líneas (SQL) |
-| Endpoints | 60 en 13 módulos |
-| Páginas | 18 rutas |
+| Frontend | ~19.900 líneas (TypeScript/React) |
+| Backend | ~4.240 líneas (Node/Express) |
+| Estilos | ~5.270 líneas (CSS) |
+| Endpoints | 60+ en 15 módulos |
+| Rutas | 23 |
 | Tablas | 19 |
-| Pruebas | 29 comprobaciones de integración |
+| Dependencias de Supabase | **0** |
 
 ## Enlaces
 
 - Repositorio: `Sekkon0906/consultorioEstetico-vm`
-- Rama de trabajo: `claude/supabase-migration-hostinger-upywuz`
-- Frontend: Vercel · Backend: Railway · Base: Supabase (en migración)
+- Frontend: Vercel · Backend: Railway · Base: **Neon** · Archivos: **Cloudflare R2**
+- Errores: Sentry (solo producción)
+
+> [!warning] Antes de que la doctora lo use con pacientes reales
+> Rotar la contraseña de Neon y el token de R2 — se pegaron en un chat
+> durante la migración. Es el punto **DEP1** de [[10 — Cosas por hacer]].
