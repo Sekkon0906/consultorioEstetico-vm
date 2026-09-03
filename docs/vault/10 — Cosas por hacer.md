@@ -262,7 +262,7 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ## 🐞 Bugs — reportados 2026-09-03
 
-- [ ] **BUG5 · "Invalid Date" en Mis Citas Agendadas.** La tarjeta de la cita
+- [x] **BUG5 · "Invalid Date" en Mis Citas Agendadas.** La tarjeta de la cita
       muestra literalmente `Invalid Date` donde debería ir la fecha y la hora.
       **No es un problema de color** — es una fecha que no se está parseando.
       Sospecha: la cita se guarda con `fecha` y `hora` en columnas separadas y
@@ -270,8 +270,14 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
       navegador no acepta (`"2026-09-02 10:00"` sin la `T`, o la hora sola).
       Revisar `app/perfil/citas_agendadas/`.
       *Visto en la cita "Bótox Complementario" del 2026-09-03.*
+      ⟶ **Hecho.** La causa estaba en el backend: `pg` convertía la columna
+      `date` a un `Date` de JavaScript y le pegaba la medianoche en la zona
+      del servidor. Arreglado en el origen (devuelve texto "YYYY-MM-DD") y
+      con un helper compartido en el frontend. Había un segundo fallo
+      latente detrás: con el servidor en UTC la cita se habría mostrado un
+      día antes.
 
-- [ ] **BUG6 · El selector de procedimiento del formulario de agendar está
+- [x] **BUG6 · El selector de procedimiento del formulario de agendar está
       roto.** Al abrir el modal para escoger el tipo de procedimiento, la lista
       aparece **cortada por arriba**: el ítem resaltado se solapa con la
       cabecera "FACIALES" y se ve media línea. El scroll arranca en una
@@ -279,9 +285,11 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
       Sospecha: el `scrollIntoView` de la opción seleccionada corre antes de
       que el modal termine de montar, o falta `scroll-margin-top` sobre la
       cabecera pegajosa del grupo.
-      ⟶ Juan además pide **replantear cómo se busca el procedimiento**, no solo
-      arreglar el corte: hoy es una lista larga con buscador; con ~20
-      procedimientos en 3 categorías, se siente pesado.
+      ⟶ **Hecho.** El desplazamiento al elemento elegido ahora es
+      intencionado y centrado, y los ítems llevan `scroll-margin-top`.
+      La búsqueda se replanteó con **chips de categoría** para filtrar sin
+      teclear. Queda por evaluar si hace falta además navegación con
+      teclado (flechas + Enter).
 
 ---
 
@@ -292,32 +300,32 @@ adaptar**. Hay un patrón de fondo: son los sitios donde el color está escrito
 a mano en el componente y no cita el token, así que en oscuro se queda con el
 valor claro. Es la continuación natural de F14.
 
-- [ ] **O1 · Recuadros de "Lo que me distingue" (home).** Los títulos
+- [x] **O1 · Recuadros de "Lo que me distingue" (home).** Los títulos
       ("Tecnología HydraFacial", "Productos premium", "Mínimo dolor",
       "Atención personalizada") son **casi invisibles** sobre la tarjeta
       oscura; solo se lee el subtítulo. Los íconos también salen demasiado
       claros y se pierden contra el fondo.
 
-- [ ] **O2 · Sección "Conoce los procedimientos más demandados y promociones"
+- [x] **O2 · Sección "Conoce los procedimientos más demandados y promociones"
       (home) no está en modo oscuro.** Sigue con el fondo café/beige claro
       mientras el resto de la página ya es oscuro. Es la sección entera, no un
       detalle.
 
-- [ ] **O3 · El botón "Agendar cita" se vuelve ilegible.** El champán de
+- [x] **O3 · El botón "Agendar cita" se vuelve ilegible.** El champán de
       `--brand` en oscuro es muy claro, y con el texto encima el contraste no
       alcanza. Pasa en el navbar, en la ficha de procedimiento ("Agendar este
       procedimiento") y en el resto de botones primarios.
       *Nota:* `--brand-contrast` existe justamente para esto (`#1A1720` en
       oscuro). El problema es que estos botones no lo están usando.
 
-- [ ] **O4 · "Formación / crecimiento continuo" (página de la doctora) no está
+- [x] **O4 · "Formación / crecimiento continuo" (página de la doctora) no está
       adaptado.** Aparece un bloque blanco/crema a pantalla completa —con el
       texto "Sin actividades registradas aún"— en medio de una página oscura.
 
-- [ ] **O5 · Botones de la página /procedimientos ilegibles.** Mismo caso que
+- [x] **O5 · Botones de la página /procedimientos ilegibles.** Mismo caso que
       O3: el fondo claro del botón con texto claro encima.
 
-- [ ] **O6 · "Mis Citas Agendadas" en oscuro.** La tarjeta de la cita y la
+- [x] **O6 · "Mis Citas Agendadas" en oscuro.** La tarjeta de la cita y la
       columna de filtros (Todos / Pendiente / Confirmada…) no están adaptadas.
 
 > [!tip] Cómo atacarlos de una vez
@@ -330,13 +338,16 @@ valor claro. Es la continuación natural de F14.
 
 ## 🟦 Rediseño pedido — Consultorio (2026-09-03)
 
-- [ ] **R1 · "Elegancia, confort y tecnología" → galería con descripción
+- [x] **R1 · "Elegancia, confort y tecnología" → galería con descripción
       sincronizada.** Hoy la sección es un bloque de texto y aparte una
       galería. Juan quiere separarlas y convertirlo en:
       **foto a la izquierda · descripción breve a la derecha**, y que **al
       cambiar de imagen cambie la descripción** (los implementos que se ven,
       la zona del consultorio, la vista…).
       Objetivo suyo, textual: *"darle como un récord visual a esa parte"*.
+      ⟶ **Hecho.** Foto a la izquierda, descripción a la derecha, cambiando
+      con la imagen. **Los cinco textos son un borrador** escrito a partir
+      de lo que se ve en cada foto: la doctora debería revisarlos.
       ⟶ Implica **contenido nuevo**: hace falta un texto corto por cada foto de
       la galería. Eso lo tiene que escribir la doctora, o sacarse de lo que se
       ve en cada imagen. Es la parte que bloquea, no el código.
