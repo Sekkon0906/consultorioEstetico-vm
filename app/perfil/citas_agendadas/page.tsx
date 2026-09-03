@@ -61,7 +61,7 @@ function ProgressBar({ estado, t }: { estado: string; t: ReturnType<typeof useTr
               <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
             </div>
             {!isLast && (
-              <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 4px", marginBottom: 18, background: currentStep > i + 1 ? "linear-gradient(90deg, #B08968, #C9AD8D)" : "var(--border)", transition: "background 0.4s" }} />
+              <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 4px", marginBottom: 18, background: currentStep > i + 1 ? "linear-gradient(90deg, var(--brand), #C9AD8D)" : "var(--border)", transition: "background 0.4s" }} />
             )}
           </div>
         );
@@ -159,7 +159,7 @@ export default function CitasAgendadas() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", marginBottom: "2rem" }}>
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem" }}>{t("title")}</h2>
-        <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, margin: "0 auto 1.2rem" }} />
+        <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, var(--brand), #C9AD8D)", borderRadius: 2, margin: "0 auto 1.2rem" }} />
       </motion.div>
 
       {/* Layout: filtros a la izquierda (pila) · citas a la derecha */}

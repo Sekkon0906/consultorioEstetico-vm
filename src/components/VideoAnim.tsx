@@ -99,7 +99,7 @@ export default function VideoAnim() {
       <div style={{ textAlign: "center", padding: "1rem 0.6rem", borderRadius: 14, background: "linear-gradient(145deg, #FFFBF7, #F0E5D8)", border: "1px solid rgba(176,137,104,0.14)", transition: "transform 0.35s, box-shadow 0.35s", position: "relative", overflow: "hidden", cursor: "default" }}
         onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px) scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(176,137,104,0.16)"; }}
         onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
-        <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #B08968, #D4A87A)", color: "white", fontSize: "0.75rem", marginBottom: 6 }}><i className={icon} /></div>
+        <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand), #D4A87A)", color: "white", fontSize: "0.75rem", marginBottom: 6 }}><i className={icon} /></div>
         <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.7rem", fontWeight: 700, color: "var(--text)", lineHeight: 1 }}>{count}{suffix}</div>
         <div style={{ fontSize: "0.7rem", fontWeight: 500, color: "#7A6554", marginTop: 3 }}>{label}</div>
         <div style={{ position: "absolute", top: "-50%", left: "-50%", width: "200%", height: "200%", background: "linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.2) 50%, transparent 60%)", transform: "rotate(25deg)", animation: "va-shine 4s ease-in-out infinite", pointerEvents: "none" }} />
@@ -139,7 +139,7 @@ export default function VideoAnim() {
         {/* Header — sin kicker para ahorrar vertical y que título+video+CTAs entren juntos en pantalla */}
         <div ref={hdr.ref} style={{ ...rs(hdr.v), textAlign: "center", marginBottom: "1.4rem", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.4rem, 2.6vw, 2rem)", fontWeight: 700, color: "var(--text)", maxWidth: 780, margin: "0 auto 0.6rem", lineHeight: 1.2 }}>{t("title")}</h2>
-          <div style={{ width: 50, height: 3, background: "linear-gradient(90deg,#C9AD8D,#B08968)", borderRadius: 2, margin: "0 auto 0.55rem" }} />
+          <div style={{ width: 50, height: 3, background: "linear-gradient(90deg,var(--brand-soft),#B08968)", borderRadius: 2, margin: "0 auto 0.55rem" }} />
           <p style={{ fontSize: "0.95rem", color: "#7A6554", margin: 0 }}>{t("subtitle")}</p>
         </div>
 

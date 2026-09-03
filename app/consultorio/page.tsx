@@ -124,7 +124,7 @@ export default function ConsultorioPage() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.8 }}
-          className="text-3xl md:text-4xl font-semibold text-[#B08968] mb-8"
+          className="text-3xl md:text-4xl font-semibold text-[var(--brand)] mb-8"
         >
           {t("description.title")}
         </motion.h2>
@@ -144,7 +144,7 @@ export default function ConsultorioPage() {
       {/* GALERÍA — showcase interactivo: imagen grande + miniaturas */}
       <section className="consultorio-gallery-section px-4 pb-16 pt-4">
         <div className="max-w-5xl mx-auto mb-8 text-center">
-          <h2 className="consultorio-gallery-title text-2xl md:text-3xl font-semibold text-[#B08968]">
+          <h2 className="consultorio-gallery-title text-2xl md:text-3xl font-semibold text-[var(--brand)]">
             {t("gallery.title")}
           </h2>
         </div>

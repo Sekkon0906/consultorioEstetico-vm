@@ -102,7 +102,7 @@ export default function HorariosHabilitados() {
       if (cita.estado === "pendiente") return { bg: "#FFF8E1", color: "#7D6608", border: "#F0E0A0", label: `${cita.nombres} - ${cita.procedimiento}` };
       if (cita.estado === "confirmada") return { bg: "#E3F2FD", color: "#0B3C78", border: "#A0C8F0", label: `${cita.nombres} - ${cita.procedimiento}` };
       if (cita.estado === "atendida") return { bg: "#E8F5E9", color: "#145A32", border: "#A0D8A8", label: `${cita.nombres} - ${cita.procedimiento}` };
-      return { bg: "#EEF7EE", color: "#2D6A4F", border: "#A8D8B9", label: `${cita.nombres}` };
+      return { bg: "#EEF7EE", color: "var(--success)", border: "#A8D8B9", label: `${cita.nombres}` };
     }
     if (esBloqueada(hora)) return { bg: "#FDE8D8", color: "#922B21", border: "#F0A898", label: "Bloqueada" };
     return { bg: "var(--surface-soft)", color: "var(--text)", border: "var(--border)", label: "Disponible" };
@@ -119,7 +119,7 @@ export default function HorariosHabilitados() {
         {[{ k: "diario", l: "Bloqueo por dia" }, { k: "global", l: "Bloqueo global" }].map(t => (
           <button key={t.k} onClick={() => setTab(t.k as any)}
             style={{ padding: "0.6rem 1.3rem", borderRadius: 100, fontWeight: 600, fontSize: "0.85rem", border: "none", cursor: "pointer",
-              background: tab === t.k ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "var(--surface-soft)", color: tab === t.k ? "white" : "var(--text)" }}>
+              background: tab === t.k ? "linear-gradient(135deg, var(--brand-deep), #B08968)" : "var(--surface-soft)", color: tab === t.k ? "white" : "var(--text)" }}>
             {t.l}
           </button>
         ))}

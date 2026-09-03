@@ -76,12 +76,12 @@ export default function HistorialReportes() {
           </thead>
           <tbody>
             {reportes.map((r) => (
-              <tr key={r.id} style={{ borderBottom: "1px solid #F5EEE6" }}>
+              <tr key={r.id} style={{ borderBottom: "1px solid var(--surface-soft)" }}>
                 <td className="fw-semibold" style={{ color: "var(--text)" }}>
                   {MESES[(r.mes || 1) - 1]} {r.anio}
                 </td>
                 <td style={{ color: "#1B4F72" }}>{fmt(r.totalOnline)}</td>
-                <td style={{ color: "#2D6A4F" }}>{fmt(r.totalConsultorio)}</td>
+                <td style={{ color: "var(--success)" }}>{fmt(r.totalConsultorio)}</td>
                 <td style={{ color: "#7F5539" }}>{fmt(r.totalEsperado)}</td>
                 <td style={{ color: "var(--text-soft)", fontSize: "0.8rem" }}>
                   {new Date(r.fechaGeneracion).toLocaleDateString("es-CO")}

@@ -269,12 +269,15 @@ export default function Galeria3D() {
         <h2
           style={{
             fontFamily: "'Playfair Display', serif",
-            color: "var(--surface)",
+            /* Va sobre la foto, no sobre una superficie: `--surface` es
+               crema en claro pero casi negro en oscuro, y ahí el título
+               se volvía ilegible. Ver `--texto-sobre-foto`. */
+            color: "var(--texto-sobre-foto)",
             fontWeight: 700,
             /* Título mucho más grande para tomar más presencia visual. */
             fontSize: "clamp(1.7rem, 2.8vw, 2.5rem)",
             margin: 0,
-            textShadow: "0 4px 20px rgba(0,0,0,0.75)",
+            textShadow: "var(--sombra-sobre-foto)",
             letterSpacing: "0.01em",
             lineHeight: 1.2,
           }}
@@ -721,7 +724,7 @@ export default function Galeria3D() {
               width: "60%",
               height: 4,
               background:
-                "linear-gradient(90deg, transparent 0%, #B08968 30%, #C9AD8D 50%, #B08968 70%, transparent 100%)",
+                "linear-gradient(90deg, transparent 0%, var(--brand) 30%, #C9AD8D 50%, #B08968 70%, transparent 100%)",
               borderRadius: "0 0 4px 4px",
             }}
           />
@@ -843,7 +846,7 @@ export default function Galeria3D() {
                   style={{
                     width: 36,
                     height: 3,
-                    background: "linear-gradient(90deg, #B08968, #C9AD8D)",
+                    background: "linear-gradient(90deg, var(--brand), #C9AD8D)",
                     borderRadius: 2,
                     marginBottom: "0.9rem",
                   }}

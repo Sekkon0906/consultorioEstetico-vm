@@ -64,7 +64,7 @@ export default function Step3Exito({ formData }: Props) {
   if (status === "error") {
     return (
       <div className="text-center py-5">
-        <p style={{ color: "#b02e2e" }}>
+        <p style={{ color: "var(--danger)" }}>
            {errorMsg || "No se pudo crear la cuenta. Intenta de nuevo."}
         </p>
         <button

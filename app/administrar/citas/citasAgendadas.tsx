@@ -266,7 +266,7 @@ export default function CitasAgendadas() {
                   <textarea value={reagendarMotivo} onChange={(e) => { setReagendarMotivo(e.target.value); if (reagendarError) setReagendarError(null); }} rows={3} placeholder="Explica al cliente por qué se propone reagendar..." style={{ ...IS, resize: "vertical" as const }} />
                 </div>
               </div>
-              {reagendarError && <p style={{ color: "#b02e2e", fontSize: "0.82rem", marginTop: "0.6rem", textAlign: "center" }}>{reagendarError}</p>}
+              {reagendarError && <p style={{ color: "var(--danger)", fontSize: "0.82rem", marginTop: "0.6rem", textAlign: "center" }}>{reagendarError}</p>}
               <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center", marginTop: "1.2rem" }}>
                 <BtnM label="Cancelar" bg="var(--surface-soft)" color="var(--text)" onClick={() => setReagendarModal(null)} />
                 <BtnM label={reagendarSaving ? "Enviando..." : "Enviar solicitud"} bg="var(--brand)" color="#fff" onClick={doReagendar} disabled={reagendarSaving || !reagendarFecha || !reagendarHora || !reagendarMotivo.trim()} />

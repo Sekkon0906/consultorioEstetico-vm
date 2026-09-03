@@ -123,7 +123,7 @@ export default function AgendarForm({
         onClick={goBack}
       >
         <ArrowLeft size={20} className="text-[#5C4533]" />
-        <span className="text-sm font-medium text-[#5C4533] hover:text-[#8B6A4B] transition-colors">
+        <span className="text-sm font-medium text-[#5C4533] hover:text-[var(--brand-deep)] transition-colors">
           {t("back")}
         </span>
       </div>
@@ -229,7 +229,7 @@ export default function AgendarForm({
             onChange={(e) => handleChange("nombre", e.target.value)}
             placeholder={t("fullNamePlaceholder")}
             required
-            className="w-full p-3 rounded-lg border bg-white focus:border-[#B08968] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
+            className="w-full p-3 rounded-lg border bg-white focus:border-[var(--brand)] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
             style={{
               borderColor: DARK_PALETTE.border,
               color: DARK_PALETTE.text,
@@ -251,7 +251,7 @@ export default function AgendarForm({
             placeholder={t("phonePlaceholder")}
             required
             pattern="[0-9]{7,}"
-            className="w-full p-3 rounded-lg border bg-white focus:border-[#B08968] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
+            className="w-full p-3 rounded-lg border bg-white focus:border-[var(--brand)] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
             style={{
               borderColor: DARK_PALETTE.border,
               color: DARK_PALETTE.text,
@@ -272,7 +272,7 @@ export default function AgendarForm({
             type="email"
             placeholder={t("emailPlaceholder")}
             required
-            className="w-full p-3 rounded-lg border bg-white focus:border-[#B08968] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
+            className="w-full p-3 rounded-lg border bg-white focus:border-[var(--brand)] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
             style={{
               borderColor: DARK_PALETTE.border,
               color: DARK_PALETTE.text,
@@ -331,7 +331,7 @@ export default function AgendarForm({
             onChange={(e) => handleChange("nota", e.target.value)}
             rows={3}
             placeholder={t("notePlaceholder")}
-            className="w-full p-3 rounded-lg border bg-white focus:border-[#B08968] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
+            className="w-full p-3 rounded-lg border bg-white focus:border-[var(--brand)] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
             style={{
               borderColor: DARK_PALETTE.border,
               color: DARK_PALETTE.text,

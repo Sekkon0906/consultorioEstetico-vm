@@ -289,7 +289,7 @@ export default function FirmaConsentimiento(props: Props) {
             transition={{ type: "spring", damping: 26, stiffness: 320 }}
             style={{ background: "var(--surface)", borderRadius: 24, boxShadow: "0 30px 80px rgba(0,0,0,0.5)", width: "100%", maxWidth: 580, maxHeight: "92vh", overflowY: "auto", position: "relative" }}
             onClick={function(e) { e.stopPropagation(); }}>
-              <div style={{ height: 4, background: "linear-gradient(90deg, #B08968, #C9AD8D)" }} />
+              <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)" }} />
               <button onClick={cerrar} style={{ position: "absolute", top: 14, right: 14, width: 32, height: 32, borderRadius: "50%", background: "rgba(78,59,43,0.06)", border: "none", color: "#4E3B2B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}><X size={16} /></button>
 
               <div style={{ padding: "2rem 2rem 2.5rem" }}>
@@ -321,7 +321,7 @@ export default function FirmaConsentimiento(props: Props) {
                       <button onClick={function() { limpiar(); setFirmaError(null); }} style={{ padding: "0.5rem 1.2rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "var(--text-soft)", fontWeight: 600, fontSize: "0.82rem", cursor: "pointer" }}>{t("clear")}</button>
                     </div>
                     {firmaError && (
-                      <p style={{ color: "#b02e2e", fontSize: "0.82rem", textAlign: "center", marginBottom: "0.8rem" }}>{firmaError}</p>
+                      <p style={{ color: "var(--danger)", fontSize: "0.82rem", textAlign: "center", marginBottom: "0.8rem" }}>{firmaError}</p>
                     )}
                     <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
                       <button onClick={function() { setStep("intro"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "var(--text-soft)", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer" }}>{t("back")}</button>

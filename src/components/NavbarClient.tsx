@@ -363,7 +363,7 @@ export default function Navbar() {
               left: indicator.left,
               width: indicator.width,
               opacity: indicator.width ? 1 : 0,
-              background: "linear-gradient(90deg, #b08968, #ffe4c0, #b08968)",
+              background: "linear-gradient(90deg, var(--brand), #ffe4c0, #b08968)",
               borderRadius: "3px",
               pointerEvents: "none",
               transition:
@@ -602,7 +602,7 @@ export default function Navbar() {
                 </button>
                 <button
                   className="btn flex-fill"
-                  style={{ background: "#b02e2e", color: "#fff", fontWeight: 600, border: "none", borderRadius: "10px" }}
+                  style={{ background: "var(--danger)", color: "#fff", fontWeight: 600, border: "none", borderRadius: "10px" }}
                   onClick={handleLogout}
                 >
                   {t("logout")}

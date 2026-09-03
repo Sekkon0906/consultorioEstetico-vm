@@ -70,6 +70,24 @@
      El navegador que no entienda `dvh` ignora la segunda y se queda con la
      primera; el que sí, la pisa. */
   --alto-pantalla: 100dvh;
+
+  /* ==========================
+     TEXTO SOBRE FOTO
+     ==========================
+     Un titular encima de una imagen no sigue al tema: la foto es oscura
+     en claro y en oscuro, así que el texto tiene que quedarse claro en
+     los dos. Este token existe porque no tenerlo ya causó un bug real —
+     el título "Conoce los procedimientos…" usaba `--surface` (la
+     superficie de las tarjetas, crema en claro) y en modo oscuro se
+     volvía #26222A: serif casi negro sobre una foto café oscura,
+     ilegible.
+
+     La regla: si el fondo es una imagen, no uses un token de superficie
+     como color de texto. Usa este, que a propósito NO se redefine en la
+     paleta oscura. La sombra acompaña — sobre una foto clara el texto
+     claro necesita el contorno para leerse. */
+  --texto-sobre-foto: #F7F2EA;
+  --sombra-sobre-foto: 0 4px 20px rgba(0, 0, 0, 0.75);
 }
 
 @media (min-width: 768px) {

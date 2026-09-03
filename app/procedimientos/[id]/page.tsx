@@ -129,7 +129,7 @@ export default function ProcedimientoPage() {
                 style={{ objectFit: "cover" }}
               />
             ) : (
-              <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #E9DED2, #B08968)" }} />
+              <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, var(--border), #B08968)" }} />
             )}
             {/* Gradient bottom para legibilidad del título */}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 45%, transparent 70%)" }} />

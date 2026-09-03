@@ -481,8 +481,8 @@ export default function ProcedimientosPage() {
           padding: 0.65rem 2.4rem 0.65rem 2.6rem;
           border-radius: 100px;
           border: 1px solid rgba(176, 137, 104, 0.25);
-          background: #FFFDF9;
-          color: #3A2A1A;
+          background: var(--surface);
+          color: var(--text);
           font-size: 0.92rem;
           outline: none;
           transition: border-color var(--mov-normal) ease, box-shadow var(--mov-normal) ease;
@@ -492,7 +492,7 @@ export default function ProcedimientosPage() {
           color: #A0907B;
         }
         .proc-search-input:focus {
-          border-color: #B08968;
+          border-color: var(--brand);
           box-shadow: 0 0 0 4px rgba(176, 137, 104, 0.12);
         }
         .proc-search-clear {
@@ -534,8 +534,8 @@ export default function ProcedimientosPage() {
           letter-spacing: 0.01em;
         }
         .proc-chip:hover {
-          border-color: #B08968;
-          color: #3A2A1A;
+          border-color: var(--brand);
+          color: var(--text);
         }
         .proc-chip.is-active {
           background: linear-gradient(135deg, var(--brand), var(--brand-soft));
@@ -578,7 +578,7 @@ export default function ProcedimientosPage() {
         .proc-subchip:hover {
           background: rgba(255, 253, 249, 0.9);
           border-color: rgba(176, 137, 104, 0.4);
-          color: #3A2A1A;
+          color: var(--text);
         }
         .proc-subchip.is-active {
           background: #3A2A1A;
@@ -598,7 +598,7 @@ export default function ProcedimientosPage() {
         .proc-sort-label {
           font-size: 0.78rem;
           font-weight: 600;
-          color: #6C584C;
+          color: var(--text-soft);
           white-space: nowrap;
         }
         .proc-sort-trigger {
@@ -608,8 +608,8 @@ export default function ProcedimientosPage() {
           padding: 0.45rem 0.85rem 0.45rem 1rem;
           border-radius: 100px;
           border: 1px solid rgba(176, 137, 104, 0.28);
-          background: #FFFDF9;
-          color: #3A2A1A;
+          background: var(--surface);
+          color: var(--text);
           font-size: 0.84rem;
           font-weight: 600;
           cursor: pointer;
@@ -619,12 +619,12 @@ export default function ProcedimientosPage() {
           font-family: inherit;
         }
         .proc-sort-trigger:hover {
-          border-color: #B08968;
+          border-color: var(--brand);
           background: #FFF9F1;
         }
         .proc-sort-trigger.is-open,
         .proc-sort-trigger:focus-visible {
-          border-color: #B08968;
+          border-color: var(--brand);
           box-shadow: 0 0 0 4px rgba(176, 137, 104, 0.14);
         }
         .proc-sort-caret {
@@ -638,7 +638,7 @@ export default function ProcedimientosPage() {
           right: 0;
           min-width: 240px;
           padding: 0.35rem;
-          background: #FFFDF9;
+          background: var(--surface);
           border: 1px solid rgba(176, 137, 104, 0.2);
           border-radius: 14px;
           box-shadow:
@@ -657,7 +657,7 @@ export default function ProcedimientosPage() {
           padding: 0.55rem 0.85rem;
           border: none;
           background: transparent;
-          color: #3A2A1A;
+          color: var(--text);
           font-size: 0.85rem;
           font-weight: 500;
           text-align: left;
@@ -668,7 +668,7 @@ export default function ProcedimientosPage() {
         }
         .proc-sort-option:hover {
           background: rgba(176, 137, 104, 0.1);
-          color: #3A2A1A;
+          color: var(--text);
         }
         .proc-sort-option.is-selected {
           background: linear-gradient(135deg, var(--brand), var(--brand-soft));
@@ -695,7 +695,7 @@ export default function ProcedimientosPage() {
         /* Card */
         .proc-card {
           position: relative;
-          background: #FFFDF9;
+          background: var(--surface);
           border-radius: 24px;
           overflow: hidden;
           border: 1px solid rgba(176, 137, 104, 0.12);
@@ -803,13 +803,13 @@ export default function ProcedimientosPage() {
           font-family: 'Playfair Display', serif;
           font-size: 1.15rem;
           font-weight: 700;
-          color: #3A2A1A;
+          color: var(--text);
           margin: 0;
           line-height: 1.25;
         }
         .proc-card-desc {
           font-size: 0.88rem;
-          color: #6C584C;
+          color: var(--text-soft);
           line-height: 1.55;
           margin: 0;
           display: -webkit-box;
@@ -828,7 +828,7 @@ export default function ProcedimientosPage() {
         .proc-card-price {
           font-size: 0.85rem;
           font-weight: 700;
-          color: #B08968;
+          color: var(--brand);
         }
         .proc-card-price-unit {
           font-size: 0.7rem;
@@ -964,7 +964,7 @@ function FeaturedCarousel({
           gridTemplateColumns: "1.05fr 1fr",
           gap: 0,
           alignItems: "stretch",
-          background: "linear-gradient(135deg, #FFFDF9 0%, #F7EFE3 100%)",
+          background: "linear-gradient(135deg, var(--surface) 0%, #F7EFE3 100%)",
           borderRadius: 28,
           border: "1px solid rgba(255, 215, 138, 0.55)",
           boxShadow:
@@ -1261,7 +1261,7 @@ function FeaturedCarousel({
         }
         .featured-dot.is-active {
           width: 26px;
-          background: linear-gradient(90deg, #B08968, #C9AD8D);
+          background: linear-gradient(90deg, var(--brand), #C9AD8D);
         }
         @media (max-width: 820px) {
           .featured-grid {

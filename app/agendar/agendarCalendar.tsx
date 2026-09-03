@@ -223,7 +223,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
 
             {!selectedDate && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: "center", padding: "3rem 1rem" }}>
-                <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, #E9DED2, #F5EEE6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, var(--border), #F5EEE6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
                   <i className="fas fa-calendar-day" style={{ color: "var(--brand)", fontSize: "1.4rem" }} />
                 </div>
                 <p style={{ color: "var(--text-muted)", fontSize: "0.92rem" }}>{t("pickDayHint")}</p>

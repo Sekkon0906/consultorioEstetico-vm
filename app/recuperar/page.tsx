@@ -36,7 +36,7 @@ export default function RecuperarPage() {
   return (
     <section
       style={{
-        background: "linear-gradient(180deg, #FAF9F7 0%, #F1E9E0 100%)",
+        background: "linear-gradient(180deg, var(--bg) 0%, #F1E9E0 100%)",
         minHeight: "var(--alto-pantalla, 100vh)",
         display: "flex",
         alignItems: "center",
@@ -52,7 +52,7 @@ export default function RecuperarPage() {
               <h2
                 className="fw-bold mb-3"
                 style={{
-                  color: "#4E3B2B",
+                  color: "var(--topbar-text)",
                   fontFamily: "'Playfair Display', serif",
                 }}
               >
@@ -88,7 +88,7 @@ export default function RecuperarPage() {
                   {error && (
                     <p
                       className="mb-2"
-                      style={{ color: "#b02e2e", fontSize: "0.85rem" }}
+                      style={{ color: "var(--danger)", fontSize: "0.85rem" }}
                     >
                       {error}
                     </p>

@@ -20,7 +20,7 @@ export default function Filosofia() {
         <h3
           className="fw-bold mb-5"
           style={{
-            color: "#4E3B2B",
+            color: "var(--topbar-text)",
             fontFamily: "'Playfair Display',serif",
           }}
         >
@@ -40,7 +40,7 @@ export default function Filosofia() {
                 </div>
                 <h5
                   className="fw-bold mt-3 mb-2"
-                  style={{ color: "#4E3B2B" }}
+                  style={{ color: "var(--topbar-text)" }}
                 >
                   {v.title}
                 </h5>

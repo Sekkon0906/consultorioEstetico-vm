@@ -9,7 +9,7 @@ export default function VisionMision() {
     <section
       className="dark-aware-section vm-section"
       style={{
-        background: "linear-gradient(180deg,#FAF9F7 0%,#F5EDE3 100%)",
+        background: "linear-gradient(180deg,var(--bg) 0%,#F5EDE3 100%)",
         padding: "5rem 2rem",
       }}
     >
@@ -21,7 +21,7 @@ export default function VisionMision() {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           style={{
-            color: "#4E3B2B",
+            color: "var(--topbar-text)",
             fontFamily: "'Playfair Display', serif",
           }}
         >
@@ -53,7 +53,7 @@ export default function VisionMision() {
               </h4>
               <p
                 style={{
-                  color: "#4E3B2B",
+                  color: "var(--topbar-text)",
                   fontSize: "1.05rem",
                   lineHeight: "1.7",
                 }}
@@ -87,7 +87,7 @@ export default function VisionMision() {
               </h4>
               <p
                 style={{
-                  color: "#4E3B2B",
+                  color: "var(--topbar-text)",
                   fontSize: "1.05rem",
                   lineHeight: "1.7",
                 }}

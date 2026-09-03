@@ -218,7 +218,7 @@ export default function CharlasList() {
                 </button>
                 <button
                   className="btn flex-fill rounded-pill"
-                  style={{ background: "#b02e2e", color: "#fff", fontWeight: 600, border: "none" }}
+                  style={{ background: "var(--danger)", color: "#fff", fontWeight: 600, border: "none" }}
                   onClick={() => handleEliminar(confirmEliminarId)}
                 >
                   Eliminar
@@ -371,7 +371,7 @@ export default function CharlasList() {
                           style={{
                             width: 18,
                             height: 18,
-                            backgroundColor: "#b02e2e",
+                            backgroundColor: "var(--danger)",
                             color: "#fff",
                             fontSize: "0.6rem",
                             lineHeight: 1,

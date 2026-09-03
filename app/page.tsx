@@ -160,8 +160,8 @@ export default function HomePage() {
       {/* GALERÍA 3D — el componente trae su propia imagen de fondo y título */}
       <section
         style={{
-          borderTop: "1px solid #E8E1D4",
-          borderBottom: "1px solid #E8E1D4",
+          borderTop: "1px solid var(--topbar-bg)",
+          borderBottom: "1px solid var(--topbar-bg)",
         }}
       >
         <Galeria3D />
@@ -172,7 +172,7 @@ export default function HomePage() {
         className="py-5 text-center home-location-section"
         style={{
           backgroundColor: "var(--border)",
-          color: "#4E3B2B",
+          color: "var(--topbar-text)",
         }}
       >
         <h2

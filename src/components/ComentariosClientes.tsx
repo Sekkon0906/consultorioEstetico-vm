@@ -70,7 +70,7 @@ export default function ComentariosClientes() {
   const ratingLabels = t.raw("ratingLabels") as string[];
 
   return (
-    <section className="dark-aware-section comentarios-section" style={{ position: "relative", zIndex: 10, padding: "4rem 1.5rem", textAlign: "center", backgroundColor: "#FAF7F2", color: "#4E3B2B", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+    <section className="dark-aware-section comentarios-section" style={{ position: "relative", zIndex: 10, padding: "4rem 1.5rem", textAlign: "center", backgroundColor: "#FAF7F2", color: "var(--topbar-text)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
       <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 600, marginBottom: "0.4rem" }}>{t("title")}</h2>
       <p style={{ fontSize: "0.88rem", fontStyle: "italic", color: "var(--text-soft)", marginBottom: "1.5rem" }}>{t("subtitle")}</p>
 
@@ -129,7 +129,7 @@ export default function ComentariosClientes() {
           </div>
 
           <button onClick={handleEnviar} disabled={enviando}
-            style={{ width: "100%", background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", borderRadius: 100, padding: "0.7rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer", opacity: enviando ? 0.7 : 1 }}>
+            style={{ width: "100%", background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "white", border: "none", borderRadius: 100, padding: "0.7rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer", opacity: enviando ? 0.7 : 1 }}>
             {enviando ? t("form.submitting") : t("form.submit")}
           </button>
         </div>

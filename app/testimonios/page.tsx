@@ -53,7 +53,7 @@ export default function TestimoniosPage() {
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
           <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--brand)", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("badge")}</span>
           <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "var(--text)", marginBottom: "0.8rem" }}>{t("title")}</h1>
-          <div style={{ width: 50, height: 3, background: "linear-gradient(90deg, #C9AD8D, #B08968)", borderRadius: 2, margin: "0 auto 0.8rem" }} />
+          <div style={{ width: 50, height: 3, background: "linear-gradient(90deg, var(--brand-soft), #B08968)", borderRadius: 2, margin: "0 auto 0.8rem" }} />
           <p style={{ fontSize: "1.05rem", color: "#7A6554", maxWidth: 600, margin: "0 auto" }}>{t("subtitle")}</p>
         </div>
 

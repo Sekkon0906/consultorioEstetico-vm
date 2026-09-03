@@ -131,5 +131,5 @@
   background: #FFFFFF;
 }
 :root[data-theme="light"] .admin-cal-day.is-today {
-  background: #F5EEE6;
+  background: var(--surface-soft);
 }

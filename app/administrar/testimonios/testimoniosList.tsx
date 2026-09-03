@@ -99,8 +99,8 @@ export default function TestimoniosList() {
       <h2 style={{ fontWeight: 700, color: "var(--text)", marginBottom: "1rem" }}>Testimonios y Comentarios</h2>
 
       <div style={{ display: "flex", gap: "0.7rem", marginBottom: "1.5rem" }}>
-        <button onClick={function() { setTab("testimonios"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", background: tab === "testimonios" ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "var(--surface-soft)", color: tab === "testimonios" ? "white" : "var(--text)", boxShadow: tab === "testimonios" ? "0 4px 14px rgba(176,137,104,0.25)" : "none", transition: "all 0.2s" }}>Testimonios</button>
-        <button onClick={function() { setTab("comentarios"); }} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "0.7rem 1.5rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", background: tab === "comentarios" ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "var(--surface-soft)", color: tab === "comentarios" ? "white" : "var(--text)", boxShadow: tab === "comentarios" ? "0 4px 14px rgba(176,137,104,0.25)" : "none", transition: "all 0.2s" }}>
+        <button onClick={function() { setTab("testimonios"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", background: tab === "testimonios" ? "linear-gradient(135deg, var(--brand-deep), #B08968)" : "var(--surface-soft)", color: tab === "testimonios" ? "white" : "var(--text)", boxShadow: tab === "testimonios" ? "0 4px 14px rgba(176,137,104,0.25)" : "none", transition: "all 0.2s" }}>Testimonios</button>
+        <button onClick={function() { setTab("comentarios"); }} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "0.7rem 1.5rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", background: tab === "comentarios" ? "linear-gradient(135deg, var(--brand-deep), #B08968)" : "var(--surface-soft)", color: tab === "comentarios" ? "white" : "var(--text)", boxShadow: tab === "comentarios" ? "0 4px 14px rgba(176,137,104,0.25)" : "none", transition: "all 0.2s" }}>
           Comentarios {pendientes > 0 && <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 22, height: 22, padding: "0 7px", borderRadius: 100, background: tab === "comentarios" ? "rgba(255,255,255,0.28)" : "#C62828", color: "white", fontSize: "0.78rem", fontWeight: 700 }}>{pendientes}</span>}
         </button>
       </div>
@@ -151,7 +151,7 @@ export default function TestimoniosList() {
       {tab === "testimonios" && (
         <div>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
-            {modo === "lista" && <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 7, padding: "0.7rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(176,137,104,0.28)" }}><Plus size={17} /> Nuevo</motion.button>}
+            {modo === "lista" && <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 7, padding: "0.7rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "white", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(176,137,104,0.28)" }}><Plus size={17} /> Nuevo</motion.button>}
           </div>
 
           <AnimatePresence>
@@ -165,16 +165,16 @@ export default function TestimoniosList() {
                     <Play size={16} color="var(--brand)" style={{ flexShrink: 0 }} />
                     <input style={IS} value={form.video} onChange={function(e) { setForm({ ...form, video: e.target.value }); }} placeholder="https://youtube.com/watch?v=..." />
                   </div>
-                  {form.video && form.video.includes("youtu") && <p style={{ fontSize: "0.72rem", color: "#2D6A4F", marginTop: 3 }}>Video detectado</p>}
+                  {form.video && form.video.includes("youtu") && <p style={{ fontSize: "0.72rem", color: "var(--success)", marginTop: 3 }}>Video detectado</p>}
                 </div>
                 <div style={{ background: "var(--surface-soft)", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}><Lbl>Foto del paciente</Lbl>
                   <div style={{ display: "flex", gap: "0.8rem", alignItems: "center", flexWrap: "wrap", marginTop: 6 }}>
                     {form.thumb && <div style={{ position: "relative" }}><Image src={form.thumb} alt="" width={64} height={64} quality={70} style={{ height: 64, width: 64, borderRadius: 10, objectFit: "cover", border: "2px solid var(--brand)" }} /><button onClick={function() { setForm({ ...form, thumb: "" }); }} style={{ position: "absolute", top: -5, right: -5, width: 18, height: 18, borderRadius: "50%", background: "#C62828", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} /></button></div>}
-                    <label style={{ padding: "0.45rem 1rem", borderRadius: 12, border: "1px dashed #B08968", cursor: upl ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: upl ? 0.6 : 1 }}><Upload size={14} /> {upl ? "Subiendo..." : form.thumb ? "Cambiar" : "Subir foto"}<input type="file" accept="image/*" style={{ display: "none" }} onChange={handleThumb} disabled={upl} /></label>
+                    <label style={{ padding: "0.45rem 1rem", borderRadius: 12, border: "1px dashed var(--brand)", cursor: upl ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: upl ? 0.6 : 1 }}><Upload size={14} /> {upl ? "Subiendo..." : form.thumb ? "Cambiar" : "Subir foto"}<input type="file" accept="image/*" style={{ display: "none" }} onChange={handleThumb} disabled={upl} /></label>
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: "0.6rem" }}>
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={handleSave} disabled={saving} style={{ flex: 1, padding: "0.65rem", borderRadius: 100, background: "linear-gradient(135deg, #8B6A4B, #B08968)", color: "white", border: "none", fontWeight: 600, cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1 }}>{saving ? "Guardando..." : "Guardar"}</motion.button>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={handleSave} disabled={saving} style={{ flex: 1, padding: "0.65rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "white", border: "none", fontWeight: 600, cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1 }}>{saving ? "Guardando..." : "Guardar"}</motion.button>
                   <button onClick={reset} style={{ padding: "0.65rem 1.5rem", borderRadius: 100, background: "var(--surface-soft)", color: "var(--text)", border: "none", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
                 </div>
               </motion.div>
