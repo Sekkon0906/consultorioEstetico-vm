@@ -1,6 +1,6 @@
 ---
 tags: [proyecto, indice]
-actualizado: 2026-09-02
+actualizado: 2026-09-03
 ---
 
 # Consultorio Estético — Dra. Julieth Vanessa Medina Orjuela
@@ -26,6 +26,7 @@ Ibagué (Tolima, Colombia). Hace dos cosas a la vez:
 - [[08 — Bitácora 2026-09-02]] — corte final de Supabase y reestructura de móvil
 - [[09 — Estudio de móvil]] — por qué el sitio se veía mal en un teléfono, medido
 - [[10 — Cosas por hacer]] — backlog vivo, por tipo de trabajo
+- `Decisiones/` — las elecciones caras de revertir, con su porqué
 
 ## Estado en una línea
 
@@ -54,5 +55,11 @@ Contados el 2026-09-02.
 - Errores: Sentry (solo producción)
 
 > [!warning] Antes de que la doctora lo use con pacientes reales
-> Rotar la contraseña de Neon y el token de R2 — se pegaron en un chat
-> durante la migración. Es el punto **DEP1** de [[10 — Cosas por hacer]].
+> 1. **Rotar la contraseña de Neon y el token de R2** — se pegaron en un chat
+>    durante la migración (punto **DEP1** de [[10 — Cosas por hacer]]).
+> 2. **Crear el bucket privado de R2** y definir `R2_BUCKET_PRIVADO`. El
+>    código ya lo usa, pero mientras la variable esté vacía los
+>    consentimientos firmados se siguen guardando en el bucket **público**.
+>    El servidor lo avisa al arrancar. Ver `Decisiones/005`.
+> 3. **Migrar los consentimientos firmados antes del 2026-09-03**, que
+>    guardan una URL pública en vez de una clave.
