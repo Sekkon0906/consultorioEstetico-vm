@@ -11,6 +11,7 @@ import {
   deleteBloqueoHoraByFechaApi,
   getCitasByDayApi,
 } from "@/services/citasApi";
+import { aISOLocal } from "@/lib/fechas";
 
 const HORAS_BASE = [
   "08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM","10:30 AM",
@@ -203,7 +204,7 @@ export default function HorariosHabilitados() {
                       const global = esGlobal(hora);
                       const bloqueada = esBloqueada(hora);
                       // Check if hour is past for today
-                      const esHoy = selectedDate === new Date().toISOString().slice(0, 10);
+                      const esHoy = selectedDate === aISOLocal(new Date());
                       const horaPasada = esHoy && (() => {
                         const [hStr] = hora.split(":");
                         let h = parseInt(hStr);

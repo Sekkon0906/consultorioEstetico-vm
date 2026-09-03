@@ -60,9 +60,10 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Dra. Vanessa Medina" }],
   creator: "Dra. Vanessa Medina",
+  /* El favicon lo aporta `app/icon.svg`, que Next recoge solo: pesa menos
+     de 1 KB, escala a cualquier tamaño y cambia de color en modo oscuro.
+     Aquí queda solo el icono de Apple, que no admite SVG. */
   icons: {
-    icon: IMG.logo,
-    shortcut: IMG.logo,
     apple: IMG.logo,
   },
   alternates: {

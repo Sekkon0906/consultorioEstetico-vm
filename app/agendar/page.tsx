@@ -15,6 +15,7 @@ import AgendarPago, { CitaSinPagos } from "./agendarPago";
 import TarjetaCita from "./tarjetaCita";
 
 import { PALETTE } from "./palette";
+import { aISOLocal, aFechaLocal } from "@/lib/fechas";
 
 function AgendarPageContent() {
   const router = useRouter();
@@ -27,6 +28,8 @@ function AgendarPageContent() {
   const [fecha, setFecha] = useState<Date | null>(null);
   const [hora, setHora] = useState<string>("");
   const [aviso, setAviso] = useState<string | null>(null);
+  /** Aviso de "necesitas una cuenta" con las dos salidas, en vez de expulsar. */
+  const [gateSesion, setGateSesion] = useState(false);
   const [procedimientos, setProcedimientos] = useState<Procedimiento[]>([]);
   const [citaDraft, setCitaDraft] = useState<CitaSinPagos | null>(null);
   const [citaCreada, setCitaCreada] = useState<Cita | null>(null);
@@ -71,6 +74,41 @@ function AgendarPageContent() {
     void cargarProcedimientos();
   }, []);
 
+  // Al volver de iniciar sesión o de crear la cuenta, retoma el día y la
+  // hora que ya se habían elegido. Se consume una sola vez.
+  useEffect(() => {
+    if (!usuario) return;
+    try {
+      const guardado = sessionStorage.getItem("agendar:seleccion");
+      if (!guardado) return;
+      sessionStorage.removeItem("agendar:seleccion");
+      const { fecha: f, hora: h } = JSON.parse(guardado);
+      const d = aFechaLocal(f);
+      if (d) setFecha(d);
+      if (h) setHora(h);
+    } catch {
+      // Un valor corrupto no debe impedir agendar: simplemente se ignora.
+    }
+  }, [usuario]);
+
+  // Guarda el día y la hora elegidos antes de mandar a iniciar sesión, y
+  // vuelve aquí. Sin esto, el paciente que no tiene cuenta pierde el trabajo
+  // hecho justo en el paso en que ya había decidido venir.
+  const irAAcceder = (destino: "login" | "register") => {
+    try {
+      if (fecha && hora) {
+        sessionStorage.setItem(
+          "agendar:seleccion",
+          JSON.stringify({ fecha: aISOLocal(fecha), hora })
+        );
+      }
+    } catch {
+      // sessionStorage puede fallar en modo privado; no es motivo para
+      // impedir que la persona inicie sesión.
+    }
+    router.push(`/${destino}?next=/agendar`);
+  };
+
   // Paso 1 → 2
   const handleAvanzar = () => {
     if (!fecha || !hora) {
@@ -78,12 +116,15 @@ function AgendarPageContent() {
       return;
     }
     if (!usuario) {
-      setAviso(t("warningLoginRequired"));
-      router.push("/login");
+      // Antes esto expulsaba a /login de inmediato: perdías el día y la hora
+      // que acababas de elegir, y al volver empezabas de cero. Ahora se
+      // ofrece la decisión —entrar o crear cuenta— y se conserva la
+      // selección para retomarla al volver.
+      setGateSesion(true);
       return;
     }
     setAviso(null);
-    const fechaISO = fecha.toISOString().slice(0, 10);
+    const fechaISO = aISOLocal(fecha);
     setFormData((prev) => ({ ...prev, fecha: fechaISO, hora }));
     setStep(2);
   };
@@ -101,7 +142,7 @@ function AgendarPageContent() {
       procedimiento: formData.procedimiento,
       nota:          formData.nota,
       tipoCita:      "valoracion",
-      fecha:         fecha.toISOString().slice(0, 10),
+      fecha:         aISOLocal(fecha),
       hora,
       pagado:        false,
       creadaPor:     "usuario",
@@ -136,6 +177,63 @@ function AgendarPageContent() {
                 onHoraSelect={setHora}
                 usuario={usuario}
               />
+              {gateSesion && (
+                /* La alternativa era mandar a /login sin más. Pero quien
+                   llega aquí ya eligió día y hora: está decidido. Sacarlo
+                   de la página en ese momento, sin decirle por qué ni
+                   guardarle la selección, es donde se pierde una cita. */
+                <div
+                  className="mx-auto mt-6 max-w-md rounded-2xl px-5 py-4 text-center"
+                  style={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
+                    boxShadow: "var(--shadow-md)",
+                  }}
+                >
+                  <p style={{ color: "var(--text)", fontWeight: 600, marginBottom: "0.35rem" }}>
+                    {t("gate.title")}
+                  </p>
+                  <p style={{ color: "var(--text-soft)", fontSize: "0.88rem", marginBottom: "1rem" }}>
+                    {t("gate.subtitle")}
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => irAAcceder("login")}
+                      style={{
+                        padding: "var(--btn-pad-md)", borderRadius: "var(--btn-radio)",
+                        background: "var(--brand)", color: "var(--brand-contrast)",
+                        border: "none", fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                      }}
+                    >
+                      {t("gate.login")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => irAAcceder("register")}
+                      style={{
+                        padding: "var(--btn-pad-md)", borderRadius: "var(--btn-radio)",
+                        background: "transparent", color: "var(--brand-deep)",
+                        border: "1px solid var(--brand)", fontWeight: 600,
+                        cursor: "pointer", fontFamily: "inherit",
+                      }}
+                    >
+                      {t("gate.register")}
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setGateSesion(false)}
+                    style={{
+                      marginTop: "0.8rem", background: "none", border: "none",
+                      color: "var(--text-muted)", fontSize: "0.8rem",
+                      cursor: "pointer", fontFamily: "inherit", textDecoration: "underline",
+                    }}
+                  >
+                    {t("gate.cancel")}
+                  </button>
+                </div>
+              )}
               {aviso && (
                 <div
                   className="mx-auto mt-6 max-w-md text-center rounded-2xl px-4 py-3 text-sm font-medium flex items-center justify-between gap-3"

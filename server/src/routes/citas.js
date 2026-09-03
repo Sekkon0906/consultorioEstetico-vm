@@ -264,12 +264,15 @@ router.post(
         return res.status(403).json({ ok: false, error: "Esta cita no es tuya" });
       }
 
+      // Privado, no público: son documentos médicos con nombre, documento y
+      // firma del paciente. Ver `subirArchivoPrivado` en lib/almacenamiento.
+      // Devuelven CLAVE, no URL — la dirección se genera al leer y caduca.
       const [rFirma, rPdf] = await Promise.all([
-        almacenamiento.subirArchivo(firma.buffer, {
-          carpeta: "ConsultorioImagenes/Firmas", tipoMime: firma.mimetype || "image/png", nombreOriginal: "firma.png",
+        almacenamiento.subirArchivoPrivado(firma.buffer, {
+          carpeta: "Privado/Firmas", tipoMime: firma.mimetype || "image/png", nombreOriginal: "firma.png",
         }),
-        almacenamiento.subirArchivo(pdf.buffer, {
-          carpeta: "ConsultorioImagenes/Consentimientos", tipoMime: pdf.mimetype || "application/pdf", nombreOriginal: "consentimiento.pdf",
+        almacenamiento.subirArchivoPrivado(pdf.buffer, {
+          carpeta: "Privado/Consentimientos", tipoMime: pdf.mimetype || "application/pdf", nombreOriginal: "consentimiento.pdf",
         }),
       ]);
       if (!rFirma.ok) return res.status(400).json(rFirma);
@@ -283,16 +286,69 @@ router.post(
                 firma_fecha = NOW(),
                 actualizado_en = NOW()
           WHERE id = $3`,
-        [rFirma.url, rPdf.url, id]
+        [rFirma.clave, rPdf.clave, id]
       );
 
-      return res.json({ ok: true, firmaUrl: rFirma.url, consentimientoPdf: rPdf.url });
+      // No se devuelve una URL: el cliente pide el documento cuando lo
+      // necesita, por GET /citas/:id/consentimiento, y ahí se comprueba
+      // quién lo pide.
+      return res.json({ ok: true });
     } catch (err) {
       console.error("Error POST /citas/:id/consentimiento:", err);
       return res.status(500).json({ ok: false, error: "Error al guardar el consentimiento" });
     }
   }
 );
+
+/**
+ * GET /citas/:id/consentimiento — devuelve el consentimiento firmado.
+ *
+ * No sirve el archivo directamente ni entrega una dirección permanente:
+ * comprueba quién pregunta y responde con una URL temporal.
+ *
+ * Antes el PDF y la firma vivían en el bucket público y su URL quedaba
+ * guardada en la base. Cualquiera con esa dirección abría el documento —y
+ * esa dirección viaja por correo, por el historial y por los registros de
+ * cualquier intermediario. Un consentimiento médico lleva nombre,
+ * documento y firma: no es material de vitrina.
+ *
+ * `?tipo=firma` devuelve la imagen de la firma; por defecto, el PDF.
+ */
+router.get("/:id/consentimiento", verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rows } = await pool.query(
+      "SELECT user_id, firma_url, consentimiento_pdf FROM citas WHERE id = $1 LIMIT 1",
+      [id]
+    );
+    if (!rows.length) return res.status(404).json({ ok: false, error: "Cita no encontrada" });
+
+    const cita = rows[0];
+    // La doctora ve cualquiera; un paciente, solo las suyas.
+    if (req.user.rol !== "admin" && cita.user_id !== req.user.id) {
+      return res.status(403).json({ ok: false, error: "Esta cita no es tuya" });
+    }
+
+    const clave = req.query.tipo === "firma" ? cita.firma_url : cita.consentimiento_pdf;
+    if (!clave) {
+      return res.status(404).json({ ok: false, error: "Esta cita no tiene consentimiento firmado" });
+    }
+
+    // Compatibilidad con lo firmado antes de este cambio, cuando se guardaba
+    // la URL pública completa en vez de la clave. Se devuelve tal cual: son
+    // pocos y ya están en el bucket público; migrarlos es un paso aparte.
+    if (/^https?:\/\//.test(clave)) {
+      return res.json({ ok: true, url: clave, heredado: true });
+    }
+
+    const url = await almacenamiento.urlFirmada(clave);
+    if (!url) return res.status(500).json({ ok: false, error: "No se pudo generar el enlace" });
+    return res.json({ ok: true, url, expiraEnSegundos: 600 });
+  } catch (err) {
+    console.error("Error GET /citas/:id/consentimiento:", err);
+    return res.status(500).json({ ok: false, error: "Error al leer el consentimiento" });
+  }
+});
 
 // POST /citas/recordatorios — cron: recordatorio 24 h antes de la cita.
 // Protegido por `Authorization: Bearer <CRON_SECRET>`. Lo llama la ruta de

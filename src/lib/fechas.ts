@@ -51,3 +51,21 @@ export function formatearFecha(
   if (!d) return fecha ? String(fecha) : "";
   return d.toLocaleDateString(locale, opciones);
 }
+
+/**
+ * Un `Date` local a "YYYY-MM-DD", sin pasar por UTC.
+ *
+ * `toISOString().slice(0, 10)` es la forma habitual y está mal para esto:
+ * convierte a UTC primero. Un `new Date(2026, 8, 15)` es la medianoche
+ * LOCAL del 15 de septiembre; en una zona al este de Greenwich eso ya es el
+ * 14 en UTC, y la cita se guardaría un día antes.
+ *
+ * En Colombia (UTC-5) sale bien por casualidad, igual que salía bien el
+ * `date` del backend antes de arreglarlo. Pero "funciona en nuestra zona
+ * horaria" no es que funcione: es que todavía no ha fallado.
+ */
+export function aISOLocal(d: Date): string {
+  const mes = String(d.getMonth() + 1).padStart(2, "0");
+  const dia = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${mes}-${dia}`;
+}

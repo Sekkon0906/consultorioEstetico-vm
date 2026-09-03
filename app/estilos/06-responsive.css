@@ -161,10 +161,12 @@
 ============================================================ */
 
 @media (max-width: 767px) {
-  /* 1. Logo más pequeño */
+  /* En móvil el logo también sube —de 32 a 42 de alto— y la barra sigue en
+     56px: el elemento más alto es la hamburguesa con sus 46, así que hasta
+     ahí no cuesta nada. */
   .navbar-logo img {
-    width: 44px !important;
-    height: 32px !important;
+    width: 58px !important;
+    height: 42px !important;
     object-fit: contain !important;
   }
   /* La barra fija se queda en 56px (era 62). Es el alto que importa: la
@@ -2575,11 +2577,20 @@ footer a:hover i {
 
 /* Los dos ejes explícitos, en la proporción original 75×55. Con `height:
    auto` la altura la decidía la imagen, y era ella —no el padding— la que
-   marcaba el alto de toda la barra. */
+   marcaba el alto de toda la barra.
+
+   El logo se agranda de 48 a 64 de alto, pero la barra NO crece: se le
+   quita al padding lo que gana la imagen. Antes el problema era el revés
+   —una imagen de 96px estirando la barra a 128— y la respuesta no es un
+   logo pequeño, es que el alto lo decida la barra y no la imagen. */
 .navbar-logo img {
-  width: 66px;
-  height: 48px;
+  width: 88px;
+  height: 64px;
   object-fit: contain;
+}
+.navbar-container {
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 /* === CENTRO: MENÚ === */
@@ -4033,4 +4044,31 @@ a:hover {
 }
 @media (prefers-reduced-motion: reduce) {
   .consultorio-showcase-info-anim { animation: none; }
+}
+
+/* Flechas del carrusel del home, junto a los dots.
+   El carrusel de /procedimientos ya tenía flechas y este no: solo se podía
+   avanzar apuntando al punto exacto, un blanco de 8px. Van dentro de la
+   misma píldora que los dots para no tapar las tarjetas de la rueda. */
+.g3d-flecha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin: -7px 0;          /* no engorda la píldora */
+  border: none;
+  background: none;
+  color: var(--brand-deep);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 50%;
+  transition: background var(--mov-rapido), color var(--mov-rapido);
+}
+.g3d-flecha:hover,
+.g3d-flecha:focus-visible {
+  background: var(--surface-soft);
+  color: var(--brand);
 }

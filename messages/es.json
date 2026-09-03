@@ -68,7 +68,9 @@
     },
     "gallery_a11y": {
       "close": "Cerrar",
-      "goToCard": "Ir al tratamiento {n}"
+      "goToCard": "Ir al tratamiento {n}",
+      "prevCard": "Anterior",
+      "nextCard": "Siguiente"
     },
     "video": {
       "kicker": "Sobre mi práctica",
@@ -529,6 +531,13 @@
       },
       "footerInfo": "El pago se realizará al asistir al consultorio. La información fue enviada por WhatsApp a la doctora.",
       "appointmentNumber": "Número de cita: #"
+    },
+    "gate": {
+      "title": "Necesitas una cuenta para confirmar",
+      "subtitle": "Guardamos el día y la hora que elegiste. Al volver, sigues justo desde aquí.",
+      "login": "Iniciar sesión",
+      "register": "Crear cuenta",
+      "cancel": "Seguir mirando"
     }
   },
   "perfil": {

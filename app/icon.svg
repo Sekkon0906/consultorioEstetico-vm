@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Consultorio JM">
+  <!--
+    Favicon del sitio.
+
+    Antes era LogoJM.jpg servido desde R2: 1,29 MB para un icono de 16px, y
+    un logo oscuro sobre fondo claro, que es justo lo que desaparece en la
+    interfaz oscura del navegador.
+
+    Un SVG lo resuelve de una vez:
+      · pesa menos de 1 KB en vez de 1,29 MB;
+      · escala a cualquier tamaño sin versiones de 32/180/192/512;
+      · lleva DENTRO la consulta de tema, así que cambia solo cuando el
+        navegador está en oscuro. Un PNG necesitaría dos archivos y dos
+        etiquetas <link media="...">, y aun así Safari las ignora.
+
+    Next.js recoge `app/icon.svg` automáticamente; no hace falta declararlo.
+  -->
+  <style>
+    .fondo { fill: #FAF9F7; }
+    .letras { fill: #3A2A1A; }
+    @media (prefers-color-scheme: dark) {
+      .fondo { fill: #17151A; }
+      /* Champán: el mismo acento que la marca usa en oscuro. */
+      .letras { fill: #E8C9A0; }
+    }
+  </style>
+  <rect class="fondo" width="64" height="64" rx="14" />
+  <text
+    class="letras"
+    x="32" y="33"
+    text-anchor="middle"
+    dominant-baseline="central"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="34"
+    font-weight="700"
+    letter-spacing="-2"
+  >JM</text>
+</svg>

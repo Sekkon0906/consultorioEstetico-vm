@@ -618,6 +618,19 @@ export default function Galeria3D() {
               boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
             }}
           >
+            {/* Flechas junto a los dots.
+                El carrusel de /procedimientos las tiene y este no: solo se
+                podía avanzar apuntando al punto exacto, que en escritorio es
+                un blanco de 8px. Van pegadas a los dots y no flotando sobre
+                la rueda, para no tapar las tarjetas. */}
+            <button
+              type="button"
+              onClick={() => goToCard((frontIndex - 1 + tratamientos.length) % tratamientos.length)}
+              aria-label={ta("prevCard")}
+              className="g3d-flecha"
+            >
+              ‹
+            </button>
             {tratamientos.map((_, i) => (
               <button
                 key={i}
@@ -639,6 +652,14 @@ export default function Galeria3D() {
                 }}
               />
             ))}
+            <button
+              type="button"
+              onClick={() => goToCard((frontIndex + 1) % tratamientos.length)}
+              aria-label={ta("nextCard")}
+              className="g3d-flecha"
+            >
+              ›
+            </button>
           </div>
         </div>
       )}

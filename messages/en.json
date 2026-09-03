@@ -68,7 +68,9 @@
     },
     "gallery_a11y": {
       "close": "Close",
-      "goToCard": "Go to treatment {n}"
+      "goToCard": "Go to treatment {n}",
+      "prevCard": "Previous",
+      "nextCard": "Next"
     },
     "video": {
       "kicker": "About my practice",
@@ -529,6 +531,13 @@
       },
       "footerInfo": "Payment is made when you arrive at the clinic. Your details were sent to the doctor on WhatsApp.",
       "appointmentNumber": "Appointment #"
+    },
+    "gate": {
+      "title": "You need an account to confirm",
+      "subtitle": "We'll keep the day and time you picked. When you come back, you carry on from here.",
+      "login": "Sign in",
+      "register": "Create account",
+      "cancel": "Keep browsing"
     }
   },
   "perfil": {

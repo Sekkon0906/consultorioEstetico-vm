@@ -7,6 +7,7 @@ import { Cita, getCitasByDayAPI, getCitasAPI, confirmarCitaAPI, cancelarCitaAPI,
 import CitasAgendadasCard from "./citasAgendadasCard";
 import CitasAgendadasModal from "./citasAgendadasModal";
 import { ChevronUp, ChevronDown, CalendarDays, Inbox, Phone, Mail, Calendar, Clock } from "lucide-react";
+import { aISOLocal } from "@/lib/fechas";
 
 const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 const HORAS = ["08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","01:00 PM","01:30 PM","02:00 PM","02:30 PM","03:00 PM","03:30 PM","04:00 PM","04:30 PM","05:00 PM","05:30 PM","06:00 PM"];
@@ -80,7 +81,7 @@ export default function CitasAgendadas() {
 
   const handleDateClick = (d: number | null) => {
     if (d == null) return;
-    setSelectedDate(new Date(anio, mes, d).toISOString().slice(0, 10));
+    setSelectedDate(aISOLocal(new Date(anio, mes, d)));
     setBuzonGeneral(false);
   };
 
@@ -146,7 +147,7 @@ export default function CitasAgendadas() {
           </div>
           <div className="grid grid-cols-7 gap-1 w-full mb-4">
             {generarDias.map((d, i) => {
-              const iso = d != null ? new Date(anio, mes, d).toISOString().slice(0, 10) : "";
+              const iso = d != null ? aISOLocal(new Date(anio, mes, d)) : "";
               const sel = selectedDate === iso && !buzonGeneral;
               const cnt = d != null ? citasPerDay[iso] || 0 : 0;
               const hoy = d != null && new Date(anio, mes, d).toDateString() === new Date().toDateString();

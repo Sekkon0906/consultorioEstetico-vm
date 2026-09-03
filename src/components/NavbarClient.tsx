@@ -239,7 +239,10 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`navbar navbar-container py-3 ${desplazado ? "is-scrolled" : ""}`}
+      /* Sin `py-3`: las utilidades de Bootstrap llevan !important, así que
+         esa clase le ganaba a cualquier padding nuestro y la barra volvía a
+         crecer al agrandar el logo. El alto se decide en .navbar-container. */
+      className={`navbar navbar-container ${desplazado ? "is-scrolled" : ""}`}
       style={{ backgroundColor: "#FFFFFF", position: "sticky", top: 0, zIndex: 1000 }}
     >
       <div

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { iniciarSesion, entrarConGoogle, estadoAuth } from "@/lib/sesion";
@@ -15,6 +15,7 @@ interface Props {
 export default function LoginForm({ setErr }: Props) {
   const t = useTranslations("loginPage");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { refreshUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,7 +50,13 @@ export default function LoginForm({ setErr }: Props) {
     try {
       await iniciarSesion(email, password);
       await refreshUser();
-      router.push("/perfil/editar_info");
+      /* Si se llegó aquí desde otra página (hoy, desde agendar cuando falta
+         la cuenta), se vuelve allí. Solo rutas internas: aceptar una URL
+         completa desde el parámetro convertiría el login en un salto abierto
+         a cualquier sitio, que es como se hacen los engaños de phishing. */
+      const destino = searchParams.get("next");
+      const seguro = destino && destino.startsWith("/") && !destino.startsWith("//");
+      router.push(seguro ? destino : "/perfil/editar_info");
     } catch (err) {
       const msg = err instanceof Error ? err.message : t("credencialesMal");
       setErr(/incorrect|inválid|invalid/i.test(msg) ? t("credencialesMal") : msg);

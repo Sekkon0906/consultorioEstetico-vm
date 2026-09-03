@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, CheckCircle2, Calculator, FileText, FileCheck } from "lucide-react";
 import type { Cita } from "./helpers";
 import { confirmarCitaAPI, confirmarPagoCitaAPI } from "./helpers";
+import { apiAuth } from "@/lib/apiCliente";
 
 interface Props { cita: Cita; onClose: () => void; onUpdated: () => void; }
 
@@ -112,19 +113,36 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
               {cita.consentimientoFirmado ? "Consentimiento firmado" : "Consentimiento sin firmar"}
             </p>
             {cita.consentimientoPdf && (
-              <a
-                href={cita.consentimientoPdf}
-                target="_blank"
-                rel="noopener noreferrer"
+              /* Botón y no enlace: ya no hay una URL permanente que poner en
+                 el href. El consentimiento vive en almacenamiento privado y
+                 se pide al abrirlo, con una dirección que caduca a los diez
+                 minutos. Ver GET /citas/:id/consentimiento. */
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const r = await apiAuth<{ ok: boolean; url: string }>(
+                      `/citas/${cita.id}/consentimiento`
+                    );
+                    if (r?.url) window.open(r.url, "_blank", "noopener,noreferrer");
+                  } catch {
+                    alert("No se pudo abrir el consentimiento. Intenta de nuevo.");
+                  }
+                }}
                 style={{
                   fontSize: "0.82rem",
                   fontWeight: 600,
                   color: "var(--brand-deep)",
                   textDecoration: "underline",
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
                 }}
               >
                 Ver e imprimir
-              </a>
+              </button>
             )}
           </div>
 
