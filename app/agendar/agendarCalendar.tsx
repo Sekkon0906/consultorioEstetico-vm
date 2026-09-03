@@ -156,7 +156,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
           {/* CALENDAR */}
           <motion.div initial={{ y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
             className="cal-card dark-aware-card"
-            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)" }}>
+            style={{ background: "var(--bg-elevated)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)" }}>
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
               <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
@@ -209,7 +209,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
           {/* HOURS */}
           <motion.div initial={{ y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
             className="cal-card dark-aware-card"
-            style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)" }}>
+            style={{ background: "var(--bg-elevated)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)" }}>
 
             <h3 className="cal-hours-title" style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, color: "var(--text)", marginBottom: "0.3rem", textAlign: "center" }}>
               {selectedDate ? t("hoursAvailable") : t("pickDay")}

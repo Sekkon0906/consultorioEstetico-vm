@@ -68,7 +68,7 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
       transition={{ duration: 0.5 }}
       style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}
     >
-      <div style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 16px 48px rgba(78,59,43,0.1)", overflow: "hidden" }}>
+      <div style={{ background: "var(--bg-elevated)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 16px 48px rgba(78,59,43,0.1)", overflow: "hidden" }}>
 
         {/* Top accent */}
         <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)" }} />

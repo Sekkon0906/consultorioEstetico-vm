@@ -1,176 +1,198 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 /**
- * Palabra que aparece como si la pintaran de un trazo.
+ * Una palabra que se escribe a mano, letra por letra.
  *
- * Reemplaza la máquina de escribir (react-type-animation), que escribía y
- * borraba en bucle. Aquí la palabra se revela con un trazo de pincel que la
- * recorre de izquierda a derecha.
+ * QUÉ CAMBIÓ Y POR QUÉ
+ * Antes rotaba entre cuatro palabras y cada una se revelaba con un solo
+ * trazo que barría de izquierda a derecha. Dos problemas: el barrido es un
+ * efecto muy visto —se lee como "una transición", no como algo escrito— y
+ * la rotación obligaba a leer el titular varias veces para entenderlo,
+ * porque el sentido de la frase cambiaba cada 3,6 segundos.
+ *
+ * Ahora es UNA palabra, fija, que se traza letra a letra: primero la C,
+ * luego la o, y así. Se queda. El titular se lee una vez.
  *
  * CÓMO FUNCIONA
- * Un `<mask>` de SVG contiene una línea gruesa. Lo que la máscara pinta de
- * blanco es lo que se ve del texto. Animando `stroke-dashoffset` la línea
- * "se dibuja", y a su paso va destapando las letras. No es una imagen ni un
- * video: el texto es texto de verdad, así que se puede seleccionar, traducir
- * y leer con lector de pantalla.
+ * Un `<mask>` de SVG decide qué parte del texto se ve: lo que la máscara
+ * pinta de blanco, se ve. Dentro hay UN TRAZO POR LETRA, cada uno cubriendo
+ * solo el ancho de su letra, y cada uno se "dibuja" animando
+ * `stroke-dashoffset` con un retardo escalonado. El efecto es el de una
+ * mano que avanza.
+ *
+ * Las posiciones de cada letra no se calculan a ojo: se preguntan al propio
+ * SVG con `getStartPositionOfChar`, que es el único que sabe dónde cae cada
+ * glifo con esta fuente y este tamaño.
+ *
+ * El texto sigue siendo TEXTO: se puede seleccionar, traducir y leer con un
+ * lector de pantalla. No es una imagen ni un vídeo.
  *
  * SOBRE LA CURSIVA
- * Va en serif itálica, no en caligráfica. Una caligráfica de verdad es bonita
- * pero cuesta leerla, y en un titular que vende confianza eso juega en
- * contra. La itálica se siente escrita a mano y elegante, pero cada letra
- * sigue siendo reconocible para quien no está acostumbrado a la cursiva.
+ * Serif itálica, no caligráfica. Una caligráfica de verdad es bonita pero
+ * cuesta leerla, y en un titular que vende confianza eso juega en contra.
+ * La itálica se siente escrita a mano y elegante, pero cada letra sigue
+ * siendo reconocible para quien no está acostumbrado a la cursiva.
  */
 
 /** Aire a cada lado, en unidades del viewBox. La cursiva sobresale de su
- *  caja de avance y la pincelada de la máscara lleva punta redonda, que se
- *  extiende media anchura de trazo más allá de donde empieza y termina. */
+ *  caja de avance y la pincelada lleva punta redonda, que se extiende media
+ *  anchura de trazo más allá de donde empieza y termina. */
 const MARGEN_CURSIVA = 28;
 
+/** Alto del lienzo. El tamaño de letra y el grosor del trazo derivan de él. */
+const ALTO = 130;
+
+/** Lo que tarda en trazarse una letra, y cada cuánto entra la siguiente.
+ *  El paso es menor que la duración a propósito: las letras se solapan un
+ *  poco, que es como se escribe de verdad — no se espera a terminar una
+ *  para empezar la siguiente. */
+const DURACION_LETRA = 0.34;
+const PASO_LETRA = 0.11;
+
 interface Props {
-  /** Palabras a mostrar. Con una sola, queda fija. */
-  palabras: string[];
-  /** Milisegundos que permanece cada palabra antes de repintar la siguiente. */
-  duracionPorPalabra?: number;
+  /** La palabra. Una sola: no rota ni se borra. */
+  palabra: string;
 }
 
-export default function PalabraPintada({ palabras, duracionPorPalabra = 3600 }: Props) {
-  const [indice, setIndice] = useState(0);
+interface Trazo {
+  d: string;
+  largo: number;
+  retardo: number;
+}
+
+export default function PalabraPintada({ palabra }: Props) {
   const [anchoTexto, setAnchoTexto] = useState(560);
+  const [trazos, setTrazos] = useState<Trazo[]>([]);
   const textoRef = useRef<SVGTextElement>(null);
-  const trazoRef = useRef<SVGPathElement>(null);
+  const medidorRef = useRef<SVGPathElement>(null);
   // useId evita que dos instancias compartan el mismo id de máscara, que en
   // SVG es global al documento y haría que una tapara a la otra.
   const idMascara = useId().replace(/:/g, "");
 
-  const palabra = palabras[indice] ?? "";
+  // Las letras que llevan trazo. Los espacios no se pintan: no hay nada que
+  // revelar, y darles su turno metería una pausa rara en mitad de la palabra.
+  const letras = useMemo(
+    () => Array.from(palabra).map((c, i) => ({ c, i, pinta: c.trim() !== "" })),
+    [palabra]
+  );
 
-  // El ancho del SVG se ajusta a la palabra: si no, "confianza." y "armonía."
-  // quedarían con cajas distintas y el texto saltaría de tamaño al cambiar.
-  //
-  // Aquí estaba el bug de la palabra cortada ("autenticidac", sin la última
-  // letra). La medida se tomaba UNA vez, al montar, y en ese momento Playfair
-  // todavía no había cargado: se medía la fuente de reserva, que es más
-  // estrecha, y el viewBox salía más corto que el texto real. Al llegar la
-  // fuente el texto crecía, pero la caja ya estaba fijada y lo que sobraba
-  // por la derecha quedaba fuera.
-  //
-  // Se mide con getBBox, no con getComputedTextLength: la cursiva se inclina
-  // y sobresale de la caja de avance por los dos lados, y getComputedTextLength
-  // solo suma anchos de avance — justo la parte que se salía.
   useEffect(() => {
-    const el = textoRef.current;
-    if (!el) return;
+    const texto = textoRef.current;
+    const medidor = medidorRef.current;
+    if (!texto || !medidor) return;
 
     const medir = () => {
-      const actual = textoRef.current;
-      if (!actual) return;
+      const t = textoRef.current;
+      const m = medidorRef.current;
+      if (!t || !m) return;
       try {
-        const caja = actual.getBBox();
-        // `caja.x` ya incluye el desplazamiento inicial del texto, así que
-        // el borde derecho es x + width y solo falta el margen de la
-        // derecha. Sumar dos márgenes aquí sobraría espacio y, como el SVG
-        // se escala a `width: 100%`, encogería la palabra sin motivo.
+        // Ancho total del lienzo. Con getBBox y no con getComputedTextLength:
+        // la cursiva se inclina y sobresale de la caja de avance por los dos
+        // lados, y getComputedTextLength solo suma anchos de avance — justo
+        // la parte que se salía y cortaba la última letra.
+        const caja = t.getBBox();
         const bordeDerecho = caja.x + caja.width;
         if (bordeDerecho > 0) setAnchoTexto(Math.ceil(bordeDerecho) + MARGEN_CURSIVA);
+
+        // Un trazo por letra, colocado sobre ella. Las posiciones se le
+        // preguntan al SVG: es el único que sabe dónde cae cada glifo con
+        // esta fuente y este tamaño.
+        const nuevos: Trazo[] = [];
+        let turno = 0;
+        for (const { i, pinta } of letras) {
+          if (!pinta) continue;
+          const ini = t.getStartPositionOfChar(i);
+          const fin = t.getEndPositionOfChar(i);
+          // Se desborda a los lados el propio grosor del trazo, para que la
+          // punta redonda no deje media letra sin destapar en los extremos.
+          const desborde = ALTO * 0.42;
+          const x1 = ini.x - desborde;
+          const x2 = fin.x + desborde;
+          // Una leve curva: se lee como pincelada y no como una barra.
+          const y = ALTO * 0.5;
+          const d = `M ${x1} ${y + 6} Q ${(x1 + x2) / 2} ${y - 8}, ${x2} ${y + 4}`;
+          m.setAttribute("d", d);
+          nuevos.push({
+            d,
+            largo: m.getTotalLength(),
+            retardo: turno * PASO_LETRA,
+          });
+          turno++;
+        }
+        setTrazos(nuevos);
       } catch {
-        // getBBox lanza si el nodo aún no está pintado; se reintenta al
-        // cargar las fuentes.
+        // getBBox y getStartPositionOfChar lanzan si el nodo todavía no está
+        // pintado. Se reintenta cuando terminen de cargar las fuentes.
       }
     };
 
     medir();
+    // Sin esto la medida se toma con la fuente de reserva, que es más
+    // estrecha: el lienzo salía corto y la última letra quedaba fuera.
     let vivo = true;
     document.fonts?.ready.then(() => { if (vivo) medir(); }).catch(() => {});
     return () => { vivo = false; };
-  }, [palabra]);
-
-  // Repinta el trazo cada vez que cambia la palabra O el ancho medido.
-  //
-  // Depender solo de `palabra` dejaba un desfase visible: `anchoTexto`
-  // cambia después, al cargar la fuente, y con él cambia la `d` del trazo y
-  // por tanto su longitud. El `strokeDasharray` se quedaba con la longitud
-  // vieja, más corta que el trazo nuevo, así que el sobrante quedaba sin
-  // guion que lo cubriera y la palabra aparecía a trozos.
-  useEffect(() => {
-    const trazo = trazoRef.current;
-    if (!trazo) return;
-
-    const prefiereMenosMovimiento =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const largo = trazo.getTotalLength();
-    trazo.style.strokeDasharray = String(largo);
-
-    if (prefiereMenosMovimiento) {
-      // Sin animación: la palabra simplemente está ahí, visible.
-      trazo.style.transition = "none";
-      trazo.style.strokeDashoffset = "0";
-      return;
-    }
-
-    trazo.style.transition = "none";
-    trazo.style.strokeDashoffset = String(largo);
-    // Reflow forzado: sin esto el navegador funde los dos estados en uno y
-    // no se ve la animación.
-    void trazo.getBoundingClientRect();
-    trazo.style.transition = "stroke-dashoffset 1.4s cubic-bezier(0.35,0.1,0.25,1)";
-    trazo.style.strokeDashoffset = "0";
-  }, [palabra, anchoTexto]);
-
-  // Rotación entre palabras. Con una sola no hace nada.
-  useEffect(() => {
-    if (palabras.length <= 1) return;
-    const t = setTimeout(
-      () => setIndice((i) => (i + 1) % palabras.length),
-      duracionPorPalabra
-    );
-    return () => clearTimeout(t);
-  }, [indice, palabras.length, duracionPorPalabra]);
-
-  const alto = 130;
+  }, [palabra, letras]);
 
   return (
     <svg
-      viewBox={`0 0 ${anchoTexto} ${alto}`}
+      viewBox={`0 0 ${anchoTexto} ${ALTO}`}
       style={{ width: "100%", maxWidth: anchoTexto, height: "auto", overflow: "visible" }}
       role="img"
       aria-label={palabra}
     >
       <defs>
+        {/* Path oculto que solo sirve para preguntarle su longitud al
+            navegador antes de dibujar el trazo de verdad. */}
+        <path ref={medidorRef} d="M 0 0" />
         <mask id={`pincel-${idMascara}`}>
-          {/* Trazo con curva y punta redonda: se lee como pincelada, no
-              como una barra de progreso. El grosor cubre el alto del texto. */}
-          {/* Arranca y termina FUERA del viewBox (−MARGEN, ancho+MARGEN):
-              con la punta redonda, si el trazo empezara en el borde exacto
-              la primera y la última letra se destapaban a medias. */}
-          <path
-            ref={trazoRef}
-            d={`M ${-MARGEN_CURSIVA} ${alto * 0.52} Q ${anchoTexto * 0.3} ${alto * 0.36}, ${anchoTexto * 0.55} ${alto * 0.5} T ${anchoTexto + MARGEN_CURSIVA} ${alto * 0.47}`}
-            stroke="#fff"
-            strokeWidth={alto * 0.85}
-            fill="none"
-            strokeLinecap="round"
-          />
+          {trazos.map((t, i) => (
+            <path
+              key={i}
+              d={t.d}
+              stroke="#fff"
+              strokeWidth={ALTO * 0.9}
+              fill="none"
+              strokeLinecap="round"
+              style={{
+                strokeDasharray: t.largo,
+                strokeDashoffset: t.largo,
+                animation: `palabra-trazo ${DURACION_LETRA}s cubic-bezier(0.4,0,0.3,1) ${t.retardo}s forwards`,
+              }}
+            />
+          ))}
         </mask>
       </defs>
       <text
         ref={textoRef}
         x={MARGEN_CURSIVA}
-        y={alto * 0.7}
-        mask={`url(#pincel-${idMascara})`}
+        y={ALTO * 0.7}
+        mask={trazos.length ? `url(#pincel-${idMascara})` : undefined}
         fill="currentColor"
         style={{
           fontFamily: "'Playfair Display', Georgia, serif",
           fontStyle: "italic",
           fontWeight: 700,
-          fontSize: alto * 0.62,
+          fontSize: ALTO * 0.62,
+          // Mientras no haya trazos medidos no hay máscara, y sin máscara el
+          // texto se ve entero. Se oculta hasta que la haya, pero SOLO si el
+          // navegador va a animar: si algo falla y los trazos nunca llegan,
+          // es preferible una palabra quieta que ninguna palabra.
+          opacity: trazos.length ? 1 : 0,
+          transition: "opacity 80ms linear",
         }}
       >
         {palabra}
       </text>
+      <style>{`
+        @keyframes palabra-trazo { to { stroke-dashoffset: 0; } }
+        @media (prefers-reduced-motion: reduce) {
+          /* Sin trazo: la palabra está ahí y ya. */
+          [id^="pincel-"] path { animation: none !important; stroke-dashoffset: 0 !important; }
+        }
+      `}</style>
     </svg>
   );
 }

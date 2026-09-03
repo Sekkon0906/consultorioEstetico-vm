@@ -70,7 +70,7 @@ export default function ComentariosClientes() {
   const ratingLabels = t.raw("ratingLabels") as string[];
 
   return (
-    <section className="dark-aware-section comentarios-section" style={{ position: "relative", zIndex: 10, padding: "4rem 1.5rem", textAlign: "center", backgroundColor: "#FAF7F2", color: "var(--topbar-text)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+    <section className="dark-aware-section comentarios-section" style={{ position: "relative", zIndex: 10, padding: "4rem 1.5rem", textAlign: "center", backgroundColor: "var(--bg)", color: "var(--topbar-text)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
       <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 600, marginBottom: "0.4rem" }}>{t("title")}</h2>
       <p style={{ fontSize: "0.88rem", fontStyle: "italic", color: "var(--text-soft)", marginBottom: "1.5rem" }}>{t("subtitle")}</p>
 

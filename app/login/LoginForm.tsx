@@ -109,7 +109,7 @@ export default function LoginForm({ setErr }: Props) {
             className="btn btn-light rounded-end-3 border"
             type="button"
             onClick={() => setShow((s) => !s)}
-            style={{ borderColor: PALETTE.border, backgroundColor: "#F8F5F0", color: PALETTE.text }}
+            style={{ borderColor: PALETTE.border, backgroundColor: "var(--surface)", color: PALETTE.text }}
           >
             <i className={`fas ${show ? "fa-eye-slash" : "fa-eye"}`}></i>
           </button>

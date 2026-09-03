@@ -73,7 +73,7 @@ export default function Footer() {
   };
 
   const inputStyle: React.CSSProperties = {
-    background: "rgba(255,253,250,0.08)", border: "1px solid rgba(176,137,104,0.4)",
+    background: "var(--surface-soft)", border: "1px solid rgba(176,137,104,0.4)",
     color: "var(--footer-text)", borderRadius: 12, padding: "0.7rem 1rem", fontSize: "0.9rem",
     outline: "none", width: "100%", transition: "border-color 0.3s",
   };

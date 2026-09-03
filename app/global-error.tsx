@@ -20,7 +20,12 @@ export default function GlobalError({
         style={{
           margin: 0,
           fontFamily: "system-ui, sans-serif",
-          backgroundColor: "#F6F4EF",
+          /* Valor literal, no token. global-error se renderiza FUERA del
+             layout raíz —es la red que atrapa un fallo del propio layout—,
+             así que globals.css puede no haberse cargado y las variables no
+             existirían: el fondo quedaría transparente justo en la pantalla
+             que tiene que funcionar cuando todo lo demás falló. */
+          backgroundColor: "#F8F5F0",
           color: "#3E2E22",
           minHeight: "var(--alto-pantalla, 100vh)",
           display: "flex",
