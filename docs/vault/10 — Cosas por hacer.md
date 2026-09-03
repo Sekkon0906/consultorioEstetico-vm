@@ -130,7 +130,7 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 - [ ] **F6 · Separar los elementos** de esa sección: el indicador de posición
       **más abajo**, las cards de procedimiento **más arriba**. Que todo tenga
       aire.
-- [ ] **F7 · Flechas de navegación** en ese carrusel del home (hoy solo hay
+- [x] **F7 · Flechas de navegación** en ese carrusel del home (hoy solo hay
       dots, faltan flechas — sí las tiene el carrusel de `/procedimientos`).
 - [ ] **F8 · Modal de procedimiento (al seleccionar una card).** Hoy oscurece
       el fondo pero deja seguir scrolleando con el modal "en la mano" — se ve
@@ -159,7 +159,7 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ### Agendar cita
 
-- [ ] **F13 · Gate de sesión.** Al seleccionar hora y pulsar "Continuar" sin
+- [x] **F13 · Gate de sesión.** Al seleccionar hora y pulsar "Continuar" sin
       sesión, hoy redirige directo a `/login`. En su lugar: **mensaje en la
       misma pantalla** ("para agendar una cita debes iniciar sesión") con dos
       botones — **Iniciar sesión** y **Registrarse** (el visitante puede tener
@@ -179,7 +179,7 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ### Frontend — ya conocidas
 
-- [ ] **F16 · Favicon en modo oscuro** — `<link rel="icon" media="(prefers-color-scheme: dark)">`
+- [x] **F16 · Favicon en modo oscuro** — `<link rel="icon" media="(prefers-color-scheme: dark)">`
       + `app/icon`. **Desbloqueado (2026-09-02):** ya están en R2
       `ConsultorioImagenes/Logo/LogoLimpioBlanco.png` (para fondo oscuro) y
       `LogoLimpioNegro.png` (para fondo claro). Ojo: pesan 1,29 MB y 843 KB —
@@ -192,14 +192,19 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 
 ## 🟦 Código — Backend
 
-- [ ] **B1 · Bucket privado para consentimientos y firmas.** Nuevo bucket R2
+- [x] **B1 · Bucket privado para consentimientos y firmas.** ⚠️ **El código
+      está hecho, pero FALTA CREAR EL BUCKET en Cloudflare.** Mientras
+      `R2_BUCKET_PRIVADO` esté vacío se sigue usando el público (el servidor
+      avisa al arrancar). Los consentimientos firmados ANTES del cambio
+      siguen con su URL pública guardada; migrarlos es un paso aparte.
+      Nuevo bucket R2
       privado + `GET /citas/:id/consentimiento.pdf` (autenticado, URL firmada),
       guardar la *clave* y no la URL pública. Cierra el hallazgo **CRÍTICO #1**
       del inventario. Necesita crear el bucket en Cloudflare (config).
-- [ ] **B2 · `jspdf@3` → `jspdf@4`.** Vuln crítica pre-existente
+- [x] **B2 · `jspdf@3` → `jspdf@4`.** Vuln crítica pre-existente
       (`FirmaConsentimiento`). Major con cambios de API — probar que el PDF
       sigue generándose.
-- [ ] **B3 · `withSentryConfig` import.** `from "@sentry/nextjs/config"` — una
+- [x] **B3 · `withSentryConfig` import.** `from "@sentry/nextjs/config"` — una
       línea, avisa en cada build (romperá en v11).
 - [ ] **B4 · (opcional)** Que el cron de recordatorios de Vercel llame directo
       a Railway en vez del proxy `app/api/reminders/send`.
