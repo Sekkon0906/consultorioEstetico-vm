@@ -284,7 +284,7 @@ export default function CopilotoChat() {
         <AnimatePresence>
           {mostrarConfig && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
+              initial={{ height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               style={{ overflow: "hidden" }}
@@ -349,7 +349,7 @@ export default function CopilotoChat() {
         {burbujas.map((b, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             style={{ alignSelf: b.de === "doctora" ? "flex-end" : "flex-start", maxWidth: "82%" }}
           >
@@ -377,7 +377,7 @@ export default function CopilotoChat() {
         <AnimatePresence>
           {propuesta && (
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               style={{ background: "var(--bg-elevated)", border: "2px solid var(--brand)", borderRadius: 14, padding: "1.1rem", alignSelf: "stretch" }}

@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useMemo, useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -71,6 +72,22 @@ export default function Navbar() {
   }, []);
   const linkRefs = useRef<(HTMLLIElement | null)[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
+  const indicatorRef = useRef<HTMLDivElement>(null);
+  /** El portal del menú móvil solo existe en el cliente. */
+  const [montado, setMontado] = useState(false);
+  useEffect(() => setMontado(true), []);
+
+  /* Con el menú abierto la página de atrás no debe desplazarse: si no, se
+     scrollea el fondo mientras el panel se queda quieto. */
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previo = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previo;
+    };
+  }, [mobileOpen]);
 
   /* === MENÚ PRINCIPAL === */
   // `grupo` agrupa los enlaces por intención para poder separarlos
@@ -100,10 +117,26 @@ export default function Navbar() {
       setIndicator((prev) => (prev.width === 0 ? prev : { ...prev, width: 0 }));
       return;
     }
-    // offsetLeft/offsetWidth son valores de layout (NO afectados por el
-    // scale del hover ni por transforms), y son relativos al mismo
-    // offsetParent que el indicador → alineación correcta.
-    const next = { left: el.offsetLeft, width: el.offsetWidth };
+    // `offsetLeft` NO sirve aquí: los <li> cuelgan del <ul> y el indicador
+    // del <div class="position-relative"> que lo envuelve, así que cada uno
+    // mide contra un offsetParent distinto y el subrayado salía corrido el
+    // ancho del propio <ul>. Medimos el <li> contra el elemento respecto al
+    // que el indicador se posiciona de verdad, sea cual sea el anidamiento.
+    //
+    // Sumamos la cadena de offsetParent hasta esa base en vez de restar
+    // getBoundingClientRect: el <li> lleva `whileHover: scale(1.05)` y los
+    // rects SÍ incluyen ese transform — el subrayado crecería con el cursor.
+    // offsetLeft/offsetWidth son valores de layout y lo ignoran.
+    const base = indicatorRef.current?.offsetParent as HTMLElement | null;
+    if (!base) return;
+    let left = 0;
+    let nodo: HTMLElement | null = el;
+    while (nodo && nodo !== base) {
+      left += nodo.offsetLeft;
+      nodo = nodo.offsetParent as HTMLElement | null;
+    }
+    if (!nodo) return; // el indicador y el enlace no comparten cadena
+    const next = { left, width: el.offsetWidth };
     setIndicator((prev) =>
       prev.left !== next.left || prev.width !== next.width ? next : prev
     );
@@ -115,37 +148,48 @@ export default function Navbar() {
       const activeEl = activeIndex !== -1 ? linkRefs.current[activeIndex] : null;
       updateIndicatorTo(activeEl);
     };
-    // Espera a que el layout/tipografías/traducciones se asienten
-    const r1 = requestAnimationFrame(() => requestAnimationFrame(measure));
-    const t1 = setTimeout(measure, 80);
-    const t2 = setTimeout(measure, 250);
-    const t3 = setTimeout(measure, 600); // re-mide tras animaciones de framer-motion
+
+    // El indicador guarda una POSICIÓN (offsetLeft/offsetWidth), no una
+    // referencia al elemento. Cualquier cosa que reacomode la barra deja esa
+    // posición obsoleta y el subrayado aparece bajo el enlace equivocado.
+    //
+    // Pasaba en cada carga: mientras AuthContext resuelve, el bloque derecho
+    // no ocupa nada; al resolver aparece "Iniciar sesión" (o el avatar, y con
+    // un admin también el enlace "Administrar"), el menú centrado se
+    // redistribuye y el subrayado se quedaba donde estaba — visualmente,
+    // debajo del siguiente enlace.
+    //
+    // Un ResizeObserver reacciona al reacomodo real, en vez de adivinarlo con
+    // temporizadores. Observamos también cada <li>: el <ul> tiene ancho fijo
+    // (flex: 1.5), así que al aparecer "Iniciar sesión" los enlaces se
+    // reacomodan DENTRO sin que el <ul> cambie de tamaño — observarlo solo a
+    // él no disparaba nada y el subrayado se quedaba donde estaba.
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (menuRef.current) ro.observe(menuRef.current);
+    if (dropdownRef.current) ro.observe(dropdownRef.current);
+    for (const li of linkRefs.current) if (li) ro.observe(li);
+
+    // El caso que rompía la carga: al resolver AuthContext aparece "Iniciar
+    // sesión" y la fila se recentra. Eso mueve los enlaces sin cambiar el
+    // tamaño de nadie, y un ResizeObserver no ve movimiento. Por eso el
+    // efecto depende de `loading`/`user` y vuelve a medir en el frame
+    // siguiente al repintado.
+    const raf = requestAnimationFrame(measure);
+
+    // Las fuentes cambian el ancho de los enlaces al terminar de cargar.
+    document.fonts?.ready.then(measure).catch(() => {});
+
     window.addEventListener("resize", measure);
     return () => {
-      cancelAnimationFrame(r1);
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
+      ro.disconnect();
+      cancelAnimationFrame(raf);
       window.removeEventListener("resize", measure);
     };
     // Importante: depender de `menuItems` (no solo .length) para que se
     // re-mida cuando cambian las etiquetas (cambio de idioma).
-  }, [pathname, menuItems]);
+  }, [pathname, menuItems, loading, user]);
 
-  /* === SECCIÓN ACTUAL (pt 22) === */
-  const currentSection = useMemo(() => {
-    const exact = menuItems.find((i) => i.href === pathname);
-    if (exact) return exact.label;
-    const prefix = menuItems
-      .filter((i) => i.href !== "/" && pathname.startsWith(i.href))
-      .sort((a, b) => b.href.length - a.href.length)[0];
-    if (prefix) return prefix.label;
-    if (pathname.startsWith("/perfil")) return t("profileSection");
-    if (pathname.startsWith("/legal")) return t("legalSection");
-    if (pathname.startsWith("/login") || pathname.startsWith("/register"))
-      return "Acceso";
-    return "Inicio";
-  }, [pathname, menuItems, t]);
 
   /* === LOGOUT === */
   const requestLogout = () => {
@@ -211,38 +255,22 @@ export default function Navbar() {
               width={75}
               height={55}
               priority
-              className="me-2"
-              style={{ width: "auto", height: "auto" }}
+              className="me-2 navbar-logo-img"
+              /* Antes iba `width: auto; height: auto` en línea, y el estilo
+                 en línea le gana a la hoja: la imagen se pintaba a su
+                 tamaño intrínseco, 96px de alto, y ella sola estiraba la
+                 navbar de escritorio hasta 128px. La medida se decide ahora
+                 en CSS (.navbar-logo img), que es donde puede cambiar por
+                 breakpoint. Se dan los dos ejes para conservar la
+                 proporción 75×55 y no disparar el aviso de next/image. */
             />
           </Link>
-          {/* Solo en móvil. En escritorio el menú está a la vista y el
-              subrayado ya indica dónde estás, así que repetirlo aquí solo
-              robaba ancho a los enlaces. En móvil el menú va colapsado
-              detrás de la hamburguesa y no hay otra pista de ubicación.
-              Se recorta con ellipsis para no empujar la hamburguesa. */}
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={currentSection}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 8 }}
-              transition={{ duration: 0.25 }}
-              className="d-inline-block d-md-none"
-              style={{
-                fontWeight: 600,
-                fontSize: "0.88rem",
-                color: "var(--text-muted)",
-                borderLeft: "1px solid var(--border)",
-                paddingLeft: "0.6rem",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                maxWidth: "38vw",
-              }}
-            >
-              {currentSection}
-            </motion.span>
-          </AnimatePresence>
+          {/* Aquí iba la "sección actual" ("Inicio", "Procedimientos"…) en
+              móvil. Se quitó: la página ya dice en qué sección estás —con
+              su propio titular, a pantalla completa— así que era la misma
+              información dos veces, y en 375px se comía hasta un 38 % del
+              ancho de la barra por repetirla. Ese ancho es lo que ahora
+              deja respirar al logo y a la hamburguesa. */}
         </div>
 
         {/* MENÚ DESKTOP */}
@@ -252,6 +280,7 @@ export default function Navbar() {
           onMouseLeave={handleMenuLeave}
         >
           <ul
+            ref={menuRef}
             className="navbar-menu d-flex justify-content-center align-items-center mb-0"
             /* gap chico: cada enlace ya trae su propio padding lateral, que
                es lo que le da el área de clic y el fondo al pasar el cursor */
@@ -289,22 +318,26 @@ export default function Navbar() {
             })}
           </ul>
 
-          <motion.div
-            layout
+          {/* Un div normal con transición CSS, no un motion.div: framer no
+              llegaba a aplicar el `animate` de left/width en el primer commit
+              (la fibra ya tenía la medida correcta y el DOM seguía en 0), así
+              que en la carga el subrayado no aparecía. Para un subrayado de
+              3px la transición del navegador basta y es determinista. */}
+          <div
+            ref={indicatorRef}
             className="navbar-indicator"
-            animate={{
-              left: indicator.left,
-              width: indicator.width,
-              opacity: indicator.width ? 1 : 0,
-            }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
             style={{
               position: "absolute",
               bottom: -2,
               height: "3px",
-              background: "linear-gradient(90deg, #b08968, #ffe4c0, #b08968)",
+              left: indicator.left,
+              width: indicator.width,
+              opacity: indicator.width ? 1 : 0,
+              background: "linear-gradient(90deg, var(--brand), #ffe4c0, #b08968)",
               borderRadius: "3px",
               pointerEvents: "none",
+              transition:
+                "left var(--mov-lento) var(--mov-curva), width var(--mov-lento) var(--mov-curva), opacity var(--mov-normal) ease",
             }}
           />
         </div>
@@ -373,7 +406,7 @@ export default function Navbar() {
                 {menuOpen && (
                   <motion.div
                     key="perfil-menu"
-                    initial={{ opacity: 0, y: -8, scale: 0.92 }}
+                    initial={{ y: -8, scale: 0.92 }}
                     animate={{ opacity: 1, y: 12, scale: 1 }}
                     exit={{ opacity: 0, y: -6, scale: 0.94 }}
                     transition={{ type: "spring", damping: 22, stiffness: 320, mass: 0.6 }}
@@ -442,6 +475,16 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* Los overlays (sidebar, backdrop, modal) se montan en <body> con un
+          portal. Dentro del <nav> no funcionaban: el nav lleva
+          `backdrop-filter` para el efecto de cristal, y eso (a) rasteriza todo
+          su subárbol en una capa que se compone con el desenfoque del fondo —
+          por eso el sidebar se veía transparente aunque su fondo es opaco — y
+          (b) convierte al nav en bloque contenedor de los `position: fixed`,
+          así que el overlay se posicionaba contra la barra y no contra la
+          pantalla. */}
+      {montado && createPortal(
+        <>
       {/* SIDEBAR MÓVIL */}
       <div className={`mobile-sidebar ${mobileOpen ? "open" : ""}`} style={{ transition: "transform 0.4s ease, opacity 0.4s ease" }}>
         {user ? (
@@ -493,7 +536,7 @@ export default function Navbar() {
         {confirmLogout && (
           <motion.div
             key="logout-confirm"
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
@@ -505,7 +548,7 @@ export default function Navbar() {
             }}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
@@ -529,7 +572,7 @@ export default function Navbar() {
                 </button>
                 <button
                   className="btn flex-fill"
-                  style={{ background: "#b02e2e", color: "#fff", fontWeight: 600, border: "none", borderRadius: "10px" }}
+                  style={{ background: "var(--danger)", color: "#fff", fontWeight: 600, border: "none", borderRadius: "10px" }}
                   onClick={handleLogout}
                 >
                   {t("logout")}
@@ -545,16 +588,19 @@ export default function Navbar() {
         {mobileOpen && (
           <motion.div
             key="backdrop"
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             className="mobile-backdrop"
             onClick={() => setMobileOpen(false)}
-            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", backdropFilter: "blur(2px)", zIndex: 80 }}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", backdropFilter: "blur(2px)", zIndex: 1400 }}
           />
         )}
       </AnimatePresence>
+        </>,
+        document.body
+      )}
     </nav>
   );
 }

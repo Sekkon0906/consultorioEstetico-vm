@@ -63,7 +63,7 @@ export default function DatosPersonalesForm({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       style={{ textAlign: "start" }}

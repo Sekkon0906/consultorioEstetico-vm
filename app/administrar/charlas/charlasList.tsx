@@ -184,7 +184,7 @@ export default function CharlasList() {
       <AnimatePresence>
         {confirmEliminarId !== null && (
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setConfirmEliminarId(null)}
@@ -218,7 +218,7 @@ export default function CharlasList() {
                 </button>
                 <button
                   className="btn flex-fill rounded-pill"
-                  style={{ background: "#b02e2e", color: "#fff", fontWeight: 600, border: "none" }}
+                  style={{ background: "var(--danger)", color: "#fff", fontWeight: 600, border: "none" }}
                   onClick={() => handleEliminar(confirmEliminarId)}
                 >
                   Eliminar
@@ -233,7 +233,7 @@ export default function CharlasList() {
       <AnimatePresence>
         {(modo === "crear" || modo === "editar") && (
           <motion.div
-            initial={{ opacity: 0, y: -12 }}
+            initial={{ y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             className="card border-0 rounded-4 shadow-sm p-4 mb-5 dark-aware-card admin-form-card"
@@ -371,7 +371,7 @@ export default function CharlasList() {
                           style={{
                             width: 18,
                             height: 18,
-                            backgroundColor: "#b02e2e",
+                            backgroundColor: "var(--danger)",
                             color: "#fff",
                             fontSize: "0.6rem",
                             lineHeight: 1,
@@ -433,7 +433,7 @@ export default function CharlasList() {
             <motion.div
               key={c.id}
               className="admin-card"
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.02 }}
               style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}

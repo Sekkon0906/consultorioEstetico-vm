@@ -50,3 +50,6 @@ Thumbs.db
 *.swp
 *.tsbuildinfo
 .neon
+
+# Configuración local del previsualizador (Claude Code)
+.claude/launch.json

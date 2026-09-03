@@ -47,17 +47,17 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
     } catch (e: any) { setError(e.message); } finally { setSaving(false); }
   };
 
-  const estadoColor: Record<string, string> = { pendiente: "var(--brand)", confirmada: "#2D6A4F", atendida: "#1B4F72", cancelada: "#922B21" };
+  const estadoColor: Record<string, string> = { pendiente: "var(--brand)", confirmada: "var(--success)", atendida: "#1B4F72", cancelada: "#922B21" };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+    <motion.div initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <motion.div initial={{ scale: 0.92, y: 30 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 30 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
         style={{ background: "white", borderRadius: 24, width: "100%", maxWidth: 540, maxHeight: "90vh", overflowY: "auto", position: "relative" }}>
 
-        <div style={{ height: 4, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: "24px 24px 0 0" }} />
+        <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)", borderRadius: "24px 24px 0 0" }} />
         <div style={{ padding: "1.8rem 2rem 2rem" }}>
 
           {/* Header */}
@@ -67,7 +67,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
             <span style={{ background: estadoColor[cita.estado] ?? "#aaa", color: "white", padding: "0.3rem 0.9rem", borderRadius: 100, fontSize: "0.75rem", fontWeight: 600, textTransform: "capitalize" }}>{cita.estado}</span>
           </div>
 
-          {error && <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} style={{ background: "#FDE8D8", color: "#922B21", padding: "0.6rem 1rem", borderRadius: 12, marginBottom: "1rem", fontSize: "0.85rem" }}>{error}</motion.div>}
+          {error && <motion.div initial={{ y: -8 }} animate={{ opacity: 1, y: 0 }} style={{ background: "#FDE8D8", color: "#922B21", padding: "0.6rem 1rem", borderRadius: 12, marginBottom: "1rem", fontSize: "0.85rem" }}>{error}</motion.div>}
 
           {/* Patient */}
           <div style={{ background: "var(--surface-soft)", borderRadius: 14, padding: "1rem", marginBottom: "0.8rem" }}>
@@ -78,7 +78,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
 
           {/* Procedure */}
           <div style={{ background: "#EEF7EE", borderRadius: 14, padding: "1rem", marginBottom: "1.5rem" }}>
-            <p style={{ fontWeight: 600, color: "#2D6A4F", margin: 0 }}>{cita.procedimiento}</p>
+            <p style={{ fontWeight: 600, color: "var(--success)", margin: 0 }}>{cita.procedimiento}</p>
             {cita.nota && <p style={{ fontSize: "0.82rem", color: "#4A7A5A", margin: "0.2rem 0 0" }}>Nota: {cita.nota}</p>}
           </div>
 
@@ -104,7 +104,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
                 gap: 8,
                 fontWeight: 600,
                 fontSize: "0.88rem",
-                color: cita.consentimientoFirmado ? "#2D6A4F" : "#8B5A12",
+                color: cita.consentimientoFirmado ? "var(--success)" : "#8B5A12",
                 margin: 0,
               }}
             >
@@ -155,7 +155,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
                 {(["Efectivo", "Tarjeta"] as const).map(m => (
                   <motion.button key={m} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} onClick={() => setModoPago(m)}
                     style={{ flex: 1, padding: "0.75rem", borderRadius: 14, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", transition: "all 0.25s",
-                      background: modoPago === m ? "linear-gradient(135deg, #8B6A4B, #B08968)" : "var(--surface-soft)",
+                      background: modoPago === m ? "linear-gradient(135deg, var(--brand-deep), #B08968)" : "var(--surface-soft)",
                       color: modoPago === m ? "white" : "var(--text)",
                       boxShadow: modoPago === m ? "0 4px 14px rgba(176,137,104,0.3)" : "none",
                     }}>{m}</motion.button>
@@ -164,7 +164,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
 
               {/* Summary */}
               {montoNum > 0 && pagoNum > 0 && (
-                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} style={{ overflow: "hidden" }}>
+                <motion.div initial={{ height: 0 }} animate={{ opacity: 1, height: "auto" }} style={{ overflow: "hidden" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", marginBottom: 6 }}>
                     <span style={{ color: "var(--text-soft)" }}>Pagado: <strong>${pagadoTotal.toLocaleString("es-CO")}</strong></span>
                     {restante > 0 && <span style={{ color: "var(--brand)", fontWeight: 600 }}>Restante: ${restante.toLocaleString("es-CO")}</span>}
@@ -175,7 +175,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
                       style={{ height: "100%", background: devolucion > 0 ? "linear-gradient(90deg, #43A047, #66BB6A)" : "linear-gradient(90deg, #8B6A4B, #B08968)", borderRadius: 4 }} />
                   </div>
                   {devolucion > 0 && (
-                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ fontSize: "0.82rem", color: "#2E7D32", fontWeight: 600, marginTop: 6, textAlign: "center", background: "#E8F5E9", padding: "0.5rem", borderRadius: 10 }}>
+                    <motion.p initial={false} animate={{ opacity: 1 }} style={{ fontSize: "0.82rem", color: "#2E7D32", fontWeight: 600, marginTop: 6, textAlign: "center", background: "#E8F5E9", padding: "0.5rem", borderRadius: 10 }}>
                       Debe devolver ${devolucion.toLocaleString("es-CO")} al cliente
                     </motion.p>
                   )}
@@ -188,7 +188,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
           <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", justifyContent: "center" }}>
             {cita.estado === "pendiente" && (
               <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setShowConfirm(true)} disabled={saving}
-                style={{ flex: 1, padding: "0.9rem", borderRadius: 100, background: "linear-gradient(135deg, #2D6A4F, #43A047)", color: "white", border: "none", fontWeight: 700, fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, boxShadow: "0 6px 18px rgba(45,106,79,0.28)" }}>
+                style={{ flex: 1, padding: "0.9rem", borderRadius: 100, background: "linear-gradient(135deg, var(--success), #43A047)", color: "white", border: "none", fontWeight: 700, fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, boxShadow: "0 6px 18px rgba(45,106,79,0.28)" }}>
                 <CheckCircle2 size={17} /> Confirmar cita
               </motion.button>
             )}
@@ -213,7 +213,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
       {/* Confirm sub-modal */}
       <AnimatePresence>
         {showConfirm && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          <motion.div initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{ position: "fixed", inset: 0, zIndex: 300, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}
             onClick={() => setShowConfirm(false)}>
             <motion.div initial={{ scale: 0.85, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.85, y: 20 }}
@@ -225,7 +225,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
               <p style={{ fontSize: "0.85rem", color: "var(--text-soft)", marginBottom: "1.5rem" }}>Cita de <strong>{cita.nombres}</strong> para <strong>{cita.procedimiento}</strong></p>
               <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
                 <button onClick={() => setShowConfirm(false)} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, border: "1px solid var(--border)", background: "transparent", color: "var(--text-soft)", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
-                <button onClick={handleConfirmarCita} disabled={saving} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, background: "#2D6A4F", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>{saving ? "..." : "Si, confirmar"}</button>
+                <button onClick={handleConfirmarCita} disabled={saving} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, background: "var(--success)", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>{saving ? "..." : "Si, confirmar"}</button>
               </div>
             </motion.div>
           </motion.div>

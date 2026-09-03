@@ -14,6 +14,26 @@
    lo aplica antes del primer paint para evitar parpadeo.
 ========================== */
 
+/* ==========================
+   ALTURA DE LA BARRA FIJA
+   La navbar es sticky. Sin reservar su alto, cualquier salto a un ancla
+   (o el scroll a una sección) deja el título medio tapado debajo de ella.
+   `scroll-margin-top` en los destinos lo resuelve de una vez para todo el
+   sitio, en lugar de parchear sección por sección.
+========================== */
+:root {
+  --nav-h: 56px;
+}
+@media (min-width: 768px) {
+  :root { --nav-h: 80px; }
+}
+
+[id],
+section,
+h1, h2, h3 {
+  scroll-margin-top: calc(var(--nav-h) + 12px);
+}
+
 /* === PALETA CLARA (por defecto) === */
 :root,
 :root[data-theme="light"] {

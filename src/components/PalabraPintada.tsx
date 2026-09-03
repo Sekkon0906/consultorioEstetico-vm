@@ -23,6 +23,11 @@ import { useEffect, useId, useRef, useState } from "react";
  * sigue siendo reconocible para quien no está acostumbrado a la cursiva.
  */
 
+/** Aire a cada lado, en unidades del viewBox. La cursiva sobresale de su
+ *  caja de avance y la pincelada de la máscara lleva punta redonda, que se
+ *  extiende media anchura de trazo más allá de donde empieza y termina. */
+const MARGEN_CURSIVA = 28;
+
 interface Props {
   /** Palabras a mostrar. Con una sola, queda fija. */
   palabras: string[];
@@ -43,19 +48,51 @@ export default function PalabraPintada({ palabras, duracionPorPalabra = 3600 }: 
 
   // El ancho del SVG se ajusta a la palabra: si no, "confianza." y "armonía."
   // quedarían con cajas distintas y el texto saltaría de tamaño al cambiar.
+  //
+  // Aquí estaba el bug de la palabra cortada ("autenticidac", sin la última
+  // letra). La medida se tomaba UNA vez, al montar, y en ese momento Playfair
+  // todavía no había cargado: se medía la fuente de reserva, que es más
+  // estrecha, y el viewBox salía más corto que el texto real. Al llegar la
+  // fuente el texto crecía, pero la caja ya estaba fijada y lo que sobraba
+  // por la derecha quedaba fuera.
+  //
+  // Se mide con getBBox, no con getComputedTextLength: la cursiva se inclina
+  // y sobresale de la caja de avance por los dos lados, y getComputedTextLength
+  // solo suma anchos de avance — justo la parte que se salía.
   useEffect(() => {
     const el = textoRef.current;
     if (!el) return;
-    try {
-      const ancho = el.getComputedTextLength();
-      if (ancho > 0) setAnchoTexto(Math.ceil(ancho) + 40);
-    } catch {
-      // getComputedTextLength falla si la fuente aún no cargó; se queda con
-      // el ancho por defecto, que es razonable.
-    }
+
+    const medir = () => {
+      const actual = textoRef.current;
+      if (!actual) return;
+      try {
+        const caja = actual.getBBox();
+        // `caja.x` ya incluye el desplazamiento inicial del texto, así que
+        // el borde derecho es x + width y solo falta el margen de la
+        // derecha. Sumar dos márgenes aquí sobraría espacio y, como el SVG
+        // se escala a `width: 100%`, encogería la palabra sin motivo.
+        const bordeDerecho = caja.x + caja.width;
+        if (bordeDerecho > 0) setAnchoTexto(Math.ceil(bordeDerecho) + MARGEN_CURSIVA);
+      } catch {
+        // getBBox lanza si el nodo aún no está pintado; se reintenta al
+        // cargar las fuentes.
+      }
+    };
+
+    medir();
+    let vivo = true;
+    document.fonts?.ready.then(() => { if (vivo) medir(); }).catch(() => {});
+    return () => { vivo = false; };
   }, [palabra]);
 
-  // Repinta el trazo cada vez que cambia la palabra.
+  // Repinta el trazo cada vez que cambia la palabra O el ancho medido.
+  //
+  // Depender solo de `palabra` dejaba un desfase visible: `anchoTexto`
+  // cambia después, al cargar la fuente, y con él cambia la `d` del trazo y
+  // por tanto su longitud. El `strokeDasharray` se quedaba con la longitud
+  // vieja, más corta que el trazo nuevo, así que el sobrante quedaba sin
+  // guion que lo cubriera y la palabra aparecía a trozos.
   useEffect(() => {
     const trazo = trazoRef.current;
     if (!trazo) return;
@@ -81,7 +118,7 @@ export default function PalabraPintada({ palabras, duracionPorPalabra = 3600 }: 
     void trazo.getBoundingClientRect();
     trazo.style.transition = "stroke-dashoffset 1.4s cubic-bezier(0.35,0.1,0.25,1)";
     trazo.style.strokeDashoffset = "0";
-  }, [palabra]);
+  }, [palabra, anchoTexto]);
 
   // Rotación entre palabras. Con una sola no hace nada.
   useEffect(() => {
@@ -106,9 +143,12 @@ export default function PalabraPintada({ palabras, duracionPorPalabra = 3600 }: 
         <mask id={`pincel-${idMascara}`}>
           {/* Trazo con curva y punta redonda: se lee como pincelada, no
               como una barra de progreso. El grosor cubre el alto del texto. */}
+          {/* Arranca y termina FUERA del viewBox (−MARGEN, ancho+MARGEN):
+              con la punta redonda, si el trazo empezara en el borde exacto
+              la primera y la última letra se destapaban a medias. */}
           <path
             ref={trazoRef}
-            d={`M 10 ${alto * 0.52} Q ${anchoTexto * 0.3} ${alto * 0.36}, ${anchoTexto * 0.55} ${alto * 0.5} T ${anchoTexto + 10} ${alto * 0.47}`}
+            d={`M ${-MARGEN_CURSIVA} ${alto * 0.52} Q ${anchoTexto * 0.3} ${alto * 0.36}, ${anchoTexto * 0.55} ${alto * 0.5} T ${anchoTexto + MARGEN_CURSIVA} ${alto * 0.47}`}
             stroke="#fff"
             strokeWidth={alto * 0.85}
             fill="none"
@@ -118,7 +158,7 @@ export default function PalabraPintada({ palabras, duracionPorPalabra = 3600 }: 
       </defs>
       <text
         ref={textoRef}
-        x="0"
+        x={MARGEN_CURSIVA}
         y={alto * 0.7}
         mask={`url(#pincel-${idMascara})`}
         fill="currentColor"

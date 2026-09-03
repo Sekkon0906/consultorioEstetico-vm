@@ -51,7 +51,7 @@ export default function CitasAgendadasEditor({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       className="bg-white p-6 rounded-4 shadow-lg w-100 border"

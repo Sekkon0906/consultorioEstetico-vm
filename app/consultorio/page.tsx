@@ -74,7 +74,7 @@ export default function ConsultorioPage() {
 
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6">
           <motion.span
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-sm md:text-base tracking-[0.3em] uppercase mb-4"
@@ -83,7 +83,7 @@ export default function ConsultorioPage() {
           </motion.span>
 
           <motion.h1
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
             className="text-4xl md:text-6xl font-semibold mb-4 drop-shadow-xl"
@@ -92,7 +92,7 @@ export default function ConsultorioPage() {
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 1 }}
             className="text-lg md:text-xl max-w-3xl"
@@ -101,7 +101,7 @@ export default function ConsultorioPage() {
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            initial={{ y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
             className="mt-6 flex justify-center w-full"
@@ -124,7 +124,7 @@ export default function ConsultorioPage() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.8 }}
-          className="text-3xl md:text-4xl font-semibold text-[#B08968] mb-8"
+          className="text-3xl md:text-4xl font-semibold text-[var(--brand)] mb-8"
         >
           {t("description.title")}
         </motion.h2>
@@ -144,13 +144,13 @@ export default function ConsultorioPage() {
       {/* GALERÍA — showcase interactivo: imagen grande + miniaturas */}
       <section className="consultorio-gallery-section px-4 pb-16 pt-4">
         <div className="max-w-5xl mx-auto mb-8 text-center">
-          <h2 className="consultorio-gallery-title text-2xl md:text-3xl font-semibold text-[#B08968]">
+          <h2 className="consultorio-gallery-title text-2xl md:text-3xl font-semibold text-[var(--brand)]">
             {t("gallery.title")}
           </h2>
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6 }}
@@ -161,7 +161,7 @@ export default function ConsultorioPage() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeIndex}
-                initial={{ opacity: 0, scale: 1.03 }}
+                initial={{ scale: 1.03 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
@@ -239,7 +239,7 @@ export default function ConsultorioPage() {
         {currentImage && (
           <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeModal}

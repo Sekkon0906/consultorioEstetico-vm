@@ -61,7 +61,7 @@ function ProgressBar({ estado, t }: { estado: string; t: ReturnType<typeof useTr
               <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
             </div>
             {!isLast && (
-              <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 4px", marginBottom: 18, background: currentStep > i + 1 ? "linear-gradient(90deg, #B08968, #C9AD8D)" : "var(--border)", transition: "background 0.4s" }} />
+              <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 4px", marginBottom: 18, background: currentStep > i + 1 ? "linear-gradient(90deg, var(--brand), #C9AD8D)" : "var(--border)", transition: "background 0.4s" }} />
             )}
           </div>
         );
@@ -157,9 +157,9 @@ export default function CitasAgendadas() {
   return (
     <div className="dark-aware-section citas-page" style={{ maxWidth: 1180, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", marginBottom: "2rem" }}>
+      <motion.div initial={{ y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", marginBottom: "2rem" }}>
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem" }}>{t("title")}</h2>
-        <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)", borderRadius: 2, margin: "0 auto 1.2rem" }} />
+        <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, var(--brand), #C9AD8D)", borderRadius: 2, margin: "0 auto 1.2rem" }} />
       </motion.div>
 
       {/* Layout: filtros a la izquierda (pila) · citas a la derecha */}
@@ -209,7 +209,7 @@ export default function CitasAgendadas() {
 
               return (
                 <motion.div key={cita.id}
-                  initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                  initial={{ y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.4, delay: i * 0.04 }}
                   style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(8px)", borderRadius: 20, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 4px 16px rgba(78,59,43,0.06)", overflow: "hidden", transition: "box-shadow 0.3s" }}
                   onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 24px rgba(78,59,43,0.1)"; }}

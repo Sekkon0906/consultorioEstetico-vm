@@ -43,7 +43,7 @@ export default function AuthCallbackPage() {
       style={{
         position: "relative",
         overflow: "hidden",
-        minHeight: "100vh",
+        minHeight: "var(--alto-pantalla, 100vh)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

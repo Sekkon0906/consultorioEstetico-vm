@@ -9,19 +9,19 @@ export default function VisionMision() {
     <section
       className="dark-aware-section vm-section"
       style={{
-        background: "linear-gradient(180deg,#FAF9F7 0%,#F5EDE3 100%)",
+        background: "linear-gradient(180deg,var(--bg) 0%,#F5EDE3 100%)",
         padding: "5rem 2rem",
       }}
     >
       <div className="container text-center">
         <motion.h3
           className="fw-bold mb-5"
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
           style={{
-            color: "#4E3B2B",
+            color: "var(--topbar-text)",
             fontFamily: "'Playfair Display', serif",
           }}
         >
@@ -32,7 +32,7 @@ export default function VisionMision() {
           <div className="col-12 col-md-6">
             <motion.div
               whileHover={{ scale: 1.03 }}
-              initial={{ opacity: 0, x: -80 }}
+              initial={{ x: -80 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.9, ease: "easeOut" }}
               viewport={{ once: true }}
@@ -53,7 +53,7 @@ export default function VisionMision() {
               </h4>
               <p
                 style={{
-                  color: "#4E3B2B",
+                  color: "var(--topbar-text)",
                   fontSize: "1.05rem",
                   lineHeight: "1.7",
                 }}
@@ -66,7 +66,7 @@ export default function VisionMision() {
           <div className="col-12 col-md-6">
             <motion.div
               whileHover={{ scale: 1.03 }}
-              initial={{ opacity: 0, x: 80 }}
+              initial={{ x: 80 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.9, ease: "easeOut" }}
               viewport={{ once: true }}
@@ -87,7 +87,7 @@ export default function VisionMision() {
               </h4>
               <p
                 style={{
-                  color: "#4E3B2B",
+                  color: "var(--topbar-text)",
                   fontSize: "1.05rem",
                   lineHeight: "1.7",
                 }}

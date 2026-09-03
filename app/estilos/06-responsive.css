@@ -167,16 +167,23 @@
     height: 32px !important;
     object-fit: contain !important;
   }
-  .navbar-container { padding: 0.5rem 0 !important; }
+  /* La barra fija se queda en 56px (era 62). Es el alto que importa: la
+     topbar se va con el scroll, la navbar es sticky y esos píxeles se
+     pierden en TODA la página. 56 sobre 812 son 6,9 %, que es el objetivo
+     del estudio.
 
-  /* 7. Texto del breadcrumb (currentSection) truncado para no romper */
-  .navbar-container > div > div:first-child > span {
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.82rem !important;
+     Sin padding y con `min-height`: el contenido más alto de la barra es
+     la hamburguesa, 46px, y ese alto NO se toca — 44px es el mínimo para
+     que un dedo acierte. Con padding encima se sumaba a los 46 y la barra
+     acababa en 71px. Dejando que `min-height` haga el trabajo, la
+     hamburguesa conserva su área táctil y la barra su altura. */
+  .navbar-container {
+    padding: 0 !important;
+    min-height: 56px;
   }
+
+  /* Aquí se truncaba la "sección actual" con ellipsis. Ya no existe: la
+     página dice en qué sección estás con su propio titular. */
 
   /* Mobile sidebar: footer fijo abajo con controles + logout */
   .mobile-sidebar-footer {
@@ -197,7 +204,7 @@
     border-radius: 12px;
     border: 1px solid #e4bfbf;
     background: #fff3ef;
-    color: #b02e2e;
+    color: var(--danger);
     font-weight: 700;
     font-size: 0.95rem;
     cursor: pointer;
@@ -219,9 +226,9 @@
     inset: 0;
     background: linear-gradient(
       180deg,
-      rgba(0,0,0,0.18) 0%,
-      rgba(0,0,0,0.42) 45%,
-      rgba(0,0,0,0.82) 100%
+      var(--foto-velo-suave) 0%,
+      var(--foto-velo-medio) 45%,
+      var(--foto-velo-fuerte) 100%
     );
     pointer-events: none;
     z-index: 1;
@@ -251,9 +258,10 @@
     order: -1 !important;
     padding-top: 0 !important;
   }
-  .videoanim-section .va-video-col > div:last-child {
-    padding-top: 60% !important;
-  }
+  /* Era `.va-video-col > div:last-child`, un selector posicional que pisaba
+     por especificidad cualquier regla escrita con la clase del elemento.
+     Ahora el marco tiene clase propia (.va-marco) y la medida se decide
+     ahí abajo, en un solo sitio. */
   .videoanim-section h2 {
     font-size: 1.5rem !important;
   }
@@ -623,7 +631,7 @@
   border-radius: 50%;
   border: none;
   background: rgba(255, 255, 255, 0.85);
-  color: #3a2a1a;
+  color: var(--text);
   font-size: 1.6rem;
   line-height: 1;
   cursor: pointer;
@@ -739,11 +747,11 @@
    Citas agendadas — filter buttons con count visible
 ============================================================ */
 .citas-filter-btn {
-  background: #F5EEE6;
-  color: #4E3B2B;
+  background: var(--surface-soft);
+  color: var(--topbar-text);
 }
 .citas-filter-btn.is-active {
-  background: linear-gradient(135deg, #B08968, #C9AD8D);
+  background: linear-gradient(135deg, var(--brand), #C9AD8D);
   color: #FFFFFF;
   box-shadow: 0 4px 14px rgba(176,137,104,0.25);
 }
@@ -967,7 +975,7 @@
 /* Seleccionado en LIGHT: café degradado + texto blanco (brand-deep es
    café oscuro en light). */
 :root[data-theme="light"] .treatment-picker-item.is-selected {
-  background: linear-gradient(135deg, #8B6A4B, #C9AD8D);
+  background: linear-gradient(135deg, var(--brand-deep), #C9AD8D);
   color: #FFFFFF;
   border-color: var(--brand);
 }
@@ -1328,10 +1336,10 @@
 :root[data-theme="dark"] .citas-page motion-div[style*="background"] {
   /* Captura general — los hijos directos que tienen bg blanco */
 }
-:root[data-theme="dark"] .citas-page [style*="background: #FFFDF9"],
-:root[data-theme="dark"] .citas-page [style*="background:#FFFDF9"],
+:root[data-theme="dark"] .citas-page [style*="background: var(--surface)"],
+:root[data-theme="dark"] .citas-page [style*="background:var(--surface)"],
 :root[data-theme="dark"] .citas-page [style*="background: linear-gradient(135deg, #FFFBF7"],
-:root[data-theme="dark"] .citas-page [style*="background: #F5EEE6"] {
+:root[data-theme="dark"] .citas-page [style*="background: var(--surface-soft)"] {
   background: var(--surface) !important;
   color: var(--text) !important;
   border-color: var(--border) !important;
@@ -1359,11 +1367,11 @@
   color: var(--brand) !important;
 }
 /* Filtros inactivos (bg #F5EEE6) → texto cream */
-:root[data-theme="dark"] .citas-page button[style*="background: #F5EEE6"] {
+:root[data-theme="dark"] .citas-page button[style*="background: var(--surface-soft)"] {
   background: var(--surface-soft) !important;
   color: var(--text) !important;
 }
-:root[data-theme="dark"] .citas-page button[style*="background: #F5EEE6"] span {
+:root[data-theme="dark"] .citas-page button[style*="background: var(--surface-soft)"] span {
   color: var(--text) !important;
 }
 /* Cards de cita (rgba 255,253,250,0.95) */
@@ -1408,7 +1416,7 @@
   color: var(--text-muted) !important;
 }
 /* Botón "Ordenar por fecha" */
-:root[data-theme="dark"] .citas-page button[style*="background: #FFFDF9"] {
+:root[data-theme="dark"] .citas-page button[style*="background: var(--surface)"] {
   background: var(--surface) !important;
   color: var(--text) !important;
 }
@@ -1601,8 +1609,8 @@
   border: 1px solid rgba(176, 137, 104, 0.25);
 }
 /* Avatar circle bg (E9DED2) */
-:root[data-theme="dark"] .comentarios-section [style*="background:#E9DED2"],
-:root[data-theme="dark"] .comentarios-section [style*="background: #E9DED2"] {
+:root[data-theme="dark"] .comentarios-section [style*="background:var(--border)"],
+:root[data-theme="dark"] .comentarios-section [style*="background: var(--border)"] {
   background: var(--surface-soft) !important;
   color: var(--text) !important;
 }
@@ -1685,7 +1693,7 @@
 
 /* Light mode: brand-deep es un café oscuro real */
 :root[data-theme="light"] .profile-menu-btn-primary {
-  background: linear-gradient(135deg, #8B6A4B, #C9AD8D);
+  background: linear-gradient(135deg, var(--brand-deep), #C9AD8D);
   color: #FFFFFF;
 }
 
@@ -1715,7 +1723,7 @@
   bottom: -6px;
   height: 3px;
   border-radius: 3px;
-  background: linear-gradient(90deg, #b08968, #ffe4c0, #b08968);
+  background: linear-gradient(90deg, var(--brand), #ffe4c0, #b08968);
   box-shadow: 0 0 8px rgba(176, 137, 104, 0.4);
   pointer-events: none;
 }
@@ -1784,12 +1792,15 @@ body {
 .hero-fs-overlay {
   position: absolute;
   inset: 0;
+  /* El matiz sale de --foto-tinte (00-cimientos.css), no de un café fijo:
+     así la foto acompaña al tema en vez de quedarse marrón cuando el
+     resto de la página ya es grafito. */
   background:
     linear-gradient(90deg,
-      rgba(58, 42, 26, 0.0) 0%,
-      rgba(58, 42, 26, 0.10) 35%,
-      rgba(28, 20, 12, 0.55) 70%,
-      rgba(28, 20, 12, 0.75) 100%),
+      rgba(var(--foto-tinte), 0) 0%,
+      var(--foto-velo-suave) 35%,
+      var(--foto-velo-medio) 70%,
+      var(--foto-velo-fuerte) 100%),
     linear-gradient(180deg,
       rgba(0, 0, 0, 0.18) 0%,
       rgba(0, 0, 0, 0) 30%);
@@ -1880,7 +1891,7 @@ body {
 }
 
 .hero-fs-btn-primary {
-  background: linear-gradient(135deg, #B08968, #E0B892);
+  background: linear-gradient(135deg, var(--brand), #E0B892);
   color: #FFFFFF;
   box-shadow: 0 8px 22px rgba(176, 137, 104, 0.4);
   border: none;
@@ -1905,7 +1916,7 @@ body {
 .hero-fs-btn-ghost:hover {
   /* Se "rellena" con la marca y mantiene texto blanco —
      siempre alto contraste, sin parpadeo en la transición. */
-  background: linear-gradient(135deg, #B08968, #C9AD8D);
+  background: linear-gradient(135deg, var(--brand), #C9AD8D);
   color: #FFFFFF;
   border-color: transparent;
   transform: translateY(-2px);
@@ -1941,7 +1952,7 @@ body {
 }
 .btn-ghost-app:hover,
 .btn-ghost-app:focus-visible {
-  background: linear-gradient(135deg, #B08968, #C9AD8D) !important;
+  background: linear-gradient(135deg, var(--brand), #C9AD8D) !important;
   color: #FFFFFF !important;
   border-color: transparent !important;
   transform: translateY(-2px);
@@ -1967,7 +1978,7 @@ body {
 .btn-ghost-app.footer-cta-ghost:focus-visible {
   color: #FFFFFF !important;
   border-color: transparent !important;
-  background: linear-gradient(135deg, #B08968, #C9AD8D) !important;
+  background: linear-gradient(135deg, var(--brand), #C9AD8D) !important;
 }
 
 /* Link "términos y condiciones" del checkbox del Footer.
@@ -2030,7 +2041,7 @@ body {
 ========================== */
 
 .hero {
-  background: #faf9f7;
+  background: var(--bg);
   position: relative;
   overflow: hidden;
 }
@@ -2039,7 +2050,11 @@ body {
 .hero-home {
   display: flex;
   flex-direction: column;
+  /* `100vh` en móvil incluye la barra del navegador: el hero medía más que
+     la pantalla visible y el titular quedaba fuera. Ver `--alto-pantalla`
+     en 00-cimientos.css. */
   min-height: 100vh;
+  min-height: var(--alto-pantalla);
   background: linear-gradient(180deg, #f7eee6 0%, #fff7f0 60%, #ffffff 100%);
 }
 
@@ -2097,7 +2112,7 @@ body {
 .hero-separator {
   width: 50px;
   height: 3px;
-  background: linear-gradient(90deg, #B08968, #C9AD8D);
+  background: linear-gradient(90deg, var(--brand), #C9AD8D);
   border-radius: 2px;
   margin: 0 0 1.2rem;
 }
@@ -2107,7 +2122,7 @@ body {
   font-weight: 700;
   font-size: 1.7rem;
   line-height: 1.35;
-  color: #4e3b2b;
+  color: var(--topbar-text);
   margin-bottom: 1.3rem;
   text-align: center;
 }
@@ -2122,7 +2137,7 @@ body {
   display: block;
   font-size: 0.95rem;
   line-height: 1.6;
-  color: #6c584c;
+  color: var(--text-soft);
   margin-bottom: 1.2rem;
   text-align: center;
 }
@@ -2158,7 +2173,7 @@ body {
 
 /* Botón principal (Agendar Cita) */
 .hero-btn-primary {
-  background: linear-gradient(135deg, #b08968, #e0b892);
+  background: linear-gradient(135deg, var(--brand), #e0b892);
   color: #fff;
 }
 
@@ -2171,7 +2186,7 @@ body {
 /* Botón secundario (Instagram) */
 .hero-btn-secondary {
   background-color: #fff7f0;
-  color: #4e3b2b;
+  color: var(--topbar-text);
   border: 1px solid #e3cbb1;
 }
 
@@ -2227,7 +2242,7 @@ body {
     display: block;
     font-size: 1.08rem;
     line-height: 1.85;
-    color: #6c584c;
+    color: var(--text-soft);
     margin-bottom: 1.6rem;
     text-align: justify;
   }
@@ -2311,7 +2326,7 @@ footer a:hover i {
 }
 
 .animate-shine i {
-  background: linear-gradient(90deg, transparent, #e9ded2 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent, var(--border) 50%, transparent 100%);
   background-size: 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -2485,7 +2500,7 @@ footer a:hover i {
   .navbar-container { background-color: var(--topbar-bg); }
 }
 :root:not([data-theme="dark"]) .navbar-container {
-  background-color: #faf9f7;
+  background-color: var(--bg);
 }
 
 .navbar-inner {
@@ -2518,9 +2533,13 @@ footer a:hover i {
   filter: brightness(1.08);
 }
 
+/* Los dos ejes explícitos, en la proporción original 75×55. Con `height:
+   auto` la altura la decidía la imagen, y era ella —no el padding— la que
+   marcaba el alto de toda la barra. */
 .navbar-logo img {
-  width: 56px;
-  height: auto;
+  width: 66px;
+  height: 48px;
+  object-fit: contain;
 }
 
 /* === CENTRO: MENÚ === */
@@ -2544,7 +2563,7 @@ footer a:hover i {
 }
 
 .navbar-menu a:hover {
-  color: #b08968;
+  color: var(--brand);
 }
 
 /* === SECCIONADO DEL MENÚ ===
@@ -2597,7 +2616,7 @@ footer a:hover i {
 }
 
 .menu-item.active a {
-  color: #b08968;
+  color: var(--brand);
 }
 
 /* === Animación de indicador === */
@@ -2605,7 +2624,7 @@ footer a:hover i {
   position: absolute;
   bottom: -4px;
   height: 3px;
-  background: linear-gradient(90deg, #b08968, #ffe4c0, #b08968);
+  background: linear-gradient(90deg, var(--brand), #ffe4c0, #b08968);
   border-radius: 3px;
   transition: all var(--mov-lento) cubic-bezier(0.45, 0, 0.55, 1);
 }
@@ -2714,7 +2733,7 @@ footer a:hover i {
     top: 100%;
     left: 0;
     right: 0;
-    background: #faf9f7;
+    background: var(--bg);
     flex-direction: column;
     align-items: center;
     gap: 1rem;
@@ -2741,9 +2760,10 @@ footer a:hover i {
     padding: 0.8rem 1rem;
   }
 
-  .navbar-logo img {
-    width: 60px;
-  }
+  /* Aquí había un `.navbar-logo img { width: 60px }`. Regla muerta: el
+     bloque de 767px de arriba ya fija 44×32 con !important, así que nunca
+     llegaba a aplicarse, y además tocaba un solo eje —rompiendo la
+     proporción— si algún día ganaba. */
 
   .navbar-menu {
     gap: 0.8rem;
@@ -2800,7 +2820,7 @@ footer a:hover i {
   width: 78%;
   max-width: 350px;
   height: 100%;
-  background: #faf9f7;
+  background: var(--bg);
   box-shadow: -6px 0 20px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
@@ -2811,7 +2831,9 @@ footer a:hover i {
   transition:
     transform var(--mov-lento) cubic-bezier(0.22, 0.7, 0.2, 1),
     opacity 0.35s ease;
-  z-index: 90;
+  /* Por encima de la navbar sticky (z-index 1000). El sidebar se monta en
+     <body> con un portal, así que compite directamente con ella. */
+  z-index: 1500;
 }
 
 .mobile-sidebar.open {
@@ -2914,7 +2936,7 @@ footer a:hover i {
 }
 
 .mobile-sidebar a:hover {
-  color: #b08968;
+  color: var(--brand);
 }
 
 /* === MOBILE SIDEBAR — MODO OSCURO === */
@@ -3163,7 +3185,7 @@ footer a:hover i {
 /* === BOTONES HERO DOCTORA ANIMADOS === */
 
 .btn-doctora {
-  background: linear-gradient(135deg, #b08968, #d9b89a);
+  background: linear-gradient(135deg, var(--brand), #d9b89a);
   color: #fff;
   border: none;
   padding: var(--btn-pad-lg);
@@ -3322,7 +3344,7 @@ footer a:hover i {
 
 /* Cambiar el color de los íconos */
 .topbar-item i {
-  color: #4E3B2B;  /* Establecer color de todos los íconos */
+  color: var(--topbar-text);  /* Establecer color de todos los íconos */
 }
 
 /* Responsive */
@@ -3330,9 +3352,97 @@ footer a:hover i {
   .topbar-track{ --dur: 32s; --gap: clamp(20px, 6vw, 48px); }
 }
 
-@media (max-width: 576px){
+/* ==========================
+   TOPBAR EN MÓVIL: SIN MARQUESINA
+   ==========================
+   La pista mide 743px desplazándose dentro de 375. El resultado es que
+   la información SOLO se puede leer a media palabra ("…02. Ibagué –
+   Tolima."), y encima obliga a esperar a que pase. Una marquesina
+   funciona en escritorio, donde cabe entera y es decoración; en un
+   teléfono es un obstáculo.
+
+   Debajo de 768 se para la animación y se reparte lo que de verdad sirve
+   ahí: el teléfono (tocable) y las redes. La dirección se va — está en el
+   pie y en "Nuestra ubicación", con mapa, que es donde alguien la busca.
+
+   Fase 1 del estudio de móvil. */
+@media (max-width: 767px){
   .topbar{ font-size:.85rem; }
-  .topbar-track{ --dur: 36s; --gap: clamp(16px, 7vw, 40px); }
+
+  .topbar-marquee{
+    height: auto;
+    /* El desvanecido de los bordes existía para que el texto entrara y
+       saliera suave. Sin movimiento solo recortaría los extremos. */
+    -webkit-mask-image: none;
+            mask-image: none;
+  }
+
+  .topbar-track{
+    animation: none;
+    position: static;
+    transform: none;
+    justify-content: space-between;
+    width: 100%;
+    padding-inline: var(--gutter);
+    gap: 0;
+  }
+
+  .topbar-direccion{ display: none; }
+
+  /* Miniatura del vídeo. La lista de procedimientos va quemada en la propia
+     imagen, en su mitad derecha, y a 375px se lee cortada a media palabra.
+     No basta con mover el encuadre: la imagen ya es panorámica, así que en
+     un marco 16:9 `cover` apenas recorta a los lados y la lista sigue
+     entrando. Estrechando el marco a 4:5 sí hay recorte lateral, y con el
+     encuadre corrido a la izquierda lo que queda es la doctora — que es lo
+     que una miniatura de vídeo tiene que enseñar. Ver VideoAnim.tsx. */
+  .va-marco {
+    padding-top: 125% !important;
+  }
+  .va-poster {
+    object-position: 8% center !important;
+  }
+
+  /* ==========================
+     HERO: QUE EL TITULAR SE VEA SIN HACER SCROLL
+     ==========================
+     El hero medía `100dvh` (812px) pero EMPIEZA debajo de la cabecera, a
+     96px, así que sus últimos 96px caían fuera de la pantalla. Como el
+     texto va pegado abajo (`align-items: flex-end`), lo que quedaba fuera
+     era justo el final del bloque de texto, y el titular arrancaba al 51 %
+     de la pantalla: había que desplazar para leer de qué va el sitio.
+
+     Restando la cabecera, el hero ocupa la primera pantalla ENTERA y ni un
+     píxel más.
+
+     Hay que restarla en los DOS: la sección y su capa de contenido llevan
+     cada una su propio `100dvh`, y bajar solo la de fuera no sirve porque
+     la de dentro la vuelve a empujar. */
+  .hero-fs,
+  .hero-fs-content {
+    min-height: calc(var(--alto-pantalla) - var(--cabecera-h));
+  }
+
+  /* El segundo botón pasa a enlace de texto.
+     Dos botones del mismo tamaño uno encima del otro no son una jerarquía:
+     son dos primeros. La acción del sitio es agendar; "conoce los
+     procedimientos" es un desvío legítimo pero secundario, y como enlace
+     sigue estando a un toque mientras devuelve ~60px de alto al bloque —
+     que es parte de lo que hace que el titular quepa. */
+  .hero-fs-btn-ghost {
+    border: none !important;
+    background: none !important;
+    padding: 0.5rem 0 !important;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    font-weight: 600;
+  }
+
+  /* Área táctil: un enlace de 20px de alto se falla al tocarlo. */
+  .topbar-tel{
+    padding-block: 4px;
+    text-decoration: none;
+  }
 }
 
 /* Accesibilidad: si el usuario prefiere menos movimiento, mostrar
@@ -3413,7 +3523,7 @@ footer a:hover i {
   width: 45px;
   height: 45px;
   font-size: 1.5rem;
-  color: #6c584c;
+  color: var(--text-soft);
   cursor: pointer;
   z-index: 10;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -3455,9 +3565,9 @@ footer a:hover i {
   height: 85%;
   border-radius: 16px;
   overflow: hidden;
-  background-color: #fffdf9;
+  background-color: var(--surface);
   box-shadow: 0 8px 25px rgba(176, 137, 104, 0.25);
-  border: 1px solid #e9ded2;
+  border: 1px solid var(--border);
   cursor: pointer;
   transition: transform var(--mov-normal) ease;
 }
@@ -3467,7 +3577,7 @@ footer a:hover i {
 
 /* PANEL DETALLE */
 .galeria3d-detalle {
-  background-color: #faf9f7;
+  background-color: var(--bg);
   width: 80%;
   max-width: 1000px;
   display: flex;
@@ -3475,7 +3585,7 @@ footer a:hover i {
   gap: 2rem;
   align-items: center;
   justify-content: center;
-  border: 1px solid #e9ded2;
+  border: 1px solid var(--border);
   box-shadow: 0 10px 40px rgba(176, 137, 104, 0.3);
   padding: 4rem 3rem;
   border-radius: 20px;
@@ -3489,7 +3599,7 @@ footer a:hover i {
   left: 30px;
   background: none;
   border: none;
-  color: #4e3b2b;
+  color: var(--topbar-text);
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
@@ -3509,16 +3619,16 @@ footer a:hover i {
 }
 .galeria3d-detalle-text {
   flex: 0 0 45%;
-  color: #4e3b2b;
+  color: var(--topbar-text);
 }
 .galeria3d-detalle-text h3 {
   font-family: "Playfair Display", serif;
   font-weight: bold;
   margin-bottom: 1rem;
-  color: #4e3b2b;
+  color: var(--topbar-text);
 }
 .galeria3d-detalle-text p {
-  color: #6c584c;
+  color: var(--text-soft);
   line-height: 1.6;
   font-size: 1.05rem;
   margin-bottom: 2rem;
@@ -3571,8 +3681,8 @@ a:hover {
 .fc {
   --fc-border-color: #e5d8c8;
   --fc-today-bg-color: #f7ede1;
-  --fc-button-bg-color: #b08968;
-  --fc-button-hover-bg-color: #8b6a4b;
+  --fc-button-bg-color: var(--brand);
+  --fc-button-hover-bg-color: var(--brand-deep);
   --fc-button-active-bg-color: #c7a27a;
   --fc-page-bg-color: #fbf7f2;
   font-family: 'Poppins', sans-serif;
@@ -3618,7 +3728,7 @@ a:hover {
 }
 
 .fc-toolbar-title {
-  color: #8b6a4b;
+  color: var(--brand-deep);
   font-weight: 600;
 }
 
@@ -3630,7 +3740,7 @@ a:hover {
 }
 
 .fc-button-primary:hover {
-  background: #b08968;
+  background: var(--brand);
 }
 /* ============================================================================
    SISTEMA DE BOTONES (app/src/components/ui/Button.tsx)

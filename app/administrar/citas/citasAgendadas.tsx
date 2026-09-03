@@ -266,7 +266,7 @@ export default function CitasAgendadas() {
                   <textarea value={reagendarMotivo} onChange={(e) => { setReagendarMotivo(e.target.value); if (reagendarError) setReagendarError(null); }} rows={3} placeholder="Explica al cliente por qué se propone reagendar..." style={{ ...IS, resize: "vertical" as const }} />
                 </div>
               </div>
-              {reagendarError && <p style={{ color: "#b02e2e", fontSize: "0.82rem", marginTop: "0.6rem", textAlign: "center" }}>{reagendarError}</p>}
+              {reagendarError && <p style={{ color: "var(--danger)", fontSize: "0.82rem", marginTop: "0.6rem", textAlign: "center" }}>{reagendarError}</p>}
               <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center", marginTop: "1.2rem" }}>
                 <BtnM label="Cancelar" bg="var(--surface-soft)" color="var(--text)" onClick={() => setReagendarModal(null)} />
                 <BtnM label={reagendarSaving ? "Enviando..." : "Enviar solicitud"} bg="var(--brand)" color="#fff" onClick={doReagendar} disabled={reagendarSaving || !reagendarFecha || !reagendarHora || !reagendarMotivo.trim()} />
@@ -321,7 +321,7 @@ function InfoBlock({ cita }: { cita: Cita }) {
 
 function Overlay({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+    <motion.div initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)" }}
       onClick={onClose}>
       <motion.div initial={{ scale: 0.92, y: 15 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 15 }}

@@ -6,6 +6,24 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { IMG } from "@/lib/imagenes";
 
+/**
+ * Revela la sección al entrar en pantalla.
+ *
+ * Lleva red de seguridad, y no es teórica: esta sección se quedaba en
+ * blanco —titular y texto en `opacity: 0` sobre fondo claro— cuando el
+ * observador no llegaba a disparar. Es la "pantalla fantasma" del estudio
+ * de móvil.
+ *
+ * El observador puede no disparar por varios motivos: que el umbral no se
+ * alcance nunca porque la sección es más alta que la ventana, que el
+ * elemento esté en un contenedor con `overflow` que hace de raíz, o
+ * simplemente que el hilo principal esté ocupado en la carga. Y como esto
+ * decide si el CONTENIDO se ve —no un adorno—, no puede depender de que
+ * todo salga bien.
+ *
+ * Pasado el plazo, se revela igual. Si el observador dispara antes, mejor;
+ * si no, el usuario lee la sección en vez de mirar un hueco.
+ */
 function useReveal(t = 0.15) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [v, setV] = useState(false);
@@ -14,7 +32,8 @@ function useReveal(t = 0.15) {
     if (!el) return;
     const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setV(true); o.disconnect(); } }, { threshold: t });
     o.observe(el);
-    return () => o.disconnect();
+    const respaldo = setTimeout(() => { setV(true); o.disconnect(); }, 1200);
+    return () => { clearTimeout(respaldo); o.disconnect(); };
   }, [t]);
   return { ref, v };
 }
@@ -99,7 +118,7 @@ export default function VideoAnim() {
       <div style={{ textAlign: "center", padding: "1rem 0.6rem", borderRadius: 14, background: "linear-gradient(145deg, #FFFBF7, #F0E5D8)", border: "1px solid rgba(176,137,104,0.14)", transition: "transform 0.35s, box-shadow 0.35s", position: "relative", overflow: "hidden", cursor: "default" }}
         onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px) scale(1.03)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(176,137,104,0.16)"; }}
         onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
-        <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #B08968, #D4A87A)", color: "white", fontSize: "0.75rem", marginBottom: 6 }}><i className={icon} /></div>
+        <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand), #D4A87A)", color: "white", fontSize: "0.75rem", marginBottom: 6 }}><i className={icon} /></div>
         <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.7rem", fontWeight: 700, color: "var(--text)", lineHeight: 1 }}>{count}{suffix}</div>
         <div style={{ fontSize: "0.7rem", fontWeight: 500, color: "#7A6554", marginTop: 3 }}>{label}</div>
         <div style={{ position: "absolute", top: "-50%", left: "-50%", width: "200%", height: "200%", background: "linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.2) 50%, transparent 60%)", transform: "rotate(25deg)", animation: "va-shine 4s ease-in-out infinite", pointerEvents: "none" }} />
@@ -139,7 +158,7 @@ export default function VideoAnim() {
         {/* Header — sin kicker para ahorrar vertical y que título+video+CTAs entren juntos en pantalla */}
         <div ref={hdr.ref} style={{ ...rs(hdr.v), textAlign: "center", marginBottom: "1.4rem", padding: "0 1.5rem", position: "relative", zIndex: 1 }}>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.4rem, 2.6vw, 2rem)", fontWeight: 700, color: "var(--text)", maxWidth: 780, margin: "0 auto 0.6rem", lineHeight: 1.2 }}>{t("title")}</h2>
-          <div style={{ width: 50, height: 3, background: "linear-gradient(90deg,#C9AD8D,#B08968)", borderRadius: 2, margin: "0 auto 0.55rem" }} />
+          <div style={{ width: 50, height: 3, background: "linear-gradient(90deg,var(--brand-soft),#B08968)", borderRadius: 2, margin: "0 auto 0.55rem" }} />
           <p style={{ fontSize: "0.95rem", color: "#7A6554", margin: 0 }}>{t("subtitle")}</p>
         </div>
 
@@ -169,7 +188,7 @@ export default function VideoAnim() {
           {/* CENTER - Video */}
           <div className="va-video-col" ref={vid.ref} style={{ ...rs(vid.v, 0.08), position: "relative" }}>
             <div style={{ position: "absolute", top: "50%", left: "50%", width: "115%", height: "140%", background: "radial-gradient(ellipse, rgba(176,137,104,0.14) 0%, transparent 65%)", filter: "blur(45px)", animation: "va-glow 4s ease-in-out infinite", pointerEvents: "none", zIndex: 0, transform: "translate(-50%,-50%)" }} />
-            <div onClick={() => setVideoActivo(true)} style={{
+            <div onClick={() => setVideoActivo(true)} className="va-marco" style={{
               position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 20, overflow: "hidden", cursor: "pointer", zIndex: 1,
               boxShadow: "0 20px 55px rgba(58,42,26,0.18), 0 0 0 1px rgba(176,137,104,0.12)", transition: "transform 0.4s, box-shadow 0.4s",
             }}
@@ -179,7 +198,20 @@ export default function VideoAnim() {
                 <iframe src="https://www.youtube.com/embed/pBkwUM0IpTE?autoplay=1&modestbranding=1&rel=0" title={t("iframeTitle")} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 20 }} />
               ) : (
                 <>
-                  <Image src={IMG.previewVideo} alt={t("iframeTitle")} fill sizes="(max-width: 1024px) 100vw, 960px" quality={80} style={{ objectFit: "cover" }} />
+                  {/* La miniatura trae una lista de 15 procedimientos quemada
+                      en la propia imagen. En un marco 16:9 de 375px de ancho
+                      esa lista se corta a media palabra ("Manejo de cicatrice",
+                      "Manejo de estria") y encima le cae el botón encima: se
+                      lee peor que si no estuviera. Además es texto que ni
+                      Google ni un lector de pantalla pueden leer.
+
+                      En móvil el encuadre se corre al lado de la doctora, así
+                      que la lista queda FUERA del marco en vez de cortada. No
+                      se pierde nada: esos mismos procedimientos están, como
+                      texto de verdad, en /procedimientos. Lo correcto de raíz
+                      es una miniatura sin texto encima — eso depende de una
+                      imagen nueva, no del código. */}
+                  <Image src={IMG.previewVideo} alt={t("iframeTitle")} fill sizes="(max-width: 1024px) 100vw, 960px" quality={80} className="va-poster" style={{ objectFit: "cover" }} />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.32) 100%)" }} />
                   <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 2 }}>
                     <div style={{ position: "absolute", top: "50%", left: "50%", width: 90, height: 90, borderRadius: "50%", background: "rgba(176,137,104,0.2)", animation: "va-pulse 2.2s ease-out infinite", transform: "translate(-50%,-50%)" }} />

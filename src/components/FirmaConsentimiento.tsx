@@ -281,7 +281,7 @@ export default function FirmaConsentimiento(props: Props) {
   var modalContent = (
     <AnimatePresence>
       {showModal && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        <motion.div initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
           style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 99999, padding: "1.5rem" }}
           onClick={cerrar}>
@@ -289,12 +289,12 @@ export default function FirmaConsentimiento(props: Props) {
             transition={{ type: "spring", damping: 26, stiffness: 320 }}
             style={{ background: "var(--surface)", borderRadius: 24, boxShadow: "0 30px 80px rgba(0,0,0,0.5)", width: "100%", maxWidth: 580, maxHeight: "92vh", overflowY: "auto", position: "relative" }}
             onClick={function(e) { e.stopPropagation(); }}>
-              <div style={{ height: 4, background: "linear-gradient(90deg, #B08968, #C9AD8D)" }} />
+              <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)" }} />
               <button onClick={cerrar} style={{ position: "absolute", top: 14, right: 14, width: 32, height: 32, borderRadius: "50%", background: "rgba(78,59,43,0.06)", border: "none", color: "#4E3B2B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}><X size={16} /></button>
 
               <div style={{ padding: "2rem 2rem 2.5rem" }}>
                 {step === "intro" && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div initial={false} animate={{ opacity: 1 }}>
                     <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
                       <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem", boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}><FileText size={22} color="white" /></div>
                       <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#2A1C12", marginBottom: "0.8rem" }}>{t("title")}</h3>
@@ -310,7 +310,7 @@ export default function FirmaConsentimiento(props: Props) {
                 )}
 
                 {step === "firma" && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <motion.div initial={false} animate={{ opacity: 1 }}>
                     <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.3rem", textAlign: "center" }}>{t("drawTitle")}</h3>
                     <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", textAlign: "center", marginBottom: "1rem" }}>{t("drawHint")}</p>
                     <div className="firma-canvas-wrap dark-aware-keep" style={{ border: "2px dashed rgba(176,137,104,0.3)", borderRadius: 16, overflow: "hidden", marginBottom: "1rem", background: "white" }}>
@@ -321,7 +321,7 @@ export default function FirmaConsentimiento(props: Props) {
                       <button onClick={function() { limpiar(); setFirmaError(null); }} style={{ padding: "0.5rem 1.2rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "var(--text-soft)", fontWeight: 600, fontSize: "0.82rem", cursor: "pointer" }}>{t("clear")}</button>
                     </div>
                     {firmaError && (
-                      <p style={{ color: "#b02e2e", fontSize: "0.82rem", textAlign: "center", marginBottom: "0.8rem" }}>{firmaError}</p>
+                      <p style={{ color: "var(--danger)", fontSize: "0.82rem", textAlign: "center", marginBottom: "0.8rem" }}>{firmaError}</p>
                     )}
                     <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
                       <button onClick={function() { setStep("intro"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "var(--text-soft)", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer" }}>{t("back")}</button>
@@ -338,7 +338,7 @@ export default function FirmaConsentimiento(props: Props) {
                 )}
 
                 {step === "listo" && (
-                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: "center" }}>
+                  <motion.div initial={{ scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: "center" }}>
                     <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#E8F5E9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>

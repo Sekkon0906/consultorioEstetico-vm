@@ -62,7 +62,7 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
   return (
     <motion.div
       className="dark-aware-card"
-      initial={{ opacity: 0, y: 25 }}
+      initial={{ y: 25 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       style={{ maxWidth: 880, margin: "0 auto", width: "100%" }}
@@ -70,7 +70,7 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
       <div style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 16px 48px rgba(78,59,43,0.1)", overflow: "hidden" }}>
 
         {/* Top accent */}
-        <div style={{ height: 4, background: "linear-gradient(90deg, #B08968, #C9AD8D)" }} />
+        <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)" }} />
 
         <div style={{ padding: "2rem 2rem 2.5rem" }}>
 
@@ -104,7 +104,7 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
                     </motion.div>
                     <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
                   </div>
-                  {!isLast && <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 6px", marginBottom: 18, background: progreso > i + 1 ? "linear-gradient(90deg, #B08968, #C9AD8D)" : "var(--border)", transition: "all 0.4s" }} />}
+                  {!isLast && <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 6px", marginBottom: 18, background: progreso > i + 1 ? "linear-gradient(90deg, var(--brand), #C9AD8D)" : "var(--border)", transition: "all 0.4s" }} />}
                 </div>
               );
             })}

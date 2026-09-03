@@ -32,7 +32,7 @@ function CardItem({
   const t = useTranslations("doctora.formacion");
   return (
     <motion.div
-      initial={{ opacity: 0, x: fromLeft ? -40 : 40 }}
+      initial={{ x: fromLeft ? -40 : 40 }}
       animate={inView ? { opacity: 1, x: 0 } : {}}
       transition={{ duration: 0.55, ease: "easeOut", delay: 0.15 }}
       whileHover={{ y: -5, boxShadow: "0 20px 50px rgba(78,59,43,0.14)" }}
@@ -160,7 +160,7 @@ function TimelineNode({
         ) : (
           anio && (
             <motion.span
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ delay: 0.4 }}
               style={{
@@ -185,7 +185,7 @@ function TimelineNode({
           aria-label={charla.titulo}
           style={{
             width: 20, height: 20, borderRadius: "50%",
-            background: "linear-gradient(135deg, #B08968, #8B6A4B)",
+            background: "linear-gradient(135deg, var(--brand), #8B6A4B)",
             border: "3px solid #FBF8F4",
             boxShadow: "0 0 0 4px #DDD0C2",
             cursor: "pointer", outline: "none",
@@ -200,7 +200,7 @@ function TimelineNode({
         ) : (
           anio && (
             <motion.span
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={inView ? { opacity: 1 } : {}}
               transition={{ delay: 0.4 }}
               style={{
@@ -249,7 +249,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
+      initial={false}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       style={{
@@ -276,7 +276,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
         {/* Franja dorada */}
         <div style={{
           height: 5, borderRadius: "26px 26px 0 0",
-          background: "linear-gradient(90deg, #8B6A4B, #C9AD8D, #8B6A4B)",
+          background: "linear-gradient(90deg, var(--brand-deep), #C9AD8D, #8B6A4B)",
         }} />
 
         <div style={{ padding: "1.6rem 2rem 2rem" }}>
@@ -324,7 +324,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
           <p style={{
             fontSize: "0.86rem", color: "var(--text-soft)", lineHeight: 1.75,
             marginBottom: "1.4rem",
-            borderLeft: "3px solid #C9AD8D",
+            borderLeft: "3px solid var(--brand-soft)",
             paddingLeft: "0.9rem",
           }}>
             {charla.detalle || charla.descripcion}
@@ -339,7 +339,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
             <AnimatePresence mode="wait">
               <motion.div
                 key={idx}
-                initial={{ opacity: 0 }}
+                initial={false}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
@@ -493,7 +493,7 @@ export default function FormacionContinua() {
           transition={{ repeat: Infinity, duration: 1.1, ease: "linear" }}
           style={{
             width: 32, height: 32, borderRadius: "50%",
-            border: "3px solid #E9DED2", borderTopColor: "var(--brand)",
+            border: "3px solid var(--border)", borderTopColor: "var(--brand)",
           }}
         />
       </section>
@@ -532,7 +532,7 @@ export default function FormacionContinua() {
 
         {/* Título */}
         <motion.div
-          initial={{ opacity: 0, y: -16 }}
+          initial={{ y: -16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.55 }}
@@ -560,7 +560,7 @@ export default function FormacionContinua() {
           </p>
           <div style={{
             width: 42, height: 3,
-            background: "linear-gradient(90deg, #B08968, #C9AD8D)",
+            background: "linear-gradient(90deg, var(--brand), #C9AD8D)",
             borderRadius: 2, margin: "1rem auto 0",
           }} />
         </motion.div>
@@ -578,7 +578,7 @@ export default function FormacionContinua() {
               position: "absolute",
               left: "calc(50% - 1px)",
               top: 0, bottom: 0, width: 2,
-              background: "linear-gradient(180deg, #C9AD8D 0%, #EDE4D8 100%)",
+              background: "linear-gradient(180deg, var(--brand-soft) 0%, #EDE4D8 100%)",
               transformOrigin: "top",
               zIndex: 0,
             }}
@@ -595,7 +595,7 @@ export default function FormacionContinua() {
         </div>
 
         <motion.p
-          initial={{ opacity: 0 }}
+          initial={false}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           style={{

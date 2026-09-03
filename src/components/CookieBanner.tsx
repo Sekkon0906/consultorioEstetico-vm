@@ -77,7 +77,7 @@ export default function CookieBanner() {
         <motion.div
           role="dialog"
           aria-label={t("title")}
-          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          initial={{ y: 30, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.98 }}
           transition={{ type: "spring", damping: 26, stiffness: 280 }}
@@ -96,7 +96,7 @@ export default function CookieBanner() {
           }}
           className="cookie-banner dark-aware-card"
         >
-          <div style={{ height: 3, background: "linear-gradient(90deg, #B08968, #C9AD8D)" }} />
+          <div style={{ height: 3, background: "linear-gradient(90deg, var(--brand), #C9AD8D)" }} />
           <div style={{ padding: "1.1rem 1.2rem 1.2rem" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
               <div
@@ -229,7 +229,7 @@ const primaryBtn: React.CSSProperties = {
   padding: "0.6rem 1rem",
   borderRadius: 100,
   border: "none",
-  background: "linear-gradient(135deg, #8B6A4B, #B08968)",
+  background: "linear-gradient(135deg, var(--brand-deep), #B08968)",
   color: "#FFF",
   fontWeight: 700,
   fontSize: "0.85rem",

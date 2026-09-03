@@ -154,7 +154,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
 
         <div className="cal-grid" style={{ position: "relative", zIndex: 1 }}>
           {/* CALENDAR */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+          <motion.div initial={{ y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
             className="cal-card dark-aware-card"
             style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)" }}>
 
@@ -207,7 +207,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
           </motion.div>
 
           {/* HOURS */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
+          <motion.div initial={{ y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
             className="cal-card dark-aware-card"
             style={{ background: "rgba(255,253,250,0.95)", backdropFilter: "blur(10px)", borderRadius: 22, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 8px 30px rgba(78,59,43,0.06)" }}>
 
@@ -216,14 +216,14 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
             </h3>
 
             {selectedDate && (
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: "center", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "1.2rem" }}>
+              <motion.p initial={false} animate={{ opacity: 1 }} style={{ textAlign: "center", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "1.2rem" }}>
                 {new Date(selectedDate + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", day: "numeric", month: "long" })}
               </motion.p>
             )}
 
             {!selectedDate && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: "center", padding: "3rem 1rem" }}>
-                <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, #E9DED2, #F5EEE6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
+              <motion.div initial={false} animate={{ opacity: 1 }} style={{ textAlign: "center", padding: "3rem 1rem" }}>
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, var(--border), #F5EEE6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
                   <i className="fas fa-calendar-day" style={{ color: "var(--brand)", fontSize: "1.4rem" }} />
                 </div>
                 <p style={{ color: "var(--text-muted)", fontSize: "0.92rem" }}>{t("pickDayHint")}</p>
@@ -235,7 +235,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
             )}
 
             {selectedDate && !loadingHoras && !hayHorasDisponibles && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: "center", padding: "2.5rem 1rem" }}>
+              <motion.div initial={false} animate={{ opacity: 1 }} style={{ textAlign: "center", padding: "2.5rem 1rem" }}>
                 <div style={{ width: 60, height: 60, borderRadius: "50%", background: "linear-gradient(135deg, #F3DDD2, #F5EEE6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
                   <i className="fas fa-clock" style={{ color: "var(--brand)", fontSize: "1.3rem" }} />
                 </div>
@@ -252,7 +252,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
                   const sel = hora === h;
                   return (
                     <motion.button key={h}
-                      initial={{ opacity: 0, y: 12 }}
+                      initial={{ y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.25, delay: i * 0.025 }}
                       whileHover={occ ? {} : { scale: 1.06 }}

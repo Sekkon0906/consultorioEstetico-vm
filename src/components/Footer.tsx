@@ -301,7 +301,7 @@ export default function Footer() {
           </div>
 
           <p style={{ fontSize: "0.78rem", color: "rgba(255, 255, 255, 0.85)" }}>{t("rights")}</p>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} style={{ fontSize: "0.78rem", color: "rgba(255, 255, 255, 0.85)", marginTop: "0.2rem" }}>
+          <motion.p initial={false} animate={{ opacity: 1 }} transition={{ duration: 1 }} style={{ fontSize: "0.78rem", color: "rgba(255, 255, 255, 0.85)", marginTop: "0.2rem" }}>
             {t("designedBy")}{" "}
             <a href="https://portafoliojmo.vercel.app" target="_blank" rel="noopener noreferrer" className="designer-credit">
               <span className="designer-text">Juan Medina O.</span>

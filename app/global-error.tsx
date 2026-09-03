@@ -22,7 +22,7 @@ export default function GlobalError({
           fontFamily: "system-ui, sans-serif",
           backgroundColor: "#F6F4EF",
           color: "#3E2E22",
-          minHeight: "100vh",
+          minHeight: "var(--alto-pantalla, 100vh)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

@@ -74,9 +74,9 @@ export default function ProcedimientoPage() {
     return () => window.removeEventListener("keydown", h);
   }, [modalIndex, galeria.length]);
 
-  if (loading) return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
+  if (loading) return <div style={{ minHeight: "var(--alto-pantalla, 100vh)", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
   if (!proc) return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--bg)", color: "var(--text)", gap: "1rem" }}>
+    <div style={{ minHeight: "var(--alto-pantalla, 100vh)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--bg)", color: "var(--text)", gap: "1rem" }}>
       <p style={{ fontSize: "1.5rem", fontWeight: 600 }}>{t("notFound")}</p>
       <button onClick={() => router.push("/procedimientos")} style={{ padding: "0.7rem 2rem", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", border: "none", borderRadius: 100, fontWeight: 600, cursor: "pointer" }}>{t("back2")}</button>
     </div>
@@ -85,12 +85,21 @@ export default function ProcedimientoPage() {
   const descDetalle = proc.descCompleta || proc.descripcion;
 
   return (
-    <main style={{ minHeight: "100vh", background: "linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%)" }}>
+    <main style={{ minHeight: "var(--alto-pantalla, 100vh)", background: "linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%)" }}>
       <style>{`
         @media (max-width: 820px) {
           .proc-detail-hero { height: 280px !important; }
           .proc-detail-body { padding: 1.5rem 1.4rem 2rem !important; }
           .proc-detail-price-row { padding: 1.2rem 1.2rem !important; gap: 1rem !important; }
+          /* El CTA traía white-space:nowrap y padding lateral de 2.4rem: al
+             envolverse a su propia línea seguía midiendo por contenido y se
+             salía de la tarjeta. En móvil ocupa el ancho completo. */
+          .proc-detail-cta {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 0.95rem 1.2rem !important;
+            white-space: normal !important;
+          }
         }
         @media (max-width: 480px) {
           .proc-detail-hero { height: 220px !important; }
@@ -120,7 +129,7 @@ export default function ProcedimientoPage() {
                 style={{ objectFit: "cover" }}
               />
             ) : (
-              <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #E9DED2, #B08968)" }} />
+              <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, var(--border), #B08968)" }} />
             )}
             {/* Gradient bottom para legibilidad del título */}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 45%, transparent 70%)" }} />
@@ -207,7 +216,8 @@ export default function ProcedimientoPage() {
                 <small style={{ fontSize: "0.74rem", color: "var(--text-muted)" }}>{t("priceNote")}</small>
               </div>
               <Link href={`/agendar?proc=${encodeURIComponent(proc.nombre)}`}
-                style={{ display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", padding: "1rem 2.4rem", borderRadius: 100, fontWeight: 700, fontSize: "1rem", textDecoration: "none", boxShadow: "0 6px 22px rgba(176,137,104,0.35)", whiteSpace: "nowrap" }}>
+                className="proc-detail-cta"
+                style={{ display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", padding: "1rem 2.4rem", borderRadius: 100, fontWeight: 700, fontSize: "1rem", textDecoration: "none", boxShadow: "0 6px 22px rgba(176,137,104,0.35)", whiteSpace: "nowrap", maxWidth: "100%", boxSizing: "border-box" }}>
                 <FaCalendarCheck /> {t("bookCta")}
               </Link>
             </section>

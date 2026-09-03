@@ -187,10 +187,17 @@ export default function ProcedimientosPage() {
           margin: "0 auto",
         }}
       >
-        <motion.h1
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+        {/* Entrada por CSS, no por framer.
+            Estos dos elementos SON la página: si su animación no llega a
+            ejecutarse, lo que queda es una pantalla en blanco con un
+            titular casi invisible — es la "pantalla fantasma" que reporta
+            el estudio de móvil. Con `initial={{opacity:0}}` el estado
+            legible depende de que el JS corra y termine; con una animación
+            CSS el navegador garantiza el estado final aunque el hilo
+            principal esté ocupado, y además se compone fuera de él.
+            La animación es adorno; el texto no. */}
+        <h1
+          className="proc-aparece"
           style={{
             fontFamily: "'Playfair Display', serif",
             fontSize: "clamp(2rem, 4vw, 3.2rem)",
@@ -201,11 +208,9 @@ export default function ProcedimientosPage() {
           }}
         >
           {t("title")}
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+        </h1>
+        <p
+          className="proc-aparece proc-aparece-tarde"
           style={{
             color: "var(--text-soft)",
             fontSize: "clamp(0.95rem, 1.1vw, 1.1rem)",
@@ -215,7 +220,7 @@ export default function ProcedimientosPage() {
           }}
         >
           {t("subtitle")}
-        </motion.p>
+        </p>
       </section>
 
       {/* === Carrusel de destacados y promociones === */}
@@ -413,9 +418,29 @@ export default function ProcedimientosPage() {
 
       {/* === Estilos === */}
       <style jsx global>{`
+        /* Entrada del encabezado. El relleno "both" es la parte importante:
+           mantiene el primer fotograma antes de empezar y EL ÚLTIMO al
+           terminar, así que el texto acaba visible pase lo que pase. */
+        .proc-aparece {
+          animation: proc-aparecer 0.6s var(--mov-curva) both;
+        }
+        .proc-aparece-tarde {
+          animation-delay: 0.1s;
+        }
+        @keyframes proc-aparecer {
+          from { opacity: 0; transform: translateY(14px); }
+          to   { opacity: 1; transform: none; }
+        }
+        /* Quien pide menos movimiento recibe el texto ya puesto, no una
+           versión más lenta de la animación. */
+        @media (prefers-reduced-motion: reduce) {
+          .proc-aparece { animation: none; }
+        }
+
         .proc-page {
           position: relative;
           min-height: 100vh;
+          min-height: var(--alto-pantalla);
           background: linear-gradient(180deg, #FBF9F5 0%, #F4ECDF 100%);
           overflow-x: hidden;
         }
@@ -480,8 +505,8 @@ export default function ProcedimientosPage() {
           padding: 0.65rem 2.4rem 0.65rem 2.6rem;
           border-radius: 100px;
           border: 1px solid rgba(176, 137, 104, 0.25);
-          background: #FFFDF9;
-          color: #3A2A1A;
+          background: var(--surface);
+          color: var(--text);
           font-size: 0.92rem;
           outline: none;
           transition: border-color var(--mov-normal) ease, box-shadow var(--mov-normal) ease;
@@ -491,7 +516,7 @@ export default function ProcedimientosPage() {
           color: #A0907B;
         }
         .proc-search-input:focus {
-          border-color: #B08968;
+          border-color: var(--brand);
           box-shadow: 0 0 0 4px rgba(176, 137, 104, 0.12);
         }
         .proc-search-clear {
@@ -533,8 +558,8 @@ export default function ProcedimientosPage() {
           letter-spacing: 0.01em;
         }
         .proc-chip:hover {
-          border-color: #B08968;
-          color: #3A2A1A;
+          border-color: var(--brand);
+          color: var(--text);
         }
         .proc-chip.is-active {
           background: linear-gradient(135deg, var(--brand), var(--brand-soft));
@@ -577,7 +602,7 @@ export default function ProcedimientosPage() {
         .proc-subchip:hover {
           background: rgba(255, 253, 249, 0.9);
           border-color: rgba(176, 137, 104, 0.4);
-          color: #3A2A1A;
+          color: var(--text);
         }
         .proc-subchip.is-active {
           background: #3A2A1A;
@@ -597,7 +622,7 @@ export default function ProcedimientosPage() {
         .proc-sort-label {
           font-size: 0.78rem;
           font-weight: 600;
-          color: #6C584C;
+          color: var(--text-soft);
           white-space: nowrap;
         }
         .proc-sort-trigger {
@@ -607,8 +632,8 @@ export default function ProcedimientosPage() {
           padding: 0.45rem 0.85rem 0.45rem 1rem;
           border-radius: 100px;
           border: 1px solid rgba(176, 137, 104, 0.28);
-          background: #FFFDF9;
-          color: #3A2A1A;
+          background: var(--surface);
+          color: var(--text);
           font-size: 0.84rem;
           font-weight: 600;
           cursor: pointer;
@@ -618,12 +643,12 @@ export default function ProcedimientosPage() {
           font-family: inherit;
         }
         .proc-sort-trigger:hover {
-          border-color: #B08968;
+          border-color: var(--brand);
           background: #FFF9F1;
         }
         .proc-sort-trigger.is-open,
         .proc-sort-trigger:focus-visible {
-          border-color: #B08968;
+          border-color: var(--brand);
           box-shadow: 0 0 0 4px rgba(176, 137, 104, 0.14);
         }
         .proc-sort-caret {
@@ -637,7 +662,7 @@ export default function ProcedimientosPage() {
           right: 0;
           min-width: 240px;
           padding: 0.35rem;
-          background: #FFFDF9;
+          background: var(--surface);
           border: 1px solid rgba(176, 137, 104, 0.2);
           border-radius: 14px;
           box-shadow:
@@ -656,7 +681,7 @@ export default function ProcedimientosPage() {
           padding: 0.55rem 0.85rem;
           border: none;
           background: transparent;
-          color: #3A2A1A;
+          color: var(--text);
           font-size: 0.85rem;
           font-weight: 500;
           text-align: left;
@@ -667,7 +692,7 @@ export default function ProcedimientosPage() {
         }
         .proc-sort-option:hover {
           background: rgba(176, 137, 104, 0.1);
-          color: #3A2A1A;
+          color: var(--text);
         }
         .proc-sort-option.is-selected {
           background: linear-gradient(135deg, var(--brand), var(--brand-soft));
@@ -694,7 +719,7 @@ export default function ProcedimientosPage() {
         /* Card */
         .proc-card {
           position: relative;
-          background: #FFFDF9;
+          background: var(--surface);
           border-radius: 24px;
           overflow: hidden;
           border: 1px solid rgba(176, 137, 104, 0.12);
@@ -802,13 +827,13 @@ export default function ProcedimientosPage() {
           font-family: 'Playfair Display', serif;
           font-size: 1.15rem;
           font-weight: 700;
-          color: #3A2A1A;
+          color: var(--text);
           margin: 0;
           line-height: 1.25;
         }
         .proc-card-desc {
           font-size: 0.88rem;
-          color: #6C584C;
+          color: var(--text-soft);
           line-height: 1.55;
           margin: 0;
           display: -webkit-box;
@@ -827,7 +852,7 @@ export default function ProcedimientosPage() {
         .proc-card-price {
           font-size: 0.85rem;
           font-weight: 700;
-          color: #B08968;
+          color: var(--brand);
         }
         .proc-card-price-unit {
           font-size: 0.7rem;
@@ -940,10 +965,8 @@ function FeaturedCarousel({
   const item = items[index];
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
+    <section
+      className="proc-aparece proc-aparece-tarde"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       style={{
@@ -956,6 +979,23 @@ function FeaturedCarousel({
       aria-roledescription="carousel"
       aria-label={t("featured.kicker")}
     >
+      {/* Fila: flecha · tarjeta · flecha.
+          Las flechas estaban DENTRO de la tarjeta, en absoluto y encima de
+          la foto, y los dots también. Tapaban justo lo que el carrusel
+          quiere enseñar. Sacarlas a una fila flex las deja fuera del área
+          de contenido sin necesidad de posicionarlas a ojo, y sin que la
+          tarjeta —que lleva `overflow: hidden` para redondear la imagen—
+          las recorte. */}
+      <div className="featured-viewport">
+      <button
+        type="button"
+        onClick={prev}
+        aria-label={t("featured.prevSlide")}
+        className="featured-arrow"
+        hidden={total <= 1}
+      >
+        <ChevronLeft size={22} />
+      </button>
       <div
         className="featured-grid featured-card"
         style={{
@@ -963,7 +1003,7 @@ function FeaturedCarousel({
           gridTemplateColumns: "1.05fr 1fr",
           gap: 0,
           alignItems: "stretch",
-          background: "linear-gradient(135deg, #FFFDF9 0%, #F7EFE3 100%)",
+          background: "linear-gradient(135deg, var(--surface) 0%, #F7EFE3 100%)",
           borderRadius: 28,
           border: "1px solid rgba(255, 215, 138, 0.55)",
           boxShadow:
@@ -1158,52 +1198,56 @@ function FeaturedCarousel({
           </motion.div>
         </AnimatePresence>
 
-        {/* Controles: flechas y dots solo si hay 2+ destacados */}
-        {total > 1 && (
-          <>
-            <button
-              type="button"
-              onClick={prev}
-              aria-label={t("featured.prevSlide")}
-              className="featured-arrow featured-arrow-left"
-            >
-              <ChevronLeft size={22} />
-            </button>
-            <button
-              type="button"
-              onClick={next}
-              aria-label={t("featured.nextSlide")}
-              className="featured-arrow featured-arrow-right"
-            >
-              <ChevronRight size={22} />
-            </button>
-
-            {/* Dots */}
-            <div className="featured-dots" role="tablist">
-              {items.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  role="tab"
-                  aria-selected={i === index}
-                  aria-label={t("featured.slideAria", { n: i + 1, total })}
-                  onClick={() => {
-                    setDirection(i > index ? 1 : -1);
-                    setIndex(i);
-                  }}
-                  className={`featured-dot ${i === index ? "is-active" : ""}`}
-                />
-              ))}
-            </div>
-          </>
-        )}
+      </div>
+      <button
+        type="button"
+        onClick={next}
+        aria-label={t("featured.nextSlide")}
+        className="featured-arrow"
+        hidden={total <= 1}
+      >
+        <ChevronRight size={22} />
+      </button>
       </div>
 
+      {/* Dots debajo de la tarjeta, siempre. Antes flotaban sobre la foto y
+          en móvil se habían movido arriba "estilo stories" para no chocar
+          con los botones: dos parches por estar dentro. Fuera no chocan con
+          nada. */}
+      {total > 1 && (
+        <div className="featured-dots" role="tablist">
+          {items.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              role="tab"
+              aria-selected={i === index}
+              aria-label={t("featured.slideAria", { n: i + 1, total })}
+              onClick={() => {
+                setDirection(i > index ? 1 : -1);
+                setIndex(i);
+              }}
+              className={`featured-dot ${i === index ? "is-active" : ""}`}
+            />
+          ))}
+        </div>
+      )}
+
       <style jsx>{`
+        /* Fila que contiene flecha · tarjeta · flecha. La tarjeta se lleva
+           todo el ancho sobrante; las flechas ocupan su sitio propio, así
+           que no hace falta posicionarlas ni dejarles hueco a ojo. */
+        .featured-viewport {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+        .featured-viewport > .featured-card {
+          flex: 1;
+          min-width: 0; /* sin esto un hijo flex no baja de su ancho de contenido */
+        }
         .featured-arrow {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
+          flex: 0 0 auto;
           width: 44px;
           height: 44px;
           border-radius: 50%;
@@ -1223,21 +1267,13 @@ function FeaturedCarousel({
         .featured-arrow:hover {
           background: linear-gradient(135deg, var(--brand), var(--brand-soft));
           color: #FFF;
-          transform: translateY(-50%) scale(1.08);
+          transform: scale(1.08);
           box-shadow: 0 10px 24px rgba(176, 137, 104, 0.35);
         }
-        .featured-arrow-left {
-          left: 14px;
-        }
-        .featured-arrow-right {
-          right: 14px;
-        }
         .featured-dots {
-          position: absolute;
-          bottom: 18px;
-          left: 50%;
-          transform: translateX(-50%);
           display: flex;
+          justify-content: center;
+          margin-top: 1rem;
           gap: 8px;
           padding: 0.4rem 0.7rem;
           background: rgba(255, 253, 249, 0.85);
@@ -1260,30 +1296,22 @@ function FeaturedCarousel({
         }
         .featured-dot.is-active {
           width: 26px;
-          background: linear-gradient(90deg, #B08968, #C9AD8D);
+          background: linear-gradient(90deg, var(--brand), #C9AD8D);
         }
-        @media (max-width: 820px) {
+        @media (max-width: 767px) {
           .featured-grid {
             grid-template-columns: 1fr !important;
           }
+          /* En un teléfono manda el dedo: la tarjeta ya se arrastra con
+             drag="x", y dos botones de 36px robándole ancho a una pantalla
+             de 375 no compensan. Los dots siguen abajo, que además dicen
+             cuántos hay — cosa que una flecha no dice. */
           .featured-arrow {
-            width: 36px;
-            height: 36px;
-          }
-          /* En 1 columna las flechas se centran sobre la IMAGEN (parte de
-             arriba), no a media tarjeta donde queda el texto. */
-          .featured-arrow { top: 28% !important; }
-          .featured-arrow-left { left: 8px; }
-          .featured-arrow-right { right: 8px; }
-          /* Los dots pasan ARRIBA, sobre la imagen (estilo stories), para no
-             solaparse con los botones "Agendar"/"Conocer más". */
-          .featured-dots {
-            bottom: auto !important;
-            top: 14px !important;
+            display: none;
           }
         }
       `}</style>
-    </motion.section>
+    </section>
   );
 }
 
@@ -1301,10 +1329,16 @@ function ProcCard({
   intlLocale: string;
   t: ReturnType<typeof useTranslations>;
 }) {
+  // `initial` NO lleva opacity: 0.
+  // Aquí sí hace falta framer, porque `layout` y `exit` son los que animan
+  // el reordenado al filtrar. Pero el estado inicial no puede dejar la
+  // tarjeta invisible: si la animación no llega a correr, el catálogo
+  // entero desaparece. Arrancando solo desplazada, lo peor que pasa es que
+  // aparezca 18px más abajo — se lee igual.
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 18 }}
+      initial={{ y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{
@@ -1392,8 +1426,10 @@ function EmptyState({
   t: ReturnType<typeof useTranslations>;
 }) {
   return (
+    // Igual: el mensaje de "no hay resultados" es justo el que NO puede
+    // quedarse invisible, o la página parece rota en vez de vacía.
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       style={{

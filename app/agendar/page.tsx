@@ -124,7 +124,7 @@ function AgendarPageContent() {
           {step === 1 && (
             <motion.div
               key="calendar"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.5 }}
@@ -141,7 +141,7 @@ function AgendarPageContent() {
                   className="mx-auto mt-6 max-w-md text-center rounded-2xl px-4 py-3 text-sm font-medium flex items-center justify-between gap-3"
                   style={{
                     background: PALETTE.surface,
-                    color: "#b02e2e",
+                    color: "var(--danger)",
                     border: "1px solid #e4bfbf",
                   }}
                 >
@@ -150,7 +150,7 @@ function AgendarPageContent() {
                     type="button"
                     onClick={() => setAviso(null)}
                     aria-label={t("closeWarning")}
-                    style={{ background: "none", border: "none", color: "#b02e2e", cursor: "pointer", fontWeight: 700 }}
+                    style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontWeight: 700 }}
                   >
                     ×
                   </button>
@@ -204,7 +204,7 @@ function AgendarPageContent() {
           {step === 4 && citaCreada && (
             <motion.div
               key="confirmacion"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.5 }}

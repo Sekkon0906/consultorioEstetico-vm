@@ -9,6 +9,7 @@
    estos imports cambia qué regla gana sin que salte ningún error.
 ============================================================ */
 
+@import "./estilos/00-cimientos.css";  /* Escala de breakpoints, canal lateral, alto de pantalla */
 @import "./estilos/01-tokens.css";  /* Tokens de tema (claro/oscuro), movimiento y logo */
 @import "./estilos/02-tema-oscuro.css";  /* Overrides de modo oscuro por sección */
 @import "./estilos/03-compatibilidad.css";  /* Red de seguridad: atrapa estilos en línea con color fijo */

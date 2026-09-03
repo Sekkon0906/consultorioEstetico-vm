@@ -24,7 +24,7 @@ export default function ModalAviso({
     <AnimatePresence>
       {show && (
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={false}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/40 flex justify-center items-center z-50"

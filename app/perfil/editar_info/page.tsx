@@ -9,7 +9,7 @@ export default function EditarInfoPage() {
       className="py-5 d-flex justify-content-center align-items-start"
       style={{
         background: `linear-gradient(180deg,var(--bg) 0%,var(--surface-soft) 100%)`,
-        minHeight: "100vh",
+        minHeight: "var(--alto-pantalla, 100vh)",
       }}
     >
       <div className="container mt-4" style={{ maxWidth: 1000 }}>

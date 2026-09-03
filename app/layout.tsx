@@ -145,7 +145,12 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://lh3.googleusercontent.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.google.com" />
         {/* Theme color para barra del navegador en móvil */}
-        <meta name="theme-color" content="var(--brand)" />
+        {/* Valores literales a propósito: `theme-color` lo lee el navegador
+            para pintar SU barra, fuera del documento, así que una var() de
+            CSS aquí no resuelve y el navegador descartaba la etiqueta
+            entera. Se declara uno por esquema. */}
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#E8E1D4" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0E0C11" />
         {/* Apple touch */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -167,10 +172,17 @@ export default async function RootLayout({
           <div className="topbar">
             <div className="topbar-marquee">
               <div className="topbar-track">
-                <span className="topbar-item">
+                {/* Enlace `tel:`, no texto suelto: en un teléfono el número
+                    de la clínica se toca para llamar. Era lo primero que
+                    alguien intenta hacer desde el móvil y no funcionaba. */}
+                <a className="topbar-item topbar-tel" href="tel:+573155445748">
                   <i className="fas fa-phone me-2"></i> 315 5445748
-                </span>
-                <span className="topbar-item">
+                </a>
+                {/* La dirección se oculta en móvil (ver .topbar-direccion en
+                    06-responsive.css): en 375px la marquesina la partía a
+                    media palabra y la dirección completa ya está en el pie
+                    y en "Nuestra ubicación", con mapa. */}
+                <span className="topbar-item topbar-direccion">
                   <i className="fas fa-map-marker-alt me-2"></i>
                   {tTop("address")}
                 </span>
