@@ -243,7 +243,14 @@ export default function Navbar() {
          esa clase le ganaba a cualquier padding nuestro y la barra volvía a
          crecer al agrandar el logo. El alto se decide en .navbar-container. */
       className={`navbar navbar-container ${desplazado ? "is-scrolled" : ""}`}
-      style={{ backgroundColor: "#FFFFFF", position: "sticky", top: 0, zIndex: 1000 }}
+      /* El fondo sale del token, no de un blanco fijo.
+         Estaba quemado en "#FFFFFF" EN LÍNEA, y el estilo en línea le gana a
+         cualquier regla de tema: en modo oscuro la barra se quedaba blanca.
+         Y como el logo SÍ recibe su filtro de oscuro (brightness(0)
+         invert(1), que lo vuelve blanco), quedaba un logo blanco sobre una
+         barra blanca — invisible. Se veía en el móvil de Juan: barra en
+         blanco con solo la hamburguesa apenas marcada. */
+      style={{ backgroundColor: "var(--bg-elevated)", position: "sticky", top: 0, zIndex: 1000 }}
     >
       <div
         className="container-fluid d-flex align-items-center justify-content-between"

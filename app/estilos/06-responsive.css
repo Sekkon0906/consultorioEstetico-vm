@@ -27,14 +27,36 @@
   .tarjeta-cita-grid { grid-template-columns: 1fr !important; }
 }
 
-/* Galería 3D — en móvil la card detalle toma full width */
+/* Galería 3D — el modal de detalle en móvil.
+
+   Antes: `width: 92%` más `right/top/transform` heredados de cuando el
+   panel era `position: absolute`. Dos problemas.
+
+   El 92 % se medía contra el contenedor y no contra la pantalla, así que
+   en un móvil de 375px el modal salía de 242 — el 65 %, no el 92 — y el
+   botón "Saber más sobre el procedimiento" se salía 91px por la derecha.
+
+   Y el `transform: translate(50%, -50%) !important` pisaba la animación de
+   volteo al abrir, porque `transform` es una sola propiedad: el !important
+   ganaba y la animación no llegaba a aplicarse. Hoy el modal es un hijo
+   flex centrado por el backdrop, así que ese posicionamiento sobra. */
 @media (max-width: 900px) {
   .g3d-detail {
-    width: 92% !important;
-    max-width: 92% !important;
-    right: 50% !important;
-    top: 50% !important;
-    transform: translate(50%, -50%) !important;
+    width: min(92vw, 460px) !important;
+    max-width: min(92vw, 460px) !important;
+  }
+  /* El CTA del modal: a lo ancho y con el texto partido si hace falta.
+     Es una frase larga en un modal estrecho; sin permitirle romper línea
+     se sale por el lado. */
+  .g3d-detail .g3d-detail-cta,
+  .g3d-detail a[class*="cta"],
+  .g3d-detail button[class*="cta"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    white-space: normal !important;
+    text-align: center !important;
+    justify-content: center !important;
   }
 }
 
@@ -217,10 +239,14 @@
   .mobile-sidebar-header .user-email { display: none !important; }
   .mobile-sidebar-header { padding: 1rem 1.5rem 0.5rem !important; }
 
-  /* 4. Hero: imagen más centrada (encuadra la cara/cuerpo de la doctora)
-     y overlay más oscuro abajo para legibilidad del texto. */
+  /* 4. Hero: el encuadre se ancla ARRIBA, no al centro.
+     `center` reparte el recorte por igual arriba y abajo, y en un marco
+     alto y estrecho como el de un teléfono eso corta justo por la cara —
+     quedaba la doctora de la nariz para abajo. Con el 18 % vertical el
+     recorte se lleva el suelo, que no aporta nada, y la cara entra en
+     cuadro. Es lo que la foto tiene que enseñar. */
   .hero-fs-bg img {
-    object-position: 38% center !important;
+    object-position: 38% 18% !important;
   }
   .hero-fs-bg::after {
     content: "";
@@ -337,15 +363,37 @@
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
+    /* Solo horizontal, como se pidió: sin esto un deslizamiento en
+       diagonal puede mover también el eje vertical dentro del carrusel y
+       las tarjetas dan un salto. */
+    overflow-y: hidden;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
     gap: 0.6rem;
-    padding: 0 1rem 0.3rem;
+
+    /* El hueco de la izquierda es la doctora.
+       La foto de fondo la encuadra al 30 % desde la izquierda, señalando
+       con la mano hacia la derecha. Con las tarjetas empezando en x=0 le
+       caían justo encima: se perdía el gesto y la sección dejaba de contar
+       nada. Reservando el 42 % del ancho, la primera tarjeta arranca al
+       lado de su mano y se lee lo que la composición quiere decir —
+       "mira estos procedimientos".
+
+       `scroll-padding-inline-start` va a juego: sin él, el scroll-snap
+       alinearía cada tarjeta contra el borde del contenedor y anularía la
+       reserva en cuanto se deslizara la primera vez. */
+    padding: 0 1rem 0.3rem 42%;
+    scroll-padding-inline-start: 42%;
   }
   .g3d-stage .g3d-grid-wrap::-webkit-scrollbar { display: none; }
   .g3d-stage .g3d-grid-card {
     position: relative;
-    flex: 0 0 44%;
+    /* En vw y no en %: el porcentaje se mide contra el contenido del
+       contenedor, y ese contenido encogió al reservarle el 42 % a la
+       doctora — las tarjetas bajaban de 152px a 89px. Anclado al ancho de
+       la pantalla, la tarjeta mide lo mismo independientemente del hueco
+       que se reserve al lado. */
+    flex: 0 0 40vw;
     scroll-snap-align: start;
     aspect-ratio: 3 / 4;
     border-radius: 14px;
