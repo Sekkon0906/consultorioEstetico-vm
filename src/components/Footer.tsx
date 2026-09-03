@@ -280,6 +280,34 @@ export default function Footer() {
 
         {/* Social + credits */}
         <div style={{ borderTop: "1px solid rgba(176,137,104,0.2)", paddingTop: "1.5rem", textAlign: "center" }}>
+
+          {/* Marca. El monograma va en SVG y no como imagen: es el mismo
+              dibujo que el favicon (`app/icon.svg`), pesa unos cientos de
+              bytes y se pinta con el champán de la marca, así que no
+              desaparece sobre el fondo oscuro del pie como haría el logo
+              en JPG, que es oscuro sobre claro y ademas pesa 1,29 MB. */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.7rem", marginBottom: "1.4rem" }}>
+            <svg width="38" height="38" viewBox="0 0 64 64" aria-hidden="true" style={{ flexShrink: 0 }}>
+              <rect width="64" height="64" rx="14" fill="rgba(240,216,176,0.12)" stroke="rgba(240,216,176,0.35)" />
+              <text
+                x="32" y="34"
+                textAnchor="middle"
+                dominantBaseline="central"
+                fill="var(--brand-soft)"
+                fontFamily="'Playfair Display', Georgia, serif"
+                fontSize="30"
+                fontWeight="700"
+                letterSpacing="-2"
+              >JM</text>
+            </svg>
+            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "#FFFFFF", letterSpacing: "0.01em", lineHeight: 1.2, textAlign: "left" }}>
+              Dra. Vanessa Medina
+              <span style={{ display: "block", fontFamily: "inherit", fontSize: "0.74rem", fontWeight: 500, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--brand-soft)" }}>
+                Consultorio
+              </span>
+            </span>
+          </div>
+
           <div style={{ display: "flex", justifyContent: "center", gap: "1.5rem", marginBottom: "1rem" }}>
             {[
               { href: "https://www.facebook.com/profile.php?id=61556167276406", icon: "fab fa-facebook" },

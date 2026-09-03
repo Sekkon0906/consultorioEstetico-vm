@@ -45,8 +45,8 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Consultorio JM · Medicina Estética en Ibagué",
-    template: "%s · Consultorio JM",
+    default: "Dra. Vanessa Medina · Consultorio",
+    template: "%s · Dra. Vanessa Medina",
   },
   description:
     "Especialista en Medicina Estética, Nutrición y Antiedad en Ibagué. Procedimientos faciales, corporales y capilares con valoración médica personalizada.",
@@ -60,10 +60,18 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Dra. Vanessa Medina" }],
   creator: "Dra. Vanessa Medina",
-  /* El favicon lo aporta `app/icon.svg`, que Next recoge solo: pesa menos
-     de 1 KB, escala a cualquier tamaño y cambia de color en modo oscuro.
-     Aquí queda solo el icono de Apple, que no admite SVG. */
+  /* `app/icon.svg` pesa menos de 1 KB, escala a cualquier tamaño y cambia
+     de color en modo oscuro porque lleva la consulta de tema dentro.
+
+     Hay que declararlo A MANO. Next lo recoge solo por convención de
+     archivo, pero SOLO mientras no exista este objeto `icons`: en cuanto se
+     declara uno —aquí se declaró para el icono de Apple, que no admite
+     SVG—, la convención deja de aplicarse y se emite únicamente lo que hay
+     escrito. El resultado era una página sin `<link rel="icon">`, el
+     navegador caía a `/favicon.ico`, no existía, y la pestaña salía con el
+     globo genérico. */
   icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     apple: IMG.logo,
   },
   alternates: {
@@ -71,7 +79,7 @@ export const metadata: Metadata = {
     languages: { "es-CO": "/", "en-US": "/" },
   },
   openGraph: {
-    title: "Consultorio JM · Medicina Estética en Ibagué",
+    title: "Dra. Vanessa Medina · Consultorio",
     description:
       "Medicina estética y antienvejecimiento en Ibagué — Tolima. Valoración médica personalizada con la Dra. Vanessa Medina.",
     url: SITE_URL,
@@ -82,7 +90,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Consultorio JM · Medicina Estética en Ibagué",
+    title: "Dra. Vanessa Medina · Consultorio",
     description:
       "Medicina estética y antienvejecimiento en Ibagué — Tolima.",
     images: [IMG.logo],
