@@ -91,6 +91,15 @@ export default function ProcedimientoPage() {
           .proc-detail-hero { height: 280px !important; }
           .proc-detail-body { padding: 1.5rem 1.4rem 2rem !important; }
           .proc-detail-price-row { padding: 1.2rem 1.2rem !important; gap: 1rem !important; }
+          /* El CTA traía white-space:nowrap y padding lateral de 2.4rem: al
+             envolverse a su propia línea seguía midiendo por contenido y se
+             salía de la tarjeta. En móvil ocupa el ancho completo. */
+          .proc-detail-cta {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 0.95rem 1.2rem !important;
+            white-space: normal !important;
+          }
         }
         @media (max-width: 480px) {
           .proc-detail-hero { height: 220px !important; }
@@ -207,7 +216,8 @@ export default function ProcedimientoPage() {
                 <small style={{ fontSize: "0.74rem", color: "var(--text-muted)" }}>{t("priceNote")}</small>
               </div>
               <Link href={`/agendar?proc=${encodeURIComponent(proc.nombre)}`}
-                style={{ display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", padding: "1rem 2.4rem", borderRadius: 100, fontWeight: 700, fontSize: "1rem", textDecoration: "none", boxShadow: "0 6px 22px rgba(176,137,104,0.35)", whiteSpace: "nowrap" }}>
+                className="proc-detail-cta"
+                style={{ display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", padding: "1rem 2.4rem", borderRadius: 100, fontWeight: 700, fontSize: "1rem", textDecoration: "none", boxShadow: "0 6px 22px rgba(176,137,104,0.35)", whiteSpace: "nowrap", maxWidth: "100%", boxSizing: "border-box" }}>
                 <FaCalendarCheck /> {t("bookCta")}
               </Link>
             </section>

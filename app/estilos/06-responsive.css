@@ -2811,7 +2811,9 @@ footer a:hover i {
   transition:
     transform var(--mov-lento) cubic-bezier(0.22, 0.7, 0.2, 1),
     opacity 0.35s ease;
-  z-index: 90;
+  /* Por encima de la navbar sticky (z-index 1000). El sidebar se monta en
+     <body> con un portal, así que compite directamente con ella. */
+  z-index: 1500;
 }
 
 .mobile-sidebar.open {
