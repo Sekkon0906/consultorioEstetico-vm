@@ -20,14 +20,16 @@ const cardVariant = {
 export default function ConsultorioPage() {
   const t = useTranslations("consultorio");
   const imageLabels = t.raw("gallery.images") as string[];
+  // Un texto corto por foto: al cambiar de imagen cambia la descripción.
+  // Sin esto la galería es "cinco fotos bonitas" y no cuenta nada del
+  // espacio — que es justo lo que alguien quiere saber antes de venir.
+  const imageDescriptions = t.raw("gallery.descriptions") as string[];
 
-  const galleryImages = [
-    { src: IMG.consultorioRelleno[0], label: imageLabels[0] },
-    { src: IMG.consultorioRelleno[1], label: imageLabels[1] },
-    { src: IMG.consultorioRelleno[2], label: imageLabels[2] },
-    { src: IMG.consultorioRelleno[3], label: imageLabels[3] },
-    { src: IMG.consultorioRelleno[4], label: imageLabels[4] },
-  ];
+  const galleryImages = IMG.consultorioRelleno.slice(0, 5).map((src, i) => ({
+    src,
+    label: imageLabels[i],
+    desc: imageDescriptions[i],
+  }));
 
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   // Imagen activa del showcase (galería grande + miniaturas).
@@ -156,7 +158,11 @@ export default function ConsultorioPage() {
           transition={{ duration: 0.6 }}
           className="consultorio-showcase max-w-5xl mx-auto"
         >
-          {/* Imagen principal */}
+          {/* Foto a la izquierda, descripción a la derecha.
+              Antes la galería iba sola y el texto del espacio vivía en un
+              bloque aparte, arriba, sin relación con lo que estabas mirando.
+              Ahora la descripción acompaña a la foto y cambia con ella. */}
+          <div className="consultorio-showcase-fila">
           <div className="consultorio-showcase-main">
             <AnimatePresence mode="wait">
               <motion.div
@@ -208,6 +214,30 @@ export default function ConsultorioPage() {
             <span className="consultorio-showcase-counter">
               {activeIndex + 1} / {galleryImages.length}
             </span>
+          </div>
+
+          {/* Panel de descripción, sincronizado con la foto activa */}
+          <div className="consultorio-showcase-info">
+            {/* Sin AnimatePresence a propósito.
+                `mode="wait"` no monta el contenido nuevo hasta que TERMINA la
+                animación de salida del anterior. Si esa animación se atasca
+                —el hilo principal ocupado, un navegador que no entrega
+                cuadros— la descripción se queda con la foto vieja y deja de
+                corresponder con lo que se ve. El texto no puede depender de
+                que una animación acabe; `key` reinicia una animación CSS, que
+                siempre llega a su estado final. */}
+            <div key={activeIndex} className="consultorio-showcase-info-anim">
+              <span className="consultorio-showcase-info-num">
+                {String(activeIndex + 1).padStart(2, "0")}
+              </span>
+              <h3 className="consultorio-showcase-info-titulo">
+                {galleryImages[activeIndex].label}
+              </h3>
+              <p className="consultorio-showcase-info-texto">
+                {galleryImages[activeIndex].desc}
+              </p>
+            </div>
+          </div>
           </div>
 
           {/* Tira de miniaturas */}

@@ -8,6 +8,7 @@ import { PALETTE } from "./palette";
 import Button from "@/components/ui/Button";
 import type { Cita, MetodoPago, TipoPagoConsultorio, TipoPagoOnline } from "@/types/domain";
 import { createCitaApi } from "@/services/citasApi";
+import { formatearFecha } from "@/lib/fechas";
 
 export type CrearCitaPayload = Omit<Cita, "id" | "fechaCreacion">;
 export type CitaSinPagos = Omit<CrearCitaPayload, "metodoPago" | "tipoPagoConsultorio" | "tipoPagoOnline" | "estado">;
@@ -50,7 +51,7 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
       };
       const nuevaCita = await createCitaApi(payload);
 
-      const fechaH = new Date(citaData.fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      const fechaH = formatearFecha(citaData.fecha, intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
       const tipoPagoLocalizado = isEfectivo ? t("cash") : t("card");
       const lineas = [
         t("whatsapp.title"),
@@ -84,7 +85,7 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
           <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "0.5rem 1rem", fontSize: "0.9rem", color: "#5A4A3A" }}>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.patient")}</span><span>{citaData.nombres} {citaData.apellidos || ""}</span>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.procedure")}</span><span>{citaData.procedimiento}</span>
-            <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.date")}</span><span>{new Date(citaData.fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
+            <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.date")}</span><span>{formatearFecha(citaData.fecha, intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</span>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.time")}</span><span>{citaData.hora}</span>
             <span style={{ fontWeight: 600, color: "var(--text)" }}>{t("summary.phone")}</span><span>{citaData.telefono || t("summary.notSpecified")}</span>
           </div>

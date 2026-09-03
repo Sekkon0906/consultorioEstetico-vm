@@ -193,7 +193,7 @@ export default function ProcedimientosList() {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
         <h2 style={{ fontWeight: 700, color: "var(--text)" }}>Procedimientos</h2>
-        {modo === "lista" && <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 7, padding: "0.7rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "white", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(176,137,104,0.28)" }}><Plus size={17} /> Nuevo</motion.button>}
+        {modo === "lista" && <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 7, padding: "0.7rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "var(--brand-contrast)", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(176,137,104,0.28)" }}><Plus size={17} /> Nuevo</motion.button>}
       </div>
 
       {toast && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ background: "#E8F5E9", color: "#145A32", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", textAlign: "center" }}>{toast}</motion.div>}
@@ -444,7 +444,7 @@ export default function ProcedimientosList() {
                         input.value = "";
                         showToast("Video agregado");
                       } catch (e: any) { setErr(e.message); }
-                    }} style={{ padding: "0.45rem 1rem", borderRadius: 10, background: "var(--brand)", color: "white", border: "none", fontWeight: 600, fontSize: "0.78rem", cursor: "pointer", whiteSpace: "nowrap" }}>+ Agregar</button>
+                    }} style={{ padding: "0.45rem 1rem", borderRadius: 10, background: "var(--brand)", color: "var(--brand-contrast)", border: "none", fontWeight: 600, fontSize: "0.78rem", cursor: "pointer", whiteSpace: "nowrap" }}>+ Agregar</button>
                   </div>
                 </div>
               </div>
@@ -452,7 +452,7 @@ export default function ProcedimientosList() {
 
             <div style={{ display: "flex", gap: "0.6rem" }}>
               <motion.button whileTap={{ scale: 0.97 }} onClick={handleSave} disabled={saving}
-                style={{ flex: 1, padding: "0.65rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "white", border: "none", fontWeight: 600, cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1 }}>
+                style={{ flex: 1, padding: "0.65rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "var(--brand-contrast)", border: "none", fontWeight: 600, cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Guardando..." : "Guardar"}
               </motion.button>
               <button onClick={reset} style={{ padding: "0.65rem 1.5rem", borderRadius: 100, background: "var(--surface-soft)", color: "var(--text)", border: "none", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>

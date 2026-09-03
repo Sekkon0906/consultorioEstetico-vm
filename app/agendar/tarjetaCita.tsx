@@ -5,6 +5,7 @@ import { Clock, CheckCircle2, FileText, Calendar, User, Phone, Mail, CreditCard 
 import { useLocale, useTranslations } from "next-intl";
 import type { Cita, EstadoCita } from "@/types/domain";
 import type { ReactNode } from "react";
+import { formatearFecha } from "@/lib/fechas";
 
 export type { Cita, EstadoCita };
 
@@ -38,7 +39,7 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
 
   const fmtFecha = (fecha: string): string => {
     try {
-      return new Date(fecha + "T12:00:00").toLocaleDateString(intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+      return formatearFecha(fecha, intlLocale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
     } catch { return fecha; }
   };
 

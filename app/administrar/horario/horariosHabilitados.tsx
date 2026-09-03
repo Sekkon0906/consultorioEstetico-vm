@@ -272,7 +272,7 @@ export default function HorariosHabilitados() {
               </p>
               <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
                 <button onClick={() => setConfirmAction(null)} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, border: "1px solid var(--border)", background: "transparent", color: "var(--text)", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
-                <button onClick={ejecutarAccion} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, background: "var(--brand)", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>Confirmar</button>
+                <button onClick={ejecutarAccion} style={{ padding: "0.6rem 1.3rem", borderRadius: 100, background: "var(--brand)", color: "var(--brand-contrast)", border: "none", fontWeight: 600, cursor: "pointer" }}>Confirmar</button>
               </div>
             </motion.div>
           </motion.div>

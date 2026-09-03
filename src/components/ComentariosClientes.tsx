@@ -76,7 +76,7 @@ export default function ComentariosClientes() {
 
       {user && puedeOpinar && (
         <div style={{ marginBottom: "1.5rem" }}>
-          <button onClick={function() { setShowForm(!showForm); }} style={{ background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", border: "none", borderRadius: 100, padding: "0.7rem 2rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer" }}>
+          <button onClick={function() { setShowForm(!showForm); }} style={{ background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "var(--brand-contrast)", border: "none", borderRadius: 100, padding: "0.7rem 2rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer" }}>
             {showForm ? t("closeForm") : t("openForm")}
           </button>
         </div>
@@ -129,7 +129,7 @@ export default function ComentariosClientes() {
           </div>
 
           <button onClick={handleEnviar} disabled={enviando}
-            style={{ width: "100%", background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "white", border: "none", borderRadius: 100, padding: "0.7rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer", opacity: enviando ? 0.7 : 1 }}>
+            style={{ width: "100%", background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "var(--brand-contrast)", border: "none", borderRadius: 100, padding: "0.7rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer", opacity: enviando ? 0.7 : 1 }}>
             {enviando ? t("form.submitting") : t("form.submit")}
           </button>
         </div>

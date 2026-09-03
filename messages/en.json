@@ -221,6 +221,13 @@
         "Work area",
         "Entrance & natural light",
         "Ambience detail"
+      ],
+      "descriptions": [
+        "The bed and equipment sit around a single axis, so every procedure runs with the instruments within reach and without interruptions.",
+        "Panels and curtains separate the areas: you can get ready and recover without anyone else entering the space.",
+        "This is where products are prepared and instruments sterilised, on a surface kept apart from the bed.",
+        "The entrance opens onto a wide window: natural light is what best reveals the real tone of the skin.",
+        "Warm materials and indirect lighting aim to make the visit feel closer to a salon than to an operating room."
       ]
     },
     "map": {
@@ -416,6 +423,7 @@
       "appointmentTypeValue": "Consultation / Treatment",
       "procedure": "Treatment",
       "procedurePlaceholder": "Choose a treatment",
+      "groupAll": "All",
       "groupFacial": "Facial",
       "groupCorporal": "Body",
       "groupCapilar": "Hair",

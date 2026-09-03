@@ -78,7 +78,7 @@ export default function ProcedimientoPage() {
   if (!proc) return (
     <div style={{ minHeight: "var(--alto-pantalla, 100vh)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--bg)", color: "var(--text)", gap: "1rem" }}>
       <p style={{ fontSize: "1.5rem", fontWeight: 600 }}>{t("notFound")}</p>
-      <button onClick={() => router.push("/procedimientos")} style={{ padding: "0.7rem 2rem", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", border: "none", borderRadius: 100, fontWeight: 600, cursor: "pointer" }}>{t("back2")}</button>
+      <button onClick={() => router.push("/procedimientos")} style={{ padding: "0.7rem 2rem", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "var(--brand-contrast)", border: "none", borderRadius: 100, fontWeight: 600, cursor: "pointer" }}>{t("back2")}</button>
     </div>
   );
 
@@ -151,16 +151,16 @@ export default function ProcedimientoPage() {
             <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2.5rem" }}>
               {proc.duracionMin && (
                 <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem 1.1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.9rem", flexShrink: 0 }}><i className="fas fa-clock" /></div>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--brand-contrast)", fontSize: "0.9rem", flexShrink: 0 }}><i className="fas fa-clock" /></div>
                   <div><div style={{ fontSize: "0.74rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("approxDuration")}</div><div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)" }}>{proc.duracionMin} {t("minutes")}</div></div>
                 </div>
               )}
               <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem 1.1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.9rem", flexShrink: 0 }}><i className="fas fa-shield-alt" /></div>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--brand-contrast)", fontSize: "0.9rem", flexShrink: 0 }}><i className="fas fa-shield-alt" /></div>
                 <div><div style={{ fontSize: "0.74rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("safety")}</div><div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)" }}>{t("certified")}</div></div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1rem 1.1rem", borderRadius: 14, background: "var(--bg-elevated)", border: "1px solid var(--border)" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "0.9rem", flexShrink: 0 }}><i className="fas fa-user-md" /></div>
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--brand-contrast)", fontSize: "0.9rem", flexShrink: 0 }}><i className="fas fa-user-md" /></div>
                 <div><div style={{ fontSize: "0.74rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("care")}</div><div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)" }}>{t("personalized")}</div></div>
               </div>
             </section>
@@ -217,7 +217,7 @@ export default function ProcedimientoPage() {
               </div>
               <Link href={`/agendar?proc=${encodeURIComponent(proc.nombre)}`}
                 className="proc-detail-cta"
-                style={{ display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", padding: "1rem 2.4rem", borderRadius: 100, fontWeight: 700, fontSize: "1rem", textDecoration: "none", boxShadow: "0 6px 22px rgba(176,137,104,0.35)", whiteSpace: "nowrap", maxWidth: "100%", boxSizing: "border-box" }}>
+                style={{ display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "var(--brand-contrast)", padding: "1rem 2.4rem", borderRadius: 100, fontWeight: 700, fontSize: "1rem", textDecoration: "none", boxShadow: "0 6px 22px rgba(176,137,104,0.35)", whiteSpace: "nowrap", maxWidth: "100%", boxSizing: "border-box" }}>
                 <FaCalendarCheck /> {t("bookCta")}
               </Link>
             </section>

@@ -441,7 +441,7 @@ export default function ProcedimientosPage() {
           position: relative;
           min-height: 100vh;
           min-height: var(--alto-pantalla);
-          background: linear-gradient(180deg, #FBF9F5 0%, #F4ECDF 100%);
+          background: linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%);
           overflow-x: hidden;
         }
         /* Marca de agua JM — gigante, centrada, muy diluida */
@@ -1003,7 +1003,7 @@ function FeaturedCarousel({
           gridTemplateColumns: "1.05fr 1fr",
           gap: 0,
           alignItems: "stretch",
-          background: "linear-gradient(135deg, var(--surface) 0%, #F7EFE3 100%)",
+          background: "linear-gradient(135deg, var(--surface) 0%, var(--surface-soft) 100%)",
           borderRadius: 28,
           border: "1px solid rgba(255, 215, 138, 0.55)",
           boxShadow:
@@ -1045,7 +1045,7 @@ function FeaturedCarousel({
                 position: "relative",
                 minHeight: 260,
                 aspectRatio: "5 / 4",
-                background: "#F5EEE5",
+                background: "var(--surface-soft)",
                 overflow: "hidden",
               }}
             >
@@ -1435,7 +1435,7 @@ function EmptyState({
       style={{
         textAlign: "center",
         padding: "4rem 1.5rem",
-        background: "rgba(255, 253, 249, 0.6)",
+        background: "var(--surface)",
         backdropFilter: "blur(8px)",
         borderRadius: 24,
         border: "1px dashed rgba(176, 137, 104, 0.3)",

@@ -93,7 +93,7 @@ export default function IngresosPage() {
               return (
                 <motion.div key={p.nombre} initial={{ x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                   style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "0.5rem 0.8rem", borderRadius: 12, background: i % 2 === 0 ? "var(--surface-soft)" : "transparent", marginBottom: "0.3rem" }}>
-                  <span style={{ width: 22, height: 22, borderRadius: 6, background: "var(--brand)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.68rem", fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
+                  <span style={{ width: 22, height: 22, borderRadius: 6, background: "var(--brand)", color: "var(--brand-contrast)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.68rem", fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
                   <div style={{ flex: 1 }}>
                     <p style={{ fontWeight: 600, color: "var(--text)", fontSize: "0.85rem", margin: 0 }}>{p.nombre}</p>
                     <div style={{ height: 4, borderRadius: 2, background: "var(--border)", marginTop: 3 }}><div style={{ height: "100%", borderRadius: 2, background: "var(--brand)", width: pct + "%" }} /></div>

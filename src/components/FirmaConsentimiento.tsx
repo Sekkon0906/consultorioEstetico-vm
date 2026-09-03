@@ -304,7 +304,7 @@ export default function FirmaConsentimiento(props: Props) {
                     </div>
                     <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
                       <button onClick={cerrar} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "var(--text-soft)", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer" }}>{t("cancel")}</button>
-                      <button onClick={function() { setStep("firma"); }} style={{ padding: "0.7rem 1.8rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(176,137,104,0.25)" }}>{t("addSignature")}</button>
+                      <button onClick={function() { setStep("firma"); }} style={{ padding: "0.7rem 1.8rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "var(--brand-contrast)", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(176,137,104,0.25)" }}>{t("addSignature")}</button>
                     </div>
                   </motion.div>
                 )}
@@ -325,7 +325,7 @@ export default function FirmaConsentimiento(props: Props) {
                     )}
                     <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
                       <button onClick={function() { setStep("intro"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "var(--text-soft)", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer" }}>{t("back")}</button>
-                      <button onClick={guardarFirma} disabled={!hasFirma} style={{ padding: "0.7rem 1.8rem", borderRadius: 100, background: hasFirma ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border)", color: hasFirma ? "white" : "#9B8575", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: hasFirma ? "pointer" : "not-allowed" }}>{t("confirm")}</button>
+                      <button onClick={guardarFirma} disabled={!hasFirma} style={{ padding: "0.7rem 1.8rem", borderRadius: 100, background: hasFirma ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border)", color: hasFirma ? "var(--brand-contrast)" : "#9B8575", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: hasFirma ? "pointer" : "not-allowed" }}>{t("confirm")}</button>
                     </div>
                   </motion.div>
                 )}
@@ -344,7 +344,7 @@ export default function FirmaConsentimiento(props: Props) {
                     </div>
                     <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem" }}>{t("doneTitle")}</h3>
                     <p style={{ fontSize: "0.88rem", color: "var(--text-soft)", marginBottom: "1.5rem" }}>{t("doneMessage")}</p>
-                    <button onClick={cerrar} style={{ padding: "0.7rem 2rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("close")}</button>
+                    <button onClick={cerrar} style={{ padding: "0.7rem 2rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "var(--brand-contrast)", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("close")}</button>
                   </motion.div>
                 )}
               </div>
@@ -357,7 +357,7 @@ export default function FirmaConsentimiento(props: Props) {
   return (
     <>
       <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={function() { setShowModal(true); }}
-        style={{ display: "flex", alignItems: "center", gap: 8, padding: "0.65rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "white", border: "none", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(176,137,104,0.2)" }}>
+        style={{ display: "flex", alignItems: "center", gap: 8, padding: "0.65rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "var(--brand-contrast)", border: "none", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer", boxShadow: "0 3px 12px rgba(176,137,104,0.2)" }}>
         <FileText size={16} /> {t("addSignature")}
       </motion.button>
 

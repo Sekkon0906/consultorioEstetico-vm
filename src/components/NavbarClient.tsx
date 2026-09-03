@@ -373,7 +373,7 @@ export default function Navbar() {
               onClick={() => router.push("/login")}
               className="btn rounded-pill px-4 py-2 d-none d-md-inline-flex align-items-center gap-2"
               style={{ border: "1.5px solid var(--brand)", color: "var(--brand-deep)", backgroundColor: "var(--surface)", fontWeight: 600 }}
-              whileHover={{ scale: 1.05, backgroundColor: "var(--brand)", color: "#fff", boxShadow: "0 6px 18px rgba(176,137,104,0.35)" }}
+              whileHover={{ scale: 1.05, backgroundColor: "var(--brand)", color: "var(--brand-contrast)", boxShadow: "0 6px 18px rgba(176,137,104,0.35)" }}
               whileTap={{ scale: 0.96 }}
               transition={{ type: "spring", stiffness: 320, damping: 20 }}
             >
