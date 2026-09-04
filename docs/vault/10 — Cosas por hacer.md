@@ -227,6 +227,21 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
         · **No son los otros `dangerouslySetInnerHTML`**: solo quedan el
           JSON-LD (que no se ejecuta como JS) y ninguno más en todo el
           proyecto.
+        · **No es ningún componente del layout.** Bisecado desmontando, uno a
+          uno y luego todos a la vez: `Footer`, `CookieBanner`,
+          `QuickAccessFab` y `NavbarClient`. El error sigue igual con los
+          cuatro fuera.
+        · **No son los `<link>`/`<meta>` del `<head>` manual.**
+
+      **Lo que queda por probar**, por orden de sospecha: `NextIntlClientProvider`
+      (si el locale del servidor y el del cliente no coinciden, TODO el texto
+      difiere), `AuthProvider`, la barra superior y el `style` en línea del
+      `<body>`.
+
+      **Pista sin explotar:** el mensaje siempre se corta igual, en `…nse>`,
+      que casi seguro es el cierre de un `</Suspense>`. El diff completo lo
+      imprime React, pero el overlay de Next no lo suelta en el panel de vista
+      previa; en un navegador normal con las React DevTools sale entero.
       Para el siguiente intento hace falta el **diff** que React imprime, y
       el overlay de Next no llegó a soltarlo en el panel de vista previa. En
       un navegador normal con las React DevTools sale a la primera.
