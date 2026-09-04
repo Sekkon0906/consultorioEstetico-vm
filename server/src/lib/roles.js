@@ -53,7 +53,10 @@ async function sembrarAdminSiHaceFalta(userId, email) {
     "INSERT INTO admin_users (uid, note) VALUES ($1, $2) ON CONFLICT (uid) DO NOTHING",
     [userId, "Sembrado automáticamente: primer administrador del sistema"]
   );
-  console.log(`[roles] ${email} quedó como primer administrador (admin_users estaba vacía).`);
+  // Sin el correo: es un dato personal y el registro no lo necesita para
+  // nada. Que se sembró un administrador es la información util; QUIEN se
+  // consulta en admin_users, que es donde vive.
+  console.log("[roles] Se sembró el primer administrador (admin_users estaba vacía).");
   return true;
 }
 
