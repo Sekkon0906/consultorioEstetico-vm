@@ -10,6 +10,7 @@ import {
   deleteTestimonioApi,
   bustTestimoniosCache,
 } from "@/services/testimoniosApi";
+import TextoEditable from "@/components/TextoEditable";
 import {
   getComentariosAdminApi,
   aprobarComentarioApi,
@@ -76,6 +77,18 @@ export default function TestimoniosList() {
       load(); reset();
     } catch (e: any) { setErr(e.message); }
     finally { setSaving(false); }
+  };
+
+  /* Guarda UN campo desde la lista. El PUT de testimonios ya era parcial
+     —construye el SET con lo que llega—, asi que aqui no hizo falta tocar
+     el servidor: era el de charlas el que reescribia todo. */
+  var guardarCampoSuelto = async function(id: string, campos: Partial<Testimonio>) {
+    await updateTestimonioApi(id, campos);
+    setList(function(prev: Testimonio[]) {
+      return prev.map(function(x: Testimonio) {
+        return String(x.id) === String(id) ? { ...x, ...campos } : x;
+      });
+    });
   };
 
   var toggle = async function(t: Testimonio, campo: "activo" | "destacado") {
@@ -188,8 +201,15 @@ export default function TestimoniosList() {
                   <motion.div key={t.id} className="admin-card" initial={{ y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }} style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem", opacity: t.activo ? 1 : 0.5 }}>
                     {t.thumb ? <Image src={t.thumb} alt="" width={72} height={72} quality={70} style={{ width: 72, height: 72, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 72, height: 72, borderRadius: 14, background: "var(--border)", flexShrink: 0 }} />}
                     <div className="admin-card-body" style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 7 }}><span style={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }}>{t.nombre}</span>{t.video && <Play size={16} color="var(--brand)" />}</div>
-                      <p style={{ fontSize: "0.92rem", color: "var(--text-soft)", margin: "0.25rem 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.texto}</p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 7 }}><TextoEditable valor={t.nombre} etiqueta="Nombre de la paciente" onGuardar={function(v) { return guardarCampoSuelto(t.id, { nombre: v }); }} estilo={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }} />{t.video && <Play size={16} color="var(--brand)" />}</div>
+                      {/* La cita se corrige aqui mismo: es texto de una paciente, asi
+                          que lo que se toca es una coma o una palabra, no el
+                          testimonio entero. Va en multilinea porque suele ocupar
+                          dos o tres renglones y editarlo en una sola linea
+                          obliga a desplazarse a ciegas. */}
+                      <div style={{ margin: "0.25rem 0 0" }}>
+                        <TextoEditable valor={t.texto} etiqueta="Testimonio" multilinea onGuardar={function(v) { return guardarCampoSuelto(t.id, { texto: v }); }} estilo={{ fontSize: "0.92rem", color: "var(--text-soft)" }} />
+                      </div>
                     </div>
                     <div className="admin-card-actions" style={{ display: "flex", gap: 7, flexShrink: 0 }}>
                       <IBtn icon={t.activo ? <Eye size={18} color="var(--brand-deep)" /> : <EyeOff size={18} color="var(--text-muted)" />} bg="var(--surface-soft)" title={t.activo ? "Ocultar" : "Mostrar"} onClick={function() { toggle(t, "activo"); }} />
