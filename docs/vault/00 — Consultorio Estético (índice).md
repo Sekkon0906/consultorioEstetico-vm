@@ -27,6 +27,7 @@ Ibagué (Tolima, Colombia). Hace dos cosas a la vez:
 - [[09 — Estudio de móvil]] — por qué el sitio se veía mal en un teléfono, medido
 - [[10 — Cosas por hacer]] — backlog vivo, por tipo de trabajo
 - [[11 — Bitácora 2026-09-03]] — bugs de móvil en producción, panel de admin y galería de confianza
+- [[12 — Bitácora 2026-09-04]] — el reset de enlaces que rompía el contraste, y la selección de procedimientos
 - `Decisiones/` — las elecciones caras de revertir, con su porqué
 
 ## Estado en una línea

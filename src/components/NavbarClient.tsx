@@ -12,6 +12,8 @@ import { useAuth } from "@/context/AuthContext";
 import { IMG } from "@/lib/imagenes";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
+import InsigniaSeleccion from "./InsigniaSeleccion";
+import { MUELLE_TACTO } from "@/lib/movimiento";
 
 /**
  * Avatar robusto: usa <img> nativo (no next/image) con
@@ -103,8 +105,13 @@ export default function Navbar() {
       { label: t("testimonials"), href: "/testimonios",    grupo: "servicios" },
       { label: t("book"),         href: "/agendar",        grupo: "accion"    },
     ];
+    // Grupo propio, no "accion". Compartir grupo con "Agendar cita" hacía
+    // que no se dibujara separador entre ambos y "Administrar" quedara
+    // pegado al botón, como si fuera parte de él. Y no lo es: uno es la
+    // acción que el sitio le pide a un paciente, el otro es el panel
+    // privado de la doctora.
     if (user?.rol === "admin")
-      base.push({ label: t("admin"), href: "/administrar", grupo: "accion" });
+      base.push({ label: t("admin"), href: "/administrar", grupo: "privado" });
     return base;
   }, [user?.rol, t]);
 
@@ -312,7 +319,7 @@ export default function Navbar() {
                     className={`nav-item ${esCta ? "navbar-cta-item" : ""}`}
                     style={{ cursor: "pointer" }}
                     whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.18 }}
+                    transition={MUELLE_TACTO}
                     onMouseEnter={() => handleItemEnter(index)}
                   >
                     <Link
@@ -377,6 +384,12 @@ export default function Navbar() {
             </motion.div>
           </button>
 
+          {/* La selección va ANTES del perfil y no dentro del menú de la
+              cuenta: se llena estando sin sesión, así que esconderla tras
+              "iniciar sesión" la volvería invisible justo para quien la
+              está usando. Se muestra sola cuando tiene algo dentro. */}
+          <InsigniaSeleccion />
+
           {/* PERFIL DESKTOP
               El botón de "Iniciar sesión" NAVEGA a /login; no despliega un
               panel. Decidido así a propósito: un desplegable que solo
@@ -392,7 +405,7 @@ export default function Navbar() {
               style={{ border: "1.5px solid var(--brand)", color: "var(--brand-deep)", backgroundColor: "var(--surface)", fontWeight: 600 }}
               whileHover={{ scale: 1.05, backgroundColor: "var(--brand)", color: "var(--brand-contrast)", boxShadow: "0 6px 18px rgba(176,137,104,0.35)" }}
               whileTap={{ scale: 0.96 }}
-              transition={{ type: "spring", stiffness: 320, damping: 20 }}
+              transition={MUELLE_TACTO}
             >
               {t("login")}
             </motion.button>

@@ -3768,17 +3768,38 @@ footer a:hover i {
   0%,100% { filter: hue-rotate(0deg); }
   50% { filter: hue-rotate(45deg); }
 }
-/* === Corrige enlaces azules globalmente en el panel admin === */
-a {
+/* === Corrige enlaces azules globalmente en el panel admin ===
+
+   `:not(.btn-accion)` es la parte importante, y costó encontrarla.
+
+   Esta regla se escribió para matar el azul por defecto del navegador en
+   el panel, pero se aplicó a TODOS los <a> del sitio y con !important. Un
+   botón de acción es un <a> —"Agendar este procedimiento" navega— con
+   fondo champán y `color: var(--brand-contrast)` puesto en línea. El
+   !important de aquí ganaba a ese inline, así que el botón heredaba el
+   color del texto de la página: crema claro sobre champán claro. El texto
+   no desaparecía del todo, pero estaba al borde de no leerse, y pasaba en
+   los tres sitios donde aparece ese botón a la vez.
+
+   Los <button> no estaban afectados; solo los enlaces. Por eso el mismo
+   botón se veía bien en el panel de administración y mal en la web
+   pública: en el panel es un <button>.
+
+   Se excluye por clase y no se quita el reset, que sigue haciendo falta
+   para los enlaces normales del panel. */
+a:not(.btn-accion) {
   text-decoration: none !important;
   color: inherit !important;
 }
-a:visited {
+a:visited:not(.btn-accion) {
   color: inherit !important;
 }
-a:hover {
+a:hover:not(.btn-accion) {
   text-decoration: none !important;
   color: inherit !important;
+}
+a.btn-accion {
+  text-decoration: none !important;
 }
 .fc {
   --fc-border-color: #e5d8c8;

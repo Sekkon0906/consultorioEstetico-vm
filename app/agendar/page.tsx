@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import type { Procedimiento, Cita } from "@/types/domain";
 import { getProcedimientosApi } from "@/services/procedimientosApi";
 import { useAuth } from "@/context/AuthContext";
+import { useCarrito } from "@/context/CarritoContext";
 
 import AgendarCalendar from "./agendarCalendar";
 import AgendarForm, { AgendarFormData } from "./agendarForm";
@@ -16,6 +17,7 @@ import TarjetaCita from "./tarjetaCita";
 
 import { PALETTE } from "./palette";
 import { aISOLocal, aFechaLocal } from "@/lib/fechas";
+import { MUELLE_TACTO } from "@/lib/movimiento";
 
 function AgendarPageContent() {
   const router = useRouter();
@@ -23,6 +25,7 @@ function AgendarPageContent() {
   const procParam = searchParams.get("proc") ?? "";
   const t = useTranslations("agendar");
   const tc = useTranslations("agendar.confirmacion");
+  const { items: seleccion, quitar: quitarDeSeleccion } = useCarrito();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [fecha, setFecha] = useState<Date | null>(null);
@@ -258,6 +261,7 @@ function AgendarPageContent() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
+                  transition={MUELLE_TACTO}
                   onClick={handleAvanzar}
                   className="px-6 py-3 rounded-full text-white font-semibold shadow-md"
                   style={{
@@ -294,6 +298,14 @@ function AgendarPageContent() {
               onConfirmar={(nuevaCita: Cita) => {
                 setCitaCreada(nuevaCita);
                 setStep(4);
+                // Lo que se acaba de agendar sale de la selección. Se cruza
+                // por NOMBRE porque es lo único que viaja en la URL desde
+                // /seleccion; el id no llega hasta aquí. Si no coincide con
+                // nada —el paciente entró por otro camino— no pasa nada.
+                const enLista = seleccion.find(
+                  (x) => x.nombre === nuevaCita.procedimiento
+                );
+                if (enLista) quitarDeSeleccion(enLista.id);
               }}
               goBack={() => setStep(2)}
             />
@@ -317,6 +329,7 @@ function AgendarPageContent() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
+                  transition={MUELLE_TACTO}
                   onClick={() => router.push("/")}
                   className="px-6 py-3 rounded-full font-semibold text-white shadow-md"
                   style={{
@@ -328,11 +341,41 @@ function AgendarPageContent() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
+                  transition={MUELLE_TACTO}
                   onClick={() => router.push("/perfil/citas_agendadas")}
-                  className="px-6 py-3 rounded-full font-semibold border border-[#B08968] text-[#7A5534] bg-white hover:bg-[#F6EFE7] transition"
+                  /* Iba con `bg-white` y `text-[#7A5534]` fijos: en modo
+                     oscuro quedaba un botón blanco pegado en una pantalla
+                     oscura. Sale de los tokens, como el resto. */
+                  className="px-6 py-3 rounded-full font-semibold transition"
+                  style={{
+                    border: "1px solid var(--brand)",
+                    color: "var(--text)",
+                    background: "var(--surface)",
+                  }}
                 >
                   {tc("goToMyAppointments")}
                 </motion.button>
+
+                {/* El resto de la selección. Aparece solo si queda algo, y
+                    reemplaza al "agendar otro procedimiento" genérico que
+                    habíamos hablado: es más útil llevar a la lista que ya
+                    hiciste que devolver al catálogo entero. */}
+                {seleccion.length > 0 && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={MUELLE_TACTO}
+                    onClick={() => router.push("/seleccion")}
+                    className="px-6 py-3 rounded-full font-semibold transition"
+                    style={{
+                      border: "1px solid var(--border-strong)",
+                      color: "var(--text-soft)",
+                      background: "transparent",
+                    }}
+                  >
+                    Agendar el siguiente ({seleccion.length})
+                  </motion.button>
+                )}
               </div>
             </motion.div>
           )}

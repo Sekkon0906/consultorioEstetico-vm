@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { Search, X, Sparkles, Calendar, ChevronLeft, ChevronRight, Star, ChevronDown, Check, ArrowUpDown } from "lucide-react";
+import BotonAñadirSeleccion from "@/components/BotonAñadirSeleccion";
 
 import type { Procedimiento } from "@/types/domain";
 import { getProcedimientosApi } from "@/services/procedimientosApi";
@@ -361,7 +362,9 @@ export default function ProcedimientosPage() {
             <div
               style={{
                 fontSize: "0.85rem",
-                color: "#8B7060",
+                /* Era "#8B7060": marrón oscuro fijo. Sobre el fondo casi negro
+                   del modo oscuro no se leía. */
+                color: "var(--text-soft)",
                 marginBottom: "1.4rem",
                 fontWeight: 500,
                 letterSpacing: "0.02em",
@@ -850,6 +853,32 @@ export default function ProcedimientosPage() {
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
+        /* El pie, ya fuera del enlace. El "flex: 1" se lo queda el bloque
+           de arriba —el que lleva título y descripción—, así que aquí se
+           anula: si los dos crecieran, las tarjetas de una misma fila
+           dejarían de alinear el precio a la misma altura.
+           (Sin comillas invertidas en este comentario: estamos dentro de un
+           template literal y una sola lo cerraría.) */
+        .proc-card-pie {
+          flex: 0 0 auto;
+          padding-top: 0;
+          gap: 0.7rem;
+        }
+        .proc-card-mas {
+          align-self: flex-start;
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: var(--brand);
+          text-decoration: none;
+          border-bottom: 1px solid transparent;
+          padding-bottom: 1px;
+          transition: border-color 160ms var(--mov-curva), color 160ms var(--mov-curva);
+        }
+        .proc-card-mas:hover,
+        .proc-card-mas:focus-visible {
+          color: var(--text);
+          border-bottom-color: currentColor;
+        }
         .proc-card-footer {
           display: flex;
           align-items: center;
@@ -866,22 +895,27 @@ export default function ProcedimientosPage() {
         .proc-card-price-unit {
           font-size: 0.7rem;
           font-weight: 600;
-          color: #8B7060;
+          /* "COP" iba en #8B7060 fijo y desaparecía en la tarjeta oscura. */
+          color: var(--text-muted);
           letter-spacing: 0.04em;
         }
         /* Promo: precio normal tachado + nuevo destacado */
         .proc-card-price-old {
           font-size: 0.78rem;
           font-weight: 500;
-          color: #A0907B;
+          color: var(--text-muted);
           text-decoration: line-through;
-          text-decoration-color: rgba(160, 144, 123, 0.7);
+          text-decoration-color: currentColor;
           margin-right: 0.25rem;
         }
         .proc-card-price-new {
           font-size: 0.95rem;
           font-weight: 800;
-          color: #C25B1E;
+          /* El naranja quemado #C25B1E se hundía en el fondo oscuro. Se
+             mezcla con el texto del tema para que suba de luminosidad en
+             oscuro y se mantenga bajo en claro, sin perder el matiz de
+             promoción. */
+          color: color-mix(in srgb, #E08A4A 70%, var(--text));
         }
         /* Badge variante promoción (rojizo / cálido) */
         .proc-card-promo-badge.proc-card-promo-discount {
@@ -898,7 +932,9 @@ export default function ProcedimientosPage() {
         /* Aquí vivía .proc-card-arrow, el circulito con la flecha en la
            esquina de cada tarjeta. Se quitó: no era un botón —no se podía
            pulsar por separado, la tarjeta entera es el enlace— así que
-           prometía una acción propia que no existía. */
+           prometía una acción propia que no existía. Lo que ocupa su sitio
+           ahora sí son botones de verdad: el "+" de la selección y el
+           enlace "Conocer más". */
 
         @media (max-width: 640px) {
           .proc-toolbar-inner { gap: 0.75rem; }
@@ -1377,7 +1413,14 @@ function ProcCard({
           {procedimiento.desc && (
             <p className="proc-card-desc">{procedimiento.desc}</p>
           )}
-          <div className="proc-card-footer">
+        </div>
+      </Link>
+
+      {/* El pie queda FUERA del enlace. Lleva botones, y un <button> dentro
+          de un <a> es HTML inválido: el navegador rompe el anidamiento y el
+          teclado deja de poder alcanzar el botón. */}
+      <div className="proc-card-body proc-card-pie">
+        <div className="proc-card-footer">
             {procedimiento.precio ? (
               procedimiento.enPromocion && procedimiento.precioPromocional ? (
                 <span className="proc-card-price">
@@ -1399,9 +1442,27 @@ function ProcCard({
               <span />
             )}
 
+            <BotonAñadirSeleccion
+              item={{
+                id: procedimiento.id,
+                nombre: procedimiento.nombre,
+                precio: procedimiento.precio,
+                imagen: procedimiento.imagen,
+              }}
+            />
           </div>
+
+          {/* "Conocer más" existe aunque la tarjeta entera sea un enlace.
+              Antes había un circulito con una flecha que se quitó por feo, y
+              con él se fue la única señal de que la tarjeta llevaba a algún
+              sitio: quedó una ficha muda. Un enlace con su nombre dice a
+              dónde va, y ahora hace falta más que antes, porque el "+" de al
+              lado NO navega y sin esto la tarjeta parecería tener una sola
+              acción posible. */}
+          <Link href={`/procedimientos/${procedimiento.id}`} className="proc-card-mas">
+            {t("featured.ctaInfo")}
+          </Link>
         </div>
-      </Link>
     </div>
   );
 }

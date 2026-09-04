@@ -21,6 +21,7 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
   preload: true,
 });
+import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import NavbarClient from "@/components/NavbarClient";
@@ -28,6 +29,7 @@ import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import QuickAccessFab from "@/components/QuickAccessFab";
 import { AuthProvider } from "@/context/AuthContext";
+import { CarritoProvider } from "@/context/CarritoContext";
 import { IMG } from "@/lib/imagenes";
 
 const SITE_URL =
@@ -45,8 +47,8 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Consultorio JM · Medicina Estética en Ibagué",
-    template: "%s · Consultorio JM",
+    default: "Dra. Vanessa Medina · Consultorio",
+    template: "%s · Dra. Vanessa Medina",
   },
   description:
     "Especialista en Medicina Estética, Nutrición y Antiedad en Ibagué. Procedimientos faciales, corporales y capilares con valoración médica personalizada.",
@@ -60,10 +62,18 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Dra. Vanessa Medina" }],
   creator: "Dra. Vanessa Medina",
-  /* El favicon lo aporta `app/icon.svg`, que Next recoge solo: pesa menos
-     de 1 KB, escala a cualquier tamaño y cambia de color en modo oscuro.
-     Aquí queda solo el icono de Apple, que no admite SVG. */
+  /* `app/icon.svg` pesa menos de 1 KB, escala a cualquier tamaño y cambia
+     de color en modo oscuro porque lleva la consulta de tema dentro.
+
+     Hay que declararlo A MANO. Next lo recoge solo por convención de
+     archivo, pero SOLO mientras no exista este objeto `icons`: en cuanto se
+     declara uno —aquí se declaró para el icono de Apple, que no admite
+     SVG—, la convención deja de aplicarse y se emite únicamente lo que hay
+     escrito. El resultado era una página sin `<link rel="icon">`, el
+     navegador caía a `/favicon.ico`, no existía, y la pestaña salía con el
+     globo genérico. */
   icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     apple: IMG.logo,
   },
   alternates: {
@@ -71,7 +81,7 @@ export const metadata: Metadata = {
     languages: { "es-CO": "/", "en-US": "/" },
   },
   openGraph: {
-    title: "Consultorio JM · Medicina Estética en Ibagué",
+    title: "Dra. Vanessa Medina · Consultorio",
     description:
       "Medicina estética y antienvejecimiento en Ibagué — Tolima. Valoración médica personalizada con la Dra. Vanessa Medina.",
     url: SITE_URL,
@@ -82,7 +92,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Consultorio JM · Medicina Estética en Ibagué",
+    title: "Dra. Vanessa Medina · Consultorio",
     description:
       "Medicina estética y antienvejecimiento en Ibagué — Tolima.",
     images: [IMG.logo],
@@ -156,7 +166,28 @@ export default async function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
-        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+        {/* El script antiflash va con `next/script` y NO como un <script>
+            normal, y la diferencia no es cosmética.
+
+            Renderizado como <script dangerouslySetInnerHTML> dentro de
+            <head>, React lo trata como un nodo suyo y lo vuelve a tocar al
+            hidratar. El resultado, en cada carga completa del sitio, eran
+            dos errores encadenados en consola:
+
+              SyntaxError: Invalid or unexpected token
+              Hydration failed because the server rendered HTML didn't
+              match the client
+
+            Comprobado quitándolo: sin este script los dos desaparecen.
+            (F18 del backlog.) No rompía nada visible —React reconstruye el
+            árbol— pero costaba un repintado completo en cada carga.
+
+            `beforeInteractive` lo inyecta Next fuera del árbol que React
+            hidrata, y sigue ejecutándose antes de pintar, que es lo único
+            que este script necesita para evitar el destello de tema. */}
+        <Script id="tema-antiflash" strategy="beforeInteractive">
+          {themeInit}
+        </Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -169,6 +200,7 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
         <AuthProvider>
+        <CarritoProvider>
           {/* BARRA SUPERIOR */}
           <div className="topbar">
             <div className="topbar-marquee">
@@ -231,6 +263,7 @@ export default async function RootLayout({
 
           {/* ACCESO RÁPIDO FLOTANTE — tema, idioma y contacto, solo escritorio */}
           <QuickAccessFab />
+        </CarritoProvider>
         </AuthProvider>
         </NextIntlClientProvider>
       </body>

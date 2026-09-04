@@ -1,6 +1,7 @@
 "use client";
 
 import { IMG } from "@/lib/imagenes";
+import ConsultorioDetalle from "@/components/ConsultorioDetalle";
 import Image from "next/image";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -345,6 +346,12 @@ export default function ConsultorioPage() {
       </AnimatePresence>
 
       {/* GOOGLE MAPS */}
+      {/* Lo que la página no contaba: la primera visita, la bioseguridad,
+          los horarios y cómo llegar. Va DESPUÉS de la galería y ANTES del
+          mapa: las fotos convencen, el texto resuelve, y el mapa es lo
+          último que se mira, cuando ya decidiste ir. */}
+      <ConsultorioDetalle />
+
       <section className="px-4 py-16">
         <motion.div
           variants={fadeUp}

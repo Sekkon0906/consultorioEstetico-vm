@@ -6,6 +6,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { FaCalendarCheck, FaArrowLeft, FaPlay, FaChevronLeft, FaChevronRight, FaTimes } from "react-icons/fa";
+import BotonAñadirSeleccion from "@/components/BotonAñadirSeleccion";
 import { useTranslations } from "next-intl";
 import { getProcedimientoByIdApi, getGaleriaProcedimientoApi } from "@/services/procedimientosApi";
 
@@ -242,6 +243,13 @@ export default function ProcedimientoPage() {
                 style={{ display: "flex", alignItems: "center", gap: 10, background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", color: "var(--brand-contrast)", padding: "1rem 2.4rem", borderRadius: 100, fontWeight: 700, fontSize: "1rem", textDecoration: "none", boxShadow: "0 6px 22px rgba(176,137,104,0.35)", whiteSpace: "nowrap", maxWidth: "100%", boxSizing: "border-box" }}>
                 <FaCalendarCheck /> {t("bookCta")}
               </Link>
+              {/* Guardar sin agendar todavía. En la ficha hace más falta que
+                  en la rejilla: aquí es donde se lee el precio y la duración,
+                  o sea donde se decide "este sí, pero no hoy". */}
+              <BotonAñadirSeleccion
+                item={{ id: proc.id, nombre: proc.nombre, precio: proc.precio, imagen: proc.imagen }}
+                tamaño={46}
+              />
             </section>
           </div>
         </motion.div>
