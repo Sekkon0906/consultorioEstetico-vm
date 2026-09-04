@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle, AlertCircle, XCircle, Loader, Download } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { MUELLE_TACTO } from "@/lib/movimiento";
+import HistorialProcedimientos from "@/components/HistorialProcedimientos";
 import { getMisCitasApi, getConsentimientoUrlApi } from "@/services/citasApi";
 import {
   getMisReagendasApi,
@@ -139,7 +140,7 @@ function ProgressBar({ estado, t }: { estado: string; t: ReturnType<typeof useTr
               <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
             </div>
             {!isLast && (
-              <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 4px", marginBottom: 18, background: currentStep > i + 1 ? "linear-gradient(90deg, var(--brand), #C9AD8D)" : "var(--border)", transition: "background 0.4s" }} />
+              <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 4px", marginBottom: 18, background: currentStep > i + 1 ? "linear-gradient(90deg, var(--brand), var(--brand-soft))" : "var(--border)", transition: "background 0.4s" }} />
             )}
           </div>
         );
@@ -279,8 +280,14 @@ export default function CitasAgendadas() {
       {/* Header */}
       <motion.div initial={{ y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", marginBottom: "2rem" }}>
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem" }}>{t("title")}</h2>
-        <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, var(--brand), #C9AD8D)", borderRadius: 2, margin: "0 auto 1.2rem" }} />
+        <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, var(--brand), var(--brand-soft))", borderRadius: 2, margin: "0 auto 1.2rem" }} />
       </motion.div>
+
+      {/* El historial va ANTES de la lista de citas y no despues: la
+          pregunta "cuando fue la ultima vez" se hace nada mas entrar, y la
+          lista de citas —que puede ser larga— la dejaria enterrada. Se
+          oculta solo si no hay nada atendido todavia. */}
+      <HistorialProcedimientos locale={intlLocale} />
 
       {/* Layout: filtros a la izquierda (pila) · citas a la derecha */}
       <div className="citas-layout" style={{ display: "flex", gap: "1.8rem", alignItems: "flex-start" }}>

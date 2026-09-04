@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
+import HistorialReportes from "./historialReportes";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
 import {
@@ -17,6 +18,7 @@ export default function IngresosPage() {
   var [topProcs, setTopProcs] = useState<any[]>([]);
   var [citasMes, setCitasMes] = useState<any[]>([]);
   var [loading, setLoading] = useState(true);
+  var [fallo, setFallo] = useState<string | null>(null);
 
   useEffect(function() {
     async function load() {
@@ -50,7 +52,13 @@ export default function IngresosPage() {
             return { mes: MESES[(r.mes_num || 1) - 1], total: r.total_citas, atendidas: r.atendidas };
           })
         );
-      } catch (e) { console.error(e); }
+      } catch (e: any) {
+        // Antes solo hacia console.error, asi que al fallar la pantalla se
+        // quedaba con el titulo y NADA debajo: parecia que el consultorio no
+        // tenia datos, cuando lo que pasaba es que no se pudieron leer.
+        console.error(e);
+        setFallo(e?.message || "No se pudieron cargar las estadisticas");
+      }
       finally { setLoading(false); }
     }
     load();
@@ -62,14 +70,34 @@ export default function IngresosPage() {
     <div>
       <h2 style={{ fontWeight: 700, color: "var(--text)", marginBottom: "1.5rem" }}>Analitica del Consultorio</h2>
 
+      {fallo && (
+        <div style={{ display: "flex", gap: 10, alignItems: "flex-start", background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", border: "1px solid color-mix(in srgb, var(--danger) 35%, transparent)", borderRadius: 14, padding: "1rem 1.2rem", color: "var(--text)" }}>
+          <XCircle size={18} color="var(--danger)" style={{ flexShrink: 0, marginTop: 2 }} />
+          <div>
+            <p style={{ fontWeight: 700, margin: 0 }}>
+              {/sesi[oó]n|token|401|autoriz/i.test(fallo) ? "Tu sesion caduco" : "No se pudieron cargar las estadisticas"}
+            </p>
+            <p style={{ color: "var(--text-soft)", fontSize: "0.86rem", margin: "0.2rem 0 0" }}>
+              {/sesi[oó]n|token|401|autoriz/i.test(fallo)
+                ? "Vuelve a entrar y las cifras se cargan solas."
+                : fallo}
+            </p>
+          </div>
+        </div>
+      )}
+
       {stats && (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", marginBottom: "2rem" }}>
-            <KPI icon={<CheckCircle size={18} />} label="Atendidas" value={stats.atendidas} color="#2E7D32" />
-            <KPI icon={<Clock size={18} />} label="Pendientes / Confirmadas" value={stats.pendientes} color="#F9A825" />
-            <KPI icon={<XCircle size={18} />} label="Canceladas" value={stats.canceladas} color="#C62828" />
-            <KPI icon={<Activity size={18} />} label="Citas hoy" value={stats.citasHoy} color="#1565C0" />
-            <KPI icon={<Users size={18} />} label="Pacientes registrados" value={stats.pacientes} color="#6A1B9A" />
+            {/* Los mismos tokens que usan las citas en el resto del panel.
+                Iban en verdes y rojos fijos de modo claro, asi que una cita
+                "atendida" era de un verde aqui y de otro en la agenda: eso
+                deja de ser un codigo de color y pasa a ser decoracion. */}
+            <KPI icon={<CheckCircle size={18} />} label="Atendidas" value={stats.atendidas} color="var(--estado-atendida)" />
+            <KPI icon={<Clock size={18} />} label="Pendientes / Confirmadas" value={stats.pendientes} color="var(--estado-pendiente)" />
+            <KPI icon={<XCircle size={18} />} label="Canceladas" value={stats.canceladas} color="var(--estado-cancelada)" />
+            <KPI icon={<Activity size={18} />} label="Citas hoy" value={stats.citasHoy} color="var(--estado-confirmada)" />
+            <KPI icon={<Users size={18} />} label="Pacientes registrados" value={stats.pacientes} color="var(--estado-global)" />
             <KPI icon={<Calendar size={18} />} label="Total historico" value={stats.totalCitas} color="var(--brand)" />
           </div>
 
@@ -79,9 +107,13 @@ export default function IngresosPage() {
               <BarChart data={citasMes}>
                 <XAxis dataKey="mes" tick={{ fill: "var(--text-soft)", fontSize: 12 }} />
                 <YAxis tick={{ fill: "var(--text-soft)", fontSize: 12 }} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid var(--border)" }} />
+                <Tooltip /* Sin background, recharts pinta el tooltip en blanco fijo: en
+                   modo oscuro salia una tarjeta blanca flotando sobre el negro. */
+                contentStyle={{ borderRadius: 12, border: "1px solid var(--border)", background: "var(--bg-elevated)", color: "var(--text)" }}
+                labelStyle={{ color: "var(--text)" }}
+                itemStyle={{ color: "var(--text-soft)" }} />
                 <Bar dataKey="total" name="Total" fill="var(--brand-soft)" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="atendidas" name="Atendidas" fill="#66BB6A" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="atendidas" name="Atendidas" fill="var(--estado-atendida)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -103,6 +135,15 @@ export default function IngresosPage() {
               );
             })}
           </div>
+
+          {/* El historial de ingresos existia como componente y no lo
+              renderizaba nadie: codigo escrito, probado y muerto. Es lo
+              unico de esta pantalla que habla de dinero — el resto son
+              recuentos —, asi que va debajo del todo pero va. */}
+          <div style={{ marginTop: "2rem" }}>
+            <h4 style={{ fontWeight: 600, color: "var(--text)", marginBottom: "1rem" }}>Reportes mensuales</h4>
+            <HistorialReportes />
+          </div>
         </>
       )}
     </div>
@@ -113,7 +154,12 @@ function KPI(props: { icon: React.ReactNode; label: string; value: number; color
   return (
     <motion.div initial={{ y: 10 }} animate={{ opacity: 1, y: 0 }}
       style={{ background: "var(--surface)", borderRadius: 16, border: "1px solid var(--border)", padding: "1rem", display: "flex", alignItems: "center", gap: "0.8rem" }}>
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: props.color + "18", display: "flex", alignItems: "center", justifyContent: "center", color: props.color, flexShrink: 0 }}>{props.icon}</div>
+      {/* Era `props.color + "18"`, o sea pegarle un alfa hexadecimal al
+          final del color. Eso solo funciona si el color ES un hexadecimal:
+          con `var(--estado-atendida)` produce "var(--estado-atendida)18",
+          que el navegador descarta, y el icono se quedaba sin fondo.
+          color-mix sí sabe mezclar el valor ya resuelto de una variable. */}
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: `color-mix(in srgb, ${props.color} 14%, var(--surface))`, display: "flex", alignItems: "center", justifyContent: "center", color: props.color, flexShrink: 0 }}>{props.icon}</div>
       <div>
         <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 600, margin: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>{props.label}</p>
         <p style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text)", margin: 0 }}>{props.value}</p>
