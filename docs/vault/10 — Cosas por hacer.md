@@ -203,19 +203,33 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
       `LogoLimpioNegro.png` (para fondo claro). Ojo: pesan 1,29 MB y 843 KB —
       hay que **optimizarlos y generar los tamaños** (32/180/192/512) antes de
       usarlos como favicon.
-- [ ] **F18 · Error de hidratación en todo el sitio.** *(Encontrado 2026-09-04.)*
-      En cada carga completa, React lanza `Hydration failed because the server
-      rendered HTML didn't match the client`. Se descarta que sea del carrito:
-      desmontando `CarritoProvider` **y** `InsigniaSeleccion` el error sigue
-      igual, y se dispara también en `/testimonios`, que no toca ninguno de
-      los dos. **Es anterior.**
-      Sospechoso principal: el script que escribe `data-theme` en `<html>`
-      antes de hidratar, que es la causa clásica.
-      No rompe nada visible —React reconstruye el árbol— pero cuesta un
-      repintado entero en cada carga, así que es también un problema de
-      velocidad. Para diagnosticarlo hace falta el detalle del diff, que el
-      overlay de Next no llegó a mostrar: conviene mirarlo en un navegador de
-      verdad con las React DevTools.
+- [~] **F18 · Errores en cada carga completa.** *(Mitad arreglado 2026-09-04.)*
+      Eran **dos** errores encadenados en consola, en todas las páginas:
+      `SyntaxError: Invalid or unexpected token` y, detrás,
+      `Hydration failed because the server rendered HTML didn't match`.
+
+      **ARREGLADO — el `SyntaxError`.** Salía del script antiflash del tema.
+      Iba como `<script dangerouslySetInnerHTML>` dentro de `<head>`, así que
+      React lo trataba como un nodo suyo y lo volvía a tocar al hidratar.
+      Bisecado quitándolo: sin él, el `SyntaxError` desaparece; devolviéndolo,
+      vuelve. Ahora va con `next/script` y `strategy="beforeInteractive"`, que
+      Next inyecta **fuera** del árbol que React hidrata y sigue ejecutándose
+      antes de pintar, que es lo único que ese script necesita. Verificado:
+      `data-theme` se sigue aplicando y no hay destello.
+
+      **SIGUE ABIERTO — la hidratación.** Persiste con el script ya arreglado.
+      Lo que ya está descartado, con prueba:
+        · **No es del carrito.** Desmontando `CarritoProvider` **e**
+          `InsigniaSeleccion`, sigue igual.
+        · **No es de una página concreta.** Se dispara en `/testimonios`, que
+          no toca nada de lo nuevo.
+        · **No es el script del tema**, que era el sospechoso obvio.
+        · **No son los otros `dangerouslySetInnerHTML`**: solo quedan el
+          JSON-LD (que no se ejecuta como JS) y ninguno más en todo el
+          proyecto.
+      Para el siguiente intento hace falta el **diff** que React imprime, y
+      el overlay de Next no llegó a soltarlo en el panel de vista previa. En
+      un navegador normal con las React DevTools sale a la primera.
 
 - [ ] **F17 · Videos.** Cambiar los `src` de los `<iframe>` cuando se muevan de
       la cuenta personal de YouTube.

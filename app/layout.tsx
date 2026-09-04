@@ -21,6 +21,7 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
   preload: true,
 });
+import Script from "next/script";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import NavbarClient from "@/components/NavbarClient";
@@ -165,7 +166,28 @@ export default async function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
-        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+        {/* El script antiflash va con `next/script` y NO como un <script>
+            normal, y la diferencia no es cosmética.
+
+            Renderizado como <script dangerouslySetInnerHTML> dentro de
+            <head>, React lo trata como un nodo suyo y lo vuelve a tocar al
+            hidratar. El resultado, en cada carga completa del sitio, eran
+            dos errores encadenados en consola:
+
+              SyntaxError: Invalid or unexpected token
+              Hydration failed because the server rendered HTML didn't
+              match the client
+
+            Comprobado quitándolo: sin este script los dos desaparecen.
+            (F18 del backlog.) No rompía nada visible —React reconstruye el
+            árbol— pero costaba un repintado completo en cada carga.
+
+            `beforeInteractive` lo inyecta Next fuera del árbol que React
+            hidrata, y sigue ejecutándose antes de pintar, que es lo único
+            que este script necesita para evitar el destello de tema. */}
+        <Script id="tema-antiflash" strategy="beforeInteractive">
+          {themeInit}
+        </Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
