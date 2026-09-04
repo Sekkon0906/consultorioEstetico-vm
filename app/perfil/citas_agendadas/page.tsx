@@ -12,7 +12,7 @@ import {
   rechazarReagendaApi,
 } from "@/services/reagendasApi";
 import type { Cita } from "@/types/domain";
-import { formatearFecha } from "@/lib/fechas";
+import { formatearFecha, aISOLocal } from "@/lib/fechas";
 
 // Trae jsPDF (pesado) consigo. Se usa solo cuando el paciente abre el
 // modal de firma, así que no debe formar parte de la carga inicial de "Mis citas".
@@ -34,6 +34,17 @@ const ESTADO_STYLES = {
   atendida: { bg: "#E8F5E9", text: "#145A32", icon: CheckCircle, step: 3 },
   cancelada: { bg: "#FCE4EC", text: "#7E1F1F", icon: XCircle, step: 0 },
 } as const;
+
+/** El nombre de cada bloque. En el componente y no en `messages/`: son
+ *  cuatro palabras y ponerlas en el archivo de traducciones obliga a saltar
+ *  de fichero para entender el agrupado. Cuando el sitio se traduzca de
+ *  verdad se mueven con el resto. */
+const ETIQUETA_GRUPO: Record<string, string> = {
+  hoy: "Hoy",
+  semana: "Esta semana",
+  proximas: "Más adelante",
+  pasadas: "Ya pasaron",
+};
 
 function ProgressBar({ estado, t }: { estado: string; t: ReturnType<typeof useTranslations> }) {
   const currentStep =
@@ -134,6 +145,27 @@ export default function CitasAgendadas() {
     }
   };
 
+  /**
+   * A qué bloque pertenece una cita.
+   *
+   * La lista era plana y ordenada por fecha, así que para saber si tenías
+   * algo esta semana había que leer fecha por fecha. Agrupar responde de un
+   * vistazo la única pregunta que uno le hace a esta pantalla: qué me toca
+   * ahora y qué ya pasó.
+   *
+   * Se compara con cadenas "YYYY-MM-DD" y no con objetos Date a propósito:
+   * la fecha de una cita es un día del calendario, no un instante, y en
+   * cuanto se construye un Date aparece la zona horaria y con ella el
+   * riesgo de correr la cita un día (ver `lib/fechas.ts`). Comparar texto
+   * ISO ordena igual que comparar fechas y no tiene ese problema.
+   */
+  const bloqueDe = (fecha: string, hoy: string, en7: string): string => {
+    if (fecha < hoy) return "pasadas";
+    if (fecha === hoy) return "hoy";
+    if (fecha <= en7) return "semana";
+    return "proximas";
+  };
+
   const citasFiltradas = useMemo(() => {
     let lista = [...citas];
     if (filtroEstado !== "todos") lista = lista.filter(c => c.estado === filtroEstado);
@@ -142,6 +174,29 @@ export default function CitasAgendadas() {
       return f !== 0 ? f : (ascendente ? a.hora.localeCompare(b.hora) : b.hora.localeCompare(a.hora));
     });
   }, [citas, ascendente, filtroEstado]);
+
+  /** Los bloques, en el orden en que importan, ya sin los vacíos. */
+  const grupos = useMemo(() => {
+    const hoy = aISOLocal(new Date());
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    const en7 = aISOLocal(d);
+
+    const orden = ascendente
+      ? ["hoy", "semana", "proximas", "pasadas"]
+      // Al ordenar de más nuevo a más viejo, lo pasado va primero: es lo
+      // que el usuario pidió ver al invertir.
+      : ["pasadas", "proximas", "semana", "hoy"];
+
+    const cajas: Record<string, Cita[]> = {};
+    for (const c of citasFiltradas) {
+      const k = bloqueDe(c.fecha, hoy, en7);
+      (cajas[k] ||= []).push(c);
+    }
+    return orden
+      .filter((k) => cajas[k]?.length)
+      .map((k) => ({ clave: k, citas: cajas[k] }));
+  }, [citasFiltradas, ascendente]);
 
   const resumen = useMemo(() => ({
     pendiente: citas.filter(c => c.estado === "pendiente").length,
@@ -185,7 +240,7 @@ export default function CitasAgendadas() {
             );
           })}
           <button onClick={() => setAscendente(a => !a)}
-            style={{ marginTop: "0.4rem", padding: "0.55rem 1rem", borderRadius: 12, fontSize: "0.84rem", fontWeight: 600, border: "1px solid rgba(176,137,104,0.25)", cursor: "pointer", background: "var(--surface)", color: "#4E3B2B", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            style={{ marginTop: "0.4rem", padding: "0.55rem 1rem", borderRadius: 12, fontSize: "0.84rem", fontWeight: 600, border: "1px solid rgba(176,137,104,0.25)", cursor: "pointer", background: "var(--surface)", color: "var(--text)", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
             {ascendente ? <ChevronUp size={14} /> : <ChevronDown size={14} />} {t("sortByDate")}
           </button>
         </div>
@@ -193,15 +248,28 @@ export default function CitasAgendadas() {
         {/* COLUMNA DE CITAS */}
         <div style={{ flex: 1, minWidth: 0 }}>
       {citasFiltradas.length === 0 ? (
-        <p style={{ textAlign: "center", color: "#8B7060", padding: "2rem 0" }}>
+        <p style={{ textAlign: "center", color: "var(--text-soft)", padding: "2rem 0" }}>
           {filtroEstado === "todos"
             ? t("emptyAll")
             : t("emptyFiltered", { estado: t(`filters.${filtroEstado}` as any) })}
         </p>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.6rem" }}>
+          {grupos.map((grupo) => (
+          <section key={grupo.clave} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            {/* El separador del bloque. Lleva el número al lado: el título
+                solo dice cuándo, y lo que quieres saber a la vez es cuánto. */}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
+              <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.05rem", fontWeight: 700, color: "var(--text)", margin: 0, whiteSpace: "nowrap" }}>
+                {ETIQUETA_GRUPO[grupo.clave]}
+              </h2>
+              <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "var(--brand-contrast)", background: "var(--brand)", borderRadius: 100, padding: "0.1rem 0.5rem", lineHeight: 1.6 }}>
+                {grupo.citas.length}
+              </span>
+              <span style={{ flex: 1, height: 1, background: "var(--border)" }} />
+            </div>
           <AnimatePresence>
-            {citasFiltradas.map((cita, i) => {
+            {grupo.citas.map((cita, i) => {
               const est = ESTADO_STYLES[cita.estado as keyof typeof ESTADO_STYLES] || ESTADO_STYLES.pendiente;
               const isCancelada = cita.estado === "cancelada";
               const isConfirmada = cita.estado === "confirmada";
@@ -224,8 +292,8 @@ export default function CitasAgendadas() {
                       <div>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
                           <div>
-                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", fontWeight: 700, color: "#7A6554", margin: 0, textDecoration: "line-through", textDecorationColor: "rgba(122,101,84,0.4)" }}>{cita.procedimiento}</h3>
-                            <span style={{ fontSize: "0.78rem", color: "#9B8575" }}>{formatFecha(cita.fecha)} · {cita.hora}</span>
+                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", fontWeight: 700, color: "var(--text-soft)", margin: 0, textDecoration: "line-through", textDecorationColor: "currentColor" }}>{cita.procedimiento}</h3>
+                            <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>{formatFecha(cita.fecha)} · {cita.hora}</span>
                           </div>
                           <span className="cita-estado-pill cancelada" style={{ background: est.bg, color: est.text, padding: "0.3rem 1rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 700, whiteSpace: "nowrap" }}>{t("estadoChip.cancelada")}</span>
                         </div>
@@ -287,7 +355,7 @@ export default function CitasAgendadas() {
                         <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, color: "#8A5A12", fontSize: "0.9rem", marginBottom: "0.5rem" }}>
                           <AlertCircle size={16} /> {t("reagenda.title")}
                         </div>
-                        <div style={{ fontSize: "0.85rem", color: "#5A4A3A", marginBottom: "0.3rem" }}>
+                        <div style={{ fontSize: "0.85rem", color: "var(--text-soft)", marginBottom: "0.3rem" }}>
                           {t("reagenda.newProposal")} <strong>{formatFecha(reagendas[cita.id].nueva_fecha)} — {reagendas[cita.id].nueva_hora}</strong>
                         </div>
                         {reagendas[cita.id].motivo && (
@@ -341,6 +409,8 @@ export default function CitasAgendadas() {
               );
             })}
           </AnimatePresence>
+          </section>
+          ))}
         </div>
       )}
         </div>
