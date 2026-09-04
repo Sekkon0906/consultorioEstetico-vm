@@ -7,6 +7,7 @@ import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle
 import { useLocale, useTranslations } from "next-intl";
 import { MUELLE_TACTO } from "@/lib/movimiento";
 import HistorialProcedimientos from "@/components/HistorialProcedimientos";
+import PedirReagenda from "@/components/PedirReagenda";
 import { getMisCitasApi, getConsentimientoUrlApi } from "@/services/citasApi";
 import {
   getMisReagendasApi,
@@ -466,6 +467,21 @@ export default function CitasAgendadas() {
                           onFirmado={() => {
                             setCitas(prev => prev.map(c => c.id === cita.id ? { ...c, consentimientoFirmado: true } : c));
                           }}
+                        />
+                      </div>
+                    )}
+
+                    {/* Pedir otro dia. Solo en las que todavia pueden
+                        moverse: una cita atendida ya paso, y una cancelada no
+                        tiene fecha que cambiar. Y solo si no hay ya una
+                        solicitud en curso, para no encadenar peticiones que
+                        se contradicen entre si. */}
+                    {!isCancelada && cita.estado !== "atendida" && !reagendas[cita.id] && (
+                      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem", flexWrap: "wrap" }}>
+                        <PedirReagenda
+                          citaId={String(cita.id)}
+                          fechaActual={formatFecha(cita.fecha)}
+                          onPedida={() => void cargarReagendas()}
                         />
                       </div>
                     )}
