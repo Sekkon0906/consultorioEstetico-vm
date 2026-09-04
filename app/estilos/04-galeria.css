@@ -24,8 +24,26 @@
 }
 .admin-nav-link.is-active {
   background: linear-gradient(135deg, var(--brand-deep), var(--brand));
-  color: #FFFFFF;
+  /* Era #FFFFFF fijo. En modo claro --brand-deep es un marrón oscuro y el
+     blanco funciona; en oscuro es champán claro, y el blanco encima
+     desaparecía — el enlace activo era el único ilegible del menú.
+     --brand-contrast es el par del fondo de marca en los dos temas. */
+  color: var(--brand-contrast);
   box-shadow: var(--shadow-sm);
+}
+
+/* El título de cada grupo del menú. No es pulsable y tiene que notarse:
+   minúscula espaciada, muy tenue y sin fondo. Si compitiera con los
+   enlaces, el menú pasaría de nueve elementos a trece. */
+.admin-nav-grupo {
+  margin: 0 0 0.5rem;
+  padding: 0 0.5rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.75;
 }
 .admin-logout-btn {
   background: var(--danger);

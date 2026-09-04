@@ -28,11 +28,16 @@ interface ReagendaPend {
   motivo: string;
 }
 
+/* Los mismos cuatro estados que usa el panel de la doctora, y con los
+   mismos tokens: si "confirmada" es un azul aquí y otro allí, deja de ser
+   un código de color y pasa a ser decoración. Los tokens se recalculan por
+   tema (ver 01-tokens.css); antes iban con pasteles claros fijos que en
+   oscuro quedaban como parches luminosos. */
 const ESTADO_STYLES = {
-  pendiente: { bg: "#FFF8E1", text: "#7D6608", icon: Loader, step: 1 },
-  confirmada: { bg: "#E3F2FD", text: "#0B3C78", icon: CheckCircle, step: 2 },
-  atendida: { bg: "#E8F5E9", text: "#145A32", icon: CheckCircle, step: 3 },
-  cancelada: { bg: "#FCE4EC", text: "#7E1F1F", icon: XCircle, step: 0 },
+  pendiente: { bg: "var(--estado-pendiente-bg)", text: "var(--estado-pendiente)", icon: Loader, step: 1 },
+  confirmada: { bg: "var(--estado-confirmada-bg)", text: "var(--estado-confirmada)", icon: CheckCircle, step: 2 },
+  atendida: { bg: "var(--estado-atendida-bg)", text: "var(--estado-atendida)", icon: CheckCircle, step: 3 },
+  cancelada: { bg: "var(--estado-cancelada-bg)", text: "var(--estado-cancelada)", icon: XCircle, step: 0 },
 } as const;
 
 /** El nombre de cada bloque. En el componente y no en `messages/`: son
@@ -206,7 +211,7 @@ export default function CitasAgendadas() {
   }), [citas]);
 
   if (loading) return <div style={{ display: "flex", justifyContent: "center", padding: "5rem 0" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
-  if (error) return <div style={{ textAlign: "center", padding: "3rem" }}><p style={{ color: "#7E1F1F" }}>{error}</p><button onClick={() => window.location.reload()} style={{ marginTop: "1rem", padding: "0.6rem 2rem", borderRadius: 100, background: "var(--brand)", color: "var(--brand-contrast)", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("retry")}</button></div>;
+  if (error) return <div style={{ textAlign: "center", padding: "3rem" }}><p style={{ color: "var(--estado-cancelada)" }}>{error}</p><button onClick={() => window.location.reload()} style={{ marginTop: "1rem", padding: "0.6rem 2rem", borderRadius: 100, background: "var(--brand)", color: "var(--brand-contrast)", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("retry")}</button></div>;
 
   return (
     <div className="dark-aware-section citas-page" style={{ maxWidth: 1180, margin: "0 auto", padding: "2rem 1.5rem 4rem" }}>
@@ -298,7 +303,7 @@ export default function CitasAgendadas() {
                           <span className="cita-estado-pill cancelada" style={{ background: est.bg, color: est.text, padding: "0.3rem 1rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 700, whiteSpace: "nowrap" }}>{t("estadoChip.cancelada")}</span>
                         </div>
                         {cita.motivoCancelacion && (
-                          <div style={{ marginTop: "0.7rem", padding: "0.55rem 0.9rem", background: "#FCE4EC", borderRadius: 10, fontSize: "0.8rem", color: "#7E1F1F", display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{ marginTop: "0.7rem", padding: "0.55rem 0.9rem", background: "#FCE4EC", borderRadius: 10, fontSize: "0.8rem", color: "var(--estado-cancelada)", display: "flex", alignItems: "center", gap: 8 }}>
                             <AlertCircle size={13} /> {t("labels.cancelReason")} {cita.motivoCancelacion}
                           </div>
                         )}
@@ -351,8 +356,8 @@ export default function CitasAgendadas() {
 
                     {/* Solicitud de reagenda del consultorio (pt 10) */}
                     {!isCancelada && cita.estado !== "atendida" && reagendas[cita.id] && (
-                      <div style={{ marginTop: "1rem", padding: "1rem 1.2rem", background: "#FFF6E9", border: "1px solid #E8C98A", borderRadius: 14 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, color: "#8A5A12", fontSize: "0.9rem", marginBottom: "0.5rem" }}>
+                      <div style={{ marginTop: "1rem", padding: "1rem 1.2rem", background: "var(--estado-pendiente-bg)", border: "1px solid var(--estado-pendiente-borde)", borderRadius: 14 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, color: "var(--estado-pendiente)", fontSize: "0.9rem", marginBottom: "0.5rem" }}>
                           <AlertCircle size={16} /> {t("reagenda.title")}
                         </div>
                         <div style={{ fontSize: "0.85rem", color: "var(--text-soft)", marginBottom: "0.3rem" }}>
@@ -374,7 +379,7 @@ export default function CitasAgendadas() {
                           <button
                             disabled={reagProcesando === reagendas[cita.id].id}
                             onClick={() => rechazarReagenda(cita, reagendas[cita.id])}
-                            style={{ flex: 1, minWidth: 130, padding: "0.55rem 1rem", borderRadius: 100, border: "1px solid #E0CDB5", background: "#FFF", color: "#7E1F1F", fontWeight: 600, fontSize: "0.83rem", cursor: "pointer", opacity: reagProcesando === reagendas[cita.id].id ? 0.6 : 1 }}
+                            style={{ flex: 1, minWidth: 130, padding: "0.55rem 1rem", borderRadius: 100, border: "1px solid #E0CDB5", background: "#FFF", color: "var(--estado-cancelada)", fontWeight: 600, fontSize: "0.83rem", cursor: "pointer", opacity: reagProcesando === reagendas[cita.id].id ? 0.6 : 1 }}
                           >
                             {t("reagenda.reject")}
                           </button>
@@ -399,7 +404,7 @@ export default function CitasAgendadas() {
 
                     {cita.consentimientoFirmado && (
                       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
-                        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.82rem", fontWeight: 600, color: "#145A32", background: "#E8F5E9", padding: "0.5rem 1.2rem", borderRadius: 100 }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.82rem", fontWeight: 600, color: "var(--estado-atendida)", background: "var(--estado-atendida-bg)", padding: "0.5rem 1.2rem", borderRadius: 100 }}>
                           <CheckCircle size={14} /> {t("consent.signed")}
                         </span>
                       </div>

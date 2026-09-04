@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { MUELLE_TACTO } from "@/lib/movimiento";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext"; //  ya no localDB ni auth viejo
@@ -33,38 +34,86 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
     if (isDesktop) setSidebarOpen(false);
   }, [isDesktop]);
 
-  const links: { id: string; label: string }[] = [
-    { id: "horarios",       label: "Horarios" },
-    { id: "citas",          label: "Citas Agendadas" },
-    { id: "procedimientos", label: "Procedimientos" },
-    { id: "testimonios",    label: "Testimonios" },
-    { id: "charlas",        label: "Formación" },
-    { id: "galeria",        label: "Galería de confianza" },
-    { id: "ingresos",       label: "Analítica" },
-    { id: "configuracion",  label: "Información general" },
-    { id: "copiloto",       label: "Asistente" },
+  /**
+   * El menú, en grupos.
+   *
+   * Antes eran nueve enlaces seguidos, todos con el mismo peso, en un orden
+   * que era el de cuándo se fue construyendo cada sección. Eso obliga a
+   * leer los nueve para encontrar uno.
+   *
+   * Ahora van por lo que uno viene a hacer:
+   *
+   *   · EL CONSULTORIO — lo que define el sitio entero. Va arriba porque
+   *     "Información general" cambia el pie de página, las páginas legales
+   *     y el consentimiento a la vez: es lo más caro de tener mal.
+   *   · EL DÍA A DÍA — la agenda, que es a lo que se entra a diario.
+   *   · LO QUE SE MUESTRA — el contenido de la web pública. "Galería de
+   *     confianza" va justo encima de "Procedimientos" porque las dos son
+   *     fotos que la doctora sube.
+   *   · CÓMO VA — los números, que se miran de vez en cuando.
+   */
+  const grupos: { titulo: string; links: { id: string; label: string }[] }[] = [
+    {
+      titulo: "El consultorio",
+      links: [
+        { id: "configuracion",  label: "Información general" },
+        { id: "copiloto",       label: "Asistente" },
+      ],
+    },
+    {
+      titulo: "El día a día",
+      links: [
+        { id: "horarios",       label: "Horarios" },
+        { id: "citas",          label: "Citas Agendadas" },
+      ],
+    },
+    {
+      titulo: "Lo que se muestra",
+      links: [
+        { id: "galeria",        label: "Galería de confianza" },
+        { id: "procedimientos", label: "Procedimientos" },
+        { id: "testimonios",    label: "Testimonios" },
+        { id: "charlas",        label: "Formación" },
+      ],
+    },
+    {
+      titulo: "Cómo va",
+      links: [
+        { id: "ingresos",       label: "Analítica" },
+      ],
+    },
   ];
 
   const NavLinks = () => (
-    <ul className="flex flex-col space-y-3 mb-6">
-      {links.map(({ id, label }) => {
-        const isActive = section === id;
-        return (
-          <motion.li key={id} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-            <Link
-              href={`/administrar?section=${id}`}
-              scroll={false}
-              onClick={() => setSidebarOpen(false)}
-              className={`admin-nav-link block text-center px-4 py-2 rounded-lg font-medium transition-all duration-300 no-underline ${
-                isActive ? "is-active" : ""
-              }`}
-            >
-              {label}
-            </Link>
-          </motion.li>
-        );
-      })}
-    </ul>
+    <nav className="mb-6">
+      {grupos.map((grupo) => (
+        <div key={grupo.titulo} className="mb-5">
+          {/* El título del grupo no es pulsable y se nota: en minúscula
+              espaciada y muy tenue. Si compitiera con los enlaces, el menú
+              pasaría de nueve elementos a trece. */}
+          <p className="admin-nav-grupo">{grupo.titulo}</p>
+          <ul className="flex flex-col space-y-2">
+            {grupo.links.map(({ id, label }) => {
+              const isActive = section === id;
+              return (
+                <motion.li key={id} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} transition={MUELLE_TACTO}>
+                  <Link
+                    href={`/administrar?section=${id}`}
+                    scroll={false}
+                    onClick={() => setSidebarOpen(false)}
+                    className={`admin-nav-link block text-center px-4 py-2 rounded-lg font-medium transition-all duration-300 no-underline ${
+                      isActive ? "is-active" : ""
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                </motion.li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </nav>
   );
 
   return (
