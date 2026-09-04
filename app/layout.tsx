@@ -28,6 +28,7 @@ import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import QuickAccessFab from "@/components/QuickAccessFab";
 import { AuthProvider } from "@/context/AuthContext";
+import { CarritoProvider } from "@/context/CarritoContext";
 import { IMG } from "@/lib/imagenes";
 
 const SITE_URL =
@@ -177,6 +178,7 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
         <AuthProvider>
+        <CarritoProvider>
           {/* BARRA SUPERIOR */}
           <div className="topbar">
             <div className="topbar-marquee">
@@ -239,6 +241,7 @@ export default async function RootLayout({
 
           {/* ACCESO RÁPIDO FLOTANTE — tema, idioma y contacto, solo escritorio */}
           <QuickAccessFab />
+        </CarritoProvider>
         </AuthProvider>
         </NextIntlClientProvider>
       </body>

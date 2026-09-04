@@ -12,6 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { IMG } from "@/lib/imagenes";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
+import InsigniaSeleccion from "./InsigniaSeleccion";
 
 /**
  * Avatar robusto: usa <img> nativo (no next/image) con
@@ -103,8 +104,13 @@ export default function Navbar() {
       { label: t("testimonials"), href: "/testimonios",    grupo: "servicios" },
       { label: t("book"),         href: "/agendar",        grupo: "accion"    },
     ];
+    // Grupo propio, no "accion". Compartir grupo con "Agendar cita" hacía
+    // que no se dibujara separador entre ambos y "Administrar" quedara
+    // pegado al botón, como si fuera parte de él. Y no lo es: uno es la
+    // acción que el sitio le pide a un paciente, el otro es el panel
+    // privado de la doctora.
     if (user?.rol === "admin")
-      base.push({ label: t("admin"), href: "/administrar", grupo: "accion" });
+      base.push({ label: t("admin"), href: "/administrar", grupo: "privado" });
     return base;
   }, [user?.rol, t]);
 
@@ -376,6 +382,12 @@ export default function Navbar() {
               )}
             </motion.div>
           </button>
+
+          {/* La selección va ANTES del perfil y no dentro del menú de la
+              cuenta: se llena estando sin sesión, así que esconderla tras
+              "iniciar sesión" la volvería invisible justo para quien la
+              está usando. Se muestra sola cuando tiene algo dentro. */}
+          <InsigniaSeleccion />
 
           {/* PERFIL DESKTOP
               El botón de "Iniciar sesión" NAVEGA a /login; no despliega un
