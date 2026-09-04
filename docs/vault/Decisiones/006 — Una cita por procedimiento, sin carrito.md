@@ -1,12 +1,19 @@
 ---
 tags: [proyecto, decision]
 fecha: 2026-09-03
-estado: aceptada
+estado: revisada
+revisada: 2026-09-04
 ---
 
 # 006 — Una cita por procedimiento, sin carrito
 
 Volver a [[00 — Consultorio Estético (índice)]]
+
+> [!warning] Revisada el 2026-09-04
+> El usuario pidió implementar el carrito de todas formas, después de leer
+> esta recomendación. **Se implementó.** Lo que sobrevive de la decisión es
+> el análisis del dominio, y ese análisis dio forma a cómo se construyó: ver
+> "Qué se acabó haciendo" al final.
 
 ## Contexto
 
@@ -64,3 +71,34 @@ día la doctora empieza a confirmar paquetes juntos, se añade una tabla
 puede ser nula: las citas de hoy se quedan como están, con `reserva_id` a nulo,
 y las nuevas se agrupan. La decisión es reversible precisamente porque no
 agrupamos ahora.
+
+---
+
+## Qué se acabó haciendo (2026-09-04)
+
+Se construyó, pero doblado por lo que dice el análisis de arriba en vez de
+copiar un carrito de comercio electrónico:
+
+- **Se llama "Mi selección", no "carrito"**, y el icono es un portapapeles y
+  no un carro de supermercado. El icono es la promesa: un carro anuncia que
+  al final hay una caja donde se paga todo junto, y esa caja no existe.
+- **No hay botón de "confirmar todo".** Cada línea lleva su propio
+  "Agendar", que entra al flujo de siempre con el nombre en la URL. El flujo
+  de agenda no cambió ni una línea.
+- **Sí hay total**, marcado como orientativo, porque saber cuánto suma es la
+  razón principal por la que alguien junta cosas en una lista.
+- **Vive en `localStorage`**, no en el servidor: la selección se hace antes
+  de identificarse, y guardarla en el servidor obligaría a pedir cuenta para
+  mirar precios.
+
+Y la animación que el usuario quería: el círculo que sube desde el `+`,
+describe un arco y cae en la insignia, que tiembla y sube el contador.
+
+Archivos: `src/context/CarritoContext.tsx`,
+`src/components/VueloAlCarrito.tsx`,
+`src/components/BotonAñadirSeleccion.tsx`,
+`src/components/InsigniaSeleccion.tsx`, `app/seleccion/page.tsx`.
+
+La salida sigue siendo la de arriba: `citas` no cambió, así que si algún día
+la doctora confirma paquetes juntos, se añade `reservas` y un `reserva_id`
+que puede ser nulo.
