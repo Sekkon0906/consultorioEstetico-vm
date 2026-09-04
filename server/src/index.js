@@ -87,6 +87,27 @@ app.use("/",               reagendasRoutes);  // /citas/:id/solicitar-reagenda y
 
 // ── MANEJO GLOBAL DE ERRORES ─────────────────────────────────
 app.use((err, _req, res, _next) => {
+  /* Un cuerpo mal formado NO es un fallo del servidor.
+   *
+   * Antes todo caía aquí y salía como 500 con su traza completa en el log.
+   * Dos problemas: el 500 dice "es culpa mía" cuando la petición venía
+   * rota, y cualquiera podía llenar el registro de trazas mandando basura
+   * a cualquier endpoint — que es ruido donde luego hay que buscar un
+   * incidente de verdad.
+   *
+   * body-parser marca estos casos con `type: "entity.parse.failed"` (JSON
+   * invalido) y `entity.too.large` (cuerpo por encima del limite). Se
+   * responden con su codigo, sin traza y sin detalle: decir DONDE falla el
+   * JSON le ahorra trabajo a quien esta probando el limite.
+   */
+  const tipo = err && err.type;
+  if (tipo === "entity.parse.failed" || err instanceof SyntaxError) {
+    return res.status(400).json({ ok: false, error: "El cuerpo de la petición no es JSON válido" });
+  }
+  if (tipo === "entity.too.large") {
+    return res.status(413).json({ ok: false, error: "El contenido es demasiado grande" });
+  }
+
   console.error("Error no manejado:", err);
   res.status(500).json({ ok: false, error: "Error interno del servidor" });
 });
