@@ -121,3 +121,23 @@ export async function getDisponibilidadApi(
   );
   return { globales: data.globales ?? [], ocupadas: data.ocupadas ?? [] };
 }
+
+/**
+ * Pide el enlace al consentimiento firmado de una cita.
+ *
+ * El servidor no guarda una dirección permanente: comprueba quién pregunta
+ * —la doctora ve cualquiera, un paciente solo las suyas— y devuelve una URL
+ * temporal que caduca en diez minutos. Por eso esto es una llamada y no un
+ * `href` fijo: el enlace se pide en el momento de pulsar, no se deja escrito
+ * en el HTML de la página.
+ *
+ * `tipo` distingue el PDF completo de la imagen de la firma.
+ */
+export async function getConsentimientoUrlApi(
+  citaId: string,
+  tipo: "pdf" | "firma" = "pdf"
+): Promise<string> {
+  const q = tipo === "firma" ? "?tipo=firma" : "";
+  const r = await apiAuth<{ url: string }>(`/citas/${citaId}/consentimiento${q}`);
+  return r.url;
+}

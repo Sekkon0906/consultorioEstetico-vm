@@ -98,14 +98,14 @@ export default function HorariosHabilitados() {
 
   const getHoraStyle = (hora: string): { bg: string; color: string; border: string; label: string } => {
     const cita = getCitaEnHora(hora);
-    if (esGlobal(hora)) return { bg: "#EDE0F0", color: "#5B2C8E", border: "#C8B0E0", label: "Global" };
+    if (esGlobal(hora)) return { bg: "var(--estado-global-bg)", color: "var(--estado-global)", border: "var(--estado-global-borde)", label: "Global" };
     if (cita) {
       if (cita.estado === "pendiente") return { bg: "var(--estado-pendiente-bg)", color: "var(--estado-pendiente)", border: "var(--estado-pendiente-borde)", label: `${cita.nombres} - ${cita.procedimiento}` };
       if (cita.estado === "confirmada") return { bg: "var(--estado-confirmada-bg)", color: "var(--estado-confirmada)", border: "var(--estado-confirmada-borde)", label: `${cita.nombres} - ${cita.procedimiento}` };
       if (cita.estado === "atendida") return { bg: "var(--estado-atendida-bg)", color: "var(--estado-atendida)", border: "var(--estado-atendida-borde)", label: `${cita.nombres} - ${cita.procedimiento}` };
       return { bg: "var(--estado-atendida-bg)", color: "var(--estado-atendida)", border: "var(--estado-atendida-borde)", label: `${cita.nombres}` };
     }
-    if (esBloqueada(hora)) return { bg: "#FDE8D8", color: "var(--danger)", border: "#F0A898", label: "Bloqueada" };
+    if (esBloqueada(hora)) return { bg: "var(--estado-bloqueada-bg)", color: "var(--danger)", border: "var(--estado-bloqueada-borde)", label: "Bloqueada" };
     return { bg: "var(--surface-soft)", color: "var(--text)", border: "var(--border)", label: "Disponible" };
   };
 
@@ -113,14 +113,14 @@ export default function HorariosHabilitados() {
     <div>
       <h2 style={{ fontWeight: 700, color: "var(--text)", marginBottom: "1.5rem" }}>Gestion de Horarios</h2>
 
-      {toast && <div style={{ background: "var(--border)", color: "var(--text)", border: "1px solid #D4C4B0", borderRadius: 12, padding: "0.6rem 1rem", textAlign: "center", fontWeight: 600, marginBottom: "1rem", fontSize: "0.88rem" }}>{toast}</div>}
+      {toast && <div style={{ background: "var(--border)", color: "var(--text)", border: "1px solid var(--border-strong)", borderRadius: 12, padding: "0.6rem 1rem", textAlign: "center", fontWeight: 600, marginBottom: "1rem", fontSize: "0.88rem" }}>{toast}</div>}
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem" }}>
         {[{ k: "diario", l: "Bloqueo por dia" }, { k: "global", l: "Bloqueo global" }].map(t => (
           <button key={t.k} onClick={() => setTab(t.k as any)}
             style={{ padding: "0.6rem 1.3rem", borderRadius: 100, fontWeight: 600, fontSize: "0.85rem", border: "none", cursor: "pointer",
-              background: tab === t.k ? "linear-gradient(135deg, var(--brand-deep), #B08968)" : "var(--surface-soft)", color: tab === t.k ? "white" : "var(--text)" }}>
+              background: tab === t.k ? "linear-gradient(135deg, var(--brand-deep), var(--brand))" : "var(--surface-soft)", color: tab === t.k ? "var(--brand-contrast)" : "var(--text)" }}>
             {t.l}
           </button>
         ))}
@@ -136,8 +136,8 @@ export default function HorariosHabilitados() {
               const bl = esGlobal(hora);
               return (
                 <button key={hora} onClick={() => setConfirmAction({ tipo: bl ? "global_desbloquear" : "global_bloquear", hora })}
-                  style={{ padding: "0.6rem", borderRadius: 12, fontWeight: 600, fontSize: "0.78rem", border: `1px solid ${bl ? "#C8B0E0" : "var(--border)"}`, cursor: "pointer",
-                    background: bl ? "#EDE0F0" : "var(--surface-soft)", color: bl ? "#5B2C8E" : "var(--text)" }}>
+                  style={{ padding: "0.6rem", borderRadius: 12, fontWeight: 600, fontSize: "0.78rem", border: `1px solid ${bl ? "var(--estado-global-borde)" : "var(--border)"}`, cursor: "pointer",
+                    background: bl ? "var(--estado-global-bg)" : "var(--surface-soft)", color: bl ? "var(--estado-global)" : "var(--text)" }}>
                   {hora} {bl ? "(Bloqueada)" : ""}
                 </button>
               );
@@ -172,7 +172,7 @@ export default function HorariosHabilitados() {
                     <motion.button key={dia} whileHover={pasado ? {} : { scale: 1.1 }} onClick={() => !pasado && (setSelectedDate(iso), cargarDia(iso))} disabled={pasado}
                       style={{ width: 34, height: 34, borderRadius: "50%", border: hoy && !sel ? "2px solid var(--brand)" : "none", margin: "0 auto",
                         background: sel ? "var(--brand)" : pasado ? "transparent" : "var(--surface-soft)",
-                        color: sel ? "white" : pasado ? "#ccc" : "var(--text)",
+                        color: sel ? "white" : pasado ? "var(--text-muted)" : "var(--text)",
                         fontWeight: sel || hoy ? 700 : 400, fontSize: "0.82rem", cursor: pasado ? "not-allowed" : "pointer",
                         display: "flex", alignItems: "center", justifyContent: "center", opacity: pasado ? 0.4 : 1,
                       }}>{dia}
@@ -220,7 +220,7 @@ export default function HorariosHabilitados() {
                           disabled={disabled}
                           title={horaPasada ? "Hora pasada" : s.label}
                           style={{ padding: "0.55rem 0.3rem", borderRadius: 12, fontWeight: 600, fontSize: "0.75rem",
-                            background: horaPasada ? "transparent" : s.bg, color: horaPasada ? "#ccc" : s.color, border: `1px solid ${horaPasada ? "#eee" : s.border}`,
+                            background: horaPasada ? "transparent" : s.bg, color: horaPasada ? "var(--text-muted)" : s.color, border: `1px solid ${horaPasada ? "var(--border)" : s.border}`,
                             cursor: disabled ? "default" : "pointer", transition: "all 0.2s", opacity: horaPasada ? 0.4 : 1,
                             display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
                           }}>
@@ -240,8 +240,8 @@ export default function HorariosHabilitados() {
                     { bg: "var(--estado-pendiente-bg)", border: "var(--estado-pendiente-borde)", label: "Pendiente" },
                     { bg: "var(--estado-confirmada-bg)", border: "var(--estado-confirmada-borde)", label: "Confirmada" },
                     { bg: "var(--estado-atendida-bg)", border: "var(--estado-atendida-borde)", label: "Atendida" },
-                    { bg: "#FDE8D8", border: "#F0A898", label: "Bloqueada" },
-                    { bg: "#EDE0F0", border: "#C8B0E0", label: "Global" },
+                    { bg: "var(--estado-bloqueada-bg)", border: "var(--estado-bloqueada-borde)", label: "Bloqueada" },
+                    { bg: "var(--estado-global-bg)", border: "var(--estado-global-borde)", label: "Global" },
                   ].map(l => (
                     <span key={l.label} style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--text-soft)" }}>
                       <span style={{ width: 12, height: 12, borderRadius: 3, background: l.bg, border: `1px solid ${l.border}`, display: "inline-block" }} />

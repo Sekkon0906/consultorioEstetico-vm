@@ -3,9 +3,10 @@
 import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle, AlertCircle, XCircle, Loader } from "lucide-react";
+import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle, AlertCircle, XCircle, Loader, Download } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { getMisCitasApi } from "@/services/citasApi";
+import { MUELLE_TACTO } from "@/lib/movimiento";
+import { getMisCitasApi, getConsentimientoUrlApi } from "@/services/citasApi";
 import {
   getMisReagendasApi,
   aceptarReagendaApi,
@@ -50,6 +51,66 @@ const ETIQUETA_GRUPO: Record<string, string> = {
   proximas: "Más adelante",
   pasadas: "Ya pasaron",
 };
+
+/**
+ * El botón para bajarse el consentimiento firmado.
+ *
+ * Antes esto era solo una etiqueta verde que decía "firmado". Informaba de
+ * algo y no dejaba hacer nada con ello: el paciente firma un documento
+ * clínico con su nombre, su documento y su firma, y despues no puede
+ * volver a verlo. Es suyo.
+ *
+ * El enlace se pide AL PULSAR y no se deja escrito en la página, porque el
+ * servidor devuelve una URL temporal que caduca en diez minutos. Dejarla en
+ * el HTML la volvería a convertir en una dirección permanente, que es justo
+ * lo que se quitó al sacar los consentimientos del bucket público.
+ *
+ * Se abre en pestaña nueva en vez de descargar a la fuerza: en un móvil,
+ * forzar la descarga de un PDF lo manda a una carpeta que mucha gente no
+ * sabe encontrar, mientras que abrirlo lo enseña ya.
+ */
+function BotonConsentimiento({ citaId, etiqueta }: { citaId: string; etiqueta: string }) {
+  const [estado, setEstado] = useState<"idle" | "pidiendo" | "error">("idle");
+
+  const abrir = async () => {
+    setEstado("pidiendo");
+    try {
+      const url = await getConsentimientoUrlApi(citaId);
+      window.open(url, "_blank", "noopener,noreferrer");
+      setEstado("idle");
+    } catch {
+      setEstado("error");
+    }
+  };
+
+  return (
+    <motion.button
+      type="button"
+      onClick={() => void abrir()}
+      disabled={estado === "pidiendo"}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+      transition={MUELLE_TACTO}
+      title="Abrir el consentimiento que firmaste"
+      style={{
+        display: "flex", alignItems: "center", gap: 7, fontSize: "0.82rem", fontWeight: 600,
+        color: estado === "error" ? "var(--danger)" : "var(--estado-atendida)",
+        background: estado === "error" ? "color-mix(in srgb, var(--danger) 12%, var(--surface))" : "var(--estado-atendida-bg)",
+        border: "none", padding: "0.5rem 1.2rem", borderRadius: 100,
+        cursor: estado === "pidiendo" ? "wait" : "pointer", fontFamily: "inherit",
+      }}
+    >
+      {estado === "error" ? (
+        <>No se pudo abrir — reintentar</>
+      ) : (
+        <>
+          <CheckCircle size={14} /> {etiqueta}
+          <Download size={13} style={{ opacity: estado === "pidiendo" ? 0.4 : 0.75 }} />
+        </>
+      )}
+    </motion.button>
+  );
+}
 
 function ProgressBar({ estado, t }: { estado: string; t: ReturnType<typeof useTranslations> }) {
   const currentStep =
@@ -404,9 +465,7 @@ export default function CitasAgendadas() {
 
                     {cita.consentimientoFirmado && (
                       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
-                        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.82rem", fontWeight: 600, color: "var(--estado-atendida)", background: "var(--estado-atendida-bg)", padding: "0.5rem 1.2rem", borderRadius: 100 }}>
-                          <CheckCircle size={14} /> {t("consent.signed")}
-                        </span>
+                        <BotonConsentimiento citaId={String(cita.id)} etiqueta={t("consent.signed")} />
                       </div>
                     )}
                   </div>
