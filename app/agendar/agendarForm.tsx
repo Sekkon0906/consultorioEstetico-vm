@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { MUELLE_TACTO } from "@/lib/movimiento";
 import { useLocale, useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
 
@@ -49,10 +50,13 @@ export default function AgendarForm({
     ? procedimientos
     : [];
 
+  /* Se llamaba DARK_PALETTE pero era al reves: dos marrones MUY oscuros
+     pensados para leerse sobre el fondo claro. En modo oscuro eran texto
+     casi negro sobre fondo casi negro. Ahora sale del tema. */
   const DARK_PALETTE = {
     ...PALETTE,
-    text: "#2A1C12",
-    textSoft: "#4B3726",
+    text: "var(--text)",
+    textSoft: "var(--text-soft)",
   };
 
   const handleChange = <K extends keyof AgendarFormData>(
@@ -110,7 +114,7 @@ export default function AgendarForm({
       transition={{ duration: 0.5, ease: "easeInOut" }}
       className="agendar-form-card dark-aware-card rounded-3xl shadow-2xl overflow-hidden"
       style={{
-        background: "linear-gradient(180deg, #FBF7F2 0%, #F4EBE2 100%)",
+        background: "linear-gradient(180deg, var(--bg-elevated) 0%, var(--surface) 100%)",
         border: `1px solid ${DARK_PALETTE.border}`,
         color: DARK_PALETTE.text,
         maxWidth: 920,
@@ -122,8 +126,8 @@ export default function AgendarForm({
         className="p-6 flex items-center gap-2 cursor-pointer w-fit"
         onClick={goBack}
       >
-        <ArrowLeft size={20} className="text-[#5C4533]" />
-        <span className="text-sm font-medium text-[#5C4533] hover:text-[var(--brand-deep)] transition-colors">
+        <ArrowLeft size={20} className="text-[var(--text-soft)]" />
+        <span className="text-sm font-medium text-[var(--text-soft)] hover:text-[var(--brand-deep)] transition-colors">
           {t("back")}
         </span>
       </div>
@@ -145,7 +149,7 @@ export default function AgendarForm({
             initial={{ y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-sm rounded-lg p-3 mx-auto max-w-lg bg-[#E8E1D4] border border-[#E0D3C0]"
+            className="text-sm rounded-lg p-3 mx-auto max-w-lg bg-[var(--surface-soft)] border border-[var(--border)]"
             style={{ color: DARK_PALETTE.textSoft }}
           >
             {t.rich("firstAppointmentNote", {
@@ -166,9 +170,9 @@ export default function AgendarForm({
         {/* === BLOQUE DÍA Y HORA SELECCIONADA === */}
         {fechaObj && formData.hora && (
           <motion.div
-            className="md:col-span-2 p-5 rounded-2xl border bg-[#e4d0b9] shadow-inner relative"
+            className="md:col-span-2 p-5 rounded-2xl border bg-[var(--surface-soft)] shadow-inner relative"
             style={{
-              borderColor: "#E0CDB5",
+              borderColor: "var(--border-strong)",
               color: DARK_PALETTE.textSoft,
             }}
             initial={{ y: 15 }}
@@ -182,7 +186,7 @@ export default function AgendarForm({
             </h3>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
               <div className="flex items-center gap-2">
-                <CalendarDays className="w-5 h-5 text-[#B08968]" />
+                <CalendarDays className="w-5 h-5 text-[var(--brand)]" />
                 <span>
                   <b>
                     {fmtDiaHumano(fechaObj)}, {fmtFechaHumana(fechaObj)}
@@ -190,7 +194,7 @@ export default function AgendarForm({
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-[#B08968]" />
+                <Clock className="w-5 h-5 text-[var(--brand)]" />
                 <span>
                   <b>{fmtHoraHumana(formData.hora)}</b>
                 </span>
@@ -201,12 +205,13 @@ export default function AgendarForm({
                 type="button"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                transition={MUELLE_TACTO}
                 onClick={goBack}
                 className="inline-flex items-center gap-2 px-4 py-2 mt-2 rounded-full text-sm font-medium shadow-sm transition-all"
                 style={{
                   background: "#FFF",
                   color: "var(--text-soft)",
-                  border: "1px solid #E0CDB5",
+                  border: "1px solid var(--border-strong)",
                 }}
               >
                 <RotateCcw size={16} />
@@ -229,7 +234,7 @@ export default function AgendarForm({
             onChange={(e) => handleChange("nombre", e.target.value)}
             placeholder={t("fullNamePlaceholder")}
             required
-            className="w-full p-3 rounded-lg border bg-white focus:border-[var(--brand)] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
+            className="w-full p-3 rounded-lg border bg-[var(--surface)] text-[var(--text)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)] outline-none transition-all"
             style={{
               borderColor: DARK_PALETTE.border,
               color: DARK_PALETTE.text,
@@ -251,7 +256,7 @@ export default function AgendarForm({
             placeholder={t("phonePlaceholder")}
             required
             pattern="[0-9]{7,}"
-            className="w-full p-3 rounded-lg border bg-white focus:border-[var(--brand)] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
+            className="w-full p-3 rounded-lg border bg-[var(--surface)] text-[var(--text)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)] outline-none transition-all"
             style={{
               borderColor: DARK_PALETTE.border,
               color: DARK_PALETTE.text,
@@ -272,7 +277,7 @@ export default function AgendarForm({
             type="email"
             placeholder={t("emailPlaceholder")}
             required
-            className="w-full p-3 rounded-lg border bg-white focus:border-[var(--brand)] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
+            className="w-full p-3 rounded-lg border bg-[var(--surface)] text-[var(--text)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)] outline-none transition-all"
             style={{
               borderColor: DARK_PALETTE.border,
               color: DARK_PALETTE.text,
@@ -292,7 +297,7 @@ export default function AgendarForm({
             initial={{ opacity: 0.8 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className="w-full p-3 rounded-lg border bg-[#FBF7F2] font-medium shadow-inner"
+            className="w-full p-3 rounded-lg border bg-[var(--bg-elevated)] font-medium shadow-inner"
             style={{
               borderColor: DARK_PALETTE.border,
               color: DARK_PALETTE.textSoft,
@@ -331,7 +336,7 @@ export default function AgendarForm({
             onChange={(e) => handleChange("nota", e.target.value)}
             rows={3}
             placeholder={t("notePlaceholder")}
-            className="w-full p-3 rounded-lg border bg-white focus:border-[var(--brand)] focus:ring-2 focus:ring-[#C7A27A]/30 outline-none transition-all"
+            className="w-full p-3 rounded-lg border bg-[var(--surface)] text-[var(--text)] focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)] outline-none transition-all"
             style={{
               borderColor: DARK_PALETTE.border,
               color: DARK_PALETTE.text,
@@ -369,6 +374,7 @@ export default function AgendarForm({
             type="submit"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
+            transition={MUELLE_TACTO}
             className="px-8 py-2 rounded-lg font-semibold shadow-md text-white transition"
             style={{
               background: DARK_PALETTE.main,
