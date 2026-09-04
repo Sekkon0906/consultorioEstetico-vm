@@ -16,10 +16,13 @@ interface Props {
 }
 
 const CE: Record<string, { bg: string; text: string; dot: string }> = {
-  pendiente:  { bg: "#FFF8E1", text: "#7D6608", dot: "#D4A017" },
-  confirmada: { bg: "#E3F2FD", text: "#0B3C78", dot: "#4A90D9" },
-  atendida:   { bg: "#E8F5E9", text: "#145A32", dot: "#2E7D32" },
-  cancelada:  { bg: "#FCE4EC", text: "#7E1F1F", dot: "#C62828" },
+  /* Los cuatro estados salen de tokens que se recalculan por tema (ver
+     01-tokens.css). Antes iban con pasteles claros fijos aquí, y en modo
+     oscuro quedaban como parches luminosos sobre el fondo casi negro. */
+  pendiente:  { bg: "var(--estado-pendiente-bg)",  text: "var(--estado-pendiente)",  dot: "var(--estado-pendiente)" },
+  confirmada: { bg: "var(--estado-confirmada-bg)", text: "var(--estado-confirmada)", dot: "var(--estado-confirmada)" },
+  atendida:   { bg: "var(--estado-atendida-bg)",   text: "var(--estado-atendida)",   dot: "var(--estado-atendida)" },
+  cancelada:  { bg: "var(--estado-cancelada-bg)",  text: "var(--estado-cancelada)",  dot: "var(--estado-cancelada)" },
 };
 
 export default function CitasAgendadasCard({
@@ -93,10 +96,10 @@ export default function CitasAgendadasCard({
           </>
         )}
         {cita.estado === "atendida" && (
-          <Btn label="Ver resumen" icon={<ClipboardList size={14} />} bg="#E8F5E9" color="#145A32" onClick={() => onVerResumen?.(cita)} />
+          <Btn label="Ver resumen" icon={<ClipboardList size={14} />} bg="var(--estado-atendida-bg)" color="var(--estado-atendida)" onClick={() => onVerResumen?.(cita)} />
         )}
         {cita.estado === "cancelada" && (
-          <Btn label="Ver motivo" icon={<Eye size={14} />} bg="#FCE4EC" color="#7E1F1F" onClick={() => onVerMotivo?.(cita)} />
+          <Btn label="Ver motivo" icon={<Eye size={14} />} bg="var(--estado-cancelada-bg)" color="var(--estado-cancelada)" onClick={() => onVerMotivo?.(cita)} />
         )}
       </div>
     </motion.div>

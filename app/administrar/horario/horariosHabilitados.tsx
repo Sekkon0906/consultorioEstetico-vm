@@ -100,10 +100,10 @@ export default function HorariosHabilitados() {
     const cita = getCitaEnHora(hora);
     if (esGlobal(hora)) return { bg: "#EDE0F0", color: "#5B2C8E", border: "#C8B0E0", label: "Global" };
     if (cita) {
-      if (cita.estado === "pendiente") return { bg: "#FFF8E1", color: "#7D6608", border: "#F0E0A0", label: `${cita.nombres} - ${cita.procedimiento}` };
-      if (cita.estado === "confirmada") return { bg: "#E3F2FD", color: "#0B3C78", border: "#A0C8F0", label: `${cita.nombres} - ${cita.procedimiento}` };
-      if (cita.estado === "atendida") return { bg: "#E8F5E9", color: "#145A32", border: "#A0D8A8", label: `${cita.nombres} - ${cita.procedimiento}` };
-      return { bg: "#EEF7EE", color: "var(--success)", border: "#A8D8B9", label: `${cita.nombres}` };
+      if (cita.estado === "pendiente") return { bg: "var(--estado-pendiente-bg)", color: "var(--estado-pendiente)", border: "var(--estado-pendiente-borde)", label: `${cita.nombres} - ${cita.procedimiento}` };
+      if (cita.estado === "confirmada") return { bg: "var(--estado-confirmada-bg)", color: "var(--estado-confirmada)", border: "var(--estado-confirmada-borde)", label: `${cita.nombres} - ${cita.procedimiento}` };
+      if (cita.estado === "atendida") return { bg: "var(--estado-atendida-bg)", color: "var(--estado-atendida)", border: "var(--estado-atendida-borde)", label: `${cita.nombres} - ${cita.procedimiento}` };
+      return { bg: "var(--estado-atendida-bg)", color: "var(--estado-atendida)", border: "var(--estado-atendida-borde)", label: `${cita.nombres}` };
     }
     if (esBloqueada(hora)) return { bg: "#FDE8D8", color: "var(--danger)", border: "#F0A898", label: "Bloqueada" };
     return { bg: "var(--surface-soft)", color: "var(--text)", border: "var(--border)", label: "Disponible" };
@@ -237,9 +237,9 @@ export default function HorariosHabilitados() {
                 <div style={{ display: "flex", gap: "0.8rem", marginTop: "1rem", flexWrap: "wrap", fontSize: "0.72rem" }}>
                   {[
                     { bg: "var(--surface-soft)", border: "var(--border)", label: "Disponible" },
-                    { bg: "#FFF8E1", border: "#F0E0A0", label: "Pendiente" },
-                    { bg: "#E3F2FD", border: "#A0C8F0", label: "Confirmada" },
-                    { bg: "#E8F5E9", border: "#A0D8A8", label: "Atendida" },
+                    { bg: "var(--estado-pendiente-bg)", border: "var(--estado-pendiente-borde)", label: "Pendiente" },
+                    { bg: "var(--estado-confirmada-bg)", border: "var(--estado-confirmada-borde)", label: "Confirmada" },
+                    { bg: "var(--estado-atendida-bg)", border: "var(--estado-atendida-borde)", label: "Atendida" },
                     { bg: "#FDE8D8", border: "#F0A898", label: "Bloqueada" },
                     { bg: "#EDE0F0", border: "#C8B0E0", label: "Global" },
                   ].map(l => (

@@ -78,7 +78,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
           </div>
 
           {/* Procedure */}
-          <div style={{ background: "#EEF7EE", borderRadius: 14, padding: "1rem", marginBottom: "1.5rem" }}>
+          <div style={{ background: "var(--estado-atendida-bg)", borderRadius: 14, padding: "1rem", marginBottom: "1.5rem" }}>
             <p style={{ fontWeight: 600, color: "var(--success)", margin: 0 }}>{cita.procedimiento}</p>
             {cita.nota && <p style={{ fontSize: "0.82rem", color: "#4A7A5A", margin: "0.2rem 0 0" }}>Nota: {cita.nota}</p>}
           </div>
@@ -87,7 +87,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
               que la doctora lo pueda ver e imprimir antes del procedimiento. */}
           <div
             style={{
-              background: cita.consentimientoFirmado ? "#EEF7EE" : "#FCEFE3",
+              background: cita.consentimientoFirmado ? "var(--estado-atendida-bg)" : "var(--estado-pendiente-bg)",
               borderRadius: 14,
               padding: "1rem",
               marginBottom: "1.5rem",
@@ -186,14 +186,14 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", marginBottom: 6 }}>
                     <span style={{ color: "var(--text-soft)" }}>Pagado: <strong>${pagadoTotal.toLocaleString("es-CO")}</strong></span>
                     {restante > 0 && <span style={{ color: "var(--brand)", fontWeight: 600 }}>Restante: ${restante.toLocaleString("es-CO")}</span>}
-                    {devolucion > 0 && <span style={{ color: "#2E7D32", fontWeight: 600 }}>Devolucion: ${devolucion.toLocaleString("es-CO")}</span>}
+                    {devolucion > 0 && <span style={{ color: "var(--estado-atendida)", fontWeight: 600 }}>Devolucion: ${devolucion.toLocaleString("es-CO")}</span>}
                   </div>
                   <div style={{ height: 8, borderRadius: 4, background: "var(--border)", overflow: "hidden" }}>
                     <motion.div animate={{ width: `${porcentaje}%` }} transition={{ duration: 0.4 }}
                       style={{ height: "100%", background: devolucion > 0 ? "linear-gradient(90deg, #43A047, #66BB6A)" : "linear-gradient(90deg, #8B6A4B, #B08968)", borderRadius: 4 }} />
                   </div>
                   {devolucion > 0 && (
-                    <motion.p initial={false} animate={{ opacity: 1 }} style={{ fontSize: "0.82rem", color: "#2E7D32", fontWeight: 600, marginTop: 6, textAlign: "center", background: "#E8F5E9", padding: "0.5rem", borderRadius: 10 }}>
+                    <motion.p initial={false} animate={{ opacity: 1 }} style={{ fontSize: "0.82rem", color: "var(--estado-atendida)", fontWeight: 600, marginTop: 6, textAlign: "center", background: "var(--estado-atendida-bg)", padding: "0.5rem", borderRadius: 10 }}>
                       Debe devolver ${devolucion.toLocaleString("es-CO")} al cliente
                     </motion.p>
                   )}
@@ -220,7 +220,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
 
             {concluida && (
               <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                style={{ display: "flex", alignItems: "center", gap: 8, color: "#145A32", fontWeight: 600, fontSize: "0.95rem", background: "#E8F5E9", padding: "0.8rem 1.5rem", borderRadius: 100 }}>
+                style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--estado-atendida)", fontWeight: 600, fontSize: "0.95rem", background: "var(--estado-atendida-bg)", padding: "0.8rem 1.5rem", borderRadius: 100 }}>
                 <CheckCircle2 size={18} /> Cita concluida
               </motion.div>
             )}
@@ -238,7 +238,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
               style={{ background: "white", borderRadius: 22, padding: "2rem", maxWidth: 380, width: "90%", textAlign: "center" }}
               onClick={e => e.stopPropagation()}>
-              <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#E8F5E9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}><CheckCircle2 size={22} color="#2E7D32" /></div>
+              <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--estado-atendida-bg)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}><CheckCircle2 size={22} color="var(--estado-atendida)" /></div>
               <h4 style={{ fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem" }}>Confirmar cita?</h4>
               <p style={{ fontSize: "0.85rem", color: "var(--text-soft)", marginBottom: "1.5rem" }}>Cita de <strong>{cita.nombres}</strong> para <strong>{cita.procedimiento}</strong></p>
               <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>

@@ -180,10 +180,10 @@ export default function CitasAgendadas() {
                 </div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 text-sm font-medium">
-                <div className="bg-[#FFF8E1] rounded-lg py-2 text-center border border-[#F1D58A] text-[#A07800]">Pendientes: {resumen.pendiente}</div>
-                <div className="bg-[#E3F2FD] rounded-lg py-2 text-center border border-[#90CAF9] text-[#1976D2]">Confirmadas: {resumen.confirmada}</div>
-                <div className="bg-[#E8F5E9] rounded-lg py-2 text-center border border-[#A5D6A7] text-[#2E7D32]">Atendidas: {resumen.atendida}</div>
-                <div className="bg-[#FCE4EC] rounded-lg py-2 text-center border border-[#F48FB1] text-[#C2185B]">Canceladas: {resumen.cancelada}</div>
+                <div className="rounded-lg py-2 text-center" style={{ background: "var(--estado-pendiente-bg)", border: "1px solid var(--estado-pendiente-borde)", color: "var(--estado-pendiente)" }}>Pendientes: {resumen.pendiente}</div>
+                <div className="rounded-lg py-2 text-center" style={{ background: "var(--estado-confirmada-bg)", border: "1px solid var(--estado-confirmada-borde)", color: "var(--estado-confirmada)" }}>Confirmadas: {resumen.confirmada}</div>
+                <div className="rounded-lg py-2 text-center" style={{ background: "var(--estado-atendida-bg)", border: "1px solid var(--estado-atendida-borde)", color: "var(--estado-atendida)" }}>Atendidas: {resumen.atendida}</div>
+                <div className="rounded-lg py-2 text-center" style={{ background: "var(--estado-cancelada-bg)", border: "1px solid var(--estado-cancelada-borde)", color: "var(--estado-cancelada)" }}>Canceladas: {resumen.cancelada}</div>
               </div>
               <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto pr-2">
                 {loadingCitas ? <p className="[color:var(--text-soft)] text-center mt-20 italic">Cargando...</p>
@@ -233,7 +233,7 @@ export default function CitasAgendadas() {
         <Overlay onClose={() => setReagendarModal(null)}>
           {reagendarOk ? (
             <div style={{ textAlign: "center", padding: "1rem 0" }}>
-              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#E8F5E9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--estado-atendida-bg)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
               </div>
               <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.4rem" }}>Solicitud enviada</h4>

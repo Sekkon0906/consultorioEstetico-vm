@@ -14,10 +14,20 @@ import { useCarrito } from "@/context/CarritoContext";
  * separado. Un portapapeles anuncia una lista, que es exactamente lo que
  * es.
  *
- * CUÁNDO APARECE
- * Solo cuando hay algo dentro. Una insignia permanente marcada con 0 es un
- * hueco que pide ser llenado; en una web de salud eso empuja a acumular
- * procedimientos, que no es lo que queremos empujar.
+ * ESTÁ SIEMPRE, TAMBIÉN VACÍA
+ * Antes solo aparecía al meter algo. Dos problemas, y el segundo era un
+ * fallo de verdad:
+ *
+ *   1. Aparecía de la nada al lado del avatar. Un icono que se materializa
+ *      donde no había nada se lee como un error de la página, no como una
+ *      respuesta a lo que acabas de pulsar.
+ *   2. **El círculo que vuela no se veía nunca en el primer añadido.** El
+ *      vuelo necesita saber a dónde ir, y su destino es esta insignia: si
+ *      no está montada, `volarDesde` no tiene ancla y se cancela. O sea que
+ *      justo la primera vez —la única que importa para entender el gesto—
+ *      no había animación.
+ *
+ * Vacía se muestra apagada y sin contador, así que no grita por llenarse.
  *
  * EL TEMBLOR
  * Se dispara con `pulso`, un contador que sube en cada añadido. La clave de
@@ -28,14 +38,17 @@ import { useCarrito } from "@/context/CarritoContext";
  */
 export default function InsigniaSeleccion({ compacta = false }: { compacta?: boolean }) {
   const { total, pulso, registrarAncla } = useCarrito();
-
-  if (total === 0) return null;
+  const vacia = total === 0;
 
   return (
     <Link
       href="/seleccion"
       ref={registrarAncla}
-      aria-label={`Mi selección, ${total} ${total === 1 ? "procedimiento" : "procedimientos"}`}
+      aria-label={
+        vacia
+          ? "Mi selección, vacía"
+          : `Mi selección, ${total} ${total === 1 ? "procedimiento" : "procedimientos"}`
+      }
       title="Mi selección"
       style={{
         position: "relative",
@@ -50,9 +63,14 @@ export default function InsigniaSeleccion({ compacta = false }: { compacta?: boo
         color: "var(--text)",
         textDecoration: "none",
         flexShrink: 0,
+        // Vacía baja de peso pero sigue ahí: se ve que existe y que no
+        // tiene nada, que es información en sí misma.
+        opacity: vacia ? 0.45 : 1,
+        transition: "opacity 260ms var(--mov-curva)",
       }}
     >
       <ClipboardList size={compacta ? 17 : 19} />
+      {!vacia && (
       <span
         key={pulso}
         aria-hidden="true"
@@ -76,6 +94,7 @@ export default function InsigniaSeleccion({ compacta = false }: { compacta?: boo
       >
         {total}
       </span>
+      )}
       <style>{`
         @keyframes insignia-tiembla {
           0%   { transform: scale(1) rotate(0deg); }

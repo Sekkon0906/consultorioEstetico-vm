@@ -160,6 +160,45 @@ h1, h2, h3 {
   color-scheme: dark;
 }
 
+/* === ESTADOS DE UNA CITA ===================================================
+
+   Cuatro estados —pendiente, confirmada, atendida, cancelada— que se pintan
+   en el panel de admin y en "Mis citas". Estaban escritos a mano en tres
+   archivos distintos con los mismos pasteles claros: #FFF8E1, #E3F2FD,
+   #E8F5E9, #FCE4EC. En modo claro se ven bien; en oscuro son parches
+   luminosos pegados sobre un fondo casi negro, y por eso el panel parecía
+   cambiar de tema según la sección.
+
+   Se define UNA vez el matiz de cada estado y el fondo se calcula
+   MEZCLÁNDOLO con la superficie del tema activo. Así el mismo token da un
+   pastel en claro y un tinte profundo en oscuro, sin dos juegos de valores
+   que se desincronizan.
+
+   El matiz sí cambia por tema: en oscuro sube de luminosidad, porque un
+   verde de contraste alto sobre blanco es ilegible sobre negro. */
+:root {
+  --estado-pendiente: #A07800;
+  --estado-confirmada: #1976D2;
+  --estado-atendida: #2E7D32;
+  --estado-cancelada: #C2185B;
+}
+:root[data-theme="dark"] {
+  --estado-pendiente: #E8C36A;
+  --estado-confirmada: #7FB6E8;
+  --estado-atendida: #8BD69C;
+  --estado-cancelada: #F09BB4;
+}
+:root {
+  --estado-pendiente-bg: color-mix(in srgb, var(--estado-pendiente) 14%, var(--surface));
+  --estado-pendiente-borde: color-mix(in srgb, var(--estado-pendiente) 38%, transparent);
+  --estado-confirmada-bg: color-mix(in srgb, var(--estado-confirmada) 14%, var(--surface));
+  --estado-confirmada-borde: color-mix(in srgb, var(--estado-confirmada) 38%, transparent);
+  --estado-atendida-bg: color-mix(in srgb, var(--estado-atendida) 14%, var(--surface));
+  --estado-atendida-borde: color-mix(in srgb, var(--estado-atendida) 38%, transparent);
+  --estado-cancelada-bg: color-mix(in srgb, var(--estado-cancelada) 14%, var(--surface));
+  --estado-cancelada-borde: color-mix(in srgb, var(--estado-cancelada) 38%, transparent);
+}
+
 /* === LOGO EN MODO OSCURO ===
    Invierte la imagen del logo (que es oscura) a blanco — funciona porque
    el logo JM es texto/líneas sobre fondo claro. */
