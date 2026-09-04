@@ -203,6 +203,20 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
       `LogoLimpioNegro.png` (para fondo claro). Ojo: pesan 1,29 MB y 843 KB —
       hay que **optimizarlos y generar los tamaños** (32/180/192/512) antes de
       usarlos como favicon.
+- [ ] **F18 · Error de hidratación en todo el sitio.** *(Encontrado 2026-09-04.)*
+      En cada carga completa, React lanza `Hydration failed because the server
+      rendered HTML didn't match the client`. Se descarta que sea del carrito:
+      desmontando `CarritoProvider` **y** `InsigniaSeleccion` el error sigue
+      igual, y se dispara también en `/testimonios`, que no toca ninguno de
+      los dos. **Es anterior.**
+      Sospechoso principal: el script que escribe `data-theme` en `<html>`
+      antes de hidratar, que es la causa clásica.
+      No rompe nada visible —React reconstruye el árbol— pero cuesta un
+      repintado entero en cada carga, así que es también un problema de
+      velocidad. Para diagnosticarlo hace falta el detalle del diff, que el
+      overlay de Next no llegó a mostrar: conviene mirarlo en un navegador de
+      verdad con las React DevTools.
+
 - [ ] **F17 · Videos.** Cambiar los `src` de los `<iframe>` cuando se muevan de
       la cuenta personal de YouTube.
 

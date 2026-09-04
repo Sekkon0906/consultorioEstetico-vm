@@ -13,6 +13,7 @@ import { IMG } from "@/lib/imagenes";
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
 import InsigniaSeleccion from "./InsigniaSeleccion";
+import { MUELLE_TACTO } from "@/lib/movimiento";
 
 /**
  * Avatar robusto: usa <img> nativo (no next/image) con
@@ -318,7 +319,7 @@ export default function Navbar() {
                     className={`nav-item ${esCta ? "navbar-cta-item" : ""}`}
                     style={{ cursor: "pointer" }}
                     whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.18 }}
+                    transition={MUELLE_TACTO}
                     onMouseEnter={() => handleItemEnter(index)}
                   >
                     <Link
@@ -404,7 +405,7 @@ export default function Navbar() {
               style={{ border: "1.5px solid var(--brand)", color: "var(--brand-deep)", backgroundColor: "var(--surface)", fontWeight: 600 }}
               whileHover={{ scale: 1.05, backgroundColor: "var(--brand)", color: "var(--brand-contrast)", boxShadow: "0 6px 18px rgba(176,137,104,0.35)" }}
               whileTap={{ scale: 0.96 }}
-              transition={{ type: "spring", stiffness: 320, damping: 20 }}
+              transition={MUELLE_TACTO}
             >
               {t("login")}
             </motion.button>
