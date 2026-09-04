@@ -43,7 +43,7 @@ function CardItem({
         width: "100%",
         background: "var(--surface)",
         borderRadius: 18,
-        border: "1px solid #EDE4D8",
+        border: "1px solid var(--border)",
         overflow: "hidden",
         cursor: "pointer",
         boxShadow: "0 3px 16px rgba(78,59,43,0.07)",
@@ -100,7 +100,7 @@ function CardItem({
           {charla.titulo}
         </h4>
         <p style={{
-          fontSize: "0.73rem", color: "#7C5B3E", lineHeight: 1.55, margin: 0,
+          fontSize: "0.73rem", color: "var(--text-soft)", lineHeight: 1.55, margin: 0,
           display: "-webkit-box", WebkitLineClamp: 2,
           WebkitBoxOrient: "vertical", overflow: "hidden",
         }}>
@@ -186,8 +186,8 @@ function TimelineNode({
           aria-label={charla.titulo}
           style={{
             width: 20, height: 20, borderRadius: "50%",
-            background: "linear-gradient(135deg, var(--brand), #8B6A4B)",
-            border: "3px solid #FBF8F4",
+            background: "linear-gradient(135deg, var(--brand), var(--brand-deep))",
+            border: "3px solid var(--surface)",
             boxShadow: "0 0 0 4px #DDD0C2",
             cursor: "pointer", outline: "none",
           }}
@@ -277,7 +277,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
         {/* Franja dorada */}
         <div style={{
           height: 5, borderRadius: "26px 26px 0 0",
-          background: "linear-gradient(90deg, var(--brand-deep), #C9AD8D, #8B6A4B)",
+          background: "linear-gradient(90deg, var(--brand-deep), var(--brand-soft), var(--brand-deep))",
         }} />
 
         <div style={{ padding: "1.6rem 2rem 2rem" }}>
@@ -305,7 +305,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
               {fechaFmt && (
                 <div style={{
                   display: "flex", alignItems: "center", gap: 5,
-                  marginTop: "0.4rem", fontSize: "0.73rem", color: "#8B7060",
+                  marginTop: "0.4rem", fontSize: "0.73rem", color: "var(--text-soft)",
                 }}>
                   <Calendar size={12} color="var(--brand)" /> {fechaFmt}
                 </div>
@@ -334,7 +334,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
           {/* Visor principal */}
           <div style={{
             position: "relative", borderRadius: 14, overflow: "hidden",
-            background: "#1a0f08", aspectRatio: "16/9",
+            background: "var(--bg)", aspectRatio: "16/9",
             marginBottom: "0.75rem",
           }}>
             <AnimatePresence mode="wait">
@@ -424,7 +424,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                 >
                   {typeof src === "string" && (src.includes("youtube") || src.endsWith(".mp4")) ? (
                     <div style={{
-                      width: "100%", height: "100%", background: "#2a1a0e",
+                      width: "100%", height: "100%", background: "var(--bg-elevated)",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontSize: "0.8rem", color: "white",
                     }}>▶</div>
@@ -507,7 +507,7 @@ export default function FormacionContinua() {
         minHeight: "40vh", display: "flex", alignItems: "center",
         justifyContent: "center", background: "var(--bg)",
       }}>
-        <p style={{ color: "#8B7060", fontStyle: "italic", fontSize: "0.88rem" }}>
+        <p style={{ color: "var(--text-soft)", fontStyle: "italic", fontSize: "0.88rem" }}>
           {t("emptyState")}
         </p>
       </section>
@@ -554,14 +554,14 @@ export default function FormacionContinua() {
             {t("title")}
           </h2>
           <p style={{
-            fontSize: "0.82rem", color: "#8B7060",
+            fontSize: "0.82rem", color: "var(--text-soft)",
             maxWidth: 430, margin: "0.7rem auto 0", lineHeight: 1.65,
           }}>
             {t("subtitle")}
           </p>
           <div style={{
             width: 42, height: 3,
-            background: "linear-gradient(90deg, var(--brand), #C9AD8D)",
+            background: "linear-gradient(90deg, var(--brand), var(--brand-soft))",
             borderRadius: 2, margin: "1rem auto 0",
           }} />
         </motion.div>
@@ -579,7 +579,7 @@ export default function FormacionContinua() {
               position: "absolute",
               left: "calc(50% - 1px)",
               top: 0, bottom: 0, width: 2,
-              background: "linear-gradient(180deg, var(--brand-soft) 0%, #EDE4D8 100%)",
+              background: "linear-gradient(180deg, var(--brand-soft) 0%, var(--border) 100%)",
               transformOrigin: "top",
               zIndex: 0,
             }}

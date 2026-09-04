@@ -335,7 +335,7 @@ export default function ProcedimientosPage() {
         }}
       >
         {loading && (
-          <p style={{ textAlign: "center", color: "#8B7060", padding: "3rem 0" }}>
+          <p style={{ textAlign: "center", color: "var(--text-soft)", padding: "3rem 0" }}>
             {t("loading")}
           </p>
         )}
@@ -344,9 +344,9 @@ export default function ProcedimientosPage() {
           <p
             style={{
               textAlign: "center",
-              color: "#7E1F1F",
+              color: "var(--danger)",
               padding: "1rem",
-              background: "#FCE4EC",
+              background: "color-mix(in srgb, var(--danger) 12%, var(--surface))",
               borderRadius: 12,
               maxWidth: 500,
               margin: "0 auto",
@@ -407,7 +407,7 @@ export default function ProcedimientosPage() {
               style={{
                 textAlign: "center",
                 fontSize: "0.78rem",
-                color: "#A0907B",
+                color: "var(--text-muted)",
                 fontStyle: "italic",
                 marginTop: "3rem",
                 maxWidth: 600,
@@ -501,7 +501,7 @@ export default function ProcedimientosPage() {
           top: 50%;
           left: 14px;
           transform: translateY(-50%);
-          color: #8B7060;
+          color: var(--text-soft);
           pointer-events: none;
         }
         .proc-search-input {
@@ -517,7 +517,7 @@ export default function ProcedimientosPage() {
           font-family: inherit;
         }
         .proc-search-input::placeholder {
-          color: #A0907B;
+          color: var(--text-muted);
         }
         .proc-search-input:focus {
           border-color: var(--brand);
@@ -533,7 +533,7 @@ export default function ProcedimientosPage() {
           border-radius: 50%;
           border: none;
           background: rgba(176, 137, 104, 0.12);
-          color: #5A4635;
+          color: var(--text);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -554,7 +554,7 @@ export default function ProcedimientosPage() {
           border-radius: 100px;
           border: 1px solid rgba(176, 137, 104, 0.25);
           background: transparent;
-          color: #5A4635;
+          color: var(--text);
           font-size: 0.86rem;
           font-weight: 600;
           cursor: pointer;
@@ -567,7 +567,7 @@ export default function ProcedimientosPage() {
         }
         .proc-chip.is-active {
           background: linear-gradient(135deg, var(--brand), var(--brand-soft));
-          color: #FFFDF9;
+          color: var(--brand-contrast);
           border-color: transparent;
           box-shadow: 0 6px 16px rgba(176, 137, 104, 0.28);
         }
@@ -596,7 +596,7 @@ export default function ProcedimientosPage() {
           border-radius: 100px;
           border: 1px solid rgba(176, 137, 104, 0.18);
           background: rgba(255, 253, 249, 0.55);
-          color: #5A4635;
+          color: var(--text);
           font-size: 0.78rem;
           font-weight: 500;
           cursor: pointer;
@@ -609,8 +609,8 @@ export default function ProcedimientosPage() {
           color: var(--text);
         }
         .proc-subchip.is-active {
-          background: #3A2A1A;
-          color: #FFFDF9;
+          background: var(--brand-deep);
+          color: var(--brand-contrast);
           border-color: transparent;
           font-weight: 600;
         }
@@ -648,7 +648,7 @@ export default function ProcedimientosPage() {
         }
         .proc-sort-trigger:hover {
           border-color: var(--brand);
-          background: #FFF9F1;
+          background: var(--surface-soft);
         }
         .proc-sort-trigger.is-open,
         .proc-sort-trigger:focus-visible {
@@ -656,7 +656,7 @@ export default function ProcedimientosPage() {
           box-shadow: 0 0 0 4px rgba(176, 137, 104, 0.14);
         }
         .proc-sort-caret {
-          color: #8B7060;
+          color: var(--text-soft);
           transition: transform var(--mov-normal) ease;
           flex-shrink: 0;
         }
@@ -700,11 +700,11 @@ export default function ProcedimientosPage() {
         }
         .proc-sort-option.is-selected {
           background: linear-gradient(135deg, var(--brand), var(--brand-soft));
-          color: #FFFDF9;
+          color: var(--brand-contrast);
           font-weight: 600;
         }
         .proc-sort-option.is-selected:hover {
-          background: linear-gradient(135deg, #A0724E, #B89A7C);
+          background: linear-gradient(135deg, var(--brand-deep), var(--brand));
         }
         @media (max-width: 640px) {
           .proc-subbar { padding-top: 0.6rem; }
@@ -787,8 +787,8 @@ export default function ProcedimientosPage() {
           align-items: center;
           gap: 4px;
           padding: 0.3rem 0.75rem;
-          background: linear-gradient(135deg, #F7D680, #FFE6B3);
-          color: #6B4419;
+          background: linear-gradient(135deg, var(--brand), var(--brand-soft));
+          color: var(--brand-contrast);
           font-size: 0.68rem;
           font-weight: 800;
           letter-spacing: 0.08em;
@@ -801,7 +801,7 @@ export default function ProcedimientosPage() {
           position: relative;
           aspect-ratio: 4 / 5;
           overflow: hidden;
-          background: linear-gradient(135deg, #F5EEE5, #E9DED2);
+          background: linear-gradient(135deg, var(--surface), var(--surface-soft));
         }
         .proc-card-img-wrap img {
           width: 100%;
@@ -820,7 +820,7 @@ export default function ProcedimientosPage() {
           padding: 0.3rem 0.7rem;
           background: rgba(255, 253, 249, 0.92);
           backdrop-filter: blur(8px);
-          color: #5A4635;
+          color: var(--text);
           font-size: 0.7rem;
           font-weight: 700;
           letter-spacing: 0.06em;
@@ -917,9 +917,18 @@ export default function ProcedimientosPage() {
              promoción. */
           color: color-mix(in srgb, #E08A4A 70%, var(--text));
         }
-        /* Badge variante promoción (rojizo / cálido) */
+        /* Badge variante promoción (rojizo / cálido).
+           Se queda con su naranja escrito a mano A PROPÓSITO: es el único
+           color del sitio que no sale de la marca, y ahí está la gracia —una
+           promoción tiene que romper con el resto para que se vea. El
+           naranja es igual de saturado sobre claro y sobre oscuro, así que
+           el texto claro encima funciona en los dos temas. */
         .proc-card-promo-badge.proc-card-promo-discount {
           background: linear-gradient(135deg, #E08A4A, #F4A671);
+          /* Claro FIJO, no --brand-contrast: el fondo de este distintivo es
+             el mismo naranja en los dos temas, asi que su texto tambien
+             tiene que serlo. Con --brand-contrast se volvia oscuro en modo
+             oscuro y perdia el contraste que el naranja le daba. */
           color: #FFFDF9;
           letter-spacing: 0.08em;
           box-shadow: 0 4px 12px rgba(224, 138, 74, 0.4);
@@ -1132,7 +1141,7 @@ function FeaturedCarousel({
                   fontWeight: 700,
                   letterSpacing: "0.16em",
                   textTransform: "uppercase",
-                  color: "#8B5A12",
+                  color: "var(--estado-pendiente)",
                   background: "linear-gradient(135deg, rgba(255, 215, 138, 0.35), rgba(255, 230, 179, 0.25))",
                   border: "1px solid rgba(255, 200, 100, 0.55)",
                   padding: "0.4rem 0.9rem",
@@ -1282,7 +1291,7 @@ function FeaturedCarousel({
           background: rgba(255, 253, 249, 0.92);
           backdrop-filter: blur(8px);
           border: 1px solid rgba(176, 137, 104, 0.3);
-          color: #5A4635;
+          color: var(--text);
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -1324,7 +1333,7 @@ function FeaturedCarousel({
         }
         .featured-dot.is-active {
           width: 26px;
-          background: linear-gradient(90deg, var(--brand), #C9AD8D);
+          background: linear-gradient(90deg, var(--brand), var(--brand-soft));
         }
         @media (max-width: 767px) {
           .featured-grid {

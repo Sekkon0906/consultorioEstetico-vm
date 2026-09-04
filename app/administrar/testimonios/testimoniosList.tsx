@@ -99,13 +99,13 @@ export default function TestimoniosList() {
       <h2 style={{ fontWeight: 700, color: "var(--text)", marginBottom: "1rem" }}>Testimonios y Comentarios</h2>
 
       <div style={{ display: "flex", gap: "0.7rem", marginBottom: "1.5rem" }}>
-        <button onClick={function() { setTab("testimonios"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", background: tab === "testimonios" ? "linear-gradient(135deg, var(--brand-deep), #B08968)" : "var(--surface-soft)", color: tab === "testimonios" ? "white" : "var(--text)", boxShadow: tab === "testimonios" ? "0 4px 14px rgba(176,137,104,0.25)" : "none", transition: "all 0.2s" }}>Testimonios</button>
-        <button onClick={function() { setTab("comentarios"); }} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "0.7rem 1.5rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", background: tab === "comentarios" ? "linear-gradient(135deg, var(--brand-deep), #B08968)" : "var(--surface-soft)", color: tab === "comentarios" ? "white" : "var(--text)", boxShadow: tab === "comentarios" ? "0 4px 14px rgba(176,137,104,0.25)" : "none", transition: "all 0.2s" }}>
-          Comentarios {pendientes > 0 && <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 22, height: 22, padding: "0 7px", borderRadius: 100, background: tab === "comentarios" ? "rgba(255,255,255,0.28)" : "#C62828", color: "white", fontSize: "0.78rem", fontWeight: 700 }}>{pendientes}</span>}
+        <button onClick={function() { setTab("testimonios"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", background: tab === "testimonios" ? "linear-gradient(135deg, var(--brand-deep), var(--brand))" : "var(--surface-soft)", color: tab === "testimonios" ? "white" : "var(--text)", boxShadow: tab === "testimonios" ? "0 4px 14px rgba(176,137,104,0.25)" : "none", transition: "all 0.2s" }}>Testimonios</button>
+        <button onClick={function() { setTab("comentarios"); }} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "0.7rem 1.5rem", borderRadius: 100, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", background: tab === "comentarios" ? "linear-gradient(135deg, var(--brand-deep), var(--brand))" : "var(--surface-soft)", color: tab === "comentarios" ? "white" : "var(--text)", boxShadow: tab === "comentarios" ? "0 4px 14px rgba(176,137,104,0.25)" : "none", transition: "all 0.2s" }}>
+          Comentarios {pendientes > 0 && <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 22, height: 22, padding: "0 7px", borderRadius: 100, background: tab === "comentarios" ? "rgba(255,255,255,0.28)" : "var(--danger)", color: "white", fontSize: "0.78rem", fontWeight: 700 }}>{pendientes}</span>}
         </button>
       </div>
 
-      {toast && <motion.div initial={false} animate={{ opacity: 1 }} style={{ background: "#E8F5E9", color: "#145A32", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", textAlign: "center" }}>{toast}</motion.div>}
+      {toast && <motion.div initial={false} animate={{ opacity: 1 }} style={{ background: "var(--estado-atendida-bg)", color: "var(--estado-atendida)", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", textAlign: "center" }}>{toast}</motion.div>}
       {err && <div style={{ background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", color: "var(--danger)", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", display: "flex", justifyContent: "space-between" }}>{err}<button onClick={function() { setErr(null); }} style={{ background: "none", border: "none", cursor: "pointer" }}><X size={13} /></button></div>}
 
       {/* ===== COMENTARIOS TAB ===== */}
@@ -117,25 +117,25 @@ export default function TestimoniosList() {
             <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
               {comentarios.map(function(c) {
                 return (
-                  <div key={c.id} className="admin-card" style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid " + (c.aprobado ? "#A0D8A8" : "#F0E0A0"), padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}>
+                  <div key={c.id} className="admin-card" style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid " + (c.aprobado ? "var(--estado-atendida)" : "#F0E0A0"), padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem" }}>
                     <div style={{ width: 60, height: 60, borderRadius: "50%", background: "var(--border)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "var(--text)", flexShrink: 0, fontSize: "1.3rem" }}>{(c.nombre || "?").charAt(0).toUpperCase()}</div>
                     <div className="admin-card-body" style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                         <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "1.05rem" }}>{c.nombre}</span>
                         <span style={{ background: "var(--surface-soft)", color: "var(--brand)", padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>{c.procedimiento}</span>
-                        <span style={{ background: c.aprobado ? "rgba(150, 220, 170, 0.2)" : "rgba(242, 221, 184, 0.2)", color: c.aprobado ? "#5DBE7B" : "var(--brand)", border: "1px solid " + (c.aprobado ? "#5DBE7B" : "var(--brand)"), padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.74rem", fontWeight: 700 }}>{c.aprobado ? "Visible" : "Pendiente"}</span>
+                        <span style={{ background: c.aprobado ? "rgba(150, 220, 170, 0.2)" : "rgba(242, 221, 184, 0.2)", color: c.aprobado ? "var(--estado-atendida)" : "var(--brand)", border: "1px solid " + (c.aprobado ? "var(--estado-atendida)" : "var(--brand)"), padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.74rem", fontWeight: 700 }}>{c.aprobado ? "Visible" : "Pendiente"}</span>
                       </div>
                       <p style={{ fontSize: "0.92rem", color: "var(--text-soft)", margin: "0.35rem 0 0", fontStyle: "italic" }}>&quot;{c.texto}&quot;</p>
                       <div style={{ display: "flex", gap: 2, marginTop: 4 }}>
-                        {[1,2,3,4,5].map(function(i) { return <span key={i} style={{ color: i <= c.puntuacion ? "#C0A080" : "#ddd", fontSize: "0.95rem" }}>★</span>; })}
+                        {[1,2,3,4,5].map(function(i) { return <span key={i} style={{ color: i <= c.puntuacion ? "var(--brand)" : "#ddd", fontSize: "0.95rem" }}>★</span>; })}
                       </div>
                     </div>
                     <div className="admin-card-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                      <button onClick={function() { toggleAprobado(c.id, c.aprobado); }} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0.5rem 1rem", borderRadius: 100, background: c.aprobado ? "rgba(232, 201, 160, 0.18)" : "rgba(150, 220, 170, 0.22)", color: c.aprobado ? "var(--brand)" : "#5DBE7B", border: "1px solid " + (c.aprobado ? "var(--brand)" : "#5DBE7B"), fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>
+                      <button onClick={function() { toggleAprobado(c.id, c.aprobado); }} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0.5rem 1rem", borderRadius: 100, background: c.aprobado ? "rgba(232, 201, 160, 0.18)" : "rgba(150, 220, 170, 0.22)", color: c.aprobado ? "var(--brand)" : "var(--estado-atendida)", border: "1px solid " + (c.aprobado ? "var(--brand)" : "var(--estado-atendida)"), fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>
                         {c.aprobado ? <EyeOff size={14} /> : <Eye size={14} />}
                         {c.aprobado ? "Ocultar" : "Aprobar"}
                       </button>
-                      <button onClick={function() { deleteCom(c.id); }} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0.5rem 1rem", borderRadius: 100, background: "rgba(244, 168, 168, 0.18)", color: "#E07878", border: "1px solid #E07878", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>
+                      <button onClick={function() { deleteCom(c.id); }} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0.5rem 1rem", borderRadius: 100, background: "rgba(244, 168, 168, 0.18)", color: "var(--danger)", border: "1px solid color-mix(in srgb, var(--danger) 45%, transparent)", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>
                         <Trash2 size={14} /> Eliminar
                       </button>
                     </div>
@@ -151,7 +151,7 @@ export default function TestimoniosList() {
       {tab === "testimonios" && (
         <div>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1rem" }}>
-            {modo === "lista" && <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 7, padding: "0.7rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "var(--brand-contrast)", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(176,137,104,0.28)" }}><Plus size={17} /> Nuevo</motion.button>}
+            {modo === "lista" && <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} onClick={function() { reset(); setModo("form"); }} style={{ display: "flex", alignItems: "center", gap: 7, padding: "0.7rem 1.5rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand-deep), var(--brand))", color: "var(--brand-contrast)", border: "none", fontWeight: 600, fontSize: "0.95rem", cursor: "pointer", boxShadow: "0 4px 14px rgba(176,137,104,0.28)" }}><Plus size={17} /> Nuevo</motion.button>}
           </div>
 
           <AnimatePresence>
@@ -169,12 +169,12 @@ export default function TestimoniosList() {
                 </div>
                 <div style={{ background: "var(--surface-soft)", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}><Lbl>Foto del paciente</Lbl>
                   <div style={{ display: "flex", gap: "0.8rem", alignItems: "center", flexWrap: "wrap", marginTop: 6 }}>
-                    {form.thumb && <div style={{ position: "relative" }}><Image src={form.thumb} alt="" width={64} height={64} quality={70} style={{ height: 64, width: 64, borderRadius: 10, objectFit: "cover", border: "2px solid var(--brand)" }} /><button onClick={function() { setForm({ ...form, thumb: "" }); }} style={{ position: "absolute", top: -5, right: -5, width: 18, height: 18, borderRadius: "50%", background: "#C62828", color: "var(--brand-contrast)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} /></button></div>}
+                    {form.thumb && <div style={{ position: "relative" }}><Image src={form.thumb} alt="" width={64} height={64} quality={70} style={{ height: 64, width: 64, borderRadius: 10, objectFit: "cover", border: "2px solid var(--brand)" }} /><button onClick={function() { setForm({ ...form, thumb: "" }); }} style={{ position: "absolute", top: -5, right: -5, width: 18, height: 18, borderRadius: "50%", background: "var(--danger)", color: "var(--brand-contrast)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} /></button></div>}
                     <label style={{ padding: "0.45rem 1rem", borderRadius: 12, border: "1px dashed var(--brand)", cursor: upl ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: upl ? 0.6 : 1 }}><Upload size={14} /> {upl ? "Subiendo..." : form.thumb ? "Cambiar" : "Subir foto"}<input type="file" accept="image/*" style={{ display: "none" }} onChange={handleThumb} disabled={upl} /></label>
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: "0.6rem" }}>
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={handleSave} disabled={saving} style={{ flex: 1, padding: "0.65rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "var(--brand-contrast)", border: "none", fontWeight: 600, cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1 }}>{saving ? "Guardando..." : "Guardar"}</motion.button>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={handleSave} disabled={saving} style={{ flex: 1, padding: "0.65rem", borderRadius: 100, background: "linear-gradient(135deg, var(--brand-deep), var(--brand))", color: "var(--brand-contrast)", border: "none", fontWeight: 600, cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1 }}>{saving ? "Guardando..." : "Guardar"}</motion.button>
                   <button onClick={reset} style={{ padding: "0.65rem 1.5rem", borderRadius: 100, background: "var(--surface-soft)", color: "var(--text)", border: "none", fontWeight: 600, cursor: "pointer" }}>Cancelar</button>
                 </div>
               </motion.div>
@@ -196,7 +196,7 @@ export default function TestimoniosList() {
                       <IBtn icon={<Star size={18} color="var(--brand)" fill={t.destacado ? "var(--brand)" : "none"} />} bg="var(--surface-soft)" title="Destacar" onClick={function() { toggle(t, "destacado"); }} />
                       <IBtn icon={<Edit3 size={18} color="var(--text)" />} bg="var(--surface-soft)" title="Editar" onClick={function() { startEdit(t); }} />
                       {delId === t.id ? (
-                        <><button onClick={function() { handleDel(t.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "#C62828", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>Sí</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--border)", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
+                        <><button onClick={function() { handleDel(t.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--danger)", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>Sí</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--border)", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>
                       ) : (
                         <IBtn icon={<Trash2 size={18} color="#E07878" />} bg="rgba(244, 168, 168, 0.12)" title="Eliminar" onClick={function() { setDelId(t.id); }} />
                       )}
