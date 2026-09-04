@@ -30,8 +30,8 @@ router.post(
       }
 
       const { rows } = await pool.query(
-        `INSERT INTO reagendas (cita_id, user_id, nueva_fecha, nueva_hora, motivo)
-         VALUES ($1,$2,$3,$4,$5) RETURNING *`,
+        `INSERT INTO reagendas (cita_id, user_id, nueva_fecha, nueva_hora, motivo, origen)
+         VALUES ($1,$2,$3,$4,$5,'paciente') RETURNING *`,
         [citaId, req.user.id, nueva_fecha, nueva_hora, motivo || ""]
       );
 
@@ -65,8 +65,8 @@ router.post(
       if (!cita.length) return res.status(404).json({ ok: false, error: "Cita no encontrada" });
 
       const { rows } = await pool.query(
-        `INSERT INTO reagendas (cita_id, user_id, nueva_fecha, nueva_hora, motivo)
-         VALUES ($1,$2,$3,$4,$5) RETURNING id`,
+        `INSERT INTO reagendas (cita_id, user_id, nueva_fecha, nueva_hora, motivo, origen)
+         VALUES ($1,$2,$3,$4,$5,'consultorio') RETURNING id`,
         [cid, cita[0].user_id, nf, nh, motivo || ""]
       );
 
@@ -95,9 +95,13 @@ router.get(
   async (req, res) => {
     try {
       const { rows } = await pool.query(
+        /* `origen = 'consultorio'`: al paciente solo se le enseña lo que
+           PROPUSO la doctora. Sin ese filtro se veria tambien su propia
+           peticion, presentada como una propuesta y con botones de aceptar
+           y rechazar: acabaria aceptandose a si mismo. */
         `SELECT id, cita_id, nueva_fecha, nueva_hora, motivo, estado, creada_en
            FROM reagendas
-          WHERE user_id = $1 AND estado = 'pendiente'
+          WHERE user_id = $1 AND estado = 'pendiente' AND origen = 'consultorio'
           ORDER BY creada_en DESC`,
         [req.user.id]
       );
@@ -171,7 +175,10 @@ router.get(
   async (_req, res) => {
     try {
       const { rows } = await pool.query(
-        `SELECT r.id, r.cita_id, r.nueva_fecha, r.nueva_hora, r.motivo, r.estado, r.creada_en,
+        /* Se devuelve `origen` para que el panel pueda separar lo que pide
+           un paciente —que espera respuesta— de lo que propuso la propia
+           doctora, que espera al paciente y no es tarea suya. */
+        `SELECT r.id, r.cita_id, r.nueva_fecha, r.nueva_hora, r.motivo, r.estado, r.creada_en, r.origen,
                 c.procedimiento, c.nombres, c.apellidos, c.fecha AS fecha_actual, c.hora AS hora_actual
          FROM reagendas r
          JOIN citas c ON c.id = r.cita_id
