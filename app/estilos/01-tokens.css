@@ -181,12 +181,19 @@ h1, h2, h3 {
   --estado-confirmada: #1976D2;
   --estado-atendida: #2E7D32;
   --estado-cancelada: #C2185B;
+  /* Los dos estados de la agenda: una hora que la doctora cierra a mano y
+     una que esta cerrada todos los dias. Estaban escritos a mano en la
+     pantalla de Horarios, en pasteles solo validos sobre fondo claro. */
+  --estado-bloqueada: #C4551F;
+  --estado-global:    #6B3FA0;
 }
 :root[data-theme="dark"] {
   --estado-pendiente: #E8C36A;
   --estado-confirmada: #7FB6E8;
   --estado-atendida: #8BD69C;
   --estado-cancelada: #F09BB4;
+  --estado-bloqueada: #F0A87E;
+  --estado-global:    #C0A0E8;
 }
 :root {
   --estado-pendiente-bg: color-mix(in srgb, var(--estado-pendiente) 14%, var(--surface));
@@ -197,6 +204,10 @@ h1, h2, h3 {
   --estado-atendida-borde: color-mix(in srgb, var(--estado-atendida) 38%, transparent);
   --estado-cancelada-bg: color-mix(in srgb, var(--estado-cancelada) 14%, var(--surface));
   --estado-cancelada-borde: color-mix(in srgb, var(--estado-cancelada) 38%, transparent);
+  --estado-bloqueada-bg: color-mix(in srgb, var(--estado-bloqueada) 14%, var(--surface));
+  --estado-bloqueada-borde: color-mix(in srgb, var(--estado-bloqueada) 38%, transparent);
+  --estado-global-bg: color-mix(in srgb, var(--estado-global) 14%, var(--surface));
+  --estado-global-borde: color-mix(in srgb, var(--estado-global) 38%, transparent);
 }
 
 /* === LOGO EN MODO OSCURO ===

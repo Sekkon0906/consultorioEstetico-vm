@@ -69,13 +69,56 @@ router.post("/", verifyToken, requireRole(["admin", "developer"]), async (req, r
 router.put("/:id", verifyToken, requireRole(["admin", "developer"]), async (req, res) => {
   try {
     const { id } = req.params;
-    const { titulo, descripcion, detalle, imagen, fecha, galeria } = req.body;
+    const { galeria } = req.body;
 
-    const { rows } = await pool.query(
-      `UPDATE charlas SET titulo=$1, descripcion=$2, detalle=$3, imagen=$4, fecha=$5, actualizado_en=NOW()
-       WHERE id=$6 RETURNING *`,
-      [titulo, descripcion, detalle, imagen || "", fecha || null, id]
-    );
+    /* ACTUALIZACIÓN PARCIAL.
+     *
+     * Antes esto reescribía las cinco columnas con lo que viniera en el
+     * cuerpo. Como las sacaba por desestructuración, lo que NO venía salía
+     * `undefined` y el driver lo manda como NULL: un PUT con solo
+     * `{ titulo }` cambiaba el título y de paso dejaba la descripción y el
+     * detalle en NULL y la imagen en cadena vacía.
+     *
+     * Aguantaba porque el único sitio que llamaba mandaba el objeto entero
+     * —el mismo patrón que ya se corrigió en `procedimientos`—. Se arregla
+     * antes de que la lista empiece a guardar campos sueltos.
+     *
+     * `imagen` y `fecha` conservan su normalización, pero SOLO cuando el
+     * campo viene de verdad: así se puede seguir vaciando una fecha a
+     * propósito mandando `null`, sin que no-mandarla la borre.
+     */
+    const EDITABLES = {
+      titulo:      (v) => v,
+      descripcion: (v) => v,
+      detalle:     (v) => v,
+      imagen:      (v) => v || "",
+      fecha:       (v) => v || null,
+    };
+
+    const sets = [];
+    const valores = [];
+    for (const [columna, normaliza] of Object.entries(EDITABLES)) {
+      if (!(columna in req.body)) continue;
+      valores.push(normaliza(req.body[columna]));
+      sets.push(`${columna}=$${valores.length}`);
+    }
+
+    // Reordenar la galería sin tocar los datos es una edición válida.
+    if (!sets.length && !Array.isArray(galeria)) {
+      return res.status(400).json({ ok: false, error: "Nada que actualizar" });
+    }
+
+    let rows = [];
+    if (sets.length) {
+      valores.push(id);
+      ({ rows } = await pool.query(
+        `UPDATE charlas SET ${sets.join(", ")}, actualizado_en=NOW()
+         WHERE id=$${valores.length} RETURNING *`,
+        valores
+      ));
+    } else {
+      ({ rows } = await pool.query("SELECT * FROM charlas WHERE id=$1", [id]));
+    }
 
     if (!rows.length) return res.status(404).json({ ok: false, error: "Charla no encontrada" });
 

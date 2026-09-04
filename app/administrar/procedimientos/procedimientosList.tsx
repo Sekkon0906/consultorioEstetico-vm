@@ -16,7 +16,8 @@ import {
 } from "@/services/procedimientosApi";
 import { subirImagenApi } from "@/services/uploadsApi";
 import type { Procedimiento } from "@/types/domain";
-import { Plus, Edit3, Trash2, X, ChevronUp, ChevronDown, Upload, Play, Star, ArrowLeft } from "lucide-react";
+import { MUELLE_TACTO } from "@/lib/movimiento";
+import { Plus, Edit3, Trash2, X, ChevronUp, ChevronDown, Upload, Play, Star, ArrowLeft, Loader2, Check } from "lucide-react";
 
 type Cat = "Facial" | "Corporal" | "Capilar";
 
@@ -40,10 +41,112 @@ const emptyForm = {
   video: "",
 };
 
+/**
+ * Editar en la lista, sin abrir el formulario.
+ *
+ * POR QUÉ SOLO EL PRECIO Y EL DESTACADO
+ * Son las dos cosas que se tocan solas: un precio sube, una promoción entra
+ * y sale del mes. El resto —nombre, descripción, fotos, galería— se escribe
+ * una vez al crear el procedimiento y casi no se vuelve a mirar, así que
+ * para eso el formulario completo sigue siendo lo correcto.
+ *
+ * Abrir un formulario de catorce campos para cambiar un número es la clase
+ * de fricción que hace que los precios se queden desactualizados.
+ */
+function PrecioEditable({
+  valor,
+  onGuardar,
+}: {
+  valor: string | number;
+  onGuardar: (nuevo: string) => Promise<void>;
+}) {
+  const [editando, setEditando] = useState(false);
+  const [texto, setTexto] = useState(String(valor));
+  const [estado, setEstado] = useState<"idle" | "guardando" | "ok" | "error">("idle");
+
+  // Si el precio cambia por fuera (recarga de la lista), el borrador local
+  // se queda obsoleto; se resincroniza mientras no se esté editando.
+  useEffect(() => { if (!editando) setTexto(String(valor)); }, [valor, editando]);
+
+  const confirmar = async () => {
+    setEditando(false);
+    const limpio = texto.replace(/[^\d]/g, "");
+    if (!limpio || limpio === String(valor)) { setTexto(String(valor)); return; }
+    setEstado("guardando");
+    try {
+      await onGuardar(limpio);
+      setEstado("ok");
+      setTimeout(() => setEstado("idle"), 1800);
+    } catch {
+      setEstado("error");
+      setTexto(String(valor));
+    }
+  };
+
+  if (editando) {
+    return (
+      <input
+        autoFocus
+        value={texto}
+        onChange={(e) => setTexto(e.target.value)}
+        onBlur={() => void confirmar()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") e.currentTarget.blur();
+          if (e.key === "Escape") { setTexto(String(valor)); setEditando(false); }
+        }}
+        aria-label="Precio en pesos"
+        style={{ width: 110, padding: "0.3rem 0.5rem", borderRadius: 8, border: "1px solid var(--brand)", background: "var(--bg-elevated)", color: "var(--text)", fontSize: "1rem", fontWeight: 700, textAlign: "right", outline: "none" }}
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setEditando(true)}
+      title="Pulsa para cambiar el precio"
+      className="admin-card-price"
+      style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "1px dashed transparent", borderRadius: 8, padding: "0.2rem 0.4rem", cursor: "text", fontSize: "1.1rem", color: estado === "error" ? "var(--danger)" : "var(--brand)", fontWeight: 700, whiteSpace: "nowrap", font: "inherit" }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "transparent"; }}
+    >
+      ${Number(valor).toLocaleString("es-CO")}
+      {estado === "guardando" && <Loader2 size={13} style={{ animation: "proc-gira 900ms linear infinite" }} />}
+      {estado === "ok" && <Check size={13} strokeWidth={3} color="var(--estado-atendida)" />}
+      {estado === "error" && <span style={{ fontSize: "0.68rem", fontWeight: 600 }}>no se guardó</span>}
+      <style>{`@keyframes proc-gira { to { transform: rotate(360deg); } }`}</style>
+    </button>
+  );
+}
+
 export default function ProcedimientosList() {
   const [procs, setProcs] = useState<Procedimiento[]>([]);
   const [modo, setModo] = useState<"lista" | "form">("lista");
   const [actual, setActual] = useState<Procedimiento | null>(null);
+
+  /**
+   * Guarda UN campo de UN procedimiento, sin abrir el formulario.
+   *
+   * Se puede mandar solo ese campo porque el PUT del servidor pasó a ser
+   * parcial: construye el SET con las columnas que de verdad llegan. Antes
+   * reescribía las catorce, así que un `{ precio }` suelto habría borrado
+   * la descripción, la imagen y la categoría de paso.
+   *
+   * La lista se actualiza en cuanto responde el servidor y con lo que
+   * DEVUELVE el servidor, no con lo que mandamos: si algo se normalizó por
+   * el camino, la pantalla enseña lo que quedó guardado de verdad.
+   */
+  const guardarCampoSuelto = useCallback(async (
+    id: string | number,
+    campos: Partial<Omit<Procedimiento, "id">>
+  ) => {
+    const actualizado = await updateProcedimientoApi(id, campos);
+    setProcs(function(prev) {
+      return prev.map(function(x) {
+        return String(x.id) === String(id) ? { ...x, ...actualizado } : x;
+      });
+    });
+  }, []);
   const [form, setForm] = useState(emptyForm);
   const [gal, setGal] = useState<GalItem[]>([]);
   const [saving, setSaving] = useState(false);
@@ -496,11 +599,28 @@ export default function ProcedimientosList() {
                           <div className="admin-card-body" style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                               <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }}>{p.nombre}</span>
-                              {p.destacado && <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(232, 201, 160, 0.18)", color: "var(--brand)", padding: "0.2rem 0.6rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 600 }}><Star size={11} fill="currentColor" /> Destacado</span>}
+                              {/* La estrella es un interruptor, no una etiqueta. Destacar
+                                  algo es una decision de temporada que se cambia sola; que
+                                  obligara a abrir el formulario entero era lo que hacia que
+                                  los destacados se quedaran meses sin tocar. */}
+                              <motion.button
+                                type="button"
+                                whileTap={{ scale: 0.9 }}
+                                transition={MUELLE_TACTO}
+                                onClick={function() { void guardarCampoSuelto(p.id, { destacado: !p.destacado }); }}
+                                aria-pressed={!!p.destacado}
+                                title={p.destacado ? "Quitar de destacados" : "Marcar como destacado"}
+                                style={{ display: "inline-flex", alignItems: "center", gap: 4, background: p.destacado ? "rgba(232, 201, 160, 0.18)" : "transparent", color: p.destacado ? "var(--brand)" : "var(--text-muted)", border: p.destacado ? "1px solid transparent" : "1px solid var(--border)", padding: "0.2rem 0.6rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 600, cursor: "pointer", font: "inherit" }}
+                              >
+                                <Star size={11} fill={p.destacado ? "currentColor" : "none"} /> Destacado
+                              </motion.button>
                             </div>
                             <p style={{ fontSize: "0.92rem", color: "var(--text-soft)", margin: "0.25rem 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.desc}</p>
                           </div>
-                          <span className="admin-card-price" style={{ fontSize: "1.1rem", color: "var(--brand)", fontWeight: 700, whiteSpace: "nowrap" }}>${Number(p.precio).toLocaleString("es-CO")}</span>
+                          <PrecioEditable
+                            valor={p.precio}
+                            onGuardar={async function(nuevo) { await guardarCampoSuelto(p.id, { precio: nuevo }); }}
+                          />
                           <div className="admin-card-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                             <motion.button aria-label="Editar procedimiento" title="Editar procedimiento" whileTap={{ scale: 0.95 }} onClick={function() { startEdit(p); }} style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Edit3 size={18} color="var(--text)" /></motion.button>
                             {delId === p.id ? (

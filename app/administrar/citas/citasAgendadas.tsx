@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PALETTE } from "../../agendar/palette";
 import { Cita, getCitasByDayAPI, getCitasAPI, confirmarCitaAPI, cancelarCitaAPI, solicitarReagendaAPI } from "./helpers";
+import SolicitudesReagenda from "@/components/SolicitudesReagenda";
 import CitasAgendadasCard from "./citasAgendadasCard";
 import CitasAgendadasModal from "./citasAgendadasModal";
 import { ChevronUp, ChevronDown, CalendarDays, Inbox, Phone, Mail, Calendar, Clock } from "lucide-react";
@@ -124,6 +125,12 @@ export default function CitasAgendadas() {
       <h2 className="text-2xl font-semibold text-center flex items-center justify-center gap-2" style={{ color: PALETTE.main }}>
         <CalendarDays size={22} /> Citas Agendadas
       </h2>
+
+      {/* Las solicitudes de cambio de fecha van ARRIBA DEL TODO y solo si
+          hay alguna. Cada una es una persona esperando respuesta: meterlas
+          en una seccion aparte, a la que se entra si uno se acuerda, es
+          garantizar que se queden sin contestar. */}
+      <SolicitudesReagenda onResuelta={() => setRecargar((r) => !r)} />
 
       <div className="flex flex-col md:flex-row gap-6 justify-center items-start">
         {/* CALENDARIO */}

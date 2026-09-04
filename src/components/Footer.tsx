@@ -93,6 +93,21 @@ export default function Footer() {
   const addressLines = t("addressLines").split("\n");
   const contactLines = t("contactLines").split("\n");
 
+  /* SOBRE LOS COLORES ESCRITOS A MANO DE ESTE ARCHIVO
+   *
+   * Los blancos y cremas de aqui NO son deuda pendiente de tokenizar: son
+   * correctos y cambiarlos romperia el modo claro.
+   *
+   * El pie es oscuro en LOS DOS TEMAS —`--footer-bg` vale #5A4A3A en claro
+   * y #0B0A0D en oscuro—, asi que es una superficie con identidad propia,
+   * no una que siga al tema. Sobre ella el texto siempre va claro. Pasarlo
+   * a `var(--text)` pondria texto oscuro sobre fondo oscuro en modo claro,
+   * que es exactamente el fallo que se esta persiguiendo por el resto del
+   * sitio, pero al reves.
+   *
+   * Lo que si sale de tokens es lo que depende del tema: el fondo, los
+   * bordes y los acentos de marca.
+   */
   return (
     <footer style={{ background: "var(--footer-bg)", color: "#FFFFFF", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 20% 0%, rgba(201,173,141,0.12) 0%, transparent 50%)", pointerEvents: "none" }} />
@@ -123,7 +138,10 @@ export default function Footer() {
                 <i className={`fas fa-chevron-${showProcs ? "up" : "down"}`} style={{ fontSize: "0.7rem", color: "var(--brand)" }} />
               </button>
               {showProcs && (
-                <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#4A3A2E", border: "1px solid rgba(176,137,104,0.3)", borderRadius: 12, marginTop: 4, maxHeight: 280, overflowY: "auto", zIndex: 20, boxShadow: "0 12px 30px rgba(0,0,0,0.3)" }}>
+                <div style={{ position: "absolute", top: "100%", left: 0, right: 0, /* Un escalon POR ENCIMA del footer en los dos temas. Iba en
+                     #4A3A2E fijo, que sobre el footer claro (#5A4A3A) apenas se
+                     distinguia y sobre el oscuro (#0B0A0D) era un salto enorme. */
+                    background: "color-mix(in srgb, var(--footer-bg) 82%, #FFFFFF)", border: "1px solid rgba(176,137,104,0.3)", borderRadius: 12, marginTop: 4, maxHeight: 280, overflowY: "auto", zIndex: 20, boxShadow: "0 12px 30px rgba(0,0,0,0.3)" }}>
                   {Object.entries(grouped).map(([cat, items]) => (
                     <div key={cat}>
                       <div style={{ padding: "0.5rem 1rem", fontSize: "0.75rem", fontWeight: 700, color: "var(--brand-soft)", background: "rgba(176,137,104,0.15)", textTransform: "uppercase", letterSpacing: "0.1em", position: "sticky", top: 0 }}>{cat}</div>

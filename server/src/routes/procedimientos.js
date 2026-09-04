@@ -199,23 +199,66 @@ router.post("/", verifyToken, requireRole(["admin", "developer"]), async (req, r
   }
 });
 
+/**
+ * Qué nombre acepta cada columna desde el cliente.
+ *
+ * Se usa para el UPDATE PARCIAL: solo se tocan las columnas cuyo campo
+ * viene de verdad en el cuerpo.
+ */
+const CAMPOS_EDITABLES = {
+  nombre:                         ["nombre"],
+  descripcion:                    ["desc", "descripcion"],
+  descripcion_completa:           ["descCompleta", "descripcion_completa"],
+  precio:                         ["precio"],
+  imagen:                         ["imagen"],
+  categoria:                      ["categoria"],
+  subcategoria:                   ["subcategoria"],
+  duracion_min:                   ["duracionMin", "duracion_min"],
+  destacado:                      ["destacado"],
+  en_promocion:                   ["enPromocion", "en_promocion"],
+  precio_promocional:             ["precioPromocional", "precio_promocional"],
+  promocion_hasta:                ["promocionHasta", "promocion_hasta"],
+  mostrar_galeria_home:           ["mostrarGaleriaHome", "mostrar_galeria_home"],
+  mostrar_galeria_procedimientos: ["mostrarGaleriaProcedimientos", "mostrar_galeria_procedimientos"],
+};
+
 // PUT /procedimientos/:id — admin
 router.put("/:id", verifyToken, requireRole(["admin", "developer"]), async (req, res) => {
   try {
-    const c = normalizeBody(req.body);
+    /* ACTUALIZACIÓN PARCIAL, y no es una comodidad: era una bomba.
+     *
+     * Antes esto reescribía LAS CATORCE columnas con lo que trajera
+     * `normalizeBody`, que rellena con valores por defecto lo que no venga.
+     * O sea que un PUT con solo `{ precio }` no cambiaba el precio: cambiaba
+     * el precio y además borraba la descripción, vaciaba la imagen, ponía la
+     * categoría en "Facial" y quitaba el destacado. Funcionaba únicamente
+     * porque el único sitio que llamaba mandaba siempre el objeto entero, y
+     * eso no es una garantía: es una casualidad que se rompe la primera vez
+     * que alguien edita un campo suelto.
+     *
+     * Ahora se construye el SET con las columnas que de verdad vienen en el
+     * cuerpo. Lo que no viene, no se toca.
+     */
+    const sets = [];
+    const valores = [];
+    for (const [columna, alias] of Object.entries(CAMPOS_EDITABLES)) {
+      const clave = alias.find((a) => a in req.body);
+      if (clave === undefined) continue;
+      valores.push(normalizeBody({ [clave]: req.body[clave] })[columna]);
+      sets.push(`${columna}=$${valores.length}`);
+    }
+
+    if (!sets.length) {
+      return res.status(400).json({ ok: false, error: "Nada que actualizar" });
+    }
+
+    valores.push(req.params.id);
     const { rows } = await pool.query(
       `UPDATE procedimientos SET
-         nombre=$1, descripcion=$2, descripcion_completa=$3, precio=$4, imagen=$5,
-         categoria=$6, subcategoria=$7, duracion_min=$8, destacado=$9,
-         en_promocion=$10, precio_promocional=$11, promocion_hasta=$12,
-         mostrar_galeria_home=$13, mostrar_galeria_procedimientos=$14,
-         actualizado_en=NOW()
-       WHERE id=$15
+         ${sets.join(", ")}, actualizado_en=NOW()
+       WHERE id=$${valores.length}
        RETURNING ${COLUMNAS}`,
-      [c.nombre, c.descripcion, c.descripcion_completa, c.precio, c.imagen, c.categoria,
-       c.subcategoria, c.duracion_min, c.destacado, c.en_promocion, c.precio_promocional,
-       c.promocion_hasta, c.mostrar_galeria_home, c.mostrar_galeria_procedimientos,
-       req.params.id]
+      valores
     );
     if (!rows.length) return res.status(404).json({ ok: false, error: "No encontrado" });
     return res.json({ ok: true, data: mapRow(rows[0]) });

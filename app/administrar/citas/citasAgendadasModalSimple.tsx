@@ -26,9 +26,9 @@ export default function CitasAgendadasModalSimple({
     value: Cita["estado"];
     color: string;
   }> = [
-    { label: "Pendiente", value: "pendiente", color: "#E6C676" },
-    { label: "Confirmada", value: "confirmada", color: "#6FB2E3" },
-    { label: "Atendida", value: "atendida", color: "#78B66D" },
+    { label: "Pendiente", value: "pendiente", color: "var(--estado-pendiente)" },
+    { label: "Confirmada", value: "confirmada", color: "var(--estado-confirmada)" },
+    { label: "Atendida", value: "atendida", color: "var(--estado-atendida)" },
   ];
 
   const idxEstado = estados.findIndex((e) => e.value === cita.estado);
@@ -64,7 +64,7 @@ export default function CitasAgendadasModalSimple({
   };
 
   const colorAccionMap: Record<Exclude<PromptTipo, null>, string> = {
-    confirmar: "#6FB2E3",
+    confirmar: "var(--estado-confirmada)",
     cancelar: "#E57373",
     reagendar: "var(--border)",
   };
@@ -116,7 +116,7 @@ export default function CitasAgendadasModalSimple({
               }%`,
             }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="h-[5px] bg-gradient-to-r from-[#C7A27A] to-[#B08968] rounded-full absolute top-1/2 -translate-y-1/2 left-0"
+            className="h-[5px] bg-gradient-to-r from-[#C7A27A] to-[var(--brand)] rounded-full absolute top-1/2 -translate-y-1/2 left-0"
           />
           <div className="flex justify-between relative z-10 px-1">
             {estados.map((e, i) => (
@@ -170,7 +170,7 @@ export default function CitasAgendadasModalSimple({
             <button
               type="button"
               onClick={() => setConfirmPrompt("confirmar")}
-              className="px-4 py-2 bg-[#8B6A4B] text-white rounded-md hover:bg-[#A58360] transition font-medium shadow-sm"
+              className="px-4 py-2 bg-[var(--brand-deep)] text-white rounded-md hover:bg-[var(--brand)] transition font-medium shadow-sm"
             >
               Confirmar
             </button>
@@ -184,21 +184,21 @@ export default function CitasAgendadasModalSimple({
             <button
               type="button"
               onClick={() => setConfirmPrompt("cancelar")}
-              className="px-4 py-2 bg-[#C27C6A] text-white rounded-md hover:bg-[#B36555] transition font-medium shadow-sm"
+              className="px-4 py-2 bg-[var(--danger)] text-white rounded-md hover:bg-[var(--danger)] transition font-medium shadow-sm"
             >
               Cancelar
             </button>
           </div>
         ) : (
           <div className="text-center mt-8 space-y-4">
-            <CheckCircle2 size={48} className="text-[#78B66D] mx-auto" />
+            <CheckCircle2 size={48} className="text-[var(--estado-atendida)] mx-auto" />
             <p className="[color:var(--text)] font-medium">
               Cita concluida, fue correctamente registrada en ingresos.
             </p>
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 bg-[#B08968] text-white rounded-md hover:bg-[#9C7A54] transition font-semibold shadow-sm"
+              className="px-6 py-2 bg-[var(--brand)] text-white rounded-md hover:bg-[var(--brand-deep)] transition font-semibold shadow-sm"
             >
               Cerrar
             </button>

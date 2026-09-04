@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Edit3, Trash2, Calendar } from "lucide-react";
 import { getCharlasApi, createCharlaApi, updateCharlaApi, deleteCharlaApi } from "@/services/charlasApi";
+import TextoEditable from "@/components/TextoEditable";
 import { subirImagenApi } from "@/services/uploadsApi";
 
 interface Charla {
@@ -28,6 +29,27 @@ const emptyForm = {
 
 export default function CharlasList() {
   const [charlas, setCharlas] = useState<Charla[]>([]);
+
+  /**
+   * Guarda UN campo desde la propia lista, sin abrir el formulario.
+   *
+   * Se puede mandar solo ese campo porque el PUT del servidor pasó a ser
+   * parcial. Antes reescribía las cinco columnas y lo que no venía salía
+   * `undefined`, que el driver manda como NULL: un `{ titulo }` suelto
+   * habría dejado la descripción y el detalle vacíos.
+   */
+  const guardarCampoSuelto = async (id: string, campos: Partial<Charla>) => {
+    // Se espera la confirmación del servidor y solo entonces se toca la
+    // lista, pero se aplican LOS CAMPOS ENVIADOS y no la fila que devuelve:
+    // `updateCharlaApi` responde con la fila cruda de la base —con nulos y
+    // nombres en snake_case— y volcarla aquí metería un objeto que no es
+    // `Charla`. Si el servidor normalizara el valor, la diferencia se vería
+    // al recargar; a cambio, el tipo se mantiene honesto.
+    await updateCharlaApi(id, campos);
+    setCharlas((prev) =>
+      prev.map((x) => (String(x.id) === String(id) ? { ...x, ...campos } : x))
+    );
+  };
   const [modo, setModo] = useState<"lista" | "crear" | "editar">("lista");
   const [actual, setActual] = useState<Charla | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -445,16 +467,33 @@ export default function CharlasList() {
               )}
               <div className="admin-card-body" style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                  <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }}>{c.titulo}</span>
+                  {/* El título y la descripción se corrigen aquí mismo: son
+                      lo que se retoca (una tilde, una palabra), y abrir un
+                      formulario de seis campos para eso es la fricción que
+                      hace que las erratas se queden puestas meses. Lo que se
+                      escribe una vez —detalle, imagen, galería— sigue en el
+                      formulario, que para eso es lo correcto. */}
+                  <TextoEditable
+                    valor={c.titulo}
+                    etiqueta="Título de la formación"
+                    onGuardar={(v) => guardarCampoSuelto(c.id, { titulo: v })}
+                    estilo={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }}
+                  />
                   {c.fecha && (
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--border)", color: "var(--brand)", padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>
                       <Calendar size={13} /> {c.fecha}
                     </span>
                   )}
                 </div>
-                <p style={{ fontSize: "0.92rem", color: "var(--text-soft)", margin: "0.25rem 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {c.descripcion}
-                </p>
+                <div style={{ margin: "0.25rem 0 0" }}>
+                  <TextoEditable
+                    valor={c.descripcion}
+                    etiqueta="Descripción corta"
+                    placeholder="Sin descripción"
+                    onGuardar={(v) => guardarCampoSuelto(c.id, { descripcion: v })}
+                    estilo={{ fontSize: "0.92rem", color: "var(--text-soft)" }}
+                  />
+                </div>
               </div>
               <div className="admin-card-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                 <motion.button aria-label="Editar charla" title="Editar charla" whileTap={{ scale: 0.95 }} onClick={() => startEditar(c)} style={{ width: 42, height: 42, borderRadius: 12, background: "var(--surface-soft)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>

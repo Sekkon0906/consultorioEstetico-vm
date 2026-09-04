@@ -3,9 +3,12 @@
 import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle, AlertCircle, XCircle, Loader } from "lucide-react";
+import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle, AlertCircle, XCircle, Loader, Download } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { getMisCitasApi } from "@/services/citasApi";
+import { MUELLE_TACTO } from "@/lib/movimiento";
+import HistorialProcedimientos from "@/components/HistorialProcedimientos";
+import PedirReagenda from "@/components/PedirReagenda";
+import { getMisCitasApi, getConsentimientoUrlApi } from "@/services/citasApi";
 import {
   getMisReagendasApi,
   aceptarReagendaApi,
@@ -51,6 +54,66 @@ const ETIQUETA_GRUPO: Record<string, string> = {
   pasadas: "Ya pasaron",
 };
 
+/**
+ * El botón para bajarse el consentimiento firmado.
+ *
+ * Antes esto era solo una etiqueta verde que decía "firmado". Informaba de
+ * algo y no dejaba hacer nada con ello: el paciente firma un documento
+ * clínico con su nombre, su documento y su firma, y despues no puede
+ * volver a verlo. Es suyo.
+ *
+ * El enlace se pide AL PULSAR y no se deja escrito en la página, porque el
+ * servidor devuelve una URL temporal que caduca en diez minutos. Dejarla en
+ * el HTML la volvería a convertir en una dirección permanente, que es justo
+ * lo que se quitó al sacar los consentimientos del bucket público.
+ *
+ * Se abre en pestaña nueva en vez de descargar a la fuerza: en un móvil,
+ * forzar la descarga de un PDF lo manda a una carpeta que mucha gente no
+ * sabe encontrar, mientras que abrirlo lo enseña ya.
+ */
+function BotonConsentimiento({ citaId, etiqueta }: { citaId: string; etiqueta: string }) {
+  const [estado, setEstado] = useState<"idle" | "pidiendo" | "error">("idle");
+
+  const abrir = async () => {
+    setEstado("pidiendo");
+    try {
+      const url = await getConsentimientoUrlApi(citaId);
+      window.open(url, "_blank", "noopener,noreferrer");
+      setEstado("idle");
+    } catch {
+      setEstado("error");
+    }
+  };
+
+  return (
+    <motion.button
+      type="button"
+      onClick={() => void abrir()}
+      disabled={estado === "pidiendo"}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+      transition={MUELLE_TACTO}
+      title="Abrir el consentimiento que firmaste"
+      style={{
+        display: "flex", alignItems: "center", gap: 7, fontSize: "0.82rem", fontWeight: 600,
+        color: estado === "error" ? "var(--danger)" : "var(--estado-atendida)",
+        background: estado === "error" ? "color-mix(in srgb, var(--danger) 12%, var(--surface))" : "var(--estado-atendida-bg)",
+        border: "none", padding: "0.5rem 1.2rem", borderRadius: 100,
+        cursor: estado === "pidiendo" ? "wait" : "pointer", fontFamily: "inherit",
+      }}
+    >
+      {estado === "error" ? (
+        <>No se pudo abrir — reintentar</>
+      ) : (
+        <>
+          <CheckCircle size={14} /> {etiqueta}
+          <Download size={13} style={{ opacity: estado === "pidiendo" ? 0.4 : 0.75 }} />
+        </>
+      )}
+    </motion.button>
+  );
+}
+
 function ProgressBar({ estado, t }: { estado: string; t: ReturnType<typeof useTranslations> }) {
   const currentStep =
     estado === "cancelada"
@@ -78,7 +141,7 @@ function ProgressBar({ estado, t }: { estado: string; t: ReturnType<typeof useTr
               <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
             </div>
             {!isLast && (
-              <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 4px", marginBottom: 18, background: currentStep > i + 1 ? "linear-gradient(90deg, var(--brand), #C9AD8D)" : "var(--border)", transition: "background 0.4s" }} />
+              <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 4px", marginBottom: 18, background: currentStep > i + 1 ? "linear-gradient(90deg, var(--brand), var(--brand-soft))" : "var(--border)", transition: "background 0.4s" }} />
             )}
           </div>
         );
@@ -218,8 +281,14 @@ export default function CitasAgendadas() {
       {/* Header */}
       <motion.div initial={{ y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", marginBottom: "2rem" }}>
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem" }}>{t("title")}</h2>
-        <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, var(--brand), #C9AD8D)", borderRadius: 2, margin: "0 auto 1.2rem" }} />
+        <div style={{ width: 40, height: 3, background: "linear-gradient(90deg, var(--brand), var(--brand-soft))", borderRadius: 2, margin: "0 auto 1.2rem" }} />
       </motion.div>
+
+      {/* El historial va ANTES de la lista de citas y no despues: la
+          pregunta "cuando fue la ultima vez" se hace nada mas entrar, y la
+          lista de citas —que puede ser larga— la dejaria enterrada. Se
+          oculta solo si no hay nada atendido todavia. */}
+      <HistorialProcedimientos locale={intlLocale} />
 
       {/* Layout: filtros a la izquierda (pila) · citas a la derecha */}
       <div className="citas-layout" style={{ display: "flex", gap: "1.8rem", alignItems: "flex-start" }}>
@@ -402,11 +471,24 @@ export default function CitasAgendadas() {
                       </div>
                     )}
 
+                    {/* Pedir otro dia. Solo en las que todavia pueden
+                        moverse: una cita atendida ya paso, y una cancelada no
+                        tiene fecha que cambiar. Y solo si no hay ya una
+                        solicitud en curso, para no encadenar peticiones que
+                        se contradicen entre si. */}
+                    {!isCancelada && cita.estado !== "atendida" && !reagendas[cita.id] && (
+                      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem", flexWrap: "wrap" }}>
+                        <PedirReagenda
+                          citaId={String(cita.id)}
+                          fechaActual={formatFecha(cita.fecha)}
+                          onPedida={() => void cargarReagendas()}
+                        />
+                      </div>
+                    )}
+
                     {cita.consentimientoFirmado && (
                       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
-                        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "0.82rem", fontWeight: 600, color: "var(--estado-atendida)", background: "var(--estado-atendida-bg)", padding: "0.5rem 1.2rem", borderRadius: 100 }}>
-                          <CheckCircle size={14} /> {t("consent.signed")}
-                        </span>
+                        <BotonConsentimiento citaId={String(cita.id)} etiqueta={t("consent.signed")} />
                       </div>
                     )}
                   </div>

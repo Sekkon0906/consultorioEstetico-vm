@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { MUELLE_TACTO } from "@/lib/movimiento";
 import { useAuth } from "@/context/AuthContext";
 import { iniciarSesion, entrarConGoogle, estadoAuth } from "@/lib/sesion";
 import { PALETTE } from "./palette2";
@@ -123,6 +124,7 @@ export default function LoginForm({ setErr }: Props) {
         style={{ backgroundColor: PALETTE.main, border: "none", color: "white", borderRadius: "50px" }}
         whileHover={{ scale: loading ? 1 : 1.03, y: loading ? 0 : -2 }}
         whileTap={{ scale: 0.97 }}
+        transition={MUELLE_TACTO}
       >
         {loading ? t("entrando") : t("entrar")}
       </motion.button>
@@ -146,6 +148,7 @@ export default function LoginForm({ setErr }: Props) {
           }}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
+          transition={MUELLE_TACTO}
         >
           {/* SVG inline — sin dependencia de Firebase CDN */}
           <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -166,6 +169,7 @@ export default function LoginForm({ setErr }: Props) {
           className="btn btn-link text-decoration-none fw-semibold p-0"
           style={{ color: PALETTE.main }}
           whileHover={{ scale: 1.08 }}
+          transition={MUELLE_TACTO}
         >
           Olvidé mi contraseña
         </motion.button>
@@ -175,6 +179,7 @@ export default function LoginForm({ setErr }: Props) {
           className="btn btn-link text-decoration-none fw-semibold p-0"
           style={{ color: PALETTE.main }}
           whileHover={{ scale: 1.08 }}
+          transition={MUELLE_TACTO}
         >
           Crear cuenta
         </motion.button>

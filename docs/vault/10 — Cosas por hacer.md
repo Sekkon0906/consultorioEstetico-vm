@@ -203,48 +203,31 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
       `LogoLimpioNegro.png` (para fondo claro). Ojo: pesan 1,29 MB y 843 KB —
       hay que **optimizarlos y generar los tamaños** (32/180/192/512) antes de
       usarlos como favicon.
-- [~] **F18 · Errores en cada carga completa.** *(Mitad arreglado 2026-09-04.)*
-      Eran **dos** errores encadenados en consola, en todas las páginas:
+- [x] **F18 · Errores en cada carga completa.** *(Cerrada 2026-09-04.)*
+      Eran **dos** errores encadenados en todas las páginas:
       `SyntaxError: Invalid or unexpected token` y, detrás,
       `Hydration failed because the server rendered HTML didn't match`.
 
-      **ARREGLADO — el `SyntaxError`.** Salía del script antiflash del tema.
-      Iba como `<script dangerouslySetInnerHTML>` dentro de `<head>`, así que
-      React lo trataba como un nodo suyo y lo volvía a tocar al hidratar.
-      Bisecado quitándolo: sin él, el `SyntaxError` desaparece; devolviéndolo,
-      vuelve. Ahora va con `next/script` y `strategy="beforeInteractive"`, que
-      Next inyecta **fuera** del árbol que React hidrata y sigue ejecutándose
-      antes de pintar, que es lo único que ese script necesita. Verificado:
-      `data-theme` se sigue aplicando y no hay destello.
+      **La causa era una sola: el script antiflash del tema.** Iba como
+      `<script dangerouslySetInnerHTML>` dentro de `<head>`, así que React lo
+      trataba como un nodo suyo y lo volvía a tocar al hidratar. Pasó a
+      `next/script` con `strategy="beforeInteractive"`, que Next inyecta
+      fuera del árbol que React hidrata.
 
-      **SIGUE ABIERTO — la hidratación.** Persiste con el script ya arreglado.
-      Lo que ya está descartado, con prueba:
-        · **No es del carrito.** Desmontando `CarritoProvider` **e**
-          `InsigniaSeleccion`, sigue igual.
-        · **No es de una página concreta.** Se dispara en `/testimonios`, que
-          no toca nada de lo nuevo.
-        · **No es el script del tema**, que era el sospechoso obvio.
-        · **No son los otros `dangerouslySetInnerHTML`**: solo quedan el
-          JSON-LD (que no se ejecuta como JS) y ninguno más en todo el
-          proyecto.
-        · **No es ningún componente del layout.** Bisecado desmontando, uno a
-          uno y luego todos a la vez: `Footer`, `CookieBanner`,
-          `QuickAccessFab` y `NavbarClient`. El error sigue igual con los
-          cuatro fuera.
-        · **No son los `<link>`/`<meta>` del `<head>` manual.**
+      > **Por qué se creyó que seguía abierto:** al arreglarlo se comprobó
+      > enseguida y el fallo de hidratación seguía saliendo, así que se dio
+      > por medio resuelto y se bisecó media hora más —desmontando `Footer`,
+      > `CookieBanner`, `QuickAccessFab`, `NavbarClient`, el `<head>` manual
+      > y la barra superior— sin encontrar nada. **La medición estaba
+      > contaminada por una compilación vieja**: Turbopack no había
+      > recompilado el layout todavía.
+      >
+      > La lección para la próxima: tras tocar el layout raíz, **parar el
+      > servidor, borrar `.next` y arrancar de cero** antes de creerse una
+      > medición. Recargar el navegador no basta.
 
-      **Lo que queda por probar**, por orden de sospecha: `NextIntlClientProvider`
-      (si el locale del servidor y el del cliente no coinciden, TODO el texto
-      difiere), `AuthProvider`, la barra superior y el `style` en línea del
-      `<body>`.
-
-      **Pista sin explotar:** el mensaje siempre se corta igual, en `…nse>`,
-      que casi seguro es el cierre de un `</Suspense>`. El diff completo lo
-      imprime React, pero el overlay de Next no lo suelta en el panel de vista
-      previa; en un navegador normal con las React DevTools sale entero.
-      Para el siguiente intento hace falta el **diff** que React imprime, y
-      el overlay de Next no llegó a soltarlo en el panel de vista previa. En
-      un navegador normal con las React DevTools sale a la primera.
+      Comprobado así: servidor parado, `.next` borrada, arranque limpio, y
+      recarga completa en `/`, `/testimonios` y `/consultorio`. Cero errores.
 
 - [ ] **F17 · Videos.** Cambiar los `src` de los `<iframe>` cuando se muevan de
       la cuenta personal de YouTube.

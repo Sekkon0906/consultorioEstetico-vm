@@ -1,6 +1,8 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
+import InicioPanel from "./InicioPanel";
+import { useAuth } from "@/context/AuthContext";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
@@ -25,6 +27,7 @@ const CopilotoChat        = dynamic(() => import("./copiloto/copilotoChat"), { l
 export default function AdministrarPageInner() {
   const params = useSearchParams();
   const section = params.get("section") || "inicio";
+  const { user } = useAuth();
   const [selected, setSelected] = useState(section);
 
   useEffect(() => {
@@ -41,17 +44,10 @@ export default function AdministrarPageInner() {
         transition={{ duration: 0.25 }}
       >
         {/* === SECCIÓN INICIAL === */}
-        {selected === "inicio" && (
-          <div className="text-center py-12">
-            <h1 className="text-3xl font-bold [color:var(--brand)] mb-4">
-              Bienvenido al Panel Administrativo
-            </h1>
-            <p className="[color:var(--text-soft)]">
-              Usa la barra lateral para administrar horarios, citas,
-              procedimientos, testimonios o ingresos.
-            </p>
-          </div>
-        )}
+        {/* El "Bienvenido al Panel Administrativo" de antes repetía lo que
+            ya dice el menú de al lado y no respondía la única pregunta con
+            la que uno entra aquí: si hay algo que hacer. */}
+        {selected === "inicio" && <InicioPanel nombre={user?.nombres} />}
 
         {/* === SECCIONES INTERNAS === */}
         {selected === "horarios" && <AdministrarHorarios />}
