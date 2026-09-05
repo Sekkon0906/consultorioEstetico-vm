@@ -41,7 +41,12 @@ function appUrl() {
 async function enviarCorreo({ para, asunto, html, texto }) {
   const cliente = getCliente();
   if (!cliente) {
-    console.warn(`[correo] RESEND_API_KEY sin configurar. No se envió "${asunto}" a ${para}.`);
+    /* Sin la direccion. Es un dato personal y el aviso no lo necesita: lo
+       accionable es que falta la clave, no a quien no le llego el correo.
+       Ademas este mensaje sale una vez por cada envio fallido, asi que con
+       la direccion dentro el registro se convierte en una lista de correos
+       de pacientes. */
+    console.warn(`[correo] RESEND_API_KEY sin configurar. No se envió "${asunto}".`);
     return { ok: false, motivo: "sin_configurar" };
   }
   try {
