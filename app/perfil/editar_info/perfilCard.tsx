@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 import DatosPersonalesForm from "./datosPersonalesForm";
 import DatosMedicosForm from "./datosMedicosForm";
+import PreferenciaCorreos from "@/components/PreferenciaCorreos";
 import { useEditarInfo } from "./useEditarInfo";
 
 export default function PerfilCard() {
@@ -73,6 +74,13 @@ export default function PerfilCard() {
             </div>
           </div>
         </div>
+
+        {/* Va FUERA del botón de guardar de abajo, a propósito: ese guarda
+            datos personales y médicos, y esto es una decisión de una sola
+            pulsación que se guarda sola. Si compartiera botón, quien
+            desactivara las promociones y se fuera sin guardar creería estar
+            dado de baja y seguiría recibiendo correos. */}
+        <PreferenciaCorreos />
 
         {/* Botón único: guarda datos personales + médicos */}
         <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
