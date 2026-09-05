@@ -384,12 +384,6 @@ export default function Navbar() {
             </motion.div>
           </button>
 
-          {/* La selección va ANTES del perfil y no dentro del menú de la
-              cuenta: se llena estando sin sesión, así que esconderla tras
-              "iniciar sesión" la volvería invisible justo para quien la
-              está usando. Se muestra sola cuando tiene algo dentro. */}
-          <InsigniaSeleccion />
-
           {/* PERFIL DESKTOP
               El botón de "Iniciar sesión" NAVEGA a /login; no despliega un
               panel. Decidido así a propósito: un desplegable que solo
@@ -514,6 +508,18 @@ export default function Navbar() {
             </>
           )}
 
+          {/* La selección va AL FINAL DEL TODO, después del perfil.
+              Estaba pegada al botón de sesión y se leía como parte de él:
+              aparecer y desaparecer al lado del avatar hacía que ese
+              rincón cambiara de forma sin motivo aparente. Al extremo
+              derecho es un sitio propio, y además queda justo donde se
+              abre el panel que despliega.
+
+              No navega: abre un panel lateral. Navegar a /seleccion te
+              sacaba de la rejilla justo cuando estabas comparando, que es
+              cuando más ganas tienes de comprobar qué llevas. */}
+          <InsigniaSeleccion />
+
           {/* Tema e idioma salieron de aquí: el navbar de escritorio competía
               por espacio con 6 enlaces + login. Ahora viven en el acceso
               rápido flotante (QuickAccessFab, esquina inferior derecha). */}
@@ -599,25 +605,25 @@ export default function Navbar() {
               transition={{ duration: 0.25, ease: "easeOut" }}
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-4 shadow-lg p-4 text-center"
-              style={{ maxWidth: 360, width: "100%", background: "linear-gradient(135deg, #fffdfb 0%, #f8f3ed 100%)" }}
+              style={{ maxWidth: 360, width: "100%", background: "linear-gradient(135deg, var(--bg-elevated) 0%, var(--surface) 100%)" }}
             >
               <h5 className="fw-bold mb-2" style={{ color: "var(--brand-deep)" }}>
                 {t("logoutConfirm")}
               </h5>
-              <p className="mb-4" style={{ color: "#8d7a6a", fontSize: "0.92rem" }}>
+              <p className="mb-4" style={{ color: "var(--text-soft)", fontSize: "0.92rem" }}>
                 {t("logoutMessage")}
               </p>
               <div className="d-flex gap-2">
                 <button
                   className="btn flex-fill"
-                  style={{ background: "#E9E0D1", color: "#4B3A2E", fontWeight: 600, border: "none", borderRadius: "10px" }}
+                  style={{ background: "var(--surface-soft)", color: "var(--text)", fontWeight: 600, border: "none", borderRadius: "10px" }}
                   onClick={() => setConfirmLogout(false)}
                 >
                   {tc("cancel")}
                 </button>
                 <button
                   className="btn flex-fill"
-                  style={{ background: "var(--danger)", color: "#fff", fontWeight: 600, border: "none", borderRadius: "10px" }}
+                  style={{ background: "var(--danger)", color: "var(--bg-elevated)", fontWeight: 600, border: "none", borderRadius: "10px" }}
                   onClick={handleLogout}
                 >
                   {t("logout")}

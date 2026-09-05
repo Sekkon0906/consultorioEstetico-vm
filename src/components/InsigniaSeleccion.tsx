@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
 import { ClipboardList } from "lucide-react";
+import PanelSeleccion from "./PanelSeleccion";
 import { useCarrito } from "@/context/CarritoContext";
 
 /**
@@ -38,12 +39,17 @@ import { useCarrito } from "@/context/CarritoContext";
  */
 export default function InsigniaSeleccion({ compacta = false }: { compacta?: boolean }) {
   const { total, pulso, registrarAncla } = useCarrito();
+  const [abierto, setAbierto] = useState(false);
   const vacia = total === 0;
 
   return (
-    <Link
-      href="/seleccion"
+    <>
+    <button
+      type="button"
+      onClick={() => setAbierto(true)}
       ref={registrarAncla}
+      aria-haspopup="dialog"
+      aria-expanded={abierto}
       aria-label={
         vacia
           ? "Mi selección, vacía"
@@ -51,6 +57,7 @@ export default function InsigniaSeleccion({ compacta = false }: { compacta?: boo
       }
       title="Mi selección"
       style={{
+        cursor: "pointer",
         position: "relative",
         display: "inline-flex",
         alignItems: "center",
@@ -61,7 +68,6 @@ export default function InsigniaSeleccion({ compacta = false }: { compacta?: boo
         background: "var(--surface)",
         border: "1px solid var(--border-strong)",
         color: "var(--text)",
-        textDecoration: "none",
         flexShrink: 0,
         // Vacía baja de peso pero sigue ahí: se ve que existe y que no
         // tiene nada, que es información en sí misma.
@@ -109,6 +115,13 @@ export default function InsigniaSeleccion({ compacta = false }: { compacta?: boo
           [style*="insignia-tiembla"] { animation: none !important; }
         }
       `}</style>
-    </Link>
+    </button>
+
+    {/* El panel vive fuera del boton, en un portal a <body>: si colgara de
+        aqui, el `overflow` del navbar lo recortaria y su `position: fixed`
+        dejaria de referirse a la ventana en cuanto un antepasado tuviera
+        un `transform` —y el navbar tiene animaciones que lo ponen. */}
+    <PanelSeleccion abierto={abierto} onCerrar={() => setAbierto(false)} />
+    </>
   );
 }
