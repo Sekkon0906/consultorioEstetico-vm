@@ -135,10 +135,10 @@ function ProgressBar({ estado, t }: { estado: string; t: ReturnType<typeof useTr
               <motion.div
                 initial={{ scale: 0.8 }}
                 animate={{ scale: active ? 1 : 0.8 }}
-                style={{ width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", fontWeight: 700, color: active ? "var(--brand-contrast)" : "#9B8575", background: active ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border)", transition: "all 0.4s", boxShadow: active ? "0 2px 8px rgba(176,137,104,0.3)" : "none" }}>
+                style={{ width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.7rem", fontWeight: 700, color: active ? "var(--brand-contrast)" : "var(--text-muted)", background: active ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border)", transition: "all 0.4s", boxShadow: active ? "0 2px 8px rgba(176,137,104,0.3)" : "none" }}>
                 {active ? <CheckCircle size={14} /> : i + 1}
               </motion.div>
-              <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
+              <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "var(--text-muted)", whiteSpace: "nowrap" }}>{s.label}</span>
             </div>
             {!isLast && (
               <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 4px", marginBottom: 18, background: currentStep > i + 1 ? "linear-gradient(90deg, var(--brand), var(--brand-soft))" : "var(--border)", transition: "background 0.4s" }} />
@@ -357,7 +357,7 @@ export default function CitasAgendadas() {
                   onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(78,59,43,0.06)"; }}
                 >
                   {/* Top accent bar */}
-                  <div style={{ height: 4, background: isCancelada ? "#E57373" : "linear-gradient(90deg, #B08968, #C9AD8D)" }} />
+                  <div style={{ height: 4, background: isCancelada ? "var(--danger)" : "linear-gradient(90deg, var(--brand), var(--brand-soft))" }} />
 
                   <div style={{ padding: "1.4rem 1.7rem" }}>
 
@@ -372,7 +372,7 @@ export default function CitasAgendadas() {
                           <span className="cita-estado-pill cancelada" style={{ background: est.bg, color: est.text, padding: "0.3rem 1rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 700, whiteSpace: "nowrap" }}>{t("estadoChip.cancelada")}</span>
                         </div>
                         {cita.motivoCancelacion && (
-                          <div style={{ marginTop: "0.7rem", padding: "0.55rem 0.9rem", background: "#FCE4EC", borderRadius: 10, fontSize: "0.8rem", color: "var(--estado-cancelada)", display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{ marginTop: "0.7rem", padding: "0.55rem 0.9rem", background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", borderRadius: 10, fontSize: "0.8rem", color: "var(--estado-cancelada)", display: "flex", alignItems: "center", gap: 8 }}>
                             <AlertCircle size={13} /> {t("labels.cancelReason")} {cita.motivoCancelacion}
                           </div>
                         )}
@@ -390,7 +390,7 @@ export default function CitasAgendadas() {
                               {cita.tipoCita === "valoracion" ? t("labels.valoracion") : t("labels.implementacion")}
                             </span>
                           </div>
-                          <div style={{ textAlign: "right", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 14, padding: "0.6rem 1rem", minWidth: 150 }}>
+                          <div style={{ textAlign: "right", background: "linear-gradient(135deg, var(--bg-elevated), var(--surface-soft))", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 14, padding: "0.6rem 1rem", minWidth: 150 }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6, fontSize: "0.9rem", fontWeight: 700, color: "var(--text)" }}>
                               <Clock size={14} color="var(--brand)" /> {cita.hora}
                             </div>
@@ -414,7 +414,7 @@ export default function CitasAgendadas() {
 
                         {/* Monto */}
                         {cita.monto != null && cita.monto > 0 && (
-                          <div style={{ padding: "0.55rem 1rem", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", borderRadius: 12, border: "1px solid rgba(176,137,104,0.1)", fontSize: "0.83rem", color: "var(--text)", marginBottom: "0.5rem" }}>
+                          <div style={{ padding: "0.55rem 1rem", background: "linear-gradient(135deg, var(--bg-elevated), var(--surface-soft))", borderRadius: 12, border: "1px solid rgba(176,137,104,0.1)", fontSize: "0.83rem", color: "var(--text)", marginBottom: "0.5rem" }}>
                             <strong>{t("labels.amount")}</strong> ${cita.monto.toLocaleString(currencyLocale)}
                             {cita.montoPagado != null && <span> · {t("labels.paid")} ${cita.montoPagado.toLocaleString(currencyLocale)}</span>}
                             {cita.montoRestante != null && cita.montoRestante > 0 && <span> · {t("labels.remaining")} ${cita.montoRestante.toLocaleString(currencyLocale)}</span>}
@@ -441,14 +441,14 @@ export default function CitasAgendadas() {
                           <button
                             disabled={reagProcesando === reagendas[cita.id].id}
                             onClick={() => aceptarReagenda(cita, reagendas[cita.id])}
-                            style={{ flex: 1, minWidth: 130, padding: "0.55rem 1rem", borderRadius: 100, border: "none", background: "linear-gradient(135deg, #2E7D32, #43A047)", color: "white", fontWeight: 600, fontSize: "0.83rem", cursor: "pointer", opacity: reagProcesando === reagendas[cita.id].id ? 0.6 : 1 }}
+                            style={{ flex: 1, minWidth: 130, padding: "0.55rem 1rem", borderRadius: 100, border: "none", background: "linear-gradient(135deg, var(--estado-atendida), var(--estado-atendida))", color: "white", fontWeight: 600, fontSize: "0.83rem", cursor: "pointer", opacity: reagProcesando === reagendas[cita.id].id ? 0.6 : 1 }}
                           >
                             {reagProcesando === reagendas[cita.id].id ? t("reagenda.applying") : t("reagenda.accept")}
                           </button>
                           <button
                             disabled={reagProcesando === reagendas[cita.id].id}
                             onClick={() => rechazarReagenda(cita, reagendas[cita.id])}
-                            style={{ flex: 1, minWidth: 130, padding: "0.55rem 1rem", borderRadius: 100, border: "1px solid #E0CDB5", background: "#FFF", color: "var(--estado-cancelada)", fontWeight: 600, fontSize: "0.83rem", cursor: "pointer", opacity: reagProcesando === reagendas[cita.id].id ? 0.6 : 1 }}
+                            style={{ flex: 1, minWidth: 130, padding: "0.55rem 1rem", borderRadius: 100, border: "1px solid var(--border-strong)", background: "#FFF", color: "var(--estado-cancelada)", fontWeight: 600, fontSize: "0.83rem", cursor: "pointer", opacity: reagProcesando === reagendas[cita.id].id ? 0.6 : 1 }}
                           >
                             {t("reagenda.reject")}
                           </button>

@@ -31,7 +31,7 @@ export default function Error({
         style={{
           maxWidth: 520,
           textAlign: "center",
-          background: "#FFFFFF",
+          background: "var(--bg-elevated)",
           border: "1px solid rgba(0,0,0,0.06)",
           borderRadius: 20,
           padding: "2.25rem 2rem",
@@ -45,12 +45,12 @@ export default function Error({
             fontSize: "1.6rem",
             margin: 0,
             marginBottom: "0.6rem",
-            color: "#3E2E22",
+            color: "var(--text)",
           }}
         >
           Algo no salió como esperábamos
         </h2>
-        <p style={{ color: "#6B5A4A", marginBottom: "1.5rem" }}>
+        <p style={{ color: "var(--text-soft)", marginBottom: "1.5rem" }}>
           Tuvimos un problema cargando esta sección. Puedes intentar de nuevo o
           volver al inicio.
         </p>
@@ -65,8 +65,8 @@ export default function Error({
           <button
             onClick={() => reset()}
             style={{
-              background: "#3E2E22",
-              color: "#FFFFFF",
+              background: "var(--brand-deep)",
+              color: "var(--brand-contrast)",
               border: "none",
               borderRadius: 999,
               padding: "0.65rem 1.4rem",
@@ -80,8 +80,8 @@ export default function Error({
             href="/"
             style={{
               background: "transparent",
-              color: "#3E2E22",
-              border: "1px solid #3E2E22",
+              color: "var(--text)",
+              border: "1px solid var(--border-strong)",
               borderRadius: 999,
               padding: "0.65rem 1.4rem",
               fontWeight: 600,
