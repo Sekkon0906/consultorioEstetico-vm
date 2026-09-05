@@ -272,12 +272,19 @@ export default function Galeria3D() {
         perspective: "1700px",
         width: "100%",
         aspectRatio: "16 / 9",
-        /* Cap a 95vh para que TODO el contenido (título + rueda + dots + CTA)
-           se vea en una sola pantalla sin scroll, incluso en monitores 21:9
-           donde 16:9 cabría holgado pero el usuario quiere ver el conjunto.
-           min-height evita que se aplaste en pantallas muy pequeñas. */
-        maxHeight: "95vh",
+        /* El cap era 95vh a secas, y ahi estaba el descuadre: la cabecera es
+           STICKY. En una ventana de 900px el escenario medía 810 y cabía…
+           salvo que los primeros 81 quedaban SIEMPRE debajo de la barra, que
+           es exactamente donde va el titulo. Al llegar scrolleando, "Conoce
+           los procedimientos" aparecia partido por la mitad.
+
+           Restando la altura real de la cabecera, lo que se ve entero es lo
+           que de verdad queda libre en pantalla, no la pantalla completa. */
+        maxHeight: "calc(95vh - var(--cabecera-h))",
         minHeight: "600px",
+        /* Y esto es lo que hace que, al llegar a la seccion, se detenga por
+           DEBAJO de la barra en vez de por debajo del borde de la ventana. */
+        scrollMarginTop: "var(--cabecera-h)",
         overflow: "hidden",
         backgroundImage: `url(${IMG.galeria3dBg})`,
         backgroundSize: "cover",
@@ -796,8 +803,15 @@ export default function Galeria3D() {
                justo debajo, leyéndose casi como parte de ella. Bajarlo lo
                deja centrado en el hueco que hay hasta el botón de abajo. */
             bottom: "7%",
+            /* Centrada sobre LA RUEDA, no sobre la seccion. Medido: el eje de
+               las tarjetas cae en 1130 y el de la seccion en 720, porque la
+               foto de la doctora ocupa la mitad izquierda. Una barra centrada
+               en la seccion queda a 410px de lo que controla y se lee como un
+               elemento suelto debajo de la foto. */
             right: "30%",
             transform: "translateX(50%)",
+            display: "flex",
+            justifyContent: "center",
             zIndex: 5,
           }}
         >
@@ -806,11 +820,18 @@ export default function Galeria3D() {
             style={{
               display: "flex",
               alignItems: "center",
-              /* Un pelo mas de aire entre puntos y en el borde. Con 4
-                 destacados la barra era corta y no se notaba; con 8 se veia
-                 apretada. */
+              /* Barra ANCHA Y BAJA en vez de pastilla corta. La pastilla
+                 crecia y encogia segun cuantos destacados hubiera, asi que
+                 el indicador cambiaba de forma al tocar el panel. Con ancho
+                 fijo, los puntos van centrados y lo unico que cambia es
+                 cuantos hay: la barra se ve igual con 4 que con 12.
+
+                 El ancho se limita al de la ventana menos margen para que en
+                 pantallas estrechas no se salga. */
+              width: "min(520px, calc(100vw - 3rem))",
+              justifyContent: "center",
               gap: 9,
-              padding: "0.4rem 0.7rem",
+              padding: "0.3rem 0.5rem",
               background: "var(--bg-elevated)",
               backdropFilter: "blur(10px)",
               border: "1px solid var(--border)",

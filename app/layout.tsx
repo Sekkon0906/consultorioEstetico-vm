@@ -62,19 +62,28 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Dra. Vanessa Medina" }],
   creator: "Dra. Vanessa Medina",
-  /* `app/icon.svg` pesa menos de 1 KB, escala a cualquier tamaño y cambia
-     de color en modo oscuro porque lleva la consulta de tema dentro.
+  /* `app/icon.png` es EL LOGO DE LA DOCTORA, no una versión dibujada.
+
+     Antes aquí había un SVG hecho a mano que imitaba el monograma. Pesaba
+     poquísimo y cambiaba de color en modo oscuro, pero era una imitación:
+     la marca del consultorio es la que es, y en la pestaña tiene que salir
+     esa. Se genera a partir de `Logo/LogoJM.jpg` recortando el transparente
+     sobrante y montándolo sobre la crema de la marca (`--surface`), que es
+     el mismo tratamiento que ya recibe en el pie de página. Sobre placa
+     clara porque el monograma es negro sobre transparente y, sin ella,
+     desaparece en la barra oscura del navegador.
+
+     Son 38 KB en vez de los 1,34 MB del original.
 
      Hay que declararlo A MANO. Next lo recoge solo por convención de
      archivo, pero SOLO mientras no exista este objeto `icons`: en cuanto se
-     declara uno —aquí se declaró para el icono de Apple, que no admite
-     SVG—, la convención deja de aplicarse y se emite únicamente lo que hay
-     escrito. El resultado era una página sin `<link rel="icon">`, el
-     navegador caía a `/favicon.ico`, no existía, y la pestaña salía con el
-     globo genérico. */
+     declara uno —aquí se declaró para el icono de Apple—, la convención
+     deja de aplicarse y se emite únicamente lo que hay escrito. El
+     resultado era una página sin `<link rel="icon">`, el navegador caía a
+     `/favicon.ico`, no existía, y la pestaña salía con el globo genérico. */
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    apple: IMG.logo,
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: "/icon.png",
   },
   alternates: {
     canonical: "/",

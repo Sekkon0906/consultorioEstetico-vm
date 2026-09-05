@@ -252,10 +252,16 @@
     content: "";
     position: absolute;
     inset: 0;
+    /* El velo arrancaba a tope desde el pixel 0 y le caia justo encima de la
+       cara, que es lo unico que la foto tiene que ensenar. Ahora los
+       primeros 28% van practicamente limpios y el oscurecido se concentra en
+       la mitad de abajo, que es donde va el texto y donde de verdad hace
+       falta para que se lea. */
     background: linear-gradient(
       180deg,
-      var(--foto-velo-suave) 0%,
-      var(--foto-velo-medio) 45%,
+      transparent 0%,
+      var(--foto-velo-suave) 28%,
+      var(--foto-velo-medio) 58%,
       var(--foto-velo-fuerte) 100%
     );
     pointer-events: none;
@@ -513,16 +519,45 @@
     gap: 6px;
     margin-top: 0.8rem;
   }
+  /* El punto medido era de 6x6 px. Una yema de dedo cubre unos 45px, asi
+     que acertar era cuestion de suerte.
+
+     El punto visible pasa a ser un pseudo-elemento y el <button> se queda de
+     area sensible. No se puede resolver con `padding` + `background-clip`,
+     que seria lo primero que uno prueba: el `border-radius` se calcula sobre
+     la caja de borde, asi que al recortar el fondo al contenido los puntos
+     saldrian cuadrados.
+
+     El ancho es 12px = 6px de punto + 6px de hueco, justo el `gap` de la
+     fila. Asi las areas se tocan sin solaparse: ni zonas muertas entre
+     puntos, ni un punto robandole el toque al vecino. En alto van los 44px
+     enteros, que ahi no hay vecinos con quien chocar; los margenes negativos
+     devuelven a la fila la altura que tenia para no mover nada debajo. */
   .g3d-stage .g3d-grid-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 44px;
+    margin: -19px -3px;
+    border: none;
+    padding: 0;
+    background: none;
+  }
+  .g3d-stage .g3d-grid-dot::before {
+    content: "";
+    /* flex-shrink: 0 es obligatorio, no adorno. El area sensible es mas
+       estrecha que el punto activo (12px frente a 18), y un hijo flex se
+       encoge por defecto hasta caber: sin esto, el indicador de la
+       diapositiva actual se comprimia y se veia igual que los demas. */
+    flex-shrink: 0;
     width: 6px;
     height: 6px;
     border-radius: 100px;
-    border: none;
-    padding: 0;
     background: rgba(232, 201, 160, 0.35);
     transition: width var(--mov-normal) cubic-bezier(0.16,1,0.3,1), background var(--mov-normal);
   }
-  .g3d-stage .g3d-grid-dot.is-active {
+  .g3d-stage .g3d-grid-dot.is-active::before {
     width: 18px;
     background: linear-gradient(90deg, #E8C9A0, #F2DDB8);
   }
@@ -3578,14 +3613,27 @@ footer a:hover i {
      entrando. Estrechando el marco a 4:5 sí hay recorte lateral, y con el
      encuadre corrido a la izquierda lo que queda es la doctora — que es lo
      que una miniatura de vídeo tiene que enseñar. Ver VideoAnim.tsx. */
-  /* 4:5 en móvil: la foto de portada sigue llevando la lista de
-     procedimientos quemada en la imagen, y en 16:9 se leía cortada. Cuando
-     la doctora la reemplace por una sin texto, esto puede volver a 16:9. */
+  /* CORRECCION: la nota de arriba daba por hecho que la portada era 16:9 y
+     por eso se estrechó el marco a 4:5, aceptando recorte lateral a cambio
+     de encuadrar a la doctora. El archivo medido es 1280x960, o sea 4:3.
+
+     Con la imagen en 4:3 dentro de un marco 4:5 y `cover`, se perdia el 40%
+     del ancho, y con el encuadre corrido al 8% lo que se iba era el lado
+     derecho: justo donde esta la lista de procedimientos quemada en la
+     foto. En el movil se leia como una tira vertical de letras cortadas.
+
+     Igualando el marco a la proporcion del archivo no se recorta nada: la
+     lista entra entera. De paso el bloque baja de 414px de alto a ~249, que
+     es lo que se pedia al decir que las cosas ocupan demasiado.
+
+     La letra quemada queda pequena a 332px de ancho. Eso no lo arregla el
+     CSS: lo arregla una portada sin texto encima, y entonces esto puede
+     volver a un recorte mas cerrado. */
   .va-marco {
-    padding-top: 125% !important;
+    padding-top: 75% !important;
   }
   .va-poster {
-    object-position: 8% center !important;
+    object-position: center !important;
   }
 
   /* ==========================
@@ -3603,9 +3651,20 @@ footer a:hover i {
      Hay que restarla en los DOS: la sección y su capa de contenido llevan
      cada una su propio `100dvh`, y bajar solo la de fuera no sirve porque
      la de dentro la vuelve a empujar. */
+  /* El 0.82 es lo unico que se anade aqui.
+
+     Restar solo la cabecera dejaba el hero ocupando EXACTAMENTE lo que mide
+     la pantalla: al abrir la web en un movil no habia ni un pixel de la
+     seccion siguiente asomando, y sin ese borde no hay forma de saber que
+     hay algo mas abajo. La foto ademas competia todo el rato con el texto
+     encima.
+
+     Con 0.82 asoma el arranque de lo que viene. Medido: el contenido del
+     hero necesita ~530px y esto deja 587 en una pantalla de 812, asi que
+     sigue cabiendo entero sin recortarse. */
   .hero-fs,
   .hero-fs-content {
-    min-height: calc(var(--alto-pantalla) - var(--cabecera-h));
+    min-height: calc((var(--alto-pantalla) - var(--cabecera-h)) * 0.82);
   }
 
   /* El segundo botón pasa a enlace de texto.
@@ -4022,10 +4081,14 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   outline-offset: 2px;
 }
 
-/* El aire que separa cada flecha del grupo de puntos. Sin esto, con el `gap`
-   uniforme de la barra, la flecha se lee como un punto más. */
-.g3d-flecha:first-child  { margin-right: 4px; }
-.g3d-flecha:last-child   { margin-left: 4px; }
+/* `auto` y no una medida fija: la barra es ancha y los puntos van centrados,
+   asi que un margen fijo dejaria las flechas pegadas al grupo, en mitad de la
+   barra, con dos huecos vacios a los lados. Con `auto` el sobrante se reparte
+   y cada flecha se va a su extremo, que es donde se busca una flecha.
+   De paso ancla los puntos en el centro exacto pase lo que pase con el
+   numero de destacados. */
+.g3d-flecha:first-child  { margin-right: auto; }
+.g3d-flecha:last-child   { margin-left: auto; }
 
 @media (prefers-reduced-motion: reduce) {
   .g3d-flecha:active { transform: none; }
@@ -4280,4 +4343,150 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
    esta es la regla que lo cumplía y que faltaba. */
 @media (max-width: 768px) {
   .quick-fab { display: none; }
+}
+
+/* ============================================================
+   MÓVIL — TAMAÑOS DE CONTACTO
+   ============================================================
+   Auditoría medida sobre la página real a 375x812, en las 12 rutas
+   públicas. Lo que sigue arregla lo que se midió, no lo que se intuyó. */
+@media (max-width: 768px) {
+
+  /* --- El zoom de iOS al enfocar un campo ---
+     Los campos median 14.5px. Safari en iPhone AMPLÍA la página al enfocar
+     cualquier campo por debajo de 16px, y NO la devuelve al salir: te quedas
+     con la web ampliada y desplazada, y hay que pellizcar para volver. Es el
+     fallo más visible de todos porque le pasa a cualquiera que intente
+     entrar a su cuenta desde el móvil.
+
+     16px es el umbral exacto de Safari, no una preferencia estética. Se pone
+     en px y no en rem a propósito: si alguien cambia el tamaño de raíz, el
+     umbral sigue siendo 16px de verdad.
+
+     Se excluyen casilla y radio: ahí el font-size no controla el tamaño de
+     la marca y el min-height los deformaría. */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+    /* Medidos en 35px. 44px es el mínimo con el que un dedo acierta sin
+       mirar (WCAG 2.5.5 y la guía de Apple coinciden en esa cifra). */
+    min-height: 44px;
+  }
+
+  /* --- Iconos sociales de la franja superior ---
+     Medían 12px de alto: la mitad de la yema de un dedo. No se puede
+     agrandar la franja sin comerse la pantalla, así que se agranda solo el
+     área sensible: padding para crecer, margen negativo igual y contrario
+     para que el hueco que ocupa en la fila no cambie. El icono se ve igual;
+     lo que cambia es dónde hay que acertar. */
+  .topbar-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 10px;
+    margin: -14px 0;
+  }
+}
+
+/* ============================================================
+   MÓVIL — LA COLA LARGA DE OBJETIVOS PEQUEÑOS
+   ============================================================
+   Segunda pasada de la auditoría a 375x812. La primera cogió los casos
+   graves (campos, calendario, puntos de carrusel); esto es lo que quedaba
+   medido por debajo de 44px. */
+@media (max-width: 768px) {
+
+  /* --- Enlaces del pie y del banner de cookies ---
+     Medidos entre 18 y 28px de alto. Son enlaces en columna, uno por línea,
+     así que la altura la daba solo la línea de texto. `inline-flex` deja que
+     el área crezca a 44 sin estirarse a todo el ancho de la columna: se toca
+     el enlace, no el hueco de al lado. */
+  footer a,
+  footer button,
+  .cookie-banner a,
+  .cookie-banner button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  /* --- CTA secundarios ---
+     36-37px medidos. Son los botones de "segunda opción" (Conoce los
+     procedimientos, Ver testimonios, Saber más sobre la doctora): los pulsa
+     quien no tiene claro todavía si quiere agendar, que es justo a quien no
+     conviene ponerle un blanco pequeño. */
+  .btn-ghost-app,
+  .hero-fs-btn,
+  .footer-cta-ghost,
+  .g3d-cta-pill,
+  .proc-chip {
+    min-height: 44px;
+  }
+
+  /* --- Texto por debajo de lo legible ---
+     La etiqueta "★ Destacado" medía 7.54px: es la mitad del cuerpo del
+     texto que tiene al lado. Que sea una etiqueta pequeña no la exime de
+     poder leerse; 10px sigue siendo discreta y ya se distingue.
+     El resto sube a 11.5, que es el suelo por debajo del cual el texto
+     corrido deja de leerse cómodamente en un teléfono. */
+  /* --- Menu lateral, CTA principal y "Conocer mas" ---
+     El menu lateral es la navegacion PRINCIPAL en movil y sus enlaces
+     median 21px. `.btn-accion` es el boton de accion de toda la web y salia
+     en 37. Y `.proc-card-mas` ("Conocer mas") en 20: es el enlace que abre
+     cada procedimiento, o sea el paso previo a agendar. */
+  .mobile-sidebar-menu a,
+  .mobile-sidebar-menu button {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .btn-accion { min-height: 44px; }
+
+  /* El "+" de anadir a la seleccion medía 34x34 con el tamaño puesto en
+     linea desde el componente. `min-width`/`min-height` se resuelven despues
+     de `width`, asi que ganan al estilo en linea sin necesidad de
+     `!important`. Aqui el circulo SI crece a 44: no es un area invisible,
+     es un boton que conviene que se vea mas grande en un telefono. */
+  .btn-anadir-seleccion {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* --- Pantalla de seleccion y controles del menu lateral ---
+     "Quitar X" median 36px y el nombre del procedimiento, que es un enlace,
+     25. Quitar algo de la seleccion por error es molesto, pero fallar el
+     toque y acabar en otra pagina lo es mas: los dos van juntos en la misma
+     fila y conviene que ninguno sea un blanco pequeno.
+
+     Los botones de tema (Claro/Oscuro) median 26px y viven en el menu
+     lateral, que en movil es el unico sitio donde se llega a ellos. */
+  /* `.btn.w-100` es el boton de enviar de /register —el que cierra el alta
+     de un paciente nuevo— y median 36px. Las flechas del carrusel del
+     consultorio, tambien 36. */
+  .btn.w-100,
+  .consultorio-showcase-arrow {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .seleccion-acciones a,
+  .seleccion-acciones button,
+  .mobile-sidebar-controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .proc-card-mas {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .g3d-grid-badge.destacado { font-size: 10px !important; }
+  .g3d-grid-dorso-desc,
+  .proc-card-cat-chip,
+  .proc-card-price-unit { font-size: 11.5px !important; }
 }
