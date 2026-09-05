@@ -3613,14 +3613,27 @@ footer a:hover i {
      entrando. Estrechando el marco a 4:5 sí hay recorte lateral, y con el
      encuadre corrido a la izquierda lo que queda es la doctora — que es lo
      que una miniatura de vídeo tiene que enseñar. Ver VideoAnim.tsx. */
-  /* 4:5 en móvil: la foto de portada sigue llevando la lista de
-     procedimientos quemada en la imagen, y en 16:9 se leía cortada. Cuando
-     la doctora la reemplace por una sin texto, esto puede volver a 16:9. */
+  /* CORRECCION: la nota de arriba daba por hecho que la portada era 16:9 y
+     por eso se estrechó el marco a 4:5, aceptando recorte lateral a cambio
+     de encuadrar a la doctora. El archivo medido es 1280x960, o sea 4:3.
+
+     Con la imagen en 4:3 dentro de un marco 4:5 y `cover`, se perdia el 40%
+     del ancho, y con el encuadre corrido al 8% lo que se iba era el lado
+     derecho: justo donde esta la lista de procedimientos quemada en la
+     foto. En el movil se leia como una tira vertical de letras cortadas.
+
+     Igualando el marco a la proporcion del archivo no se recorta nada: la
+     lista entra entera. De paso el bloque baja de 414px de alto a ~249, que
+     es lo que se pedia al decir que las cosas ocupan demasiado.
+
+     La letra quemada queda pequena a 332px de ancho. Eso no lo arregla el
+     CSS: lo arregla una portada sin texto encima, y entonces esto puede
+     volver a un recorte mas cerrado. */
   .va-marco {
-    padding-top: 125% !important;
+    padding-top: 75% !important;
   }
   .va-poster {
-    object-position: 8% center !important;
+    object-position: center !important;
   }
 
   /* ==========================
