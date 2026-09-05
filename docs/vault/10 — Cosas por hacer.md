@@ -272,6 +272,44 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 - [ ] **DEP1 · Rotar credenciales.** Contraseña de Neon + token de R2 →
       actualizar `DATABASE_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` en
       Railway. **Antes de que la doctora lo use en serio.**
+- [x] **DEP7 · El *preview* de Vercel fallaba.** *(Resuelto 2026-09-04.)*
+
+      ```
+      Error: ENOENT: no such file or directory,
+             open '/vercel/path0/.next/next-server.js.nft.json'
+      ```
+
+      Lo lanza el paso `onBuildComplete` de Vercel **después** de que la
+      compilación haya terminado bien — de ahí que el log dijera
+      `✓ Compiled successfully` justo antes.
+
+      **La causa era `output: "standalone"` en `next.config.ts`.** Empaqueta el
+      servidor de Next para auto-hospedaje —Docker, una VM— y coloca el
+      trazado de dependencias en otro sitio del que Vercel espera. El
+      comentario original decía "contenedores / Vercel", pero son cosas
+      incompatibles: **Vercel hace su propio empaquetado y no quiere que Next
+      haga otro**.
+
+      Además no hacía falta: el frontend solo va a Vercel, y se comprobó que
+      **nadie consume `.next/standalone`** —ni Dockerfile, ni compose, ni
+      nada—, así que se generaba en cada build para tirarlo.
+
+      > **Las dos hipótesis que se descartaron con el log**, y que parecían
+      > razonables: no era `engines`/Node —el log muestra `npm ci` con
+      > `found 0 vulnerabilities` y `Next.js 16.3.4`— ni el lockfile. Sin el
+      > log habría seguido tocando lo que no era. Los dos cambios se quedan
+      > porque son correctos por su cuenta.
+
+- [ ] **DEP6 · `server/railway.json` declara un builder que quizá no se usa.**
+      *(Encontrado 2026-09-04.)* El archivo dice `"builder": "NIXPACKS"` pero
+      el panel de Railway muestra **Railpack**. Son constructores distintos y
+      usan variables de entorno distintas: `NIXPACKS_INSTALL_CMD` frente a
+      `RAILPACK_INSTALL_COMMAND`. Importa porque de ahí depende que el
+      despliegue instale con `npm ci` y respete el lockfile.
+      No se tocó el archivo: cambiar de builder a ciegas puede romper un
+      despliegue que funciona. Hay que mirar en Railway cuál usó el último
+      despliegue y alinear el archivo con eso.
+
 - [ ] **DEP2 · Dominio propio.** Comprarlo → DNS a Vercel + Railway, actualizar
       `NEXT_PUBLIC_SITE_URL` / `APP_URL` / `CORS_ORIGIN` / `API_URL`, subdominio
       para R2, rehacer branding de OAuth. Desbloquea DEP3, C2, C3.

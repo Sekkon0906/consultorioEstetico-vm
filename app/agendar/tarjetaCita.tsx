@@ -71,7 +71,7 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
       <div style={{ background: "var(--bg-elevated)", backdropFilter: "blur(10px)", borderRadius: 24, border: "1px solid rgba(176,137,104,0.12)", boxShadow: "0 16px 48px rgba(78,59,43,0.1)", overflow: "hidden" }}>
 
         {/* Top accent */}
-        <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)" }} />
+        <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), var(--brand-soft))" }} />
 
         <div style={{ padding: "2rem 2rem 2.5rem" }}>
 
@@ -99,13 +99,13 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
                     <motion.div initial={{ scale: 0.8 }} animate={{ scale: active ? 1 : 0.85 }}
                       style={{ width: 30, height: 30, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
                         background: active ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border)",
-                        color: active ? "white" : "#9B8575", boxShadow: active ? "0 2px 8px rgba(176,137,104,0.3)" : "none",
+                        color: active ? "var(--brand-contrast)" : "var(--text-muted)", boxShadow: active ? "0 2px 8px rgba(176,137,104,0.3)" : "none",
                         transition: "all 0.4s" }}>
                       {s.icon}
                     </motion.div>
-                    <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "#9B8575", whiteSpace: "nowrap" }}>{s.label}</span>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 600, color: active ? "var(--text)" : "var(--text-muted)", whiteSpace: "nowrap" }}>{s.label}</span>
                   </div>
-                  {!isLast && <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 6px", marginBottom: 18, background: progreso > i + 1 ? "linear-gradient(90deg, var(--brand), #C9AD8D)" : "var(--border)", transition: "all 0.4s" }} />}
+                  {!isLast && <div style={{ flex: 1, height: 3, borderRadius: 2, margin: "0 6px", marginBottom: 18, background: progreso > i + 1 ? "linear-gradient(90deg, var(--brand), var(--brand-soft))" : "var(--border)", transition: "all 0.4s" }} />}
                 </div>
               );
             })}
@@ -129,7 +129,7 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
           `}</style>
 
           {/* Footer message */}
-          <div className="tarjeta-cita-footer-msg" style={{ marginTop: "1.5rem", padding: "1rem", background: "linear-gradient(135deg, #FFFBF7, #F0E5D8)", borderRadius: 14, border: "1px solid rgba(176,137,104,0.1)", textAlign: "center" }}>
+          <div className="tarjeta-cita-footer-msg" style={{ marginTop: "1.5rem", padding: "1rem", background: "linear-gradient(135deg, var(--bg-elevated), var(--surface-soft))", borderRadius: 14, border: "1px solid rgba(176,137,104,0.1)", textAlign: "center" }}>
             <p style={{ fontSize: "0.82rem", color: "var(--text-soft)", margin: 0 }}>
               <i className="fas fa-info-circle" style={{ marginRight: 6, color: "var(--brand)" }} />
               {t("footerInfo")}
@@ -137,7 +137,7 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
           </div>
 
           {/* Cita number */}
-          <p style={{ textAlign: "center", marginTop: "1rem", fontSize: "0.72rem", color: "#9B8575" }}>
+          <p style={{ textAlign: "center", marginTop: "1rem", fontSize: "0.72rem", color: "var(--text-muted)" }}>
             {t("appointmentNumber")}{String(cita.id).slice(0, 8)}
           </p>
         </div>
@@ -148,7 +148,7 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
 
 function InfoRow({ icon, label, value, fullWidth }: { icon: ReactNode; label: string; value: string; fullWidth?: boolean }) {
   return (
-    <div className="tarjeta-cita-row dark-aware-panel" style={{ display: "flex", alignItems: "flex-start", gap: "0.8rem", padding: "0.55rem 0.8rem", borderRadius: 12, background: "#FDFBF8", border: "1px solid rgba(176,137,104,0.06)", textAlign: "left", gridColumn: fullWidth ? "1 / -1" : undefined }}>
+    <div className="tarjeta-cita-row dark-aware-panel" style={{ display: "flex", alignItems: "flex-start", gap: "0.8rem", padding: "0.55rem 0.8rem", borderRadius: 12, background: "var(--bg-elevated)", border: "1px solid rgba(176,137,104,0.06)", textAlign: "left", gridColumn: fullWidth ? "1 / -1" : undefined }}>
       <div style={{ marginTop: 2, flexShrink: 0 }}>{icon}</div>
       <div style={{ textAlign: "left" }}>
         <span style={{ display: "block", fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
