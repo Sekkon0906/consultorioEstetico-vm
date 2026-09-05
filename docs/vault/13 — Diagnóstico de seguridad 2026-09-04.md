@@ -95,14 +95,37 @@ es barato y cierra el tema.
 
 ---
 
-### 🟡 R4 · Sin política de seguridad de contenido en el sitio
+### 🟡 R4 · CSP — **puesta en observación el 2026-09-04**
 
-Next pone `X-Frame-Options` y HSTS, pero **no hay CSP**. Con una CSP, un script
-inyectado —por una dependencia comprometida, por ejemplo— no podría enviar
-datos a un servidor ajeno. Sin ella, sí.
-
-No es urgente porque no hay contenido de terceros ejecutándose, pero es la
+Con una CSP, un script inyectado —por una dependencia comprometida, por
+ejemplo— no podría enviar datos a un servidor ajeno. Sin ella, sí. Es la
 diferencia entre "un fallo" y "un fallo que además se lleva los datos".
+
+Está en `next.config.ts` en modo **`Content-Security-Policy-Report-Only`**:
+avisa de lo que bloquearía, sin bloquear. Aplicarla a ciegas en un sitio con
+mapas incrustados y vídeos es la forma segura de romper media web un viernes.
+
+**Verificación hecha, y cómo:** listando los orígenes que cada página carga de
+verdad (`performance.getEntriesByType("resource")`) y comparándolos con la
+política. En `/`, `/consultorio`, `/testimonios` y `/procedimientos` los únicos
+externos son la API, `www.google.com` (el mapa, en `frame-src`) y el bucket de
+R2 (`img-src`). Todos permitidos.
+
+> **Ojo con el método.** Primero se intentó leer las violaciones de la consola
+> y salía "ninguna" — pero al inyectar una violación **deliberada** tampoco
+> aparecía: el lector de consola no captura los avisos de CSP en modo reporte.
+> El resultado no valía nada. Una sonda con `securitypolicyviolation` sí las
+> ve, y confirmó `disposition: "report"`. **Antes de creerse un "no hay
+> problemas", hay que comprobar que el detector detecta.**
+
+**Antes de pasarla a modo bloqueante:**
+
+1. `NEXT_PUBLIC_API_URL` **tiene que estar definida en Vercel al construir**:
+   la línea se resuelve en tiempo de compilación y, sin ella, queda
+   `connect-src 'self'` y el sitio no podría hablar con su propia API. Hay un
+   aviso en consola durante el build que lo recuerda.
+2. Pasearse por el sitio reproduciendo un vídeo, que es el único caso que la
+   verificación anterior no cubre —los vídeos cargan al pulsar, no al abrir.
 
 ---
 
