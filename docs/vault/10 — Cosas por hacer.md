@@ -272,21 +272,33 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 - [ ] **DEP1 · Rotar credenciales.** Contraseña de Neon + token de R2 →
       actualizar `DATABASE_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` en
       Railway. **Antes de que la doctora lo use en serio.**
-- [ ] **DEP7 · El despliegue de *preview* de Vercel falla.**
-      *(2026-09-04.)* Producción **sí** construye bien —comprobado: sirve la CSP
-      y el título nuevos—, así que `npm ci` y Next 16 funcionan en Vercel. Lo
-      que falla es el preview de una rama.
+- [x] **DEP7 · El *preview* de Vercel fallaba.** *(Resuelto 2026-09-04.)*
 
-      **Hipótesis principal, ya mitigada:** faltaba declarar `engines`. Next 16
-      exige Node ≥ 20.9 y un proyecto de hace meses puede seguir fijado a Node
-      18. Ya está declarado en los dos `package.json`.
+      ```
+      Error: ENOENT: no such file or directory,
+             open '/vercel/path0/.next/next-server.js.nft.json'
+      ```
 
-      **Segunda hipótesis:** las variables de entorno de Preview (**DEP4**). La
-      diferencia típica entre producción y preview es justo esa.
+      Lo lanza el paso `onBuildComplete` de Vercel **después** de que la
+      compilación haya terminado bien — de ahí que el log dijera
+      `✓ Compiled successfully` justo antes.
 
-      Para cerrarlo hace falta el log, que vive en la cuenta del usuario:
-      `npx vercel inspect <id-del-despliegue> --logs`, y mirar la primera línea
-      con `Error:`.
+      **La causa era `output: "standalone"` en `next.config.ts`.** Empaqueta el
+      servidor de Next para auto-hospedaje —Docker, una VM— y coloca el
+      trazado de dependencias en otro sitio del que Vercel espera. El
+      comentario original decía "contenedores / Vercel", pero son cosas
+      incompatibles: **Vercel hace su propio empaquetado y no quiere que Next
+      haga otro**.
+
+      Además no hacía falta: el frontend solo va a Vercel, y se comprobó que
+      **nadie consume `.next/standalone`** —ni Dockerfile, ni compose, ni
+      nada—, así que se generaba en cada build para tirarlo.
+
+      > **Las dos hipótesis que se descartaron con el log**, y que parecían
+      > razonables: no era `engines`/Node —el log muestra `npm ci` con
+      > `found 0 vulnerabilities` y `Next.js 16.3.4`— ni el lockfile. Sin el
+      > log habría seguido tocando lo que no era. Los dos cambios se quedan
+      > porque son correctos por su cuenta.
 
 - [ ] **DEP6 · `server/railway.json` declara un builder que quizá no se usa.**
       *(Encontrado 2026-09-04.)* El archivo dice `"builder": "NIXPACKS"` pero

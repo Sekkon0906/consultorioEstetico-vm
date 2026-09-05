@@ -5,8 +5,22 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
-  // Output optimizado para deploy en contenedores / Vercel
-  output: "standalone",
+  /* `output: "standalone"` salio de aqui, y era la causa del despliegue de
+     preview que fallaba con:
+       ENOENT: no such file or directory, open '.next/next-server.js.nft.json'
+     Ese error lo lanza el paso `onBuildComplete` de Vercel, DESPUES de que
+     la compilacion haya terminado bien.
+
+     `standalone` empaqueta el servidor de Next para auto-hospedaje —Docker,
+     una VM— y coloca el trazado de dependencias en otro sitio del que Vercel
+     espera. El comentario original decia "contenedores / Vercel", pero son
+     cosas incompatibles: Vercel hace su propio empaquetado y no quiere que
+     Next haga otro.
+
+     Y aqui no hacia falta: el frontend solo se despliega en Vercel. Se
+     comprobo que NADIE consume `.next/standalone` —no hay Dockerfile ni
+     compose ni nada que lo lea—, asi que ademas se estaba generando en cada
+     build para tirarlo. */
   // Compresión gzip on (Vercel/Node)
   compress: true,
   // Header X-Powered-By removido por seguridad
