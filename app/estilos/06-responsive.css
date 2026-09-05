@@ -4490,3 +4490,56 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   .proc-card-cat-chip,
   .proc-card-price-unit { font-size: 11.5px !important; }
 }
+
+/* ============================================================
+   CUÁNDO LA BARRA PASA A HAMBURGUESA
+   ============================================================
+   Estaba en 768px, heredado de `d-md-none` de Bootstrap, y ese número no
+   tenía nada que ver con esta barra. Medido sobre la página real:
+
+     · menú de paciente ............ 1163px (logo + enlaces + sesión)
+     · con "Administrar" y avatar ... ~1341px
+
+   Así que a 992px se pasaba 183px y a 955 —la ventana de la captura— el menú
+   se partía en dos filas, con el logo enorme y "Administrar" saliéndose. No
+   era un fallo de estilo: no cabía, y nadie se lo había dicho.
+
+   CÓMO COLAPSA
+   Igual que ya lo hacía por debajo de 768: se esconde el envoltorio del menú
+   horizontal y la hamburguesa abre el sidebar, que es un portal aparte con
+   su propia lista. No se convierte el menú en desplegable, porque ese
+   desplegable no lo abre nadie: la hamburguesa no apunta a él.
+
+   POR QUÉ DOS CORTES Y NO UNO
+   Con un corte único habría que ponerlo en 1400 para que el caso de la
+   doctora entre, y entonces cualquier portátil de 1280 o 1366 —la mayoría—
+   vería hamburguesa teniendo sitio de sobra. La hamburguesa en un portátil
+   ancho se lee como algo sin terminar.
+
+   El enlace de administrar solo existe para ella, así que `:has()` deja
+   colapsar antes justo en ese caso sin tocar el de los demás. */
+
+/* En pantalla ancha no hay hamburguesa. Antes lo decidía `d-md-none` en el
+   componente; ahora está aquí, junto al resto del colapso, para que un solo
+   sitio gobierne las dos mitades y no puedan desincronizarse. */
+.hamburger-btn { display: none; }
+
+/* El envoltorio del menú lleva `d-none d-md-block` de Bootstrap, sin clase
+   propia. `:has(> .navbar-menu)` lo alcanza sin tener que tocar el marcado. */
+
+/* CASO DE LA DOCTORA: colapsa antes, porque lleva dos elementos más. */
+@media (max-width: 1400px) {
+  .navbar-container:has(.navbar-link-privado) div:has(> .navbar-menu) {
+    display: none !important;
+  }
+  .navbar-container:has(.navbar-link-privado) .hamburger-btn {
+    display: flex;
+  }
+}
+
+/* TODOS LOS DEMÁS: 1200, que es 1163 de menú más margen para que el último
+   enlace no quede rozando el borde. */
+@media (max-width: 1200px) {
+  .navbar-container div:has(> .navbar-menu) { display: none !important; }
+  .hamburger-btn { display: flex; }
+}

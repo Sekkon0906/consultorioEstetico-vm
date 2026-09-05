@@ -324,7 +324,12 @@ export default function Navbar() {
                   >
                     <Link
                       href={item.href}
-                      className={`text-decoration-none navbar-link ${esCta ? "navbar-cta" : ""} ${isActive ? "navbar-link-active" : ""}`}
+                      /* `navbar-link-privado` marca el enlace de administrar.
+                         No es decorativo: el CSS lo usa con `:has()` para
+                         colapsar la barra antes cuando este enlace existe.
+                         Medido, "Administrar" mas el avatar suman ~178px, y
+                         con ellos la barra ya no cabe donde si cabia sin. */
+                      className={`text-decoration-none navbar-link ${esCta ? "navbar-cta" : ""} ${isActive ? "navbar-link-active" : ""} ${item.grupo === "privado" ? "navbar-link-privado" : ""}`}
                       style={!esCta ? { color: isActive ? "var(--brand)" : "var(--text)" } : undefined}
                     >
                       {item.label}
@@ -367,7 +372,13 @@ export default function Navbar() {
         >
           {/* HAMBURGUESA MÓVIL */}
           <button
-            className={`hamburger-btn d-md-none ${mobileOpen ? "active" : ""}`}
+            /* Sin `d-md-none`. Esa utilidad de Bootstrap fija el corte en
+               768px y no se puede mover, y el corte real de esta barra no es
+               768: medido, el menu pide 1163px y con el enlace de administrar
+               ~1341. La visibilidad se decide ahora en la hoja, junto al
+               resto del colapso, para que un solo punto gobierne las dos
+               mitades y no puedan desincronizarse. */
+            className={`hamburger-btn ${mobileOpen ? "active" : ""}`}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? t("closeMenu") : t("openMenu")}
           >
