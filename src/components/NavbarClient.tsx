@@ -518,6 +518,17 @@ export default function Navbar() {
               No navega: abre un panel lateral. Navegar a /seleccion te
               sacaba de la rejilla justo cuando estabas comparando, que es
               cuando más ganas tienes de comprobar qué llevas. */}
+          {/* Separador y aire propio.
+              Moverla al extremo derecho no bastaba: seguia pegada a
+              "Iniciar sesion" y se leia como parte de ese boton, sobre todo
+              porque la burbuja del contador invade el hueco de 0.6rem que
+              comparten todos los elementos de esta fila.
+
+              La linea es la misma que separa los grupos del menu de al lado
+              —`.navbar-sep`—, asi que dice lo mismo con el mismo lenguaje:
+              lo de la izquierda es tu cuenta, lo de la derecha es tu
+              seleccion. Son dos cosas distintas. */}
+          <span aria-hidden="true" className="navbar-sep" style={{ marginLeft: "0.5rem" }} />
           <InsigniaSeleccion />
 
           {/* Tema e idioma salieron de aquí: el navbar de escritorio competía

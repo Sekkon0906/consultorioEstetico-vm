@@ -404,6 +404,60 @@
     background: #1f1812;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
   }
+  /* El dorso de la tarjeta de móvil.
+     No se usa `rotateY` aquí como en escritorio: estas tarjetas viven en un
+     carrusel con `scroll-snap`, y un hijo rotado en 3D dentro de un
+     contenedor con scroll horizontal provoca saltos de posición en iOS. Se
+     resuelve con un cruce de opacidad y una escala mínima, que da la misma
+     sensación de "la tarjeta se dio la vuelta" sin tocar el sistema de
+     coordenadas del carrusel. */
+  .g3d-stage .g3d-grid-dorso {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.9rem 0.8rem;
+    text-align: left;
+    background: var(--bg-elevated);
+    border-radius: 14px;
+    opacity: 0;
+    transform: scale(0.94);
+    pointer-events: none;
+    transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .g3d-stage .g3d-grid-dorso.visible {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+  .g3d-stage .g3d-grid-dorso-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.25;
+  }
+  .g3d-stage .g3d-grid-dorso-desc {
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    line-height: 1.45;
+    /* Cortado a cuatro líneas: la tarjeta mide 40vw y el texto completo la
+       desbordaría por abajo sin que se note dónde acaba. */
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .g3d-stage .g3d-grid-dorso-precio {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--brand);
+  }
+
   .g3d-stage .g3d-grid-card img {
     position: absolute;
     inset: 0;
@@ -2032,7 +2086,12 @@ body {
   font-size: 0.9rem;
   line-height: 1.2;
   cursor: pointer;
-  transition: background var(--mov-normal) ease, color var(--mov-normal) ease, border-color var(--mov-normal) ease, transform var(--mov-normal) ease, box-shadow var(--mov-normal) ease;
+  /* La de SOLTAR: rebota un pelo, como el boton principal. Apretar lleva su
+     propia transicion, mas rapida, en `:active`. */
+  transition: background var(--mov-normal) ease, color var(--mov-normal) ease,
+              border-color var(--mov-normal) ease,
+              transform 260ms cubic-bezier(0.34, 1.4, 0.64, 1),
+              box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2042,12 +2101,36 @@ body {
 }
 .btn-ghost-app:hover,
 .btn-ghost-app:focus-visible {
-  background: linear-gradient(135deg, var(--brand), #C9AD8D) !important;
-  color: #FFFFFF !important;
+  background: linear-gradient(135deg, var(--brand), var(--brand-soft)) !important;
+  color: var(--brand-contrast) !important;
   border-color: transparent !important;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(176, 137, 104, 0.35);
+  /* Sin `translateY`. Levantarse al acercar el cursor es un gesto que en una
+     pantalla tactil no existe, asi que apoyar ahi la sensacion de calidad
+     deja fuera a la mitad de las visitas. Lo que se queda es el cambio de
+     fondo, que si dice "esto es pulsable". */
+  box-shadow:
+    0 1px 2px rgba(120, 84, 56, 0.18),
+    0 8px 24px -8px rgba(176, 137, 104, 0.42);
   text-decoration: none !important;
+}
+
+/* ESTE BOTON NO TENIA ESTADO DE APRETADO.
+   Solo reaccionaba al cursor, o sea que en movil no acusaba recibo de nada:
+   lo tocabas y no pasaba nada hasta que la pagina cambiaba. Ahora usa la
+   misma fisica que el principal — hundido inmediato, vuelta con inercia—
+   para que los dos botones del sitio se sientan del mismo material. */
+.btn-ghost-app:active {
+  transform: scale(0.97);
+  box-shadow:
+    0 1px 1px rgba(120, 84, 56, 0.22),
+    0 2px 6px -2px rgba(176, 137, 104, 0.4);
+  transition:
+    transform 70ms cubic-bezier(0.4, 0, 1, 1),
+    box-shadow 70ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-ghost-app:active { transform: none; }
 }
 
 /* En modo oscuro el texto pasa a cream (más legible sobre el fondo
@@ -3805,526 +3888,88 @@ a:hover:not(.btn-accion) {
   text-decoration: none !important;
   color: inherit !important;
 }
-a.btn-accion {
-  text-decoration: none !important;
-}
-.fc {
-  --fc-border-color: #e5d8c8;
-  --fc-today-bg-color: #f7ede1;
-  --fc-button-bg-color: var(--brand);
-  --fc-button-hover-bg-color: var(--brand-deep);
-  --fc-button-active-bg-color: #c7a27a;
-  --fc-page-bg-color: #fbf7f2;
-  font-family: 'Poppins', sans-serif;
-  border-radius: 12px;
-  overflow: hidden;
-}
+a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
+   Antes esto tenía un BRILLO que cruzaba el botón en diagonal al pasar el
+   cursor. Se quitó entero. Ese destello es de otra época —el botón
+   "glossy"— y sobre todo miente: anuncia que algo pasó cuando no ha pasado
+   nada, porque pasar el cursor por encima no es una acción.
 
-.fc .fc-toolbar-title {
-  color: #5a4230;
-  font-weight: 600;
-  font-size: 1.1rem;
-}
+   Lo que se siente caro no es el adorno, es la FÍSICA. Un botón de iOS no
+   brilla ni se levanta al acercarte: se hunde cuando lo aprietas y vuelve
+   con inercia cuando lo sueltas. Todo lo de abajo persigue eso.
 
-.fc-daygrid-day-number {
-  color: #5a4230;
-  font-weight: 500;
-}
-/* Día seleccionado — brillo cálido coherente con la paleta */
-.selected-day {
-  background-color: rgba(192, 150, 100, 0.15) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 0 8px rgba(192, 150, 100, 0.4);
-  transition: all var(--mov-normal) ease-in-out;
-}
-.selected-day:hover {
-  background-color: rgba(192, 150, 100, 0.25) !important;
-}
+   LAS TRES DECISIONES QUE HACEN EL EFECTO
 
-.fc {
-  font-family: 'Inter', sans-serif;
-  background: #fffaf6;
-  border-radius: 12px;
-  padding: 1rem;
-}
+   1. LA ASIMETRÍA. Apretar es instantáneo (70 ms, curva de salida), soltar
+      tarda casi el triple y rebota un pelo. Así funciona lo que tiene masa:
+      la fuerza que aplicas llega ya, y la recuperación es la del material.
+      Con las dos duraciones iguales el botón se siente de goma.
 
-.fc-daygrid-day {
-  border: 1px solid #e5d8c8;
-  transition: background var(--mov-rapido) ease;
-}
+   2. LA SOMBRA SE CIERRA AL APRETAR. No es decoración: es lo que dice que
+      el botón se acercó a la superficie. Si solo encogiera, parecería que
+      se aleja de ti en vez de hundirse.
 
-.fc-daygrid-day:hover {
-  background: #f5ede3;
-}
+   3. SOMBRAS EN CAPAS, NO UNA MANCHA. Una sombra ancha y difusa se lee como
+      niebla. Dos —una fina y pegada que dibuja el borde, otra amplia y muy
+      tenue que da la altura— se leen como un objeto sobre una mesa.
 
-.fc-toolbar-title {
-  color: var(--brand-deep);
-  font-weight: 600;
-}
-
-.fc-button-primary {
-  background: #c7a27a;
-  border: none;
-  color: white;
-  border-radius: 6px;
-}
-
-.fc-button-primary:hover {
-  background: var(--brand);
-}
-/* ============================================================================
-   SISTEMA DE BOTONES (app/src/components/ui/Button.tsx)
-   ----------------------------------------------------------------------------
-   Único lugar donde se decide tamaño, forma y color de un botón. Usa los
-   tokens de arriba (--brand, --brand-soft, --brand-contrast...), así que
-   cambia de tema sin código adicional. Los estilos en línea que sigan
-   existiendo en el resto del código NO leen esto — es la base para migrar
-   ============================================================================ */
-
-.btn-app {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border-radius: var(--btn-radio);
-  border: none;
-  font-weight: var(--btn-peso);
-  font-family: inherit;
-  cursor: pointer;
-  white-space: nowrap;
-  line-height: 1.2;
-  transition: box-shadow var(--mov-rapido) ease, opacity var(--mov-rapido) ease, background var(--mov-rapido) ease;
-}
-.btn-app:disabled { cursor: default; opacity: 0.55; }
-.btn-app--full { width: 100%; }
-
-/* tamaños */
-.btn-app--sm { padding: var(--btn-pad-sm); font-size: var(--btn-txt-sm); }
-.btn-app--md { padding: var(--btn-pad-md); font-size: var(--btn-txt-md); }
-.btn-app--lg { padding: var(--btn-pad-lg); font-size: var(--btn-txt-lg); }
-
-/* variantes */
-.btn-app--primary {
-  background: linear-gradient(135deg, var(--brand), var(--brand-soft));
-  color: var(--brand-contrast);
-  box-shadow: var(--shadow-sm);
-}
-.btn-app--primary:hover:not(:disabled) { box-shadow: var(--shadow-md); }
-
-.btn-app--outline {
-  background: var(--surface);
-  color: var(--brand-deep);
-  border: 1.5px solid var(--brand);
-}
-.btn-app--outline:hover:not(:disabled) { background: var(--surface-soft); }
-
-.btn-app--ghost {
-  background: transparent;
-  color: var(--text-soft);
-  border: 1px solid var(--border);
-}
-.btn-app--ghost:hover:not(:disabled) { background: var(--surface-soft); }
-
-.btn-app--danger {
-  background: var(--danger);
-  color: #fff;
-}
-.btn-app--danger:hover:not(:disabled) { opacity: 0.9; }
-
-/* ============================================================================
-   ACCESO RÁPIDO FLOTANTE (app/src/components/QuickAccessFab.tsx)
-   ----------------------------------------------------------------------------
-   Solo escritorio — en móvil tema/idioma/contacto ya viven en el sidebar
-   (mobile-sidebar-controls). Mismo umbral de 820px que usa Galeria3D para
-   su cambio de layout, así los dos "es móvil" coinciden en todo el sitio.
-   ============================================================================ */
-
-.quick-fab {
-  display: none;
-}
-
-@media (min-width: 821px) {
-  .quick-fab {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.7rem;
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 1200;
-  }
-}
-
-.quick-fab-trigger {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: none;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--brand), var(--brand-soft));
-  color: var(--brand-contrast);
-  box-shadow: var(--shadow-md);
-  cursor: pointer;
-}
-
-.quick-fab-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.65rem;
-  width: 240px;
-  padding: 1.1rem 1rem;
-  border-radius: 18px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
-}
-
-.quick-fab-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.7rem;
-}
-
-.quick-fab-divider {
-  width: 100%;
-  height: 1px;
-  background: var(--border);
-}
-
-.quick-fab-heading {
-  margin: 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.quick-fab-contact {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: var(--text-soft);
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-.quick-fab-contact:hover { color: var(--brand-deep); }
-
-.quick-fab-socials {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.quick-fab-social {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--surface-soft);
-  color: var(--text-soft);
-  font-size: 0.85rem;
-  transition: background var(--mov-rapido), color var(--mov-rapido);
-}
-.quick-fab-social:hover {
-  background: var(--brand);
-  color: var(--brand-contrast);
-}
-
-.quick-fab-legal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-}
-.quick-fab-legal a {
-  color: var(--text-muted);
-  font-size: 0.74rem;
-  text-decoration: none;
-}
-.quick-fab-legal a:hover {
-  color: var(--brand-deep);
-  text-decoration: underline;
-}
-
-
-/* ============================================================
-   GALERÍA DEL CONSULTORIO — foto + descripción sincronizada
-   ============================================================
-   La galería iba sola y el texto del espacio vivía en un bloque aparte,
-   arriba, sin relación con lo que estabas mirando. Ahora la descripción
-   acompaña a la foto y cambia con ella: cada imagen cuenta qué es esa
-   zona, en vez de ser una foto bonita sin contexto. */
-.consultorio-showcase-fila {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.2rem;
-  align-items: center;
-}
-@media (min-width: 768px) {
-  .consultorio-showcase-fila {
-    /* La foto manda; el texto acompaña. */
-    grid-template-columns: 1.35fr 1fr;
-    gap: 2.6rem;
-  }
-}
-/* En pantallas anchas la galería se queda corta si respeta el ancho de
-   contenido: es la sección donde el ancho ES el contenido. */
-@media (min-width: 1024px) {
-  .consultorio-showcase {
-    max-width: var(--ancho-amplio) !important;
-  }
-  .consultorio-showcase-fila {
-    grid-template-columns: 1.55fr 1fr;
-    gap: 3rem;
-  }
-}
-
-.consultorio-showcase-info {
-  padding: 0 var(--gutter);
-}
-@media (min-width: 768px) {
-  .consultorio-showcase-info { padding: 0; }
-}
-
-.consultorio-showcase-info-num {
-  display: block;
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: clamp(2.4rem, 4vw, 3.4rem);
-  line-height: 1;
-  color: var(--brand);
-  opacity: 0.45;
-  margin-bottom: 0.4rem;
-}
-.consultorio-showcase-info-titulo {
-  font-family: "Playfair Display", Georgia, serif;
-  /* Crece con la pantalla: a 1440px un título de 1,35rem al lado de una
-     foto de 800px de ancho se lee como un pie de imagen, no como el título
-     de la zona que estás mirando. */
-  font-size: clamp(1.35rem, 2.2vw, 2rem);
-  font-weight: 700;
-  color: var(--text);
-  margin: 0 0 0.6rem;
-}
-.consultorio-showcase-info-texto {
-  color: var(--text-soft);
-  font-size: clamp(0.95rem, 1.15vw, 1.12rem);
-  line-height: 1.7;
-  margin: 0;
-  /* Reserva el alto del texto más largo para que la fila no dé un salto
-     al cambiar de foto. */
-  min-height: 5.5rem;
-}
-
-/* Entrada del texto al cambiar de foto. Animación CSS reiniciada por el
-   `key` de React: llega siempre a su estado final, a diferencia de un
-   AnimatePresence, que no monta el contenido nuevo hasta terminar la
-   salida del anterior. */
-.consultorio-showcase-info-anim {
-  animation: consultorio-info-entra var(--mov-normal) var(--mov-curva) both;
-}
-@keyframes consultorio-info-entra {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .consultorio-showcase-info-anim { animation: none; }
-}
-
-/* Flechas del carrusel del home, junto a los dots.
-   El carrusel de /procedimientos ya tenía flechas y este no: solo se podía
-   avanzar apuntando al punto exacto, un blanco de 8px. Van dentro de la
-   misma píldora que los dots para no tapar las tarjetas de la rueda. */
-.g3d-flecha {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  margin: -7px 0;          /* no engorda la píldora */
-  border: none;
-  background: none;
-  color: var(--brand-deep);
-  font-size: 1.25rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0;
-  border-radius: 50%;
-  transition: background var(--mov-rapido), color var(--mov-rapido);
-}
-.g3d-flecha:hover,
-.g3d-flecha:focus-visible {
-  background: var(--surface-soft);
-  color: var(--brand);
-}
-
-/* Entrada de las tarjetas de procedimiento al filtrar.
-   Corta y sin escalonar. Antes era `layout` de framer con un retardo por
-   índice: `layout` anima cada tarjeta desde su posición ANTERIOR, y como al
-   filtrar cambia la rejilla entera, cada una salía volando desde donde
-   estaba otra. Eso es lo que se veía como "cards regadas que se acomodan
-   solas". Filtrar es una acción de precisión: la rejilla se recoloca de
-   golpe y las tarjetas solo aparecen. */
-.proc-card-entra {
-  animation: proc-card-aparece 0.22s ease-out both;
-}
-@keyframes proc-card-aparece {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .proc-card-entra { animation: none; }
-}
-
-/* ============================================================
-   MENÚ DE CUENTA — rediseño
-   ============================================================
-   Antes eran tres botones de ancho completo en tres colores (suave,
-   primario y rojo) para lo que es una lista de navegación: tres pesos
-   visuales compitiendo obligan a leerlos todos para elegir uno. Ahora
-   todas las opciones pesan igual y solo cerrar sesión se separa, porque
-   es la única que no lleva a ninguna parte. */
-.profile-menu-id {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  text-align: left;
-  padding: 0.2rem 0.4rem 0.8rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 0.4rem;
-}
-.profile-menu-name {
-  font-weight: 700;
-  font-size: 0.92rem;
-  color: var(--text);
-  line-height: 1.2;
-  /* El nombre y el correo pueden ser largos; el menú no debe estirarse. */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.profile-menu-email {
-  font-size: 0.76rem;
-  color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.profile-menu-lista {
-  display: flex;
-  flex-direction: column;
-}
-.profile-menu-item {
-  text-align: left;
-  padding: 0.6rem 0.55rem;
-  border: none;
-  background: none;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 0.88rem;
-  font-weight: 600;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background var(--mov-rapido), color var(--mov-rapido);
-}
-.profile-menu-item:hover,
-.profile-menu-item:focus-visible {
-  background: var(--surface-soft);
-}
-.profile-menu-item-salir {
-  color: var(--danger);
-  margin-top: 0.35rem;
-  padding-top: 0.7rem;
-  border-top: 1px solid var(--border);
-  border-radius: 0 0 10px 10px;
-}
-
-/* Marcadores de posición del formulario de contacto.
-   Sin regla propia heredan el color del texto y quedan igual de oscuros que
-   lo escrito, así que no se distingue lo que es un ejemplo de lo que ya
-   escribiste. */
-.footer-form input::placeholder,
-.footer-form textarea::placeholder,
-.footer-form select {
-  color: var(--text-muted);
-  opacity: 1; /* Firefox los aclara por su cuenta */
-}
-
-/* ============================================================
-   BOTÓN DE ACCIÓN PRINCIPAL — .btn-accion
-   ============================================================
-   El "Agendar este procedimiento" era un degradado con una sombra grande y
-   nada más: no respondía al cursor ni al toque, así que no se sentía
-   pulsable. Un botón tiene que acusar recibo.
-
-   Tres cosas, todas baratas y todas compuestas por el navegador (transform
-   y opacity, no layout), que es lo que hace que se sienta inmediato:
-
-     · al pasar el cursor sube 1px y la sombra se abre — insinúa relieve;
-     · al pulsar baja y se encoge un 2 % — el dedo "hunde" el botón;
-     · un brillo cruza la superficie al entrar el cursor.
-
-   La curva es la del sistema (--mov-curva): arranca rápido y frena suave,
-   que es como se mueven las cosas con masa. Y la duración es corta a
-   propósito: por encima de ~200ms una respuesta al toque deja de leerse
-   como reacción y empieza a leerse como espera. */
+   El hover casi no hace nada a propósito: sube el contraste de la sombra y
+   una pizca de luz, sin moverse. En una pantalla táctil no existe, así que
+   apoyar ahí el "se siente premium" deja fuera a la mitad de las visitas. */
 .btn-accion {
   position: relative;
-  overflow: hidden;
   isolation: isolate;
+  /* La transición de REPOSO, o sea la de soltar. `0.34, 1.4, 0.64, 1` pasa
+     de 1 y vuelve: es el rebote corto de algo que recupera su forma. */
   transition:
-    transform 160ms var(--mov-curva),
-    box-shadow 160ms var(--mov-curva),
-    filter 160ms var(--mov-curva);
+    transform 260ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 200ms ease-out;
   will-change: transform;
+  box-shadow:
+    0 1px 2px rgba(120, 84, 56, 0.16),
+    0 6px 20px -6px rgba(176, 137, 104, 0.35);
 }
-.btn-accion::after {
-  /* El brillo. Va en un pseudo-elemento para no tocar el fondo del botón,
-     que es un degradado con su propio significado de marca. */
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(
-    115deg,
-    transparent 35%,
-    rgba(255, 255, 255, 0.28) 50%,
-    transparent 65%
-  );
-  transform: translateX(-120%);
-  transition: transform 620ms var(--mov-curva);
-}
+
 .btn-accion:hover,
 .btn-accion:focus-visible {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 30px rgba(176, 137, 104, 0.42);
-  filter: saturate(1.06);
+  box-shadow:
+    0 1px 2px rgba(120, 84, 56, 0.2),
+    0 10px 28px -8px rgba(176, 137, 104, 0.5);
+  filter: brightness(1.03);
 }
-.btn-accion:hover::after,
-.btn-accion:focus-visible::after {
-  transform: translateX(120%);
-}
+
 .btn-accion:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 0 3px 12px rgba(176, 137, 104, 0.3);
-  transition-duration: 90ms;   /* el hundido responde antes que el rebote */
+  /* 0.97 y no menos: por debajo de eso el texto se ve encoger, y entonces
+     ya no parece que el botón se hunde sino que la pantalla se aleja. */
+  transform: scale(0.97);
+  box-shadow:
+    0 1px 1px rgba(120, 84, 56, 0.22),
+    0 2px 6px -2px rgba(176, 137, 104, 0.4);
+  filter: brightness(0.98);
+  /* Apretar es INMEDIATO. Esta es la mitad rápida de la asimetría. */
+  transition:
+    transform 70ms cubic-bezier(0.4, 0, 1, 1),
+    box-shadow 70ms cubic-bezier(0.4, 0, 1, 1),
+    filter 70ms linear;
 }
+
+/* El aro de foco, para quien navega con teclado. Va por fuera con `outline`
+   y no con la sombra, para que no se pise con las de arriba al apretar. */
+.btn-accion:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
 /* Quien pide menos movimiento conserva el cambio de sombra —que sigue
-   diciendo "esto responde"— pero sin desplazamiento ni brillo. */
+   diciendo "esto responde"— pero sin desplazamiento. */
 @media (prefers-reduced-motion: reduce) {
-  .btn-accion,
-  .btn-accion::after {
-    transition: box-shadow 120ms ease;
-    transform: none !important;
+  .btn-accion {
+    transition: box-shadow 120ms ease, filter 120ms ease;
+  }
+  .btn-accion:active {
+    transform: none;
+    transition: box-shadow 90ms ease;
   }
 }
 
