@@ -4251,11 +4251,21 @@ a.btn-accion {
 /* Marcadores de posición del formulario de contacto.
    Sin regla propia heredan el color del texto y quedan igual de oscuros que
    lo escrito, así que no se distingue lo que es un ejemplo de lo que ya
-   escribiste. */
+   escribiste.
+
+   `--text-soft` y NO `--text-muted`, que era lo que había: medido sobre el
+   fondo real de estos campos (--surface-soft, #F5EEE6), el muted da
+   **3,79:1** y el mínimo legible es 4,5:1. Se veía, pero apenas — y en un
+   formulario cuyo texto de ayuda vive SOLO en el marcador, no poder leerlo
+   es no saber qué va en cada campo. `--text-soft` da 5,82:1.
+
+   Sigue siendo más claro que lo escrito (--text, 11,96:1), así que se
+   mantiene la distinción entre ejemplo y contenido, que es para lo que
+   existe esta regla. */
 .footer-form input::placeholder,
 .footer-form textarea::placeholder,
 .footer-form select {
-  color: var(--text-muted);
+  color: var(--text-soft);
   opacity: 1; /* Firefox los aclara por su cuenta */
 }
 

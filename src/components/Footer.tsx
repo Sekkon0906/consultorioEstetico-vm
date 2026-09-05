@@ -133,7 +133,17 @@ export default function Footer() {
             {/* Procedure selector */}
             <div style={{ gridColumn: "1 / -1", position: "relative" }}>
               <button type="button" onClick={() => setShowProcs(!showProcs)}
-                style={{ ...inputStyle, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", textAlign: "left", color: formData.procedure ? "var(--footer-text)" : "rgba(250,249,247,0.5)" }}>
+                style={{ ...inputStyle, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center", textAlign: "left", /* Los colores del CAMPO, no los del pie.
+                     Iban con `--footer-text` y un blanco al 50%, que son
+                     los del texto sobre el fondo oscuro del pie. Pero este
+                     boton usa `inputStyle`, cuyo fondo es claro
+                     (--surface-soft): quedaba blanco sobre crema, o sea
+                     invisible, y peor aun sin elegir nada — que es
+                     justo cuando el texto es la unica pista de para que
+                     sirve el campo.
+                     Ahora usa los mismos que los demas campos: --text
+                     cuando hay valor, --text-soft cuando es el marcador. */
+                  color: formData.procedure ? "var(--text)" : "var(--text-soft)" }}>
                 {formData.procedure || t("form.procedure")}
                 <i className={`fas fa-chevron-${showProcs ? "up" : "down"}`} style={{ fontSize: "0.7rem", color: "var(--brand)" }} />
               </button>
