@@ -3973,6 +3973,95 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   }
 }
 
+
+
+/* ============================================================
+   BARRA DE NAVEGACIÓN DE LA RUEDA — flechas y puntos
+   ============================================================
+   `.g3d-flecha` NO TENÍA NINGÚN ESTILO. Eran dos <button> con un carácter
+   dentro, así que salían con la tipografía, el tamaño y el gris que pone el
+   navegador por defecto: desalineados con los puntos, sin área de toque y
+   pegados al primer punto porque compartían el mismo `gap` de 8 px que hay
+   entre ellos.
+
+   Se les da forma de control redondo, con el mismo aire que los puntos pero
+   separadas de ellos: un `gap` uniforme hacía que la flecha pareciera un
+   punto más grande en vez de un control aparte. */
+.g3d-flecha {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-soft);
+  /* El carácter ‹ es tipográfico, no un icono: sin tamaño explícito hereda
+     el del contenedor y queda diminuto al lado de los puntos. */
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 200ms ease,
+    transform 240ms cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.g3d-flecha:hover {
+  background: var(--surface-soft);
+  color: var(--text);
+}
+.g3d-flecha:active {
+  transform: scale(0.9);
+  transition: transform 70ms cubic-bezier(0.4, 0, 1, 1);
+}
+.g3d-flecha:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* El aire que separa cada flecha del grupo de puntos. Sin esto, con el `gap`
+   uniforme de la barra, la flecha se lee como un punto más. */
+.g3d-flecha:first-child  { margin-right: 4px; }
+.g3d-flecha:last-child   { margin-left: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .g3d-flecha:active { transform: none; }
+}
+
+/* ============================================================
+   TARJETA QUE GIRA — foco
+   ============================================================
+   Al hacerla `role="button"` con `tabIndex` para que responda a Enter y
+   espacio, el navegador empezó a dibujarle su aro de foco AL PULSARLA con el
+   ratón: un recuadro oscuro alrededor de la tarjeta girada que no estaba
+   antes y que se lee como un borde de más.
+
+   `:focus-visible` es justo esta distinción: el navegador solo lo aplica
+   cuando el foco llegó por teclado. Así que se apaga el aro genérico y se
+   deja el bueno.
+
+   NO se quita el foco a secas. Sin aro, quien navega con Tab pierde de vista
+   dónde está, y eso es peor que un recuadro feo. */
+.g3d-card:focus {
+  outline: none;
+}
+.g3d-card:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 4px;
+  border-radius: 22px;
+}
+/* Lo mismo para la tarjeta de móvil, que es un <button> de verdad. */
+.g3d-grid-card:focus {
+  outline: none;
+}
+.g3d-grid-card:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
 /* ============================================================
    GALERÍA DE "POR QUÉ CONFIARME"
    ============================================================
@@ -4056,4 +4145,139 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
 @media (prefers-reduced-motion: reduce) {
   .va-poster-entra { animation: none; }
   .va-miniatura { transition: opacity var(--mov-rapido); transform: none !important; }
+}
+
+/* ============================================================
+   ACCESO RÁPIDO FLOTANTE (QuickAccessFab)
+   ============================================================
+   NINGUNA de las nueve clases que usa este componente estaba definida.
+   `.quick-fab`, `.quick-fab-trigger`, `.quick-fab-panel` y las seis del
+   interior: cero reglas en toda la hoja. El componente se montaba —está en
+   `app/layout.tsx`— pero salía como un <div> sin estilo, `position: static`,
+   ancho completo, al final del <body>: medido en la página real, en y=4361
+   de un documento de 4388 px, o sea DEBAJO del pie de página.
+
+   Por eso en escritorio no había forma de cambiar el tema ni el idioma. El
+   navbar los quitó a propósito (competían por espacio con 6 enlaces y el
+   login) y los mandó aquí, pero aquí no había nada que los recogiera. En
+   móvil sí se llegaba, por el sidebar, que tiene sus propios controles: de
+   ahí que el hueco pasara desapercibido.
+
+   Va por debajo del sidebar móvil (z-index 1500) y por encima del contenido.
+   El desplegable se ancla abajo-derecha y crece hacia arriba, que es el
+   único sentido en el que cabe estando el disparador pegado al borde. */
+.quick-fab {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+.quick-fab-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  color: var(--text);
+  cursor: pointer;
+  box-shadow:
+    0 1px 2px rgba(120, 84, 56, 0.16),
+    0 8px 24px -8px rgba(176, 137, 104, 0.4);
+  transition:
+    background 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.quick-fab-trigger:hover { background: var(--surface-soft); }
+.quick-fab-trigger:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.quick-fab-panel {
+  /* El orden visual es disparador abajo, panel encima. En el DOM el panel va
+     primero, así que basta con el orden natural de la columna. */
+  width: 250px;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg-elevated);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 34px -10px rgba(0, 0, 0, 0.3);
+  /* Sin esto, en pantallas bajas el panel se sale por arriba y los enlaces
+     legales del final quedan inalcanzables. */
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+
+.quick-fab-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.quick-fab-divider {
+  height: 1px;
+  margin: 0.8rem 0;
+  background: var(--border);
+}
+
+.quick-fab-heading {
+  margin: 0 0 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.quick-fab-socials {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.quick-fab-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  transition: background 200ms ease, color 200ms ease;
+}
+.quick-fab-social:hover {
+  background: var(--surface-soft);
+  color: var(--brand);
+}
+
+.quick-fab-legal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.quick-fab-legal a {
+  font-size: 0.78rem;
+  /* --text-soft y no --text-muted: estos son enlaces, y --text-muted se midió
+     en 3.79:1 sobre este fondo, por debajo del mínimo AA. */
+  color: var(--text-soft);
+}
+.quick-fab-legal a:hover { color: var(--brand); }
+
+/* En móvil el sidebar ya lleva tema e idioma, y el disparador taparía el
+   botón de WhatsApp. El comentario del componente dice "SOLO escritorio";
+   esta es la regla que lo cumplía y que faltaba. */
+@media (max-width: 768px) {
+  .quick-fab { display: none; }
 }
