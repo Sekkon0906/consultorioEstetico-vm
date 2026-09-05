@@ -262,16 +262,17 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
       endpoints).
 - [x] **D2 · Tabla "Números"** de la nota raíz (líneas, endpoints) — está al
       2026-09-01.
-- [ ] **D3 · Commit `72062f2`** de `docs/vault/` (en la rama ya mergeada) →
-      llevar a `main` o descartar.
+- [x] **D3 · Commit `72062f2` huérfano.** *(Descartado 2026-09-04.)* Añadía 87
+      líneas a la bitácora del 2 de septiembre y 37 a la nota de migración. Esos
+      archivos existen hoy en `main` con 496 y 74 líneas: el contenido se
+      rehízo más completo por otra vía. Traerlo ahora solo duplicaría.
 
 ---
 
 ## 🟨 Deploy
 
-- [ ] **DEP1 · Rotar credenciales.** Contraseña de Neon + token de R2 →
-      actualizar `DATABASE_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` en
-      Railway. **Antes de que la doctora lo use en serio.**
+- [x] **DEP1 · Rotar credenciales.** *(Hecho 2026-09-04.)* Comprobado que las
+      nuevas funcionan: el backend responde y R2 lista el bucket.
 - [x] **DEP7 · El *preview* de Vercel fallaba.** *(Resuelto 2026-09-04.)*
 
       ```
