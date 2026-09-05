@@ -48,7 +48,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
     } catch (e: any) { setError(e.message); } finally { setSaving(false); }
   };
 
-  const estadoColor: Record<string, string> = { pendiente: "var(--brand)", confirmada: "var(--success)", atendida: "#1B4F72", cancelada: "#922B21" };
+  const estadoColor: Record<string, string> = { pendiente: "var(--brand)", confirmada: "var(--success)", atendida: "var(--estado-confirmada)", cancelada: "var(--danger)" };
 
   return (
     <motion.div initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -58,7 +58,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
         style={{ background: "white", borderRadius: 24, width: "100%", maxWidth: 540, maxHeight: "90vh", overflowY: "auto", position: "relative" }}>
 
-        <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)", borderRadius: "24px 24px 0 0" }} />
+        <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), var(--brand-soft))", borderRadius: "24px 24px 0 0" }} />
         <div style={{ padding: "1.8rem 2rem 2rem" }}>
 
           {/* Header */}
@@ -80,7 +80,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
           {/* Procedure */}
           <div style={{ background: "var(--estado-atendida-bg)", borderRadius: 14, padding: "1rem", marginBottom: "1.5rem" }}>
             <p style={{ fontWeight: 600, color: "var(--success)", margin: 0 }}>{cita.procedimiento}</p>
-            {cita.nota && <p style={{ fontSize: "0.82rem", color: "#4A7A5A", margin: "0.2rem 0 0" }}>Nota: {cita.nota}</p>}
+            {cita.nota && <p style={{ fontSize: "0.82rem", color: "var(--estado-atendida)", margin: "0.2rem 0 0" }}>Nota: {cita.nota}</p>}
           </div>
 
           {/* Consentimiento informado — visible siempre que exista, para
@@ -105,7 +105,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
                 gap: 8,
                 fontWeight: 600,
                 fontSize: "0.88rem",
-                color: cita.consentimientoFirmado ? "var(--success)" : "#8B5A12",
+                color: cita.consentimientoFirmado ? "var(--success)" : "var(--estado-pendiente)",
                 margin: 0,
               }}
             >
@@ -173,7 +173,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
                 {(["Efectivo", "Tarjeta"] as const).map(m => (
                   <motion.button key={m} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.95 }} onClick={() => setModoPago(m)}
                     style={{ flex: 1, padding: "0.75rem", borderRadius: 14, fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", transition: "all 0.25s",
-                      background: modoPago === m ? "linear-gradient(135deg, var(--brand-deep), #B08968)" : "var(--surface-soft)",
+                      background: modoPago === m ? "linear-gradient(135deg, var(--brand-deep), var(--brand))" : "var(--surface-soft)",
                       color: modoPago === m ? "white" : "var(--text)",
                       boxShadow: modoPago === m ? "0 4px 14px rgba(176,137,104,0.3)" : "none",
                     }}>{m}</motion.button>
@@ -190,7 +190,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
                   </div>
                   <div style={{ height: 8, borderRadius: 4, background: "var(--border)", overflow: "hidden" }}>
                     <motion.div animate={{ width: `${porcentaje}%` }} transition={{ duration: 0.4 }}
-                      style={{ height: "100%", background: devolucion > 0 ? "linear-gradient(90deg, #43A047, #66BB6A)" : "linear-gradient(90deg, #8B6A4B, #B08968)", borderRadius: 4 }} />
+                      style={{ height: "100%", background: devolucion > 0 ? "linear-gradient(90deg, var(--estado-atendida), var(--estado-atendida))" : "linear-gradient(90deg, var(--brand-deep), var(--brand))", borderRadius: 4 }} />
                   </div>
                   {devolucion > 0 && (
                     <motion.p initial={false} animate={{ opacity: 1 }} style={{ fontSize: "0.82rem", color: "var(--estado-atendida)", fontWeight: 600, marginTop: 6, textAlign: "center", background: "var(--estado-atendida-bg)", padding: "0.5rem", borderRadius: 10 }}>
@@ -206,14 +206,14 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
           <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", justifyContent: "center" }}>
             {cita.estado === "pendiente" && (
               <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => setShowConfirm(true)} disabled={saving}
-                style={{ flex: 1, padding: "0.9rem", borderRadius: 100, background: "linear-gradient(135deg, var(--success), #43A047)", color: "white", border: "none", fontWeight: 700, fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, boxShadow: "0 6px 18px rgba(45,106,79,0.28)" }}>
+                style={{ flex: 1, padding: "0.9rem", borderRadius: 100, background: "linear-gradient(135deg, var(--success), var(--estado-atendida))", color: "white", border: "none", fontWeight: 700, fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, boxShadow: "0 6px 18px rgba(45,106,79,0.28)" }}>
                 <CheckCircle2 size={17} /> Confirmar cita
               </motion.button>
             )}
 
             {cita.estado === "confirmada" && !concluida && (
               <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={handleConcluir} disabled={saving}
-                style={{ flex: 1, padding: "0.9rem", borderRadius: 100, background: "linear-gradient(135deg, #1B4F72, #2980B9)", color: "white", border: "none", fontWeight: 700, fontSize: "1rem", cursor: "pointer", boxShadow: "0 6px 18px rgba(27,79,114,0.28)" }}>
+                style={{ flex: 1, padding: "0.9rem", borderRadius: 100, background: "linear-gradient(135deg, var(--estado-confirmada), var(--estado-confirmada))", color: "white", border: "none", fontWeight: 700, fontSize: "1rem", cursor: "pointer", boxShadow: "0 6px 18px rgba(27,79,114,0.28)" }}>
                 {saving ? "Guardando..." : "Concluir y cobrar"}
               </motion.button>
             )}

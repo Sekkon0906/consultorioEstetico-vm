@@ -15,8 +15,8 @@ export default function NotFound() {
         style={{
           maxWidth: 560,
           textAlign: "center",
-          background: "#FFFFFF",
-          border: "1px solid rgba(0,0,0,0.06)",
+          background: "var(--bg-elevated)",
+          border: "1px solid var(--border)",
           borderRadius: 20,
           padding: "2.5rem 2rem",
           boxShadow: "0 10px 40px rgba(0,0,0,0.06)",
@@ -27,7 +27,7 @@ export default function NotFound() {
             fontFamily: "'Playfair Display', serif",
             fontSize: "4.5rem",
             lineHeight: 1,
-            color: "#E8C9A0",
+            color: "var(--brand)",
             marginBottom: "0.5rem",
           }}
         >
@@ -39,12 +39,12 @@ export default function NotFound() {
             fontSize: "1.8rem",
             margin: 0,
             marginBottom: "0.6rem",
-            color: "#3E2E22",
+            color: "var(--text)",
           }}
         >
           Página no encontrada
         </h1>
-        <p style={{ color: "#6B5A4A", marginBottom: "1.5rem" }}>
+        <p style={{ color: "var(--text-soft)", marginBottom: "1.5rem" }}>
           La página que buscas no existe o fue movida. Te invitamos a explorar
           los procedimientos o volver al inicio.
         </p>
@@ -56,11 +56,18 @@ export default function NotFound() {
             flexWrap: "wrap",
           }}
         >
+          {/* `btn-accion` no es solo la animacion: es lo unico que exime a
+              este enlace del reset global `a { color: inherit !important }`.
+              Sin la clase, el color en linea de abajo pierde contra ese
+              !important, el enlace hereda el crema del texto de la pagina y
+              queda crema sobre crema — un boton vacio. Ya paso una vez con
+              "Agendar este procedimiento". */}
           <Link
             href="/"
+            className="btn-accion"
             style={{
-              background: "#3E2E22",
-              color: "#FFFFFF",
+              background: "var(--brand-deep)",
+              color: "var(--brand-contrast)",
               borderRadius: 999,
               padding: "0.7rem 1.5rem",
               fontWeight: 600,
@@ -73,8 +80,8 @@ export default function NotFound() {
             href="/procedimientos"
             style={{
               background: "transparent",
-              color: "#3E2E22",
-              border: "1px solid #3E2E22",
+              color: "var(--text)",
+              border: "1px solid var(--border-strong)",
               borderRadius: 999,
               padding: "0.7rem 1.5rem",
               fontWeight: 600,

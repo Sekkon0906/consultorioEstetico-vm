@@ -86,15 +86,15 @@ export default function ComentariosClientes() {
         <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: "1rem", fontStyle: "italic" }}>{t("alreadyCommented")}</p>
       )}
 
-      {mensaje && <div style={{ maxWidth: 500, margin: "0 auto 1rem", padding: "0.8rem 1.2rem", borderRadius: 12, background: "var(--border)", color: "#4E3B2B", border: "1px solid #D4C4B0", fontSize: "0.88rem" }}>{mensaje}</div>}
+      {mensaje && <div style={{ maxWidth: 500, margin: "0 auto 1rem", padding: "0.8rem 1.2rem", borderRadius: 12, background: "var(--border)", color: "var(--text)", border: "1px solid var(--border-strong)", fontSize: "0.88rem" }}>{mensaje}</div>}
 
       {showForm && (
         <div className="dark-aware-card" style={{ maxWidth: 520, margin: "0 auto 2rem", padding: "1.8rem", borderRadius: 18, background: "var(--surface)", border: "1px solid var(--border)", textAlign: "left", boxShadow: "0 4px 16px rgba(78,59,43,0.06)" }}>
-          <h4 style={{ fontWeight: 600, color: "#4E3B2B", marginBottom: "1.2rem", textAlign: "center" }}>{t("form.title")}</h4>
+          <h4 style={{ fontWeight: 600, color: "var(--text)", marginBottom: "1.2rem", textAlign: "center" }}>{t("form.title")}</h4>
 
           <div style={{ marginBottom: "0.8rem" }}>
             <label style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--text-soft)", display: "block", marginBottom: 4 }}>{t("form.yourName")}</label>
-            <input value={nombreCompleto} disabled style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: 10, border: "1px solid var(--border)", background: "var(--surface-soft)", color: "#4E3B2B", fontSize: "0.9rem" }} />
+            <input value={nombreCompleto} disabled style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: 10, border: "1px solid var(--border)", background: "var(--surface-soft)", color: "var(--text)", fontSize: "0.9rem" }} />
           </div>
 
           <div style={{ marginBottom: "0.8rem" }}>
@@ -120,7 +120,7 @@ export default function ComentariosClientes() {
                     onMouseEnter={function() { setHoverStar(i); }} onMouseLeave={function() { setHoverStar(0); }}
                     onClick={function() { setPuntuacion(i); }}
                     style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}>
-                    {i <= (hoverStar || puntuacion) ? <FaStar size={26} color="#C0A080" /> : <FaRegStar size={26} color="#C0A080" />}
+                    {i <= (hoverStar || puntuacion) ? <FaStar size={26} color="var(--brand)" /> : <FaRegStar size={26} color="var(--brand)" />}
                   </button>
                 );
               })}
@@ -129,7 +129,7 @@ export default function ComentariosClientes() {
           </div>
 
           <button onClick={handleEnviar} disabled={enviando}
-            style={{ width: "100%", background: "linear-gradient(135deg, var(--brand-deep), #B08968)", color: "var(--brand-contrast)", border: "none", borderRadius: 100, padding: "0.7rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer", opacity: enviando ? 0.7 : 1 }}>
+            style={{ width: "100%", background: "linear-gradient(135deg, var(--brand-deep), var(--brand))", color: "var(--brand-contrast)", border: "none", borderRadius: 100, padding: "0.7rem", fontWeight: 600, fontSize: "0.9rem", cursor: "pointer", opacity: enviando ? 0.7 : 1 }}>
             {enviando ? t("form.submitting") : t("form.submit")}
           </button>
         </div>
@@ -144,14 +144,14 @@ export default function ComentariosClientes() {
               <div key={c.id} className="dark-aware-card" style={{ minWidth: 270, maxWidth: 310, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: "1.2rem", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", transition: "transform 0.3s", flexShrink: 0 }}
                 onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-4px)"; }}
                 onMouseLeave={function(e) { e.currentTarget.style.transform = ""; }}>
-                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "#4E3B2B", fontSize: "1.1rem", fontWeight: 700 }}>{c.nombre.charAt(0).toUpperCase()}</div>
-                <h4 style={{ fontWeight: 600, color: "#4E3B2B", fontSize: "0.95rem", margin: 0 }}>{c.nombre}</h4>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text)", fontSize: "1.1rem", fontWeight: 700 }}>{c.nombre.charAt(0).toUpperCase()}</div>
+                <h4 style={{ fontWeight: 600, color: "var(--text)", fontSize: "0.95rem", margin: 0 }}>{c.nombre}</h4>
                 <span className="comentario-proc-pill" style={{ background: "var(--surface-soft)", color: "var(--brand-deep)", padding: "0.2rem 0.8rem", borderRadius: 100, fontSize: "0.7rem", fontWeight: 600 }}>{c.procedimiento}</span>
                 <div style={{ display: "flex", gap: 2 }}>
-                  {[1,2,3,4,5].map(function(i) { return c.puntuacion >= i ? <FaStar key={i} size={14} color="#C0A080" /> : <FaRegStar key={i} size={14} color="#C0A080" />; })}
+                  {[1,2,3,4,5].map(function(i) { return c.puntuacion >= i ? <FaStar key={i} size={14} color="var(--brand)" /> : <FaRegStar key={i} size={14} color="var(--brand)" />; })}
                 </div>
                 <p style={{ fontSize: "0.85rem", color: "var(--text-soft)", fontStyle: "italic", lineHeight: 1.4, textAlign: "center" }}>&quot;{c.texto.length > 140 ? c.texto.slice(0, 140) + "..." : c.texto}&quot;</p>
-                <span style={{ fontSize: "0.72rem", color: "#8B7A6E" }}>{new Date(c.creado_en).toLocaleDateString(intlLocale, { year: "numeric", month: "long", day: "numeric" })}</span>
+                <span style={{ fontSize: "0.72rem", color: "var(--text-soft)" }}>{new Date(c.creado_en).toLocaleDateString(intlLocale, { year: "numeric", month: "long", day: "numeric" })}</span>
               </div>
             );
           })}
