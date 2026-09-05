@@ -21,7 +21,9 @@ interface AgendarPagoProps {
   tipoPagoOnline: TipoPagoOnline | undefined;
   setTipoPagoOnline: (t: TipoPagoOnline | undefined) => void;
   citaData: CitaSinPagos;
-  onConfirmar: (citaCreada: Cita) => void;
+  /** El segundo argumento es el mensaje de WhatsApp ya compuesto: lo
+   *  envia el boton del recibo, no esta pantalla. */
+  onConfirmar: (citaCreada: Cita, textoWhatsApp: string) => void;
   goBack: () => void;
 }
 
@@ -67,9 +69,20 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
       if (citaData.nota) lineas.push(`${t("whatsapp.note")} ${citaData.nota}`);
       lineas.push(`${t("whatsapp.appointmentNumber")}${nuevaCita.id}*`);
       const texto = lineas.join("\n");
-      window.open(`https://wa.me/573155445748?text=${encodeURIComponent(texto)}`, "_blank");
 
-      onConfirmar(nuevaCita);
+      /* El WhatsApp YA NO se abre aqui: se pasa hecho al paso siguiente,
+         que lo pone en un boton dentro del recibo.
+
+         Dos razones, y la segunda obliga:
+          1. Si se abriera ahora, la persona se va a otra aplicacion en
+             mitad de la animacion de impresion y no la ve.
+          2. `window.open` llamado DESPUES de un await lo bloquea Safari en
+             iPhone, porque el gesto del usuario ya se consumio. Muy
+             probablemente hoy, en iPhone, la cita se guarda y WhatsApp no
+             se abre sin avisar de nada. Desde un boton del recibo el pulsar
+             es un gesto directo y el navegador lo deja pasar. */
+
+      onConfirmar(nuevaCita, texto);
     } catch (err: any) { setError(err.message || t("errorCreate")); }
     finally { setLoading(false); }
   };

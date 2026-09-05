@@ -15,6 +15,7 @@ import {
   rechazarReagendaApi,
 } from "@/services/reagendasApi";
 import type { Cita } from "@/types/domain";
+import ReciboImpreso from "@/components/ReciboImpreso";
 import { formatearFecha, aISOLocal } from "@/lib/fechas";
 
 // Trae jsPDF (pesado) consigo. Se usa solo cuando el paciente abre el
@@ -490,6 +491,25 @@ export default function CitasAgendadas() {
                       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
                         <BotonConsentimiento citaId={String(cita.id)} etiqueta={t("consent.signed")} />
                       </div>
+                    )}
+
+                    {/* El comprobante, plegado. Desplegado siempre alargaria
+                        la lista a mas del doble y esto se consulta de vez en
+                        cuando, no cada vez.
+
+                        Se REGENERA a partir de la cita, no se guarda una copia
+                        de cuando se emitio: si la doctora cambia la fecha, el
+                        comprobante ensena la fecha nueva. Un documento con
+                        pinta de oficial que contradice la cita real es peor
+                        que no tener documento, porque la persona le hace mas
+                        caso a el que a la pantalla. */}
+                    {!isCancelada && (
+                      <details className="recibo-detalle">
+                        <summary>Ver comprobante</summary>
+                        <div style={{ marginTop: "1rem" }}>
+                          <ReciboImpreso cita={cita} locale={intlLocale} />
+                        </div>
+                      </details>
                     )}
                   </div>
                 </motion.div>
