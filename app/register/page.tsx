@@ -31,6 +31,9 @@ export interface RegisterFormData {
   antecedentesDescripcion: string;
   alergiasDescripcion: string;
   medicamentosDescripcion: string;
+  /** Permiso para promociones. Arranca en false y solo lo cambia la persona:
+   *  una casilla premarcada no es consentimiento expreso. */
+  aceptaMarketing: boolean;
 }
 
 type Direction = 1 | -1;
@@ -71,6 +74,7 @@ function RegisterPageContent() {
     antecedentesDescripcion: "",
     alergiasDescripcion: "",
     medicamentosDescripcion: "",
+    aceptaMarketing: false,
   });
 
   // Si los query params llegan después, solo rellenamos si está vacío

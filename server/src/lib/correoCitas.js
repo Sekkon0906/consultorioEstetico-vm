@@ -37,14 +37,31 @@ function fmtFecha(iso) {
   } catch { return String(iso); }
 }
 
-function shell(titulo, inner) {
+/**
+ * `shell` con un tercer parametro: el enlace de baja.
+ *
+ * Va como argumento y NO siempre puesto, porque la baja solo debe aparecer en
+ * los correos comerciales. Ponerla en un recordatorio de cita seria peor que
+ * inutil: sugiere que se puede dejar de recibir el aviso de una cita medica,
+ * y quien lo pulse se quedara esperando un recordatorio que ya no llega.
+ *
+ * Dicho de otro modo: el pie de baja se pasa a proposito en cada envio
+ * comercial, en vez de salir solo. Si algun dia alguien se olvida de pasarlo,
+ * el fallo es que un correo comercial no lleva baja —visible y corregible—, y
+ * no que un correo de servicio la lleva de mas, que es silencioso.
+ */
+function shell(titulo, inner, urlBaja) {
   return `<!doctype html><html lang="es"><body style="margin:0;padding:24px;background:#F6F4EF;font-family:'Helvetica Neue',Arial,sans-serif;color:#3E2E22;">
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" width="560" style="background:#FFFDF9;border-radius:18px;overflow:hidden;box-shadow:0 6px 24px rgba(58,42,26,0.08);">
   <tr><td style="background:linear-gradient(135deg,#B08968,#C9AD8D);padding:28px 32px;text-align:center;">
     <h1 style="margin:0;font-family:'Playfair Display',serif;color:#FFFDF9;font-size:22px;font-weight:700;">${esc(titulo)}</h1>
   </td></tr>
   <tr><td style="padding:32px;">${inner}</td></tr>
-  <tr><td style="padding:18px 32px;background:#F3EBDF;text-align:center;font-size:12px;color:#8B7060;">${MARCA} · Ibagué, Tolima.</td></tr>
+  <tr><td style="padding:18px 32px;background:#F3EBDF;text-align:center;font-size:12px;color:#8B7060;">${MARCA} · Ibagué, Tolima.${
+    urlBaja
+      ? `<br><a href="${urlBaja}" style="color:#8B7060;text-decoration:underline;">Dejar de recibir promociones</a>`
+      : ""
+  }</td></tr>
 </table></body></html>`;
 }
 

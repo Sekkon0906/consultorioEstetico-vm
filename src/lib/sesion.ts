@@ -125,6 +125,9 @@ export async function registrar(datos: {
   antecedentes?: string; antecedentesDescripcion?: string;
   alergias?: string; alergiasDescripcion?: string;
   medicamentos?: string; medicamentosDescripcion?: string;
+  /** Permiso EXPRESO para promociones. Nada que ver con los correos del
+   *  servicio (cita confirmada, recordatorio, contraseña), que van igual. */
+  aceptaMarketing?: boolean;
 }) {
   return pedir<{ ok: boolean; usuario: UsuarioSesion; mensaje: string }>(
     "/auth2/registro",

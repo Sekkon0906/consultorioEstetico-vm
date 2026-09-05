@@ -3,6 +3,7 @@ const router      = express.Router();
 const { pool }    = require("../lib/db");
 const verifyToken = require("../middlewares/verifyToken");
 const requireRole = require("../middlewares/requireRole");
+const marketing   = require("../lib/marketing");
 
 // Mapea BD snake_case → frontend camelCase
 /**
@@ -127,6 +128,52 @@ router.get("/", verifyToken, requireRole(["admin", "developer"]), async (_req, r
   } catch (err) {
     console.error("Error GET /usuarios:", err);
     return res.status(500).json({ ok: false, error: "Error al obtener usuarios" });
+  }
+});
+
+/* ── Permiso para correos comerciales ──────────────────────────────────────
+   Va en su propio endpoint y NO como un campo mas de PUT /usuarios/me.
+
+   El PUT construye el UPDATE con los campos que lleguen, asi que meter aqui
+   `acepta_marketing` funcionaria… y seria un error: guardar el permiso exige
+   ademas sellar la fecha y el origen, y eso se perderia en cuanto alguien
+   editara su telefono y el campo viajara de vuelta sin sello. Un consentimiento
+   sin fecha no sirve para demostrar nada.
+
+   Aparte, tenerlo separado deja el rastro claro en los registros: una llamada
+   a esta ruta es siempre una decision sobre publicidad, nunca un efecto
+   secundario de guardar el perfil. */
+router.put("/me/marketing", verifyToken, async (req, res) => {
+  try {
+    /* `=== true` y no valor verdadero: un formulario manda "false" o "" con
+       facilidad, y las dos son verdaderas al evaluarlas. Con el permiso
+       comercial, dudar significa que no. */
+    const acepta = req.body?.acepta === true;
+    await marketing.fijarPermiso(req.user.id, acepta, "perfil");
+    return res.json({ ok: true, aceptaMarketing: acepta });
+  } catch (err) {
+    console.error("Error PUT /usuarios/me/marketing:", err);
+    return res.status(500).json({ ok: false, error: "No se pudo guardar la preferencia" });
+  }
+});
+
+/* Baja SIN iniciar sesion. Es el enlace del pie de cada correo comercial.
+   Quien esta harto de recibir correos no va a buscar su contrasena para dejar
+   de recibirlos, asi que exigir sesion aqui equivale a no ofrecer la baja.
+
+   Va sin `verifyToken` a proposito y se apoya en la firma. Responde lo mismo
+   con firma buena o mala: si dijera "esa firma no vale" estaria confirmando
+   que el id existe, que es el unico dato que se filtraria por aqui. */
+router.post("/baja-correos", async (req, res) => {
+  const { u, f } = req.body || {};
+  try {
+    if (u && marketing.firmaValida(u, f)) {
+      await marketing.fijarPermiso(u, false, null);
+    }
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("Error POST /usuarios/baja-correos:", err);
+    return res.status(500).json({ ok: false, error: "No se pudo procesar la baja" });
   }
 });
 
