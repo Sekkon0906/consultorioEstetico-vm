@@ -97,6 +97,10 @@ export interface Cita {
   // Consentimiento informado firmado por el paciente
   consentimientoFirmado?: boolean;
   firmaUrl?: string | null;
+  /** Cuándo se firmó. Faltaba aquí y sí estaba en la copia del panel de
+   *  citas: es justo la clase de deriva que aparece cuando un tipo se
+   *  escribe dos veces. */
+  firmaFecha?: string | null;
   consentimientoPdf?: string | null;
 }
 

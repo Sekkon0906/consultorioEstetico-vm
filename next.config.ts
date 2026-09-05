@@ -14,9 +14,13 @@ const nextConfig = {
   // El proyecto usa estilo `var`/`any` de forma sistémica. ESLint NO debe
   // bloquear el build de producción (sigue corriendo con `npm run lint`).
   // El chequeo de tipos de TypeScript SÍ se mantiene activo.
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  /* El bloque `eslint: { ignoreDuringBuilds: true }` salio de aqui al subir
+     a Next 16: la clave ya no existe y el build avisaba de configuracion
+     invalida en cada compilacion.
+     Next 16 ya no ejecuta ESLint durante `next build`, asi que la opcion
+     sobra: el efecto que buscaba —que un aviso de lint no tumbe el
+     despliegue— ahora es el comportamiento por defecto. El lint se corre
+     aparte con `npm run lint`. */
   images: {
     // Calidades permitidas. IMPORTANTE: cuando esta lista existe, Next
     // RECHAZA cualquier quality fuera de ella (rompía /consultorio por
@@ -101,6 +105,11 @@ const nextConfig = {
       "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",
+      /* Chrome avisa en cada carga de que esta directiva "se ignora en una
+         politica de solo-reporte". Es cierto y es esperado: no hace nada
+         hasta que la cabecera pase a `Content-Security-Policy` a secas. Se
+         deja puesta para que al activarla no haya que acordarse de anadirla.
+         Si el aviso molesta al depurar, es este. */
       "upgrade-insecure-requests",
     ].join("; ");
 

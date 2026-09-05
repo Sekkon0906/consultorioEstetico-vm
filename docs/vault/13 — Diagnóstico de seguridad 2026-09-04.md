@@ -66,8 +66,29 @@ Lo que no lo contiene:
   intermediario.
 - 48 bits con una ventana de tiempo conocida no es una barrera criptográfica.
 
-**Estado de exposición hoy:** 1 cita con consentimiento. Es el mejor momento
-posible para arreglarlo.
+**Estado de exposición hoy: NINGUNA — corregido el 2026-09-04.**
+
+El diagnóstico decía "1 cita con consentimiento". **Era falso, y el error fue
+mío.** Lo conté con `count(firma_url)`, y `count()` en SQL cuenta las cadenas
+vacías como presentes. Al ir a migrar el archivo, el script encontró 0: las
+dos columnas de esa cita guardan `''`, no una ruta, y
+`consentimiento_firmado` es `false`.
+
+> **La lección:** para saber si un campo de texto tiene contenido no vale
+> `IS NOT NULL` ni `count()`. Hay que mirar la longitud —`length(coalesce(x,''))
+> > 0`— o comparar contra `''`. Una cadena vacía no es nulo, y en una consulta
+> de auditoría esa diferencia es la que separa "hay un documento clínico
+> expuesto" de "no hay ninguno".
+
+Así que **nunca se ha firmado un consentimiento en producción** y el riesgo era
+teórico, no actual. Sigue habiendo que crear el bucket privado antes del primer
+paciente real —el código usaría el público mientras no exista—, pero no hay
+nada que migrar ni nada expuesto ahora mismo.
+
+**Efecto secundario:** guardar `''` en vez de `NULL` hace que
+`WHERE firma_url IS NOT NULL` mienta. No rompe nada —el endpoint comprueba
+`if (!clave)`, que trata bien la cadena vacía— pero conviene normalizarlo para
+que las consultas de auditoría digan la verdad.
 
 ---
 
@@ -87,7 +108,7 @@ El del servidor se arregla hoy. El del front necesita una tarde y pruebas.
 
 ---
 
-### 🟡 R3 · Credenciales que estuvieron expuestas
+### 🟢 R3 · Credenciales que estuvieron expuestas — **rotadas el 2026-09-04**
 
 Contraseña de Neon y token de R2 pasaron por sitios menos controlados durante
 la migración (DEP1 del backlog). No hay indicio de uso indebido, pero rotarlas
@@ -161,10 +182,14 @@ GET público 200.
 
 1. **Crear `R2_BUCKET_PRIVADO`** en Cloudflare R2 —bucket **sin** acceso
    público— y definir la variable en Railway. *(Usuario. Cierra R1.)*
-2. **Mover el consentimiento que ya existe** al bucket privado. Es 1 archivo.
-   *(Puedo hacerlo yo con un script una vez exista el bucket.)*
+2. ~~**Mover el consentimiento que ya existe.**~~ **No hay ninguno**: se
+   comprobó al ejecutar la migración. El script queda hecho
+   (`server/scripts/migrar-consentimientos-a-privado.js`) por si algo se firma
+   antes de que la variable esté puesta en Railway.
 3. ~~**`npm audit fix` en el servidor.**~~ **Hecho el 2026-09-04.**
-4. **Rotar la contraseña de Neon y el token de R2.** *(Usuario. Cierra R3.)*
+4. ~~**Rotar la contraseña de Neon y el token de R2.**~~ **Hecho el
+   2026-09-04.** Comprobado que las nuevas credenciales dan acceso: el backend
+   responde y R2 lista el bucket.
 
 ### Las semanas siguientes
 

@@ -210,7 +210,12 @@ export default function FirmaConsentimiento(props: Props) {
     var c = canvasRef.current; if (!c) return;
     var ctx = c.getContext("2d"); if (!ctx) return;
     c.width = c.offsetWidth * 2; c.height = c.offsetHeight * 2;
-    ctx.scale(2, 2); ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#2A1C12";
+    ctx.scale(2, 2); ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.lineJoin = "round"; /* Tinta FIJA, no un token del tema. Este canvas se guarda como
+       imagen y acaba dentro del PDF del consentimiento: con un color de
+       tema, en modo oscuro la firma se dibujaria en crema y el documento
+       firmado saldria practicamente en blanco. El lienzo es claro siempre
+       (ver .firma-canvas), asi que la tinta es oscura siempre. */
+    ctx.strokeStyle = "#2A1C12";
   }, [step]);
 
   var getPos = function(e: React.MouseEvent | React.TouchEvent) {
@@ -290,16 +295,16 @@ export default function FirmaConsentimiento(props: Props) {
             style={{ background: "var(--surface)", borderRadius: 24, boxShadow: "0 30px 80px rgba(0,0,0,0.5)", width: "100%", maxWidth: 580, maxHeight: "92vh", overflowY: "auto", position: "relative" }}
             onClick={function(e) { e.stopPropagation(); }}>
               <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)" }} />
-              <button onClick={cerrar} style={{ position: "absolute", top: 14, right: 14, width: 32, height: 32, borderRadius: "50%", background: "rgba(78,59,43,0.06)", border: "none", color: "#4E3B2B", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}><X size={16} /></button>
+              <button onClick={cerrar} style={{ position: "absolute", top: 14, right: 14, width: 32, height: 32, borderRadius: "50%", background: "rgba(78,59,43,0.06)", border: "none", color: "var(--text)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}><X size={16} /></button>
 
               <div style={{ padding: "2rem 2rem 2.5rem" }}>
                 {step === "intro" && (
                   <motion.div initial={false} animate={{ opacity: 1 }}>
                     <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
                       <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand), var(--brand-soft))", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem", boxShadow: "0 4px 12px rgba(176,137,104,0.25)" }}><FileText size={22} color="white" /></div>
-                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "#2A1C12", marginBottom: "0.8rem" }}>{t("title")}</h3>
+                      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.8rem" }}>{t("title")}</h3>
                     </div>
-                    <div className="dark-aware-panel firma-intro-panel" style={{ background: "#F4E9DC", borderRadius: 16, padding: "1.4rem", border: "1px solid rgba(176,137,104,0.3)", marginBottom: "1.5rem" }}>
+                    <div className="dark-aware-panel firma-intro-panel" style={{ background: "var(--surface-soft)", borderRadius: 16, padding: "1.4rem", border: "1px solid rgba(176,137,104,0.3)", marginBottom: "1.5rem" }}>
                       <p style={{ fontSize: "1.02rem", color: "var(--text)", lineHeight: 1.7, margin: 0 }}>{t("intro")}</p>
                     </div>
                     <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
@@ -325,7 +330,7 @@ export default function FirmaConsentimiento(props: Props) {
                     )}
                     <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
                       <button onClick={function() { setStep("intro"); }} style={{ padding: "0.7rem 1.5rem", borderRadius: 100, border: "1px solid rgba(176,137,104,0.3)", background: "transparent", color: "var(--text-soft)", fontWeight: 600, fontSize: "0.88rem", cursor: "pointer" }}>{t("back")}</button>
-                      <button onClick={guardarFirma} disabled={!hasFirma} style={{ padding: "0.7rem 1.8rem", borderRadius: 100, background: hasFirma ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border)", color: hasFirma ? "var(--brand-contrast)" : "#9B8575", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: hasFirma ? "pointer" : "not-allowed" }}>{t("confirm")}</button>
+                      <button onClick={guardarFirma} disabled={!hasFirma} style={{ padding: "0.7rem 1.8rem", borderRadius: 100, background: hasFirma ? "linear-gradient(135deg, var(--brand), var(--brand-soft))" : "var(--border)", color: hasFirma ? "var(--brand-contrast)" : "var(--text-muted)", border: "none", fontWeight: 600, fontSize: "0.88rem", cursor: hasFirma ? "pointer" : "not-allowed" }}>{t("confirm")}</button>
                     </div>
                   </motion.div>
                 )}
@@ -339,8 +344,8 @@ export default function FirmaConsentimiento(props: Props) {
 
                 {step === "listo" && (
                   <motion.div initial={{ scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: "center" }}>
-                    <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#E8F5E9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+                    <div style={{ width: 56, height: 56, borderRadius: "50%", background: "var(--estado-atendida-bg)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--estado-atendida)" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>
                     <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontWeight: 700, color: "var(--text)", marginBottom: "0.5rem" }}>{t("doneTitle")}</h3>
                     <p style={{ fontSize: "0.88rem", color: "var(--text-soft)", marginBottom: "1.5rem" }}>{t("doneMessage")}</p>
@@ -377,7 +382,7 @@ export function BotonPDFConsentimiento(props: { citaId: string | number; firmado
       disabled={!props.firmado}
       style={{
         display: "flex", alignItems: "center", gap: 6, padding: "0.5rem 1rem", borderRadius: 100,
-        background: props.firmado ? "linear-gradient(135deg, #2E7D32, #43A047)" : "transparent",
+        background: props.firmado ? "linear-gradient(135deg, var(--estado-atendida), color-mix(in srgb, var(--estado-atendida) 70%, #FFFFFF))" : "transparent",
         color: props.firmado ? "white" : "#ccc",
         border: props.firmado ? "none" : "1px solid var(--border)",
         fontWeight: 600, fontSize: "0.78rem", cursor: props.firmado ? "pointer" : "default",

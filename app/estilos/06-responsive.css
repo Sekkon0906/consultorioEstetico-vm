@@ -3786,7 +3786,14 @@ footer a:hover i {
    pública: en el panel es un <button>.
 
    Se excluye por clase y no se quita el reset, que sigue haciendo falta
-   para los enlaces normales del panel. */
+   para los enlaces normales del panel.
+
+   REGLA PRACTICA, porque esto ya ha mordido dos veces:
+   **cualquier <a> con fondo de marca necesita la clase `.btn-accion`.**
+   Sin ella, su `color` en linea pierde contra el !important de aqui, hereda
+   el color del texto de la pagina y —como en modo oscuro ese color es el
+   mismo crema que `--brand-deep`— el boton se queda literalmente vacio.
+   Paso con "Agendar este procedimiento" y otra vez con el 404. */
 a:not(.btn-accion) {
   text-decoration: none !important;
   color: inherit !important;

@@ -213,7 +213,19 @@ router.get("/google/callback", async (req, res) => {
 });
 
 // ── Estado de configuración ─────────────────────────────────────────────────
-// Para que el frontend sepa si mostrar el botón de Google, sin exponer claves.
+/**
+ * Qué hay configurado, sin decir CON QUÉ.
+ *
+ * Devuelve booleanos, nunca valores: sirve para que el frontend sepa si
+ * mostrar el botón de Google, y para poder comprobar desde fuera —sin
+ * entrar a Railway— que una variable crítica llegó al servidor.
+ *
+ * `almacenamientoPrivado` está aquí por eso último. Mientras sea `false`,
+ * los consentimientos firmados se guardan en el bucket PÚBLICO, y eso es
+ * lo que hay que poder verificar de un vistazo antes de atender al primer
+ * paciente. Saber que existe no ayuda a nadie a entrar: el nombre del
+ * bucket no es una credencial, y aquí ni siquiera se dice.
+ */
 router.get("/estado", (_req, res) => {
   res.json({
     ok: true,
@@ -221,6 +233,7 @@ router.get("/estado", (_req, res) => {
       google: auth.googleConfigurado(),
       correo: Boolean(process.env.RESEND_API_KEY),
       jwt: Boolean(process.env.JWT_SECRET),
+      almacenamientoPrivado: Boolean(process.env.R2_BUCKET_PRIVADO),
     },
   });
 });
