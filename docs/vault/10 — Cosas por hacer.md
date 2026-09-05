@@ -446,3 +446,100 @@ valor claro. Es la continuación natural de F14.
 
 - Rol **admin** para `medinapipe123@gmail.com` en producción (fila en
   `admin_users`). Para verlo: recargar la página o cerrar y volver a entrar.
+
+---
+
+## 🔴 Bloqueantes reales — revisado 2026-09-05
+
+Esta sección va arriba del todo a propósito: lo de abajo es backlog, esto es lo
+que impide que la web funcione hoy.
+
+- [ ] **C1 · Encender los correos. Es lo que más resultado da por menos
+      trabajo de todo el proyecto.** Los siete correos ya están escritos y
+      conectados —verificado función por función—: verificar cuenta, recuperar
+      contraseña, nueva cita a la doctora, cita confirmada al paciente,
+      reagenda, recordatorio del día anterior y el cron que lo dispara. **No
+      llega nada por configuración, no por código.** Faltan cuatro variables:
+      la clave de Resend, el correo de destino de la doctora, el secreto del
+      cron —con **el mismo valor** en Vercel y en Railway, o el cron devuelve
+      401 y los recordatorios no salen— y la URL de la API en Vercel.
+
+      **Atajo para probarlo sin dominio:** Resend, mientras no haya dominio
+      verificado, solo deja enviar a la dirección con la que se creó la cuenta.
+      Si la cuenta se crea con el correo de la doctora y se pone esa misma
+      dirección como destino, el aviso de cita nueva **funciona ya**. Para
+      escribir a las pacientes sí hace falta el dominio ([[10 — Cosas por
+      hacer#DEP2 · Dominio propio|DEP2]]).
+
+- [ ] **BUG-IOS · El aviso por WhatsApp probablemente no se abre en iPhone.**
+      La ventana se pide **después** de esperar la respuesta del servidor, y
+      Safari la bloquea porque el gesto del usuario ya se consumió. Si se
+      confirma, hoy se están creando citas de las que la doctora no se entera,
+      en silencio. **Hay que probarlo en un iPhone real antes de tocar nada.**
+      Se arregla solo con el recibo, poniendo el botón en el recibo ya
+      dibujado: ahí el pulsar es un gesto directo, sin espera por delante.
+
+---
+
+## 🟩 Cerrado el 2026-09-05
+
+Se deja escrito para no volver a abrirlo por error.
+
+- [x] **Móvil — objetivos táctiles.** Barrido medido de las 12 rutas públicas a
+      375×812. No queda ningún control por debajo de 44 px salvo dos a
+      propósito: el logo del navbar (42, es un logo y no un control) y la
+      insignia del carrito (42, donde subir 2 px obliga a recolocar la fila).
+- [x] **Móvil — el zoom de iOS al enfocar un campo.** Los campos medían 14,5 px
+      y Safari ampliaba la página sin devolverla.
+- [x] **La barra de navegación se rompía antes de colapsar.** Pedía 1163 px de
+      menú (1341 con «Administrar») y colapsaba en 768.
+- [x] **El favicon vuelve a ser el logo real de la doctora.**
+- [x] **Consentimiento de marketing** — ver [[007 — El permiso comercial vive
+      aparte de los correos del servicio]]. Migración 008 **ya aplicada en
+      producción**.
+- [x] **Entrar y crear cuenta en una pantalla** — ver [[008 — Entrar y
+      registrarse comparten pantalla y estado]].
+
+---
+
+## 🟦 Siguiente tanda acordada
+
+- [ ] **El recibo impreso.** Animación de impresora de recibos, el papel
+      bajando desde arriba, y los recibos guardados en «Mis citas». Orden
+      acordado: **confirmar → se imprime → el recibo trae el botón de
+      WhatsApp**. Razón: si la impresión ocurre mientras se envía el WhatsApp,
+      la persona se va a otra aplicación en mitad de la animación y no la ve;
+      y con el botón dentro del recibo se arregla de paso el bloqueo de Safari.
+
+      **Decisión pendiente antes de escribir código:** si la doctora cambia la
+      fecha, ¿el recibo se regenera o queda como una foto del momento? La
+      recomendación es que se regenere, con el número de recibo igual al de la
+      cita. Un recibo guardado que contradice la cita real es peor que no tener
+      recibo.
+
+- [ ] **Tarjeta de fidelidad.** Descuento al séptimo procedimiento, con panel
+      para que la doctora ajuste el número y el porcentaje. El contador puede
+      reusar tal cual la lógica del historial, que ya cuenta solo citas
+      atendidas y pasadas.
+
+      **Tres decisiones que son de la doctora, no técnicas:** ¿qué cuenta, solo
+      lo atendido? ¿se reinicia al usarlo? ¿caduca? Siete procedimientos en un
+      año no es lo mismo que siete en cinco.
+
+- [ ] **Promociones por correo.** Depende de C1 y del consentimiento, que ya
+      está puesto.
+
+---
+
+## ⚫ Descartado
+
+- **Pasarela de pago.** Descartada por el usuario el 2026-09-05. Se había
+  evaluado Wompi como la más razonable —alta sencilla con RUT, PSE con tarifa
+  plana, Nequi incluido, y sobre todo widget alojado, que mantiene los datos de
+  tarjeta fuera del servidor propio—, pero se decidió no implementarla.
+
+  Queda **andamiaje muerto** de un pago en línea que nunca existió: una columna
+  de tipo de pago en línea con una restricción que solo admite PayU y PSE, más
+  el campo arrastrado por las rutas de citas y su cliente. **Pendiente de
+  confirmar si se retira.** Si se retira, en dos pasos: primero dejar de leerlo
+  y escribirlo en el código, y borrar la columna semanas después.
