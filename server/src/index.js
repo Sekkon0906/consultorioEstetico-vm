@@ -85,6 +85,24 @@ app.use("/galeria-confianza", galeriaConfianzaRoutes);
 app.use("/copiloto",       limiteIa, copilotoRoutes);
 app.use("/",               reagendasRoutes);  // /citas/:id/solicitar-reagenda y /reagendas
 
+/* ── Servidor MCP ──────────────────────────────────────────────
+   Deja que la doctora maneje el consultorio desde SU Claude, con su
+   suscripcion, en vez de que el sitio pague inferencia por fichas.
+
+   SOLO SE MONTA SI HAY TOKEN. Estas herramientas escriben en la base de un
+   consultorio medico: un MCP abierto en internet es una consola de
+   administracion abierta en internet. Sin `MCP_TOKEN` la ruta no existe, que
+   es lo unico seguro que se puede hacer por defecto.
+
+   Comparte el limitador de la IA porque el perfil de uso es el mismo: pocas
+   peticiones, caras si alguien las repite en bucle. */
+if (process.env.MCP_TOKEN) {
+  app.use("/mcp", limiteIa, require("./mcp/servidor"));
+  console.log("[mcp] servidor montado en /mcp");
+} else {
+  console.log("[mcp] MCP_TOKEN sin configurar: el servidor MCP no se monta.");
+}
+
 // ── MANEJO GLOBAL DE ERRORES ─────────────────────────────────
 app.use((err, _req, res, _next) => {
   /* Un cuerpo mal formado NO es un fallo del servidor.
