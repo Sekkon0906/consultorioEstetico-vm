@@ -7,6 +7,17 @@ const B = "https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev/ConsultorioImagen
 export const IMG = {
   logo: `${B}/Logo/LogoJM.jpg`,
 
+  /* Las dos mitades de la pantalla de acceso. Una por estado, para que al
+     cambiar entre entrar y crear cuenta no cambie solo el lado: cambia
+     tambien lo que se ve.
+
+     Las dos en JPG y de peso parecido (87 y 88 KB). `registrarse` llego como
+     PNG de 1,79 MB; convertida baja un 95% sin diferencia visible, y eso
+     importa aqui mas que en otra pagina: las dos se precargan a la vez para
+     que el cambio de lado no enseñe un hueco. */
+  accesoEntrar: `${B}/ImagenesPublicas/iniciarSesion.jpg`,
+  accesoRegistro: `${B}/ImagenesPublicas/registrarse.jpg`,
+
   homeCarrusel: [
     `${B}/ImagenesPublicas/carrucel_home1.jpg`,
     `${B}/ImagenesPublicas/carrucel_home2.jpg`,

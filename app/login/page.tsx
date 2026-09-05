@@ -1,63 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import dynamic from "next/dynamic";
 import LoginForm from "./LoginForm";
 import { PALETTE } from "./palette2";
+import PanelAcceso from "@/components/PanelAcceso";
 
-// Fondo 3D (Three.js) diferido: es decorativo, no debe bloquear el login.
-const FondoAnim = dynamic(() => import("@/components/FondoAnim"), {
-  ssr: false,
-});
+/* El fondo 3D (FondoAnim) sale de aqui. Con la pantalla partida, la mitad
+   derecha ya es una foto a sangre: dos fondos compitiendo se estorban, y el
+   de Three.js costaba una descarga y una animacion continua para quedar
+   tapado. El texto tampoco esta ya centrado sobre el, asi que su unico
+   efecto era ruido detras del formulario. */
 
 export default function LoginPage() {
   const [err, setErr] = useState<string | null>(null);
 
   return (
-    <section
-      className="py-5 position-relative"
-      style={{
-        background: "linear-gradient(180deg,var(--bg) 0%,#F1E9E0 100%)",
-        minHeight: "var(--alto-pantalla, 100vh)",
-        display: "flex",
-        alignItems: "center",
-        overflow: "hidden",
-      }}
-    >
-      <div className="absolute inset-0 z-0">
-        <FondoAnim />
-      </div>
-
-      <div className="container position-relative z-10">
-        <div className="row justify-content-center">
-          <div className="col-md-7 col-lg-5">
-            <div
-              className={`card border-0 shadow-lg rounded-4 ${err ? "shake" : ""}`}
-              style={{ backgroundColor: PALETTE.surface, transition: "all 0.4s ease" }}
-            >
-              <div className="card-body p-4 p-md-5 text-center">
-                <h1
-                  className="fw-bold mb-1"
-                  style={{ color: PALETTE.text, fontFamily: "'Playfair Display', serif" }}
-                >
-                  Iniciar sesión
-                </h1>
-                <p className="text-muted mb-4" style={{ color: PALETTE.muted, fontSize: "0.95rem" }}>
-                  Ingresa tus credenciales para disfrutar de todo lo que ofrecemos.
-                </p>
-                {err && (
-                  <div
-                    className="alert alert-danger text-center"
-                    style={{ backgroundColor: "#FCEAEA", color: "#8C2B2B", border: "1px solid #E3B4A0" }}
-                  >
-                    {err}
-                  </div>
-                )}
-                <LoginForm setErr={setErr} />
-              </div>
-            </div>
+    <PanelAcceso modo="entrar">
+      <div className={err ? "shake" : ""} style={{ transition: "all 0.4s ease" }}>
+        <h1
+          className="fw-bold mb-1"
+          style={{ color: PALETTE.text, fontFamily: "'Playfair Display', serif", fontSize: "1.85rem" }}
+        >
+          Iniciar sesión
+        </h1>
+        <p className="mb-4" style={{ color: PALETTE.muted, fontSize: "0.95rem" }}>
+          Ingresa tus credenciales para disfrutar de todo lo que ofrecemos.
+        </p>
+        {err && (
+          <div
+            className="alert alert-danger"
+            style={{ backgroundColor: "#FCEAEA", color: "#8C2B2B", border: "1px solid #E3B4A0" }}
+          >
+            {err}
           </div>
-        </div>
+        )}
+        <LoginForm setErr={setErr} />
       </div>
 
       <style jsx>{`
@@ -71,6 +48,6 @@ export default function LoginPage() {
           100%{ transform: translateX(0); }
         }
       `}</style>
-    </section>
+    </PanelAcceso>
   );
 }

@@ -4543,3 +4543,175 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   .navbar-container div:has(> .navbar-menu) { display: none !important; }
   .hamburger-btn { display: flex; }
 }
+
+/* ============================================================
+   PANTALLA DE ACCESO EN DOS MITADES (PanelAcceso)
+   ============================================================
+   El formulario a un lado y el porqué al otro, intercambiándose entre entrar
+   y crear cuenta. El intercambio se hace con `order` y no reordenando el
+   marcado: en el DOM el formulario va SIEMPRE primero, así que con teclado y
+   con lector de pantalla se llega antes al campo de correo que a los
+   argumentos, en los dos estados. Cambiar el orden real haría que crear
+   cuenta obligara a pasar por cuatro ventajas antes de poder escribir. */
+
+.acceso-envoltorio {
+  min-height: var(--alto-pantalla, 100vh);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%);
+}
+
+.acceso-rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  width: 100%;
+  max-width: 1120px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px -20px rgba(58, 42, 26, 0.28);
+}
+
+/* El intercambio. Por defecto: formulario izquierda, info derecha. */
+.acceso-columna-form { order: 1; }
+.acceso-columna-info { order: 2; }
+.acceso-rejilla.es-registro .acceso-columna-form { order: 2; }
+.acceso-rejilla.es-registro .acceso-columna-info { order: 1; }
+
+.acceso-columna-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.75rem 2.5rem;
+  min-width: 0;
+}
+
+.acceso-columna-info {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--surface);
+}
+
+.acceso-foto {
+  position: relative;
+  /* Proporción fija arriba: sin ella la foto crece con el alto del formulario
+     y en registro —que es más largo— la imagen se estiraba hasta deformar el
+     encuadre de la cara. */
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.acceso-velo {
+  position: absolute;
+  inset: 0;
+  /* Solo abajo: arriba está la cara y ahí no debe caer nada. El degradado
+     existe para que el borde entre foto y texto no sea una línea dura. */
+  background: linear-gradient(180deg, transparent 55%, var(--surface) 100%);
+}
+
+.acceso-info-texto {
+  padding: 1.5rem 2rem 2.25rem;
+}
+
+.acceso-info-titulo {
+  font-family: "Playfair Display", serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 1.2rem;
+}
+
+.acceso-ventajas {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.acceso-ventajas li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.acceso-ventaja-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--brand) 14%, var(--surface));
+  color: var(--brand);
+}
+
+.acceso-ventajas strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.acceso-ventajas span span {
+  display: block;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+
+.acceso-pie {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-soft);
+}
+
+.acceso-pie a {
+  color: var(--brand);
+  font-weight: 700;
+  /* `.btn-accion` no: esto es un enlace de texto, y el reset de anclas de
+     esta hoja solo pisa el color de los que NO llevan esa clase. Se declara
+     aquí con la especificidad de la clase, que sí gana. */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --- Apilado ---
+   1100 y no 992: la rejilla es de dos mitades sobre un máximo de 1120, así
+   que por debajo de eso cada columna baja de 550 y el formulario empieza a
+   apretarse antes de que el ancho de la ventana lo justifique. */
+@media (max-width: 1100px) {
+  .acceso-rejilla,
+  .acceso-rejilla.es-registro {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* El porqué va SIEMPRE debajo, en los dos estados. Quien abre esta pantalla
+     ya sabe a qué viene; los argumentos delante del campo de correo son un
+     obstáculo. Debajo siguen sirviendo a quien dudaba. */
+  .acceso-rejilla .acceso-columna-form,
+  .acceso-rejilla.es-registro .acceso-columna-form { order: 1; }
+  .acceso-rejilla .acceso-columna-info,
+  .acceso-rejilla.es-registro .acceso-columna-info { order: 2; }
+
+  .acceso-columna-form { padding: 2rem 1.5rem; }
+  /* Apaisada al apilarse: una foto 4:3 a ancho completo empuja el porqué
+     fuera de la pantalla y deja de acompañar al texto. */
+  .acceso-foto { aspect-ratio: 16 / 9; }
+  .acceso-info-texto { padding: 1.25rem 1.5rem 2rem; }
+}
+
+@media (max-width: 576px) {
+  .acceso-envoltorio { padding: 1rem 0.75rem; }
+  .acceso-rejilla { border-radius: 18px; }
+  .acceso-columna-form { padding: 1.75rem 1.15rem; }
+}

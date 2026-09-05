@@ -7,6 +7,7 @@ import { PALETTE } from "./palette";
 import Step1DatosPersonales from "./step1DatosPersonales";
 import Step2DatosMedicos from "./step2DatosMedicos";
 import Step3Exito from "./step3exito";
+import PanelAcceso from "@/components/PanelAcceso";
 
 // ===== Tipo central de TODO el formulario de registro =====
 export interface RegisterFormData {
@@ -111,23 +112,13 @@ function RegisterPageContent() {
   };
 
   return (
-    <section
-      className="py-5"
-      style={{
-        background: `linear-gradient(180deg,var(--bg) 0%,#F1E9E0 100%)`,
-        minHeight: "var(--alto-pantalla, 100vh)",
-        display: "flex",
-        alignItems: "center",
-      }}
-    >
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-8 col-lg-6">
-            <div
-              className="card border-0 shadow-lg rounded-4"
-              style={{ backgroundColor: PALETTE.surface, overflow: "hidden" }}
-            >
-              <div className="card-body p-4 p-md-5 text-center position-relative">
+    /* `modo="registro"` invierte los lados respecto a /login: aqui el
+       formulario va a la derecha. Es la senal mas barata de que has cambiado
+       de pantalla; dos formularios parecidos en la misma posicion se
+       confunden entre si. */
+    <PanelAcceso modo="registro">
+      <div>
+        <div className="text-center position-relative">
                 {/* Botón volver */}
                 {step > 1 && step < 3 && (
                   <p
@@ -253,10 +244,7 @@ function RegisterPageContent() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
-              </div>
-            </div>
-          </div>
+        </div>
         </div>
       </div>
 
@@ -288,7 +276,7 @@ function RegisterPageContent() {
           background-color: ${PALETTE.main};
         }
       `}</style>
-    </section>
+    </PanelAcceso>
   );
 }
 
