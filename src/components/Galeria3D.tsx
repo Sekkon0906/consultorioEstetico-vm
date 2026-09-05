@@ -23,6 +23,19 @@ export default function Galeria3D() {
   const [rotation, setRotation] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  /**
+   * Qué tarjeta está girada.
+   *
+   * Antes esto abría un panel encima con la página desenfocada detrás. El
+   * desenfoque es caro —obliga al navegador a rasterizar y recomponer todo
+   * lo que hay debajo— y además rompe la continuidad: la tarjeta que
+   * pulsaste desaparece y en su lugar surge otra cosa.
+   *
+   * Girarla mantiene el objeto. Pulsas una tarjeta, esa misma tarjeta se da
+   * la vuelta y por detrás está lo que querías leer. No hay nada que buscar
+   * con la vista porque nada se ha movido de sitio.
+   */
+  const [girada, setGirada] = useState<string | null>(null);
   const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
 
@@ -475,19 +488,48 @@ export default function Galeria3D() {
                   }}
                 >
                   <div
-                    className={`g3d-card ${isFront ? "is-front" : ""}`}
-                    onClick={() => setSelected(tr.id)}
+                    className={`g3d-card ${isFront ? "is-front" : ""} ${girada === tr.id ? "esta-girada" : ""}`}
+                    onClick={() => setGirada(girada === tr.id ? null : tr.id)}
+                    role="button"
+                    tabIndex={isFront ? 0 : -1}
+                    aria-pressed={girada === tr.id}
+                    aria-label={`${tr.nombre}. Pulsa para ver los detalles`}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setGirada(girada === tr.id ? null : tr.id);
+                      }
+                    }}
                     style={{
                       position: "relative",
                       width: "100%",
                       height: "100%",
-                      borderRadius: 20,
-                      overflow: "hidden",
-                      backgroundColor: "var(--surface)",
-                      border: "1.5px solid rgba(255, 235, 215, 0.55)",
                       cursor: "pointer",
+                      /* `preserve-3d` es lo que hace que las dos caras vivan
+                         en el mismo espacio tridimensional. Sin esto, girar
+                         el contenedor aplana a los hijos y la cara de atrás
+                         nunca llega a verse. */
+                      transformStyle: "preserve-3d",
+                      transform: girada === tr.id ? "rotateY(180deg)" : "rotateY(0deg)",
+                      transition: "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)",
                     }}
                   >
+                    {/* ── CARA FRONTAL ── */}
+                    <div
+                      className="g3d-cara g3d-cara-frente"
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        borderRadius: 20,
+                        overflow: "hidden",
+                        backgroundColor: "var(--surface)",
+                        border: "1.5px solid rgba(255, 235, 215, 0.55)",
+                        /* Sin esto se vería la cara de atrás del revés
+                           through la de delante, como una calcomanía. */
+                        backfaceVisibility: "hidden",
+                        WebkitBackfaceVisibility: "hidden",
+                      }}
+                    >
                     <img
                       src={tr.imagen || undefined}
                       alt={tr.nombre}
@@ -546,6 +588,84 @@ export default function Galeria3D() {
                         {tr.nombre}
                       </p>
                     </div>
+                    </div>
+
+                    {/* ── CARA TRASERA ──
+                        Ya girada 180°, así que al rotar el contenedor otros
+                        180° queda de frente. Es la misma tarjeta: mismo
+                        tamaño, mismo radio, mismo sitio. */}
+                    <div
+                      className="g3d-cara g3d-cara-dorso"
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        borderRadius: 20,
+                        overflow: "hidden",
+                        background: "var(--bg-elevated)",
+                        border: "1.5px solid var(--border-strong)",
+                        backfaceVisibility: "hidden",
+                        WebkitBackfaceVisibility: "hidden",
+                        transform: "rotateY(180deg)",
+                        display: "flex",
+                        flexDirection: "column",
+                        padding: "1.3rem 1.2rem",
+                        gap: "0.5rem",
+                      }}
+                    >
+                      <h3
+                        style={{
+                          margin: 0,
+                          fontFamily: "'Playfair Display', serif",
+                          fontSize: "1.05rem",
+                          fontWeight: 700,
+                          color: "var(--text)",
+                          lineHeight: 1.25,
+                        }}
+                      >
+                        {tr.nombre}
+                      </h3>
+                      <span
+                        aria-hidden="true"
+                        style={{ width: 34, height: 2, background: "var(--brand)", borderRadius: 2 }}
+                      />
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "0.86rem",
+                          color: "var(--text-soft)",
+                          lineHeight: 1.55,
+                          flex: 1,
+                          overflow: "hidden",
+                        }}
+                      >
+                        {tr.desc}
+                      </p>
+                      {tr.precio && (
+                        <p style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--brand)" }}>
+                          {Number(String(tr.precio).replace(/[^\d]/g, "")).toLocaleString("es-CO")}{" "}
+                          <span style={{ fontSize: "0.7rem", fontWeight: 600, color: "var(--text-muted)" }}>COP</span>
+                        </p>
+                      )}
+                      <Link
+                        href={`/procedimientos/${tr.id}`}
+                        className="btn-accion g3d-cta"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          padding: "0.65rem 1rem",
+                          borderRadius: 100,
+                          background: "linear-gradient(135deg, var(--brand), var(--brand-soft))",
+                          color: "var(--brand-contrast)",
+                          fontWeight: 700,
+                          fontSize: "0.84rem",
+                          textDecoration: "none",
+                        }}
+                      >
+                        Conocer más
+                      </Link>
+                    </div>
                   </div>
                 </div>
               );
@@ -569,8 +689,13 @@ export default function Galeria3D() {
                 key={tr.id}
                 type="button"
                 className="g3d-grid-card"
-                onClick={() => setSelected(tr.id)}
-                aria-label={tr.nombre}
+                /* En móvil la tarjeta gira igual que en escritorio. Si aquí
+                   se quedara el panel con la página desenfocada detrás, la
+                   mitad de las visitas —que son móvil— seguirían viendo lo
+                   que se quiso quitar. */
+                onClick={() => setGirada(girada === tr.id ? null : tr.id)}
+                aria-pressed={girada === tr.id}
+                aria-label={`${tr.nombre}. Pulsa para ver los detalles`}
                 initial={{ y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
@@ -585,6 +710,19 @@ export default function Galeria3D() {
                   </span>
                 )}
                 <span className="g3d-grid-name">{tr.nombre}</span>
+
+                {/* El dorso. Aparece encima al girar; la tarjeta de móvil es
+                    pequeña, así que aquí solo cabe lo esencial: qué es y
+                    cuánto cuesta. */}
+                <span className={`g3d-grid-dorso ${girada === tr.id ? "visible" : ""}`}>
+                  <span className="g3d-grid-dorso-titulo">{tr.nombre}</span>
+                  <span className="g3d-grid-dorso-desc">{tr.desc}</span>
+                  {tr.precio && (
+                    <span className="g3d-grid-dorso-precio">
+                      {Number(String(tr.precio).replace(/[^\d]/g, "")).toLocaleString("es-CO")} COP
+                    </span>
+                  )}
+                </span>
               </motion.button>
             ))}
           </div>

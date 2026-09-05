@@ -404,6 +404,60 @@
     background: #1f1812;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
   }
+  /* El dorso de la tarjeta de móvil.
+     No se usa `rotateY` aquí como en escritorio: estas tarjetas viven en un
+     carrusel con `scroll-snap`, y un hijo rotado en 3D dentro de un
+     contenedor con scroll horizontal provoca saltos de posición en iOS. Se
+     resuelve con un cruce de opacidad y una escala mínima, que da la misma
+     sensación de "la tarjeta se dio la vuelta" sin tocar el sistema de
+     coordenadas del carrusel. */
+  .g3d-stage .g3d-grid-dorso {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.9rem 0.8rem;
+    text-align: left;
+    background: var(--bg-elevated);
+    border-radius: 14px;
+    opacity: 0;
+    transform: scale(0.94);
+    pointer-events: none;
+    transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .g3d-stage .g3d-grid-dorso.visible {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+  .g3d-stage .g3d-grid-dorso-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.25;
+  }
+  .g3d-stage .g3d-grid-dorso-desc {
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    line-height: 1.45;
+    /* Cortado a cuatro líneas: la tarjeta mide 40vw y el texto completo la
+       desbordaría por abajo sin que se note dónde acaba. */
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .g3d-stage .g3d-grid-dorso-precio {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--brand);
+  }
+
   .g3d-stage .g3d-grid-card img {
     position: absolute;
     inset: 0;
