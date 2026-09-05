@@ -3973,6 +3973,38 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   }
 }
 
+
+/* ============================================================
+   TARJETA QUE GIRA — foco
+   ============================================================
+   Al hacerla `role="button"` con `tabIndex` para que responda a Enter y
+   espacio, el navegador empezó a dibujarle su aro de foco AL PULSARLA con el
+   ratón: un recuadro oscuro alrededor de la tarjeta girada que no estaba
+   antes y que se lee como un borde de más.
+
+   `:focus-visible` es justo esta distinción: el navegador solo lo aplica
+   cuando el foco llegó por teclado. Así que se apaga el aro genérico y se
+   deja el bueno.
+
+   NO se quita el foco a secas. Sin aro, quien navega con Tab pierde de vista
+   dónde está, y eso es peor que un recuadro feo. */
+.g3d-card:focus {
+  outline: none;
+}
+.g3d-card:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 4px;
+  border-radius: 22px;
+}
+/* Lo mismo para la tarjeta de móvil, que es un <button> de verdad. */
+.g3d-grid-card:focus {
+  outline: none;
+}
+.g3d-grid-card:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
 /* ============================================================
    GALERÍA DE "POR QUÉ CONFIARME"
    ============================================================

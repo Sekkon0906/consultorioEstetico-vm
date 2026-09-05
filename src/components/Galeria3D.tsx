@@ -753,9 +753,11 @@ export default function Galeria3D() {
           className="g3d-dots-wrap"
           style={{
             position: "absolute",
-            /* Baja del 19 % al 14 %: separa el indicador de posición de las
-               tarjetas, que es lo que pedía el rediseño. */
-            bottom: "14%",
+            /* Del 14 % al 7 %. Con las tarjetas girando, el dorso ocupa
+               todo el alto de la tarjeta y el indicador quedaba pegado
+               justo debajo, leyéndose casi como parte de ella. Bajarlo lo
+               deja centrado en el hueco que hay hasta el botón de abajo. */
+            bottom: "7%",
             right: "30%",
             transform: "translateX(50%)",
             zIndex: 5,
