@@ -136,16 +136,35 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
         @media (max-width: 900px) {
           .cal-grid { grid-template-columns: 1fr; gap: 1.2rem; }
           .cal-card { padding: 1.4rem; }
-          .cal-day-btn { width: 42px; height: 42px; font-size: 0.92rem; }
+          /* Ancho FLUIDO, no fijo. Las columnas son repeat(7, 1fr), y un
+             1fr no puede encoger por debajo de su contenido: al poner 44px
+             fijos, los 7 botones mas los huecos sumaban 350px dentro de los
+             328 disponibles y el domingo se salia de la pantalla. Dejando que
+             el boton llene su columna, la rejilla manda y nunca desborda;
+             aspect-ratio lo mantiene redondo. */
+          .cal-day-btn {
+            width: 100%;
+            max-width: 44px;
+            height: auto;
+            aspect-ratio: 1;
+            font-size: 0.92rem;
+          }
           .cal-month-title { font-size: 1.25rem; }
           .cal-hours-title { font-size: 1.2rem; }
-          .cal-hour-btn { padding: 0.65rem 0.25rem; font-size: 0.82rem; }
+          .cal-hour-btn { padding: 0.65rem 0.25rem; font-size: 0.82rem; min-height: 44px; }
           .cal-wrap { padding: 1rem 0.6rem; }
         }
         @media (max-width: 420px) {
-          .cal-day-btn { width: 36px; height: 36px; font-size: 0.82rem; }
-          .cal-hour-btn { padding: 0.55rem 0.2rem; font-size: 0.78rem; }
-          .cal-card { padding: 1rem; }
+          /* Elegir fecha es EL paso de la reserva, y el dia media 36px. Para
+             llegar a 44 hay que sacar el espacio de algun sitio: se recorta
+             el relleno de la tarjeta y el hueco entre dias. Con eso, en una
+             pantalla de 375 la columna queda en ~45px. En pantallas mas
+             estrechas el boton encoge en vez de desbordar, que es la manera
+             correcta de quedarse corto. */
+          .cal-card { padding: 0.55rem; }
+          .cal-days-grid { gap: 4px !important; }
+          .cal-day-btn { max-width: 48px; font-size: 0.9rem; }
+          .cal-hour-btn { padding: 0.55rem 0.2rem; font-size: 0.8rem; min-height: 44px; }
         }
       `}</style>
 
@@ -177,7 +196,7 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
               {WEEKDAYS.map((d, i) => <div key={`wd-${i}`} style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-muted)", paddingBottom: 10 }}>{d}</div>)}
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 7 }}>
+            <div className="cal-days-grid" style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 7 }}>
               {generarDias().map((dia, i) => {
                 if (!dia) return <div key={`e-${i}`} />;
                 const iso = `${anio}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;

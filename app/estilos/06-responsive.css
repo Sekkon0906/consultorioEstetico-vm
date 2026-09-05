@@ -252,10 +252,16 @@
     content: "";
     position: absolute;
     inset: 0;
+    /* El velo arrancaba a tope desde el pixel 0 y le caia justo encima de la
+       cara, que es lo unico que la foto tiene que ensenar. Ahora los
+       primeros 28% van practicamente limpios y el oscurecido se concentra en
+       la mitad de abajo, que es donde va el texto y donde de verdad hace
+       falta para que se lea. */
     background: linear-gradient(
       180deg,
-      var(--foto-velo-suave) 0%,
-      var(--foto-velo-medio) 45%,
+      transparent 0%,
+      var(--foto-velo-suave) 28%,
+      var(--foto-velo-medio) 58%,
       var(--foto-velo-fuerte) 100%
     );
     pointer-events: none;
@@ -513,16 +519,45 @@
     gap: 6px;
     margin-top: 0.8rem;
   }
+  /* El punto medido era de 6x6 px. Una yema de dedo cubre unos 45px, asi
+     que acertar era cuestion de suerte.
+
+     El punto visible pasa a ser un pseudo-elemento y el <button> se queda de
+     area sensible. No se puede resolver con `padding` + `background-clip`,
+     que seria lo primero que uno prueba: el `border-radius` se calcula sobre
+     la caja de borde, asi que al recortar el fondo al contenido los puntos
+     saldrian cuadrados.
+
+     El ancho es 12px = 6px de punto + 6px de hueco, justo el `gap` de la
+     fila. Asi las areas se tocan sin solaparse: ni zonas muertas entre
+     puntos, ni un punto robandole el toque al vecino. En alto van los 44px
+     enteros, que ahi no hay vecinos con quien chocar; los margenes negativos
+     devuelven a la fila la altura que tenia para no mover nada debajo. */
   .g3d-stage .g3d-grid-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 44px;
+    margin: -19px -3px;
+    border: none;
+    padding: 0;
+    background: none;
+  }
+  .g3d-stage .g3d-grid-dot::before {
+    content: "";
+    /* flex-shrink: 0 es obligatorio, no adorno. El area sensible es mas
+       estrecha que el punto activo (12px frente a 18), y un hijo flex se
+       encoge por defecto hasta caber: sin esto, el indicador de la
+       diapositiva actual se comprimia y se veia igual que los demas. */
+    flex-shrink: 0;
     width: 6px;
     height: 6px;
     border-radius: 100px;
-    border: none;
-    padding: 0;
     background: rgba(232, 201, 160, 0.35);
     transition: width var(--mov-normal) cubic-bezier(0.16,1,0.3,1), background var(--mov-normal);
   }
-  .g3d-stage .g3d-grid-dot.is-active {
+  .g3d-stage .g3d-grid-dot.is-active::before {
     width: 18px;
     background: linear-gradient(90deg, #E8C9A0, #F2DDB8);
   }
@@ -3603,9 +3638,20 @@ footer a:hover i {
      Hay que restarla en los DOS: la sección y su capa de contenido llevan
      cada una su propio `100dvh`, y bajar solo la de fuera no sirve porque
      la de dentro la vuelve a empujar. */
+  /* El 0.82 es lo unico que se anade aqui.
+
+     Restar solo la cabecera dejaba el hero ocupando EXACTAMENTE lo que mide
+     la pantalla: al abrir la web en un movil no habia ni un pixel de la
+     seccion siguiente asomando, y sin ese borde no hay forma de saber que
+     hay algo mas abajo. La foto ademas competia todo el rato con el texto
+     encima.
+
+     Con 0.82 asoma el arranque de lo que viene. Medido: el contenido del
+     hero necesita ~530px y esto deja 587 en una pantalla de 812, asi que
+     sigue cabiendo entero sin recortarse. */
   .hero-fs,
   .hero-fs-content {
-    min-height: calc(var(--alto-pantalla) - var(--cabecera-h));
+    min-height: calc((var(--alto-pantalla) - var(--cabecera-h)) * 0.82);
   }
 
   /* El segundo botón pasa a enlace de texto.
@@ -4280,4 +4326,49 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
    esta es la regla que lo cumplía y que faltaba. */
 @media (max-width: 768px) {
   .quick-fab { display: none; }
+}
+
+/* ============================================================
+   MÓVIL — TAMAÑOS DE CONTACTO
+   ============================================================
+   Auditoría medida sobre la página real a 375x812, en las 12 rutas
+   públicas. Lo que sigue arregla lo que se midió, no lo que se intuyó. */
+@media (max-width: 768px) {
+
+  /* --- El zoom de iOS al enfocar un campo ---
+     Los campos median 14.5px. Safari en iPhone AMPLÍA la página al enfocar
+     cualquier campo por debajo de 16px, y NO la devuelve al salir: te quedas
+     con la web ampliada y desplazada, y hay que pellizcar para volver. Es el
+     fallo más visible de todos porque le pasa a cualquiera que intente
+     entrar a su cuenta desde el móvil.
+
+     16px es el umbral exacto de Safari, no una preferencia estética. Se pone
+     en px y no en rem a propósito: si alguien cambia el tamaño de raíz, el
+     umbral sigue siendo 16px de verdad.
+
+     Se excluyen casilla y radio: ahí el font-size no controla el tamaño de
+     la marca y el min-height los deformaría. */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+    /* Medidos en 35px. 44px es el mínimo con el que un dedo acierta sin
+       mirar (WCAG 2.5.5 y la guía de Apple coinciden en esa cifra). */
+    min-height: 44px;
+  }
+
+  /* --- Iconos sociales de la franja superior ---
+     Medían 12px de alto: la mitad de la yema de un dedo. No se puede
+     agrandar la franja sin comerse la pantalla, así que se agranda solo el
+     área sensible: padding para crecer, margen negativo igual y contrario
+     para que el hueco que ocupa en la fila no cambie. El icono se ve igual;
+     lo que cambia es dónde hay que acertar. */
+  .topbar-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 10px;
+    margin: -14px 0;
+  }
 }

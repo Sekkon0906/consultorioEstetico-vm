@@ -1320,18 +1320,44 @@ function FeaturedCarousel({
           box-shadow: 0 4px 14px rgba(58, 42, 26, 0.12);
           z-index: 3;
         }
+        /* El punto medido era de 8x8 px: mas pequeno que la punta del dedo
+           que tiene que acertarlo. El punto visible pasa a un pseudo-elemento
+           y el <button> se queda de area sensible.
+
+           No vale padding + background-clip: content-box, que es lo primero
+           que uno prueba: el border-radius se calcula sobre la caja de borde,
+           asi que recortar el fondo al contenido deja cuadrados.
+
+           Los margenes negativos devuelven a la pastilla el tamano que tenia
+           —si no, creceria a 44px de alto y se comeria la vista— asi que el
+           area desborda por fuera sin verse. Ancho 16px = 8 de punto + 8 de
+           hueco: las areas se tocan sin solaparse. */
         .featured-dot {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          height: 44px;
+          margin: -18px -4px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+        }
+        .featured-dot::before {
+          content: "";
+          /* Obligatorio: el area sensible mide 16px y el punto activo 26, y un
+             hijo flex se encoge por defecto hasta caber. Sin esto el indicador
+             de la tarjeta actual se comprimia y no se distinguia del resto. */
+          flex-shrink: 0;
           width: 8px;
           height: 8px;
           border-radius: 100px;
           background: rgba(176, 137, 104, 0.35);
-          border: none;
-          cursor: pointer;
-          padding: 0;
           transition: width var(--mov-lento) cubic-bezier(0.22, 1, 0.36, 1),
             background 0.25s ease;
         }
-        .featured-dot.is-active {
+        .featured-dot.is-active::before {
           width: 26px;
           background: linear-gradient(90deg, var(--brand), var(--brand-soft));
         }
