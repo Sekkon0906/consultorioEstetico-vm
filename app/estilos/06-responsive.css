@@ -5018,3 +5018,93 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
 @media (prefers-reduced-motion: reduce) {
   .recibo-detalle > summary::before { transition: none; }
 }
+
+/* ============================================================
+   TARJETA DE FIDELIDAD (TarjetaFidelidad)
+   ============================================================ */
+.fidelidad {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.35rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.fidelidad-cabecera {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.fidelidad-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--brand) 14%, var(--surface));
+  color: var(--brand);
+}
+
+.fidelidad-titulo {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.fidelidad-sub {
+  margin: 4px 0 0;
+  font-size: 0.87rem;
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+/* Los sellos. `flex-wrap` porque el número lo decide la doctora desde el
+   panel: con 12 en una pantalla estrecha tienen que bajar de línea en vez de
+   encogerse hasta desaparecer. */
+.fidelidad-sellos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 1.1rem 0 0.75rem;
+}
+
+.fidelidad-sello {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px dashed var(--border-strong);
+  /* El hueco vacío no lleva relleno: un círculo lleno y otro vacío se
+     distinguen por forma, no solo por color, así que también funciona para
+     quien no distingue el marrón del beige. */
+  background: transparent;
+  transition: background 260ms ease, border-color 260ms ease;
+}
+
+.fidelidad-sello.es-marcado {
+  border-style: solid;
+  border-color: var(--brand);
+  background: linear-gradient(135deg, var(--brand), var(--brand-soft));
+}
+
+.fidelidad-faltan {
+  margin: 0;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.fidelidad-nota {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fidelidad-sello { transition: none; }
+}

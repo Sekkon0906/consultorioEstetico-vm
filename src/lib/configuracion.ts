@@ -10,6 +10,13 @@
 export type ConfigSitio = Record<string, string>;
 
 export const CONFIG_DEFAULTS: ConfigSitio = {
+  /* Tarjeta de fidelidad. `0` en `fidelidad_cada` la apaga entera, y ese es
+     el valor que vale de respaldo si la configuracion no carga: mas vale no
+     ensenar la tarjeta que ensenarla con un numero inventado, porque promete
+     un beneficio y la persona lo va a contar. */
+  fidelidad_cada:             "7",
+  fidelidad_descuento:        "20",
+
   contacto_whatsapp:          "573155445748",
   contacto_telefono_visible:  "+57 315 544 5748",
   contacto_email:             "dra.vanessamedinao@gmail.com",

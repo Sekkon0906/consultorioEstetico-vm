@@ -7,6 +7,7 @@ import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle
 import { useLocale, useTranslations } from "next-intl";
 import { MUELLE_TACTO } from "@/lib/movimiento";
 import HistorialProcedimientos from "@/components/HistorialProcedimientos";
+import TarjetaFidelidad from "@/components/TarjetaFidelidad";
 import PedirReagenda from "@/components/PedirReagenda";
 import { getMisCitasApi, getConsentimientoUrlApi } from "@/services/citasApi";
 import {
@@ -289,6 +290,13 @@ export default function CitasAgendadas() {
           pregunta "cuando fue la ultima vez" se hace nada mas entrar, y la
           lista de citas —que puede ser larga— la dejaria enterrada. Se
           oculta solo si no hay nada atendido todavia. */}
+      {/* Encima del historial a proposito: el historial dice QUE te has
+          hecho, y esto dice CUANTO llevas. Lo segundo se mira de un vistazo y
+          lo primero se lee, asi que va antes lo que se mira. Las dos cuentan
+          exactamente lo mismo —citas atendidas y pasadas—, que es lo que
+          impide que se contradigan. */}
+      <TarjetaFidelidad />
+
       <HistorialProcedimientos locale={intlLocale} />
 
       {/* Layout: filtros a la izquierda (pila) · citas a la derecha */}
