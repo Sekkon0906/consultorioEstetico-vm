@@ -412,7 +412,7 @@ export default function CitasAgendadas() {
                           <span style={{ display: "flex", alignItems: "center", gap: 5 }}><User size={13} color="var(--brand)" /> {cita.nombres} {cita.apellidos}</span>
                           {cita.telefono && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Phone size={13} color="var(--brand)" /> {cita.telefono}</span>}
                           {cita.correo && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Mail size={13} color="var(--brand)" /> {cita.correo}</span>}
-                          {cita.metodoPago && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><i className="fas fa-wallet" style={{ color: "var(--brand)" }} /> {cita.metodoPago} ({cita.tipoPagoConsultorio || cita.tipoPagoOnline || ""})</span>}
+                          {cita.metodoPago && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><i className="fas fa-wallet" style={{ color: "var(--brand)" }} /> {cita.metodoPago} ({cita.tipoPagoConsultorio || ""})</span>}
                         </div>
 
                         {cita.nota && (

@@ -6,20 +6,18 @@ import { ArrowLeft } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
 import Button from "@/components/ui/Button";
-import type { Cita, MetodoPago, TipoPagoConsultorio, TipoPagoOnline } from "@/types/domain";
+import type { Cita, MetodoPago, TipoPagoConsultorio } from "@/types/domain";
 import { createCitaApi } from "@/services/citasApi";
 import { formatearFecha } from "@/lib/fechas";
 
 export type CrearCitaPayload = Omit<Cita, "id" | "fechaCreacion">;
-export type CitaSinPagos = Omit<CrearCitaPayload, "metodoPago" | "tipoPagoConsultorio" | "tipoPagoOnline" | "estado">;
+export type CitaSinPagos = Omit<CrearCitaPayload, "metodoPago" | "tipoPagoConsultorio" | "estado">;
 
 interface AgendarPagoProps {
   metodoPago: MetodoPago | null;
   setMetodoPago: (m: MetodoPago | null) => void;
   tipoPagoConsultorio: TipoPagoConsultorio | undefined;
   setTipoPagoConsultorio: (t: TipoPagoConsultorio | undefined) => void;
-  tipoPagoOnline: TipoPagoOnline | undefined;
-  setTipoPagoOnline: (t: TipoPagoOnline | undefined) => void;
   citaData: CitaSinPagos;
   /** El segundo argumento es el mensaje de WhatsApp ya compuesto: lo
    *  envia el boton del recibo, no esta pantalla. */
@@ -48,7 +46,6 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
         ...citaData,
         metodoPago: "Consultorio",
         tipoPagoConsultorio: tipoPago,
-        tipoPagoOnline: null,
         estado: "pendiente",
       };
       const nuevaCita = await createCitaApi(payload);

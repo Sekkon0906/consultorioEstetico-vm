@@ -56,8 +56,6 @@ export default function TarjetaCita({ cita, modo = "confirmacion" }: Props) {
   let metodoPagoTxt = "";
   if (cita.metodoPago === "Consultorio") {
     metodoPagoTxt = `${t("rows.paymentOnsite")} (${cita.tipoPagoConsultorio ?? "Efectivo"})`;
-  } else if (cita.metodoPago === "Online") {
-    metodoPagoTxt = `${t("rows.paymentOnline")} (${cita.tipoPagoOnline ?? ""})`;
   }
 
   return (

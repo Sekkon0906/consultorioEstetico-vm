@@ -13,7 +13,6 @@ import { useCarrito } from "@/context/CarritoContext";
 import AgendarCalendar from "./agendarCalendar";
 import AgendarForm, { AgendarFormData } from "./agendarForm";
 import AgendarPago, { CitaSinPagos } from "./agendarPago";
-import TarjetaCita from "./tarjetaCita";
 import ReciboImpreso from "@/components/ReciboImpreso";
 
 import { PALETTE } from "./palette";
@@ -44,9 +43,8 @@ function AgendarPageContent() {
   /* `es-CO` y no `es` a secas: el formato de fecha larga en Colombia difiere
      del de Espana, y el recibo lleva la fecha escrita entera. */
   const intlLocale = useLocale() === "en" ? "en-US" : "es-CO";
-  const [metodoPago, setMetodoPago] = useState<"Consultorio" | "Online" | null>(null);
+  const [metodoPago, setMetodoPago] = useState<"Consultorio" | null>(null);
   const [tipoPagoConsultorio, setTipoPagoConsultorio] = useState<"Efectivo" | "Tarjeta" | undefined>(undefined);
-  const [tipoPagoOnline, setTipoPagoOnline] = useState<"PayU" | "PSE" | undefined>(undefined);
 
   const [formData, setFormData] = useState<AgendarFormData>({
     nombre: "",
@@ -300,8 +298,6 @@ function AgendarPageContent() {
               setMetodoPago={setMetodoPago}
               tipoPagoConsultorio={tipoPagoConsultorio}
               setTipoPagoConsultorio={setTipoPagoConsultorio}
-              tipoPagoOnline={tipoPagoOnline}
-              setTipoPagoOnline={setTipoPagoOnline}
               citaData={citaDraft}
               onConfirmar={(nuevaCita: Cita, texto: string) => {
                 setCitaCreada(nuevaCita);

@@ -46,11 +46,13 @@ export interface User extends SessionUser {
 
 export type TipoCita = "valoracion" | "implementacion";
 
-export type MetodoPago = "Consultorio" | "Online";
+/* Solo "Consultorio". El pago en linea se descarto y su andamiaje se retiro
+   (ver migracion 010): no habia pasarela detras, ninguna cita llego nunca a
+   tener "Online", y dejar el valor en el tipo invitaba a escribir ramas para
+   un caso imposible. */
+export type MetodoPago = "Consultorio";
 
 export type TipoPagoConsultorio = "Efectivo" | "Tarjeta";
-
-export type TipoPagoOnline = "PayU" | "PSE";
 
 export type EstadoCita = "pendiente" | "confirmada" | "atendida" | "cancelada";
 
@@ -78,7 +80,6 @@ export interface Cita {
   // Pago
   metodoPago?: MetodoPago | null;
   tipoPagoConsultorio?: TipoPagoConsultorio | null;
-  tipoPagoOnline?: TipoPagoOnline | null;
   pagado: boolean;
 
   monto?: number | null;

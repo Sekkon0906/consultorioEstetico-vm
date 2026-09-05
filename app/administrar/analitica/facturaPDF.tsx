@@ -61,10 +61,10 @@ export async function generarFacturaPDF(cita: Cita) {
   // === Pago ===
   let metodo = "Sin método registrado";
 
+  /* Sin rama de pago en linea: se descarto y se retiro su andamiaje. Ninguna
+     cita llego nunca a tener ese metodo. */
   if (cita.metodoPago === "Consultorio") {
     metodo = `Pago en consultorio (${cita.tipoPagoConsultorio ?? "-"})`;
-  } else if (cita.metodoPago === "Online") {
-    metodo = `Pago en línea (${cita.tipoPagoOnline ?? "-"})`;
   }
 
   const montoTotal = cita.monto ?? 0;
