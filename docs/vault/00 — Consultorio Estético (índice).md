@@ -29,6 +29,7 @@ Ibagué (Tolima, Colombia). Hace dos cosas a la vez:
 - [[11 — Bitácora 2026-09-03]] — bugs de móvil en producción, panel de admin y galería de confianza
 - [[12 — Bitácora 2026-09-04]] — el reset de enlaces que rompía el contraste, y la selección de procedimientos
 - [[13 — Diagnóstico de seguridad 2026-09-04]] — qué está bien, qué no, y en qué orden arreglarlo
+- [[14 — Bitácora 2026-09-05]] — accesibilidad, tarjetas que giran y botones con física
 - `Decisiones/` — las elecciones caras de revertir, con su porqué
 
 ## Estado en una línea
