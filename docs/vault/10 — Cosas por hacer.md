@@ -272,6 +272,16 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 - [ ] **DEP1 · Rotar credenciales.** Contraseña de Neon + token de R2 →
       actualizar `DATABASE_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` en
       Railway. **Antes de que la doctora lo use en serio.**
+- [ ] **DEP6 · `server/railway.json` declara un builder que quizá no se usa.**
+      *(Encontrado 2026-09-04.)* El archivo dice `"builder": "NIXPACKS"` pero
+      el panel de Railway muestra **Railpack**. Son constructores distintos y
+      usan variables de entorno distintas: `NIXPACKS_INSTALL_CMD` frente a
+      `RAILPACK_INSTALL_COMMAND`. Importa porque de ahí depende que el
+      despliegue instale con `npm ci` y respete el lockfile.
+      No se tocó el archivo: cambiar de builder a ciegas puede romper un
+      despliegue que funciona. Hay que mirar en Railway cuál usó el último
+      despliegue y alinear el archivo con eso.
+
 - [ ] **DEP2 · Dominio propio.** Comprarlo → DNS a Vercel + Railway, actualizar
       `NEXT_PUBLIC_SITE_URL` / `APP_URL` / `CORS_ORIGIN` / `API_URL`, subdominio
       para R2, rehacer branding de OAuth. Desbloquea DEP3, C2, C3.
