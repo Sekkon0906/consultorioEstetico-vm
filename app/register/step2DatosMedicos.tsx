@@ -6,7 +6,7 @@ import Select, { MultiValue, StylesConfig } from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { PALETTE } from "./palette";
-import type { RegisterFormData } from "./page";
+import type { RegisterFormData } from "./RegistroWizard";
 
 // ---- Tipos auxiliares ----
 type MedicalOption = { value: string; label: string };
@@ -512,6 +512,42 @@ export default function Step2DatosMedicos({
             Debes aceptar para crear tu cuenta.
           </div>
         )}
+      </div>
+
+      {/* Promociones — VOLUNTARIO, y separado del de arriba a propósito.
+
+          El de arriba es obligatorio: sin él no hay cuenta. Este no. Juntarlos
+          en una sola casilla sería justo lo que la Ley 1581 no permite: el
+          consentimiento comercial tiene que poder darse o negarse por
+          separado, y quien acepta la política de datos no está aceptando
+          publicidad.
+
+          Arranca desmarcada y solo la marca la persona. Una casilla
+          premarcada no es consentimiento expreso — el silencio no vale.
+
+          Y se dice qué NO cambia: sin esto, quien la deja en blanco puede
+          temer quedarse sin el recordatorio de su cita, y marcarla por miedo.
+          Un permiso dado por miedo a perder el servicio tampoco es
+          consentimiento libre. */}
+      <div className="text-start mb-2">
+        <label
+          style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer", color: PALETTE.text }}
+        >
+          <input
+            type="checkbox"
+            checked={formData.aceptaMarketing}
+            onChange={(e) => setFormData((p) => ({ ...p, aceptaMarketing: e.target.checked }))}
+            style={{ width: 18, height: 18, marginTop: 3, accentColor: PALETTE.main, flexShrink: 0 }}
+          />
+          <span style={{ fontSize: "0.86rem", lineHeight: 1.5 }}>
+            Quiero recibir promociones y novedades del consultorio por correo.{" "}
+            <span style={{ opacity: 0.75 }}>
+              Es opcional y puedes darte de baja cuando quieras. Los correos de
+              tus citas —confirmación, recordatorio y cambios de fecha— te
+              llegan igual.
+            </span>
+          </span>
+        </label>
       </div>
 
       {/* Botones */}

@@ -68,7 +68,8 @@ async function esAdmin(userId) {
 /** Datos públicos del usuario. Nunca incluye password_hash. */
 async function perfilPublico(userId) {
   const { rows } = await pool.query(
-    `SELECT id, nombres, apellidos, email, telefono, photo, email_verificado, proveedor
+    `SELECT id, nombres, apellidos, email, telefono, photo, email_verificado, proveedor,
+            acepta_marketing
        FROM usuarios WHERE id = $1`,
     [userId]
   );
@@ -172,6 +173,10 @@ async function registrar({
   antecedentes, antecedentesDescripcion,
   alergias, alergiasDescripcion,
   medicamentos, medicamentosDescripcion,
+  // Permiso EXPRESO para correos comerciales. Nada que ver con los correos
+  // del servicio —cita confirmada, recordatorio, contrasena—, que se envian
+  // igual: esos los pidio quien pidio una cita.
+  aceptaMarketing,
 }) {
   const correo = normalizarEmail(email);
   if (!correo.includes("@")) return { ok: false, error: "El correo no es válido." };
@@ -188,6 +193,13 @@ async function registrar({
   const generoValido = ["Masculino", "Femenino", "Otro"].includes(genero) ? genero : null;
   const edadNum = Number.isFinite(Number(edad)) && Number(edad) > 0 ? Number(edad) : null;
 
+  /* El permiso comercial se lee como `=== true` y no como valor verdadero.
+     Es a proposito: si el formulario manda "false", "0" o "" —cosas que un
+     campo de formulario manda con facilidad—, cualquiera de ellas es
+     verdadera al evaluarla, y acabariamos dando por consentido a alguien que
+     no marco nada. Con el permiso comercial, dudar significa que no. */
+  const quiereMarketing = aceptaMarketing === true;
+
   const hash = await argon2.hash(password, { type: argon2.argon2id });
   const { rows } = await pool.query(
     `INSERT INTO usuarios (
@@ -195,9 +207,12 @@ async function registrar({
        edad, genero,
        antecedentes, antecedentes_descripcion,
        alergias, alergias_descripcion,
-       medicamentos, medicamentos_descripcion
+       medicamentos, medicamentos_descripcion,
+       acepta_marketing, marketing_aceptado_en, marketing_origen
      )
-     VALUES ($1,$2,$3,$4,$5,'password',$6,$7,$8,$9,$10,$11,$12,$13)
+     VALUES ($1,$2,$3,$4,$5,'password',$6,$7,$8,$9,$10,$11,$12,$13,
+             $14, CASE WHEN $14 THEN now() ELSE NULL END,
+             CASE WHEN $14 THEN 'registro' ELSE NULL END)
      RETURNING id`,
     [
       nombres || "", apellidos || "", correo, hash, telefono || null,
@@ -205,6 +220,7 @@ async function registrar({
       antecedentes || "", antecedentesDescripcion || "",
       alergias || "", alergiasDescripcion || "",
       medicamentos || "", medicamentosDescripcion || "",
+      quiereMarketing,
     ]
   );
   const userId = rows[0].id;

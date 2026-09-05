@@ -66,6 +66,7 @@ router.post("/registro", async (req, res) => {
       antecedentes, antecedentesDescripcion,
       alergias, alergiasDescripcion,
       medicamentos, medicamentosDescripcion,
+      aceptaMarketing,
     } = req.body || {};
     const r = await auth.registrar({
       email, password, nombres, apellidos, telefono,
@@ -73,6 +74,7 @@ router.post("/registro", async (req, res) => {
       antecedentes, antecedentesDescripcion,
       alergias, alergiasDescripcion,
       medicamentos, medicamentosDescripcion,
+      aceptaMarketing,
     });
     if (!r.ok) return res.status(400).json(r);
     // No se inicia sesión automáticamente: primero hay que verificar el correo.

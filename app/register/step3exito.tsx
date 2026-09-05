@@ -37,6 +37,10 @@ export default function Step3Exito({ formData }: Props) {
           alergiasDescripcion: formData.alergiasDescripcion || "",
           medicamentos: listar(formData.medicamentos),
           medicamentosDescripcion: formData.medicamentosDescripcion || "",
+          /* `=== true` en vez de pasarlo tal cual: si el campo llegara sin
+             definir, pasarlo dejaria que el servidor decida, y en el permiso
+             comercial la ausencia de respuesta es "no". */
+          aceptaMarketing: formData.aceptaMarketing === true,
         });
 
         setStatus("ok");

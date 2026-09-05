@@ -4490,3 +4490,267 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   .proc-card-cat-chip,
   .proc-card-price-unit { font-size: 11.5px !important; }
 }
+
+/* ============================================================
+   CUÁNDO LA BARRA PASA A HAMBURGUESA
+   ============================================================
+   Estaba en 768px, heredado de `d-md-none` de Bootstrap, y ese número no
+   tenía nada que ver con esta barra. Medido sobre la página real:
+
+     · menú de paciente ............ 1163px (logo + enlaces + sesión)
+     · con "Administrar" y avatar ... ~1341px
+
+   Así que a 992px se pasaba 183px y a 955 —la ventana de la captura— el menú
+   se partía en dos filas, con el logo enorme y "Administrar" saliéndose. No
+   era un fallo de estilo: no cabía, y nadie se lo había dicho.
+
+   CÓMO COLAPSA
+   Igual que ya lo hacía por debajo de 768: se esconde el envoltorio del menú
+   horizontal y la hamburguesa abre el sidebar, que es un portal aparte con
+   su propia lista. No se convierte el menú en desplegable, porque ese
+   desplegable no lo abre nadie: la hamburguesa no apunta a él.
+
+   POR QUÉ DOS CORTES Y NO UNO
+   Con un corte único habría que ponerlo en 1400 para que el caso de la
+   doctora entre, y entonces cualquier portátil de 1280 o 1366 —la mayoría—
+   vería hamburguesa teniendo sitio de sobra. La hamburguesa en un portátil
+   ancho se lee como algo sin terminar.
+
+   El enlace de administrar solo existe para ella, así que `:has()` deja
+   colapsar antes justo en ese caso sin tocar el de los demás. */
+
+/* En pantalla ancha no hay hamburguesa. Antes lo decidía `d-md-none` en el
+   componente; ahora está aquí, junto al resto del colapso, para que un solo
+   sitio gobierne las dos mitades y no puedan desincronizarse. */
+.hamburger-btn { display: none; }
+
+/* El envoltorio del menú lleva `d-none d-md-block` de Bootstrap, sin clase
+   propia. `:has(> .navbar-menu)` lo alcanza sin tener que tocar el marcado. */
+
+/* CASO DE LA DOCTORA: colapsa antes, porque lleva dos elementos más. */
+@media (max-width: 1400px) {
+  .navbar-container:has(.navbar-link-privado) div:has(> .navbar-menu) {
+    display: none !important;
+  }
+  .navbar-container:has(.navbar-link-privado) .hamburger-btn {
+    display: flex;
+  }
+}
+
+/* TODOS LOS DEMÁS: 1200, que es 1163 de menú más margen para que el último
+   enlace no quede rozando el borde. */
+@media (max-width: 1200px) {
+  .navbar-container div:has(> .navbar-menu) { display: none !important; }
+  .hamburger-btn { display: flex; }
+}
+
+/* ============================================================
+   PANTALLA DE ACCESO EN DOS MITADES (PanelAcceso)
+   ============================================================
+   El formulario a un lado y el porqué al otro, intercambiándose entre entrar
+   y crear cuenta. El intercambio se hace con `order` y no reordenando el
+   marcado: en el DOM el formulario va SIEMPRE primero, así que con teclado y
+   con lector de pantalla se llega antes al campo de correo que a los
+   argumentos, en los dos estados. Cambiar el orden real haría que crear
+   cuenta obligara a pasar por cuatro ventajas antes de poder escribir. */
+
+.acceso-envoltorio {
+  min-height: var(--alto-pantalla, 100vh);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%);
+}
+
+.acceso-rejilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  width: 100%;
+  max-width: 1120px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px -20px rgba(58, 42, 26, 0.28);
+}
+
+/* EL INTERCAMBIO.
+
+   Con `order` el cambio es instantáneo y no hay nada que animar: el elemento
+   aparece ya en su celda nueva. Con `translateX` de un ancho de columna, el
+   resultado visual es el mismo y además es un valor que SÍ se puede
+   transicionar.
+
+   Y sobre todo: el estado final es correcto por sí mismo. Si la transición no
+   llega a correr, salta al sitio bueno. La alternativa que se probó primero
+   —`layout` de framer-motion— hace lo contrario: parte de una posición
+   invertida y anima hacia la buena, así que una animación que no corre deja
+   los lados SIN intercambiar aunque el estado haya cambiado.
+
+   El 100% funciona porque las dos columnas son `1fr` y miden lo mismo. */
+.acceso-columna {
+  transform: translateX(0);
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.acceso-rejilla.es-registro .acceso-columna-form { transform: translateX(100%); }
+.acceso-rejilla.es-registro .acceso-columna-info { transform: translateX(-100%); }
+
+.acceso-foto img { transition: opacity 340ms ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .acceso-columna,
+  .acceso-foto img { transition: none; }
+}
+
+.acceso-columna-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.75rem 2.5rem;
+  min-width: 0;
+}
+
+.acceso-columna-info {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--surface);
+}
+
+.acceso-foto {
+  position: relative;
+  /* Proporción fija arriba: sin ella la foto crece con el alto del formulario
+     y en registro —que es más largo— la imagen se estiraba hasta deformar el
+     encuadre de la cara. */
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.acceso-velo {
+  position: absolute;
+  inset: 0;
+  /* Solo abajo: arriba está la cara y ahí no debe caer nada. El degradado
+     existe para que el borde entre foto y texto no sea una línea dura. */
+  background: linear-gradient(180deg, transparent 55%, var(--surface) 100%);
+}
+
+.acceso-info-texto {
+  padding: 1.5rem 2rem 2.25rem;
+}
+
+.acceso-info-titulo {
+  font-family: "Playfair Display", serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 1.2rem;
+}
+
+.acceso-ventajas {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.acceso-ventajas li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.acceso-ventaja-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--brand) 14%, var(--surface));
+  color: var(--brand);
+}
+
+.acceso-ventajas strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.acceso-ventajas span span {
+  display: block;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+
+.acceso-pie {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-soft);
+}
+
+/* Es un <button>, no un enlace: no lleva a otra página, cambia el estado de
+   esta. Se le devuelve el aspecto de enlace porque eso es lo que la persona
+   espera pulsar ahí, pero conserva el área táctil de 44px de un control. */
+.acceso-cambiar {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--brand);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.acceso-cambiar:hover { color: var(--brand-soft); }
+.acceso-cambiar:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* --- Apilado ---
+   1100 y no 992: la rejilla es de dos mitades sobre un máximo de 1120, así
+   que por debajo de eso cada columna baja de 550 y el formulario empieza a
+   apretarse antes de que el ancho de la ventana lo justifique. */
+@media (max-width: 1100px) {
+  .acceso-rejilla,
+  .acceso-rejilla.es-registro {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Una sola columna: el desplazamiento lateral sacaría el contenido fuera de
+     la pantalla. Se anula, y el orden natural del DOM deja el formulario
+     arriba y el porqué debajo, que es lo que se quiere en los dos estados:
+     quien abre esta pantalla ya sabe a qué viene, y los argumentos delante
+     del campo de correo son un obstáculo. Debajo siguen sirviendo a quien
+     dudaba. */
+  .acceso-rejilla .acceso-columna,
+  .acceso-rejilla.es-registro .acceso-columna {
+    transform: none;
+  }
+
+  .acceso-columna-form { padding: 2rem 1.5rem; }
+  /* Apaisada al apilarse: una foto 4:3 a ancho completo empuja el porqué
+     fuera de la pantalla y deja de acompañar al texto. */
+  .acceso-foto { aspect-ratio: 16 / 9; }
+  .acceso-info-texto { padding: 1.25rem 1.5rem 2rem; }
+}
+
+@media (max-width: 576px) {
+  .acceso-envoltorio { padding: 1rem 0.75rem; }
+  .acceso-rejilla { border-radius: 18px; }
+  .acceso-columna-form { padding: 1.75rem 1.15rem; }
+}
