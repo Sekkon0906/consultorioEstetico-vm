@@ -6,53 +6,51 @@
  * Ahora pasa por la API propia, donde verifyToken/requireRole deciden.
  */
 
-import { apiAuth } from "@/lib/apiCliente";
-import { confirmarPagoCitaApi, updateCitaApi } from "@/services/citasApi";
+import type { Cita } from "@/types/domain";
+import {
+  confirmarPagoCitaApi,
+  getCitasApi,
+  getCitasByDayApi,
+  updateCitaApi,
+} from "@/services/citasApi";
 import { proponerReagendaApi } from "@/services/reagendasApi";
 
-export type EstadoCita = "pendiente" | "confirmada" | "atendida" | "cancelada";
+/* EL TIPO Y LOS ESTADOS SALEN DEL DOMINIO, NO SE REESCRIBEN AQUI.
+ *
+ * Habia una copia completa de `Cita` en este archivo, y ya habia derivado:
+ * declaraba `firmaFecha`, que faltaba en el dominio, y ponia como
+ * obligatorios campos que el dominio marca opcionales. Un tipo escrito dos
+ * veces es un tipo que en algun momento dice dos cosas distintas sobre la
+ * misma tabla — y aqui esa tabla son las citas de los pacientes.
+ *
+ * Se re-exportan para no tocar los cinco archivos del panel que los
+ * importan desde aqui: el objetivo es que haya UNA definicion, no mover
+ * imports de sitio.
+ */
+export type { Cita } from "@/types/domain";
+export type { EstadoCita } from "@/types/domain";
 
-export interface Cita {
-  id: string;
-  userId: string;
-  nombres: string;
-  apellidos: string;
-  telefono: string;
-  correo: string;
-  procedimiento: string;
-  tipoCita: "valoracion" | "implementacion";
-  nota: string | null;
-  fecha: string;
-  hora: string;
-  metodoPago: "Consultorio" | "Online" | null;
-  tipoPagoConsultorio: "Efectivo" | "Tarjeta" | null;
-  tipoPagoOnline: "PayU" | "PSE" | null;
-  pagado: boolean;
-  monto: number | null;
-  montoPagado: number | null;
-  montoRestante: number | null;
-  creadaPor: "usuario" | "doctora";
-  fechaCreacion: string;
-  estado: EstadoCita;
-  qrCita: string | null;
-  motivoCancelacion: string | null;
-  consentimientoFirmado: boolean;
-  firmaUrl: string | null;
-  firmaFecha: string | null;
-  consentimientoPdf: string | null;
-}
-
-/** GET citas por día. La API devuelve todas (rol admin); el filtro por estado
- *  se aplica aquí porque el panel cambia de estado sin recargar. */
+/**
+ * GET citas por día.
+ *
+ * La peticion la hace `services/citasApi`, no este archivo: antes estaba
+ * escrita aqui con su propia llamada a `apiAuth`, identica a la del
+ * servicio. Dos implementaciones de la misma peticion son dos sitios donde
+ * arreglar el dia que cambie la ruta o la clave de cache.
+ *
+ * Lo que SI se queda aqui es el filtro por estado y el orden por hora: eso
+ * no es hablar con la API, es comportamiento del panel —cambia de estado
+ * sin recargar— y no tiene por que vivir en la capa de servicios.
+ */
 export async function getCitasByDayAPI(fecha: string, estado?: string): Promise<Cita[]> {
-  const citas = await apiAuth<Cita[]>(`/citas?fecha=${encodeURIComponent(fecha)}`, { clave: "citas" });
+  const citas = await getCitasByDayApi(fecha);
   const lista = estado && estado !== "todos" ? citas.filter((c) => c.estado === estado) : citas;
   return ordenarCitasPorHora(lista);
 }
 
 /** GET todas las citas. */
 export async function getCitasAPI(): Promise<Cita[]> {
-  return apiAuth<Cita[]>("/citas", { clave: "citas" });
+  return getCitasApi();
 }
 
 // El backend avisa al paciente por correo cuando PUT /citas/:id cambia el estado.
