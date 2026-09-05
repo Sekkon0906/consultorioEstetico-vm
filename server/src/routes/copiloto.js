@@ -7,7 +7,24 @@ const verifyToken = require("../middlewares/verifyToken");
 const requireRole = require("../middlewares/requireRole");
 const { DEFINICIONES, ejecutar, escribe } = require("../ia/herramientas");
 
-const MODELO = process.env.ANTHROPIC_MODEL || "claude-opus-5";
+/**
+ * El modelo del copiloto.
+ *
+ * POR QUE SONNET Y NO OPUS
+ * Lo que hace este asistente es llamar a ocho herramientas sobre un esquema
+ * pequeno y conocido: crear un procedimiento, poner una promocion, cambiar
+ * el WhatsApp, contar las citas de un dia. Es uso de herramientas con
+ * argumentos claros, no razonamiento abierto.
+ *
+ * Sonnet resuelve eso igual de bien y cuesta una fraccion. En un consultorio
+ * de una sola doctora, que usara esto unas cuantas veces al mes, la
+ * diferencia de precio es real y la de calidad no se nota.
+ *
+ * Se deja `ANTHROPIC_MODEL` como valvula: si algun dia el copiloto empieza
+ * a equivocarse en peticiones ambiguas, se sube a Opus cambiando UNA
+ * variable de entorno, sin tocar codigo ni desplegar.
+ */
+const MODELO = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
 
 // ── Clave del copiloto ────────────────────────────────────────────────────
 // Dos fuentes, en orden: 1) la que la doctora guarda desde el panel
