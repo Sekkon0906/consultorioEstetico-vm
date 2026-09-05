@@ -5,7 +5,24 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
+# package-lock.json SI se versiona, y es a proposito.
+#
+# Estaba ignorado, y eso significaba que cada despliegue en Vercel y Railway
+# resolvia las dependencias de cero: podian instalarse versiones distintas de
+# las probadas. Dos problemas, y los dos importan en un sitio con datos
+# clinicos:
+#
+#   · No se puede reproducir una build que funcionaba.
+#   · No se controla la cadena de suministro. La vulnerabilidad de PostCSS
+#     que se cerro subiendo a Next 16 podria volver sola en el siguiente
+#     despliegue si alguna dependencia resolviera a otra version.
+#
+# Lo estandar en una APLICACION —no en una libreria— es versionarlo y
+# desplegar con `npm ci`, que instala exactamente lo que dice el lockfile y
+# falla si no coincide con package.json.
+#
+# pnpm sigue ignorado: aqui se usa npm, y tener dos lockfiles a la vez es
+# pedir que cada maquina instale una cosa distinta.
 pnpm-lock.yaml
 *.log
 
