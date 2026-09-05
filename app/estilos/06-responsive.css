@@ -4462,6 +4462,15 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
 
      Los botones de tema (Claro/Oscuro) median 26px y viven en el menu
      lateral, que en movil es el unico sitio donde se llega a ellos. */
+  /* `.btn.w-100` es el boton de enviar de /register —el que cierra el alta
+     de un paciente nuevo— y median 36px. Las flechas del carrusel del
+     consultorio, tambien 36. */
+  .btn.w-100,
+  .consultorio-showcase-arrow {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
   .seleccion-acciones a,
   .seleccion-acciones button,
   .mobile-sidebar-controls button {
