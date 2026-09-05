@@ -531,7 +531,7 @@ export default function ProcedimientosList() {
                       <div key={g.id || "v" + i} style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.4rem" }}>
                         <Play size={14} color="var(--brand)" />
                         <span style={{ flex: 1, fontSize: "0.78rem", color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.url}</span>
-                        <button onClick={function() { galRemove(g); }} style={{ width: 20, height: 20, borderRadius: "50%", background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} color="#C62828" /></button>
+                        <button onClick={function() { galRemove(g); }} aria-label="Quitar esta imagen de la galeria" title="Quitar de la galeria" style={{ width: 20, height: 20, borderRadius: "50%", background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} color="#C62828" /></button>
                       </div>
                     );
                   })}

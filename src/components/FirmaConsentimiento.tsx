@@ -295,7 +295,7 @@ export default function FirmaConsentimiento(props: Props) {
             style={{ background: "var(--surface)", borderRadius: 24, boxShadow: "0 30px 80px rgba(0,0,0,0.5)", width: "100%", maxWidth: 580, maxHeight: "92vh", overflowY: "auto", position: "relative" }}
             onClick={function(e) { e.stopPropagation(); }}>
               <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), #C9AD8D)" }} />
-              <button onClick={cerrar} style={{ position: "absolute", top: 14, right: 14, width: 32, height: 32, borderRadius: "50%", background: "rgba(78,59,43,0.06)", border: "none", color: "var(--text)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}><X size={16} /></button>
+              <button onClick={cerrar} aria-label="Cerrar el consentimiento" title="Cerrar" style={{ position: "absolute", top: 14, right: 14, width: 32, height: 32, borderRadius: "50%", background: "rgba(78,59,43,0.06)", border: "none", color: "var(--text)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}><X size={16} /></button>
 
               <div style={{ padding: "2rem 2rem 2.5rem" }}>
                 {step === "intro" && (

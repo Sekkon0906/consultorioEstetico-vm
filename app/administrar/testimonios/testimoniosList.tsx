@@ -119,7 +119,7 @@ export default function TestimoniosList() {
       </div>
 
       {toast && <motion.div initial={false} animate={{ opacity: 1 }} style={{ background: "var(--estado-atendida-bg)", color: "var(--estado-atendida)", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", textAlign: "center" }}>{toast}</motion.div>}
-      {err && <div style={{ background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", color: "var(--danger)", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", display: "flex", justifyContent: "space-between" }}>{err}<button onClick={function() { setErr(null); }} style={{ background: "none", border: "none", cursor: "pointer" }}><X size={13} /></button></div>}
+      {err && <div style={{ background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", color: "var(--danger)", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.82rem", display: "flex", justifyContent: "space-between" }}>{err}<button onClick={function() { setErr(null); }} aria-label="Cerrar el aviso de error" title="Cerrar aviso" style={{ background: "none", border: "none", cursor: "pointer" }}><X size={13} /></button></div>}
 
       {/* ===== COMENTARIOS TAB ===== */}
       {tab === "comentarios" && (
@@ -182,7 +182,7 @@ export default function TestimoniosList() {
                 </div>
                 <div style={{ background: "var(--surface-soft)", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}><Lbl>Foto del paciente</Lbl>
                   <div style={{ display: "flex", gap: "0.8rem", alignItems: "center", flexWrap: "wrap", marginTop: 6 }}>
-                    {form.thumb && <div style={{ position: "relative" }}><Image src={form.thumb} alt="" width={64} height={64} quality={70} style={{ height: 64, width: 64, borderRadius: 10, objectFit: "cover", border: "2px solid var(--brand)" }} /><button onClick={function() { setForm({ ...form, thumb: "" }); }} style={{ position: "absolute", top: -5, right: -5, width: 18, height: 18, borderRadius: "50%", background: "var(--danger)", color: "var(--brand-contrast)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} /></button></div>}
+                    {form.thumb && <div style={{ position: "relative" }}><Image src={form.thumb} alt="" width={64} height={64} quality={70} style={{ height: 64, width: 64, borderRadius: 10, objectFit: "cover", border: "2px solid var(--brand)" }} /><button onClick={function() { setForm({ ...form, thumb: "" }); }} aria-label="Quitar la foto" title="Quitar la foto" style={{ position: "absolute", top: -5, right: -5, width: 18, height: 18, borderRadius: "50%", background: "var(--danger)", color: "var(--brand-contrast)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} /></button></div>}
                     <label style={{ padding: "0.45rem 1rem", borderRadius: 12, border: "1px dashed var(--brand)", cursor: upl ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: upl ? 0.6 : 1 }}><Upload size={14} /> {upl ? "Subiendo..." : form.thumb ? "Cambiar" : "Subir foto"}<input type="file" accept="image/*" style={{ display: "none" }} onChange={handleThumb} disabled={upl} /></label>
                   </div>
                 </div>

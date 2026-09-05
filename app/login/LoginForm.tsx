@@ -79,11 +79,13 @@ export default function LoginForm({ setErr }: Props) {
       transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
     >
       <div className="mb-3 text-start">
-        <label className="form-label fw-semibold" style={{ color: PALETTE.text }}>
+        <label htmlFor="login-correo" className="form-label fw-semibold" style={{ color: PALETTE.text }}>
           Correo electrónico
         </label>
         <input
+          id="login-correo"
           type="email"
+          autoComplete="email"
           className={`form-control rounded-3 shadow-sm ${touched && errors.email ? "is-invalid" : ""}`}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -94,11 +96,13 @@ export default function LoginForm({ setErr }: Props) {
       </div>
 
       <div className="mb-3 text-start">
-        <label className="form-label fw-semibold" style={{ color: PALETTE.text }}>
+        <label htmlFor="login-password" className="form-label fw-semibold" style={{ color: PALETTE.text }}>
           Contraseña
         </label>
         <div className="input-group">
           <input
+            id="login-password"
+            autoComplete="current-password"
             type={show ? "text" : "password"}
             className={`form-control rounded-start-3 shadow-sm ${touched && errors.password ? "is-invalid" : ""}`}
             value={password}

@@ -224,12 +224,14 @@ export default function AgendarForm({
         {/* === CAMPOS DE FORMULARIO === */}
         <div className="md:col-span-2">
           <label
+            htmlFor="agendar-nombre"
             className="block mb-1 text-sm font-semibold"
             style={{ color: DARK_PALETTE.textSoft }}
           >
             {t("fullName")} *
           </label>
           <input
+            id="agendar-nombre"
             value={formData.nombre}
             onChange={(e) => handleChange("nombre", e.target.value)}
             placeholder={t("fullNamePlaceholder")}
@@ -244,12 +246,14 @@ export default function AgendarForm({
 
         <div>
           <label
+            htmlFor="agendar-telefono"
             className="block mb-1 text-sm font-semibold"
             style={{ color: DARK_PALETTE.textSoft }}
           >
             {t("phone")} *
           </label>
           <input
+            id="agendar-telefono"
             value={formData.telefono}
             onChange={(e) => handleChange("telefono", e.target.value)}
             type="tel"
@@ -266,12 +270,14 @@ export default function AgendarForm({
 
         <div>
           <label
+            htmlFor="agendar-correo"
             className="block mb-1 text-sm font-semibold"
             style={{ color: DARK_PALETTE.textSoft }}
           >
             {t("email")} *
           </label>
           <input
+            id="agendar-correo"
             value={formData.correo}
             onChange={(e) => handleChange("correo", e.target.value)}
             type="email"
@@ -326,12 +332,14 @@ export default function AgendarForm({
         {/* Nota */}
         <div className="md:col-span-2">
           <label
+            htmlFor="agendar-nota"
             className="block mb-1 text-sm font-semibold"
             style={{ color: DARK_PALETTE.textSoft }}
           >
             {t("noteLabel")}
           </label>
           <textarea
+            id="agendar-nota"
             value={formData.nota}
             onChange={(e) => handleChange("nota", e.target.value)}
             rows={3}
