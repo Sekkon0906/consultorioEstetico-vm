@@ -272,6 +272,22 @@ Diagnóstico completo y verificación en **[[09 — Estudio de móvil]]**.
 - [ ] **DEP1 · Rotar credenciales.** Contraseña de Neon + token de R2 →
       actualizar `DATABASE_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` en
       Railway. **Antes de que la doctora lo use en serio.**
+- [ ] **DEP7 · El despliegue de *preview* de Vercel falla.**
+      *(2026-09-04.)* Producción **sí** construye bien —comprobado: sirve la CSP
+      y el título nuevos—, así que `npm ci` y Next 16 funcionan en Vercel. Lo
+      que falla es el preview de una rama.
+
+      **Hipótesis principal, ya mitigada:** faltaba declarar `engines`. Next 16
+      exige Node ≥ 20.9 y un proyecto de hace meses puede seguir fijado a Node
+      18. Ya está declarado en los dos `package.json`.
+
+      **Segunda hipótesis:** las variables de entorno de Preview (**DEP4**). La
+      diferencia típica entre producción y preview es justo esa.
+
+      Para cerrarlo hace falta el log, que vive en la cuenta del usuario:
+      `npx vercel inspect <id-del-despliegue> --logs`, y mirar la primera línea
+      con `Error:`.
+
 - [ ] **DEP6 · `server/railway.json` declara un builder que quizá no se usa.**
       *(Encontrado 2026-09-04.)* El archivo dice `"builder": "NIXPACKS"` pero
       el panel de Railway muestra **Railpack**. Son constructores distintos y
