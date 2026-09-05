@@ -4742,17 +4742,41 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
     transform: none;
   }
 
-  .acceso-columna-form { padding: 2rem 1.5rem; }
+  .acceso-columna-form { padding: 2rem 1.5rem 2.25rem; }
+
+  /* Reportado desde un iPhone: apilados, el formulario terminaba y la foto
+     empezaba PEGADA —medido, 0 px entre bloques—, sin nada que dijera que
+     ahi acaba una cosa y empieza otra. En dos columnas ese limite lo marca
+     el propio borde vertical; al apilarse no queda ninguno.
+
+     Una linea y un cambio de fondo bastan: separan sin anadir altura, que en
+     una pantalla donde el formulario ya ocupa casi todo es lo que importa. */
+  .acceso-columna-info {
+    border-top: 1px solid var(--border);
+    background: var(--surface-soft);
+  }
+
   /* Apaisada al apilarse: una foto 4:3 a ancho completo empuja el porqué
      fuera de la pantalla y deja de acompañar al texto. */
   .acceso-foto { aspect-ratio: 16 / 9; }
-  .acceso-info-texto { padding: 1.25rem 1.5rem 2rem; }
+  .acceso-info-texto { padding: 1.5rem 1.5rem 2rem; }
+
+  /* El velo del degradado tiene que morir en el fondo NUEVO, no en el de la
+     columna en escritorio, o se ve un escalón de color justo bajo la foto. */
+  .acceso-velo {
+    background: linear-gradient(180deg, transparent 55%, var(--surface-soft) 100%);
+  }
 }
 
 @media (max-width: 576px) {
   .acceso-envoltorio { padding: 1rem 0.75rem; }
   .acceso-rejilla { border-radius: 18px; }
-  .acceso-columna-form { padding: 1.75rem 1.15rem; }
+  /* Mas relleno ABAJO que arriba, y no por gusto: los enlaces del final
+     ("Olvide mi contrasena" / "Crear cuenta") llevan 44px de alto tactil, asi
+     que su caja termina bastante por debajo de su texto. Con relleno
+     simetrico el hueco que se VE hasta la foto eran 6px medidos, aunque el
+     declarado fuese 25. */
+  .acceso-columna-form { padding: 1.75rem 1.15rem 2.5rem; }
 }
 
 /* ============================================================
@@ -5107,4 +5131,46 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
 
 @media (prefers-reduced-motion: reduce) {
   .fidelidad-sello { transition: none; }
+}
+
+/* ============================================================
+   CAMPOS DE FECHA Y HORA EN MÓVIL
+   ============================================================
+   Reportado desde un iPhone: en "pedir otro día" y en el modal de reagenda
+   del panel, el campo de fecha se salía por el borde derecho y el valor
+   quedaba cortado.
+
+   La causa no es el ancho declarado —los dos llevan `width: 100%`— sino que
+   Safari le da a `input[type=date]` un ANCHO INTRÍNSECO MÍNIMO, tomado del
+   texto que el sistema mete dentro (el formato de fecha completo con su
+   selector). Ese mínimo gana al 100 % del contenedor, y como el contenedor no
+   puede encoger por debajo del contenido de su hijo, el campo desborda.
+
+   `min-width: 0` es lo que rompe esa cadena: autoriza a la caja a bajar de su
+   contenido. `-webkit-appearance: none` quita además el adorno nativo que
+   suma ancho por su cuenta, y con `appearance` estándar detrás para los
+   navegadores que ya no necesitan el prefijo.
+
+   No se toca `font-size`: la regla de más arriba ya lo pone en 16px para
+   evitar el zoom de iOS, y bajarlo aquí lo reintroduciría. */
+@media (max-width: 768px) {
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="month"] {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* El contenedor también: una rejilla o un flex tampoco encogen por debajo
+     del contenido de sus hijos salvo que se les diga. Sin esto el arreglo de
+     arriba se queda a medias, porque el que desborda pasa a ser el padre. */
+  .reagenda-campos,
+  .reagenda-campos > * {
+    min-width: 0;
+  }
 }

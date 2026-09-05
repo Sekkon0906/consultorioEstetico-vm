@@ -257,12 +257,18 @@ export default function CitasAgendadas() {
               </p>
               <InfoBlock cita={reagendarModal} />
               <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.8rem" }}>
-                <div style={{ display: "flex", gap: "0.8rem" }}>
-                  <div style={{ flex: 1 }}>
+                {/* `minWidth: 0` en los dos hijos. Un hijo flex arranca con
+                    `min-width: auto`, o sea que NO puede encoger por debajo de
+                    su contenido, y Safari le da a `input[type=date]` un ancho
+                    intrinseco tomado del formato completo. Resultado: en un
+                    telefono el campo de fecha se salia por el borde derecho y
+                    el valor quedaba cortado. */}
+                <div className="reagenda-campos" style={{ display: "flex", gap: "0.8rem" }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text-soft)", display: "block", marginBottom: 4 }}>Nueva fecha</label>
                     <input type="date" value={reagendarFecha} onChange={(e) => setReagendarFecha(e.target.value)} style={IS} />
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text-soft)", display: "block", marginBottom: 4 }}>Nueva hora</label>
                     <select value={reagendarHora} onChange={(e) => setReagendarHora(e.target.value)} style={IS}>
                       {HORAS.map((h) => <option key={h} value={h}>{h}</option>)}
