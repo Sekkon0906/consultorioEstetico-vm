@@ -3974,6 +3974,63 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
 }
 
 
+
+/* ============================================================
+   BARRA DE NAVEGACIÓN DE LA RUEDA — flechas y puntos
+   ============================================================
+   `.g3d-flecha` NO TENÍA NINGÚN ESTILO. Eran dos <button> con un carácter
+   dentro, así que salían con la tipografía, el tamaño y el gris que pone el
+   navegador por defecto: desalineados con los puntos, sin área de toque y
+   pegados al primer punto porque compartían el mismo `gap` de 8 px que hay
+   entre ellos.
+
+   Se les da forma de control redondo, con el mismo aire que los puntos pero
+   separadas de ellos: un `gap` uniforme hacía que la flecha pareciera un
+   punto más grande en vez de un control aparte. */
+.g3d-flecha {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-soft);
+  /* El carácter ‹ es tipográfico, no un icono: sin tamaño explícito hereda
+     el del contenedor y queda diminuto al lado de los puntos. */
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 200ms ease,
+    transform 240ms cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.g3d-flecha:hover {
+  background: var(--surface-soft);
+  color: var(--text);
+}
+.g3d-flecha:active {
+  transform: scale(0.9);
+  transition: transform 70ms cubic-bezier(0.4, 0, 1, 1);
+}
+.g3d-flecha:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* El aire que separa cada flecha del grupo de puntos. Sin esto, con el `gap`
+   uniforme de la barra, la flecha se lee como un punto más. */
+.g3d-flecha:first-child  { margin-right: 4px; }
+.g3d-flecha:last-child   { margin-left: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .g3d-flecha:active { transform: none; }
+}
+
 /* ============================================================
    TARJETA QUE GIRA — foco
    ============================================================

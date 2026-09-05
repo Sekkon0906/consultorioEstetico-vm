@@ -112,11 +112,44 @@ export default function Galeria3D() {
     load();
   }, []);
 
-  /* Radio reducido (de 380 a 290) para que las cards visibles a los
-     lados queden más cerca del eje central de la rueda y, por tanto,
-     mejor alineadas visualmente con el título y los dots. */
-  const radius = 290;
   const angle = tratamientos.length > 0 ? 360 / tratamientos.length : 0;
+
+  /**
+   * El radio DEPENDE de cuántas tarjetas hay, y ese es el arreglo.
+   *
+   * Era fijo en 290. Con 4 destacados el ángulo entre tarjetas es de 90° y
+   * quedaban bien separadas; al subir a 8 el ángulo baja a 45° y, con el
+   * mismo radio, la distancia horizontal entre vecinas se reduce casi a la
+   * mitad — se amontonaban unas sobre otras.
+   *
+   * Lo que se fija NO es el radio: es DÓNDE cae la tarjeta de al lado.
+   *
+   * Con 4 destacados la vecina quedaba a 290 px del centro y la composición
+   * funcionaba —se veía entera, sin tocar a la frontal y sin salirse del
+   * escenario—. Así que esa distancia es la que se conserva, y el radio se
+   * despeja de ella:
+   *
+   *     x = sen(ángulo) × radio   →   radio = 290 / sen(ángulo)
+   *
+   * Se probó antes con `radio × ángulo` constante, que mantiene la
+   * separación medida sobre el arco. Da 410 px con 8 tarjetas y las
+   * laterales se salían por los lados. El arco no es lo que se ve; lo que
+   * se ve es la proyección horizontal.
+   *
+   * El tope evita que con muchas destacadas el radio se dispare. Pasado ese
+   * punto lo que toca no es más rueda, sino enseñar menos a la vez —de eso
+   * se encarga `visiblesMax`.
+   */
+  const X_VECINA = 290;
+  const senAngulo = Math.sin((angle * Math.PI) / 180) || 1;
+  const radius = Math.min(520, Math.max(290, X_VECINA / senAngulo));
+
+  /* Una a cada lado: tres tarjetas en pantalla, siempre.
+     No es un número al azar — es lo que se veía con 4 destacados, donde la
+     de dos puestos más allá caía justo detrás y el coseno ya la ocultaba.
+     Fijándolo, la composición es la misma con 4 que con 12: cambia cuántas
+     hay que recorrer, no cuántas compiten por la atención a la vez. */
+  const visiblesMax = 1;
 
   // Rotación continua: la rueda gira en sentido contrario al anterior
   // (cards entran por la derecha y se desplazan hacia la izquierda).
@@ -202,7 +235,12 @@ export default function Galeria3D() {
     const x = Math.sin(radianes) * radius;
     const scale = 0.62 + (coseno + 1) * 0.19;   // frente 1.0, atrás 0.62
     const brightness = 0.55 + (coseno + 1) * 0.225;
-    const opacity = coseno > -0.2 ? 1 : 0;      // las de detrás no estorban
+    /* Se ocultan por POSICIÓN en la rueda, no por ángulo.
+       Antes bastaba `coseno > -0.2`, que con 4 tarjetas dejaba ver 3. Con 8
+       ese mismo umbral deja ver 5, y las dos de los extremos aparecen
+       recortadas por el borde del escenario. Contar puestos da el mismo
+       resultado independientemente de cuántas haya. */
+    const opacity = Math.abs(offset) <= visiblesMax && coseno > -0.2 ? 1 : 0;
     const zIndex = Math.round((coseno + 1) * 100);
     const isFront = coseno > 0.85;
 
@@ -767,8 +805,12 @@ export default function Galeria3D() {
             className="g3d-dots"
             style={{
               display: "flex",
-              gap: 8,
-              padding: "0.45rem 0.85rem",
+              alignItems: "center",
+              /* Un pelo mas de aire entre puntos y en el borde. Con 4
+                 destacados la barra era corta y no se notaba; con 8 se veia
+                 apretada. */
+              gap: 9,
+              padding: "0.4rem 0.7rem",
               background: "var(--bg-elevated)",
               backdropFilter: "blur(10px)",
               border: "1px solid var(--border)",
