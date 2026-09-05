@@ -4389,3 +4389,95 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
     margin: -14px 0;
   }
 }
+
+/* ============================================================
+   MÓVIL — LA COLA LARGA DE OBJETIVOS PEQUEÑOS
+   ============================================================
+   Segunda pasada de la auditoría a 375x812. La primera cogió los casos
+   graves (campos, calendario, puntos de carrusel); esto es lo que quedaba
+   medido por debajo de 44px. */
+@media (max-width: 768px) {
+
+  /* --- Enlaces del pie y del banner de cookies ---
+     Medidos entre 18 y 28px de alto. Son enlaces en columna, uno por línea,
+     así que la altura la daba solo la línea de texto. `inline-flex` deja que
+     el área crezca a 44 sin estirarse a todo el ancho de la columna: se toca
+     el enlace, no el hueco de al lado. */
+  footer a,
+  footer button,
+  .cookie-banner a,
+  .cookie-banner button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  /* --- CTA secundarios ---
+     36-37px medidos. Son los botones de "segunda opción" (Conoce los
+     procedimientos, Ver testimonios, Saber más sobre la doctora): los pulsa
+     quien no tiene claro todavía si quiere agendar, que es justo a quien no
+     conviene ponerle un blanco pequeño. */
+  .btn-ghost-app,
+  .hero-fs-btn,
+  .footer-cta-ghost,
+  .g3d-cta-pill,
+  .proc-chip {
+    min-height: 44px;
+  }
+
+  /* --- Texto por debajo de lo legible ---
+     La etiqueta "★ Destacado" medía 7.54px: es la mitad del cuerpo del
+     texto que tiene al lado. Que sea una etiqueta pequeña no la exime de
+     poder leerse; 10px sigue siendo discreta y ya se distingue.
+     El resto sube a 11.5, que es el suelo por debajo del cual el texto
+     corrido deja de leerse cómodamente en un teléfono. */
+  /* --- Menu lateral, CTA principal y "Conocer mas" ---
+     El menu lateral es la navegacion PRINCIPAL en movil y sus enlaces
+     median 21px. `.btn-accion` es el boton de accion de toda la web y salia
+     en 37. Y `.proc-card-mas` ("Conocer mas") en 20: es el enlace que abre
+     cada procedimiento, o sea el paso previo a agendar. */
+  .mobile-sidebar-menu a,
+  .mobile-sidebar-menu button {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .btn-accion { min-height: 44px; }
+
+  /* El "+" de anadir a la seleccion medía 34x34 con el tamaño puesto en
+     linea desde el componente. `min-width`/`min-height` se resuelven despues
+     de `width`, asi que ganan al estilo en linea sin necesidad de
+     `!important`. Aqui el circulo SI crece a 44: no es un area invisible,
+     es un boton que conviene que se vea mas grande en un telefono. */
+  .btn-anadir-seleccion {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* --- Pantalla de seleccion y controles del menu lateral ---
+     "Quitar X" median 36px y el nombre del procedimiento, que es un enlace,
+     25. Quitar algo de la seleccion por error es molesto, pero fallar el
+     toque y acabar en otra pagina lo es mas: los dos van juntos en la misma
+     fila y conviene que ninguno sea un blanco pequeno.
+
+     Los botones de tema (Claro/Oscuro) median 26px y viven en el menu
+     lateral, que en movil es el unico sitio donde se llega a ellos. */
+  .seleccion-acciones a,
+  .seleccion-acciones button,
+  .mobile-sidebar-controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .proc-card-mas {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .g3d-grid-badge.destacado { font-size: 10px !important; }
+  .g3d-grid-dorso-desc,
+  .proc-card-cat-chip,
+  .proc-card-price-unit { font-size: 11.5px !important; }
+}

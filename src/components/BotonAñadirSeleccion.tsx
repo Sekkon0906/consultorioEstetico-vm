@@ -62,7 +62,12 @@ export default function BotonAñadirSeleccion({
       whileHover={{ scale: 1.12 }}
       whileTap={{ scale: 0.82 }}
       transition={MUELLE_TACTO}
-      className={className}
+      /* `btn-anadir-seleccion` va siempre, ademas de lo que llegue por prop:
+         existe solo para poder agrandarlo en movil desde el CSS. El tamaño se
+         pone en linea, y el estilo en linea le gana a la hoja… salvo
+         `min-width`/`min-height`, que se resuelven DESPUES de `width` y por
+         eso pueden subirlo a 44 sin `!important`. */
+      className={`btn-anadir-seleccion${className ? ` ${className}` : ""}`}
       aria-pressed={dentro}
       aria-label={
         dentro
