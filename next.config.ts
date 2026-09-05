@@ -85,8 +85,14 @@ const nextConfig = {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https://pub-34cf5433a9574d4e9b6b32d8a4cfd815.r2.dev https://ui-avatars.com https://lh3.googleusercontent.com https://img.youtube.com https://i.ytimg.com",
-      // La API, y Sentry para los informes de error.
-      `connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL || ""} https://*.ingest.sentry.io https://*.ingest.us.sentry.io`.trim(),
+      /* La API, y Sentry para los informes de error.
+       *
+       * OJO AL DESPLEGAR: esta línea se resuelve EN TIEMPO DE COMPILACIÓN.
+       * Si `NEXT_PUBLIC_API_URL` no está definida en Vercel al construir,
+       * queda `connect-src 'self'` y el sitio no podría hablar con su
+       * propia API — no hoy, porque la política va en modo reporte, pero sí
+       * el día que se active. Por eso el aviso de abajo. */
+      `connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL || ""} https://*.ingest.sentry.io https://*.ingest.us.sentry.io`.replace(/\s+/g, " ").trim(),
       // El mapa y los vídeos van en <iframe>.
       "frame-src 'self' https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com",
       "object-src 'none'",
@@ -97,6 +103,14 @@ const nextConfig = {
       "form-action 'self'",
       "upgrade-insecure-requests",
     ].join("; ");
+
+    if (!process.env.NEXT_PUBLIC_API_URL) {
+      console.warn(
+        "[csp] NEXT_PUBLIC_API_URL no está definida: la CSP se genera sin el " +
+        "origen de la API. Da igual mientras la política vaya en modo reporte, " +
+        "pero hay que definirla ANTES de pasarla a modo bloqueante."
+      );
+    }
 
     return [
       {
