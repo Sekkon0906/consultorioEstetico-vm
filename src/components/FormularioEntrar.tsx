@@ -36,7 +36,17 @@ export default function FormularioEntrar({ onCrearCuenta }: { onCrearCuenta?: ()
       {err && (
         <div
           className="alert alert-danger"
-          style={{ backgroundColor: "#FCEAEA", color: "#8C2B2B", border: "1px solid #E3B4A0" }}
+          style={{
+              /* Derivado de `--danger` con `color-mix` en vez de tres codigos
+                 fijos. Los que habia —#FCEAEA, #8C2B2B, #E3B4A0— estaban
+                 pensados solo para el tema claro: sobre el fondo oscuro el
+                 aviso salia como un rectangulo casi blanco. Al derivarlo del
+                 token, el fondo se mezcla con la superficie del tema que este
+                 puesto y funciona en los dos. */
+              backgroundColor: "color-mix(in srgb, var(--danger) 12%, var(--surface))",
+              color: "var(--danger)",
+              border: "1px solid color-mix(in srgb, var(--danger) 35%, var(--surface))",
+            }}
         >
           {err}
         </div>

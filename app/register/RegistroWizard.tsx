@@ -13,7 +13,7 @@
  * validaciones, alta— es el mismo que tenia en `page.tsx`.
  */
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { PALETTE } from "./palette";
@@ -187,10 +187,16 @@ export default function RegistroWizard() {
                   <div
                     className="alert alert-danger text-center"
                     style={{
-                      backgroundColor: "#FCEAEA",
-                      color: "#8C2B2B",
-                      border: "1px solid #E3B4A0",
-                    }}
+              /* Derivado de `--danger` con `color-mix` en vez de tres codigos
+                 fijos. Los que habia —#FCEAEA, #8C2B2B, #E3B4A0— estaban
+                 pensados solo para el tema claro: sobre el fondo oscuro el
+                 aviso salia como un rectangulo casi blanco. Al derivarlo del
+                 token, el fondo se mezcla con la superficie del tema que este
+                 puesto y funciona en los dos. */
+              backgroundColor: "color-mix(in srgb, var(--danger) 12%, var(--surface))",
+              color: "var(--danger)",
+              border: "1px solid color-mix(in srgb, var(--danger) 35%, var(--surface))",
+            }}
                   >
                     {err}
                   </div>
@@ -255,31 +261,46 @@ export default function RegistroWizard() {
       </div>
 
       <style jsx>{`
+        /* Los colores salen de tokens y no de PALETTE. PALETTE.main es el
+           marron de marca del tema CLARO; interpolarlo dejaba el indicador de
+           pasos con ese marron tambien en el tema oscuro, donde la marca es
+           un champan. El token cambia con el tema; la constante no.
+
+           (Los valores viejos no se citan aqui a proposito: la regla de lint
+           que prohibe colores fijos lee el texto crudo de esta plantilla y no
+           distingue un comentario de una declaracion.) */
         .circle {
           width: 36px;
           height: 36px;
           border-radius: 50%;
-          border: 2px solid ${PALETTE.main};
+          border: 2px solid var(--brand);
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: 700;
-          color: ${PALETTE.main};
+          color: var(--brand);
           transition: all var(--mov-normal) ease;
         }
         .circle.filled {
-          background-color: ${PALETTE.main};
-          color: white;
+          background-color: var(--brand);
+          /* El token de contraste, no un blanco fijo: es el color que la
+             paleta define para ir ENCIMA de la marca, y en el tema oscuro la
+             marca es un champan claro sobre el que un blanco no se lee. */
+          color: var(--brand-contrast);
         }
         .line {
           width: 56px;
           height: 4px;
-          background-color: #e6d9cf;
+          /* Era un beige fijo que solo funciona sobre fondo claro: en el
+             tema oscuro la linea entre pasos quedaba mas clara que todo lo
+             que tiene alrededor y se leia como si estuviera activa. El token
+             de borde ya es la separacion propia de cada tema. */
+          background-color: var(--border);
           margin: 0 10px;
           transition: background-color var(--mov-normal) ease;
         }
         .line.active {
-          background-color: ${PALETTE.main};
+          background-color: var(--brand);
         }
       `}</style>
     </div>
