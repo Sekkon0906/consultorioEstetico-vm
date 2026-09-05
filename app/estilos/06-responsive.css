@@ -4081,10 +4081,14 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   outline-offset: 2px;
 }
 
-/* El aire que separa cada flecha del grupo de puntos. Sin esto, con el `gap`
-   uniforme de la barra, la flecha se lee como un punto más. */
-.g3d-flecha:first-child  { margin-right: 4px; }
-.g3d-flecha:last-child   { margin-left: 4px; }
+/* `auto` y no una medida fija: la barra es ancha y los puntos van centrados,
+   asi que un margen fijo dejaria las flechas pegadas al grupo, en mitad de la
+   barra, con dos huecos vacios a los lados. Con `auto` el sobrante se reparte
+   y cada flecha se va a su extremo, que es donde se busca una flecha.
+   De paso ancla los puntos en el centro exacto pase lo que pase con el
+   numero de destacados. */
+.g3d-flecha:first-child  { margin-right: auto; }
+.g3d-flecha:last-child   { margin-left: auto; }
 
 @media (prefers-reduced-motion: reduce) {
   .g3d-flecha:active { transform: none; }
