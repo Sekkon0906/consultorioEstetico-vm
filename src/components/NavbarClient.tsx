@@ -528,7 +528,11 @@ export default function Navbar() {
               —`.navbar-sep`—, asi que dice lo mismo con el mismo lenguaje:
               lo de la izquierda es tu cuenta, lo de la derecha es tu
               seleccion. Son dos cosas distintas. */}
-          <span aria-hidden="true" className="navbar-sep" style={{ marginLeft: "0.5rem" }} />
+          {/* Margen por LOS DOS lados. Con `marginLeft` solo, el hueco medido era
+              de 8px a la izquierda y 0 a la derecha: la fila no tiene `gap`, asi
+              que la linea quedaba pegada a la insignia del carrito y se leia
+              como parte de su borde en vez de como separador. */}
+          <span aria-hidden="true" className="navbar-sep" style={{ margin: "0 0.85rem" }} />
           <InsigniaSeleccion />
 
           {/* Tema e idioma salieron de aquí: el navbar de escritorio competía
