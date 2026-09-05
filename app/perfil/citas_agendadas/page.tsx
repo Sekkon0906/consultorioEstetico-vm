@@ -7,6 +7,7 @@ import { ChevronUp, ChevronDown, Clock, User, Phone, Mail, FileText, CheckCircle
 import { useLocale, useTranslations } from "next-intl";
 import { MUELLE_TACTO } from "@/lib/movimiento";
 import HistorialProcedimientos from "@/components/HistorialProcedimientos";
+import TarjetaFidelidad from "@/components/TarjetaFidelidad";
 import PedirReagenda from "@/components/PedirReagenda";
 import { getMisCitasApi, getConsentimientoUrlApi } from "@/services/citasApi";
 import {
@@ -15,6 +16,7 @@ import {
   rechazarReagendaApi,
 } from "@/services/reagendasApi";
 import type { Cita } from "@/types/domain";
+import ReciboImpreso from "@/components/ReciboImpreso";
 import { formatearFecha, aISOLocal } from "@/lib/fechas";
 
 // Trae jsPDF (pesado) consigo. Se usa solo cuando el paciente abre el
@@ -288,6 +290,13 @@ export default function CitasAgendadas() {
           pregunta "cuando fue la ultima vez" se hace nada mas entrar, y la
           lista de citas —que puede ser larga— la dejaria enterrada. Se
           oculta solo si no hay nada atendido todavia. */}
+      {/* Encima del historial a proposito: el historial dice QUE te has
+          hecho, y esto dice CUANTO llevas. Lo segundo se mira de un vistazo y
+          lo primero se lee, asi que va antes lo que se mira. Las dos cuentan
+          exactamente lo mismo —citas atendidas y pasadas—, que es lo que
+          impide que se contradigan. */}
+      <TarjetaFidelidad />
+
       <HistorialProcedimientos locale={intlLocale} />
 
       {/* Layout: filtros a la izquierda (pila) · citas a la derecha */}
@@ -403,7 +412,7 @@ export default function CitasAgendadas() {
                           <span style={{ display: "flex", alignItems: "center", gap: 5 }}><User size={13} color="var(--brand)" /> {cita.nombres} {cita.apellidos}</span>
                           {cita.telefono && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Phone size={13} color="var(--brand)" /> {cita.telefono}</span>}
                           {cita.correo && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Mail size={13} color="var(--brand)" /> {cita.correo}</span>}
-                          {cita.metodoPago && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><i className="fas fa-wallet" style={{ color: "var(--brand)" }} /> {cita.metodoPago} ({cita.tipoPagoConsultorio || cita.tipoPagoOnline || ""})</span>}
+                          {cita.metodoPago && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><i className="fas fa-wallet" style={{ color: "var(--brand)" }} /> {cita.metodoPago} ({cita.tipoPagoConsultorio || ""})</span>}
                         </div>
 
                         {cita.nota && (
@@ -490,6 +499,25 @@ export default function CitasAgendadas() {
                       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "1rem" }}>
                         <BotonConsentimiento citaId={String(cita.id)} etiqueta={t("consent.signed")} />
                       </div>
+                    )}
+
+                    {/* El comprobante, plegado. Desplegado siempre alargaria
+                        la lista a mas del doble y esto se consulta de vez en
+                        cuando, no cada vez.
+
+                        Se REGENERA a partir de la cita, no se guarda una copia
+                        de cuando se emitio: si la doctora cambia la fecha, el
+                        comprobante ensena la fecha nueva. Un documento con
+                        pinta de oficial que contradice la cita real es peor
+                        que no tener documento, porque la persona le hace mas
+                        caso a el que a la pantalla. */}
+                    {!isCancelada && (
+                      <details className="recibo-detalle">
+                        <summary>Ver comprobante</summary>
+                        <div style={{ marginTop: "1rem" }}>
+                          <ReciboImpreso cita={cita} locale={intlLocale} />
+                        </div>
+                      </details>
                     )}
                   </div>
                 </motion.div>

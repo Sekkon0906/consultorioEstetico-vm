@@ -44,7 +44,7 @@ export async function updateCitaApi(
   id: string,
   // El backend (PUT /citas/:id) solo acepta snake_case en su lista blanca:
   // fecha, hora, estado, nota, motivo_cancelacion, metodo_pago,
-  // tipo_pago_consultorio, tipo_pago_online, pagado, monto, monto_pagado,
+  // tipo_pago_consultorio, pagado, monto, monto_pagado,
   // monto_restante.
   payload: Record<string, unknown>
 ): Promise<void> {

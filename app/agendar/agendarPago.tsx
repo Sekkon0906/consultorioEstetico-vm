@@ -6,22 +6,22 @@ import { ArrowLeft } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { PALETTE } from "./palette";
 import Button from "@/components/ui/Button";
-import type { Cita, MetodoPago, TipoPagoConsultorio, TipoPagoOnline } from "@/types/domain";
+import type { Cita, MetodoPago, TipoPagoConsultorio } from "@/types/domain";
 import { createCitaApi } from "@/services/citasApi";
 import { formatearFecha } from "@/lib/fechas";
 
 export type CrearCitaPayload = Omit<Cita, "id" | "fechaCreacion">;
-export type CitaSinPagos = Omit<CrearCitaPayload, "metodoPago" | "tipoPagoConsultorio" | "tipoPagoOnline" | "estado">;
+export type CitaSinPagos = Omit<CrearCitaPayload, "metodoPago" | "tipoPagoConsultorio" | "estado">;
 
 interface AgendarPagoProps {
   metodoPago: MetodoPago | null;
   setMetodoPago: (m: MetodoPago | null) => void;
   tipoPagoConsultorio: TipoPagoConsultorio | undefined;
   setTipoPagoConsultorio: (t: TipoPagoConsultorio | undefined) => void;
-  tipoPagoOnline: TipoPagoOnline | undefined;
-  setTipoPagoOnline: (t: TipoPagoOnline | undefined) => void;
   citaData: CitaSinPagos;
-  onConfirmar: (citaCreada: Cita) => void;
+  /** El segundo argumento es el mensaje de WhatsApp ya compuesto: lo
+   *  envia el boton del recibo, no esta pantalla. */
+  onConfirmar: (citaCreada: Cita, textoWhatsApp: string) => void;
   goBack: () => void;
 }
 
@@ -46,7 +46,6 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
         ...citaData,
         metodoPago: "Consultorio",
         tipoPagoConsultorio: tipoPago,
-        tipoPagoOnline: null,
         estado: "pendiente",
       };
       const nuevaCita = await createCitaApi(payload);
@@ -67,9 +66,20 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
       if (citaData.nota) lineas.push(`${t("whatsapp.note")} ${citaData.nota}`);
       lineas.push(`${t("whatsapp.appointmentNumber")}${nuevaCita.id}*`);
       const texto = lineas.join("\n");
-      window.open(`https://wa.me/573155445748?text=${encodeURIComponent(texto)}`, "_blank");
 
-      onConfirmar(nuevaCita);
+      /* El WhatsApp YA NO se abre aqui: se pasa hecho al paso siguiente,
+         que lo pone en un boton dentro del recibo.
+
+         Dos razones, y la segunda obliga:
+          1. Si se abriera ahora, la persona se va a otra aplicacion en
+             mitad de la animacion de impresion y no la ve.
+          2. `window.open` llamado DESPUES de un await lo bloquea Safari en
+             iPhone, porque el gesto del usuario ya se consumio. Muy
+             probablemente hoy, en iPhone, la cita se guarda y WhatsApp no
+             se abre sin avisar de nada. Desde un boton del recibo el pulsar
+             es un gesto directo y el navegador lo deja pasar. */
+
+      onConfirmar(nuevaCita, texto);
     } catch (err: any) { setError(err.message || t("errorCreate")); }
     finally { setLoading(false); }
   };

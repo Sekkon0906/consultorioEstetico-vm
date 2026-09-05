@@ -35,6 +35,10 @@ function mapUsuario(row, email, rolReal) {
     medicamentos:            row.medicamentos,
     medicamentosDescripcion: row.medicamentos_descripcion,
     creadoEn:                row.creado_en,
+    /* Permiso comercial. Se expone para poder pintar el interruptor del
+       perfil con el valor real; cambiarlo NO se hace por aqui, sino por
+       PUT /usuarios/me/marketing, que ademas sella la fecha y el origen. */
+    aceptaMarketing:         row.acepta_marketing === true,
     email,
   };
 }
@@ -46,7 +50,8 @@ router.get("/me", verifyToken, async (req, res) => {
       `SELECT id, nombres, apellidos, rol, photo, telefono, edad, genero,
               antecedentes, antecedentes_descripcion,
               alergias, alergias_descripcion,
-              medicamentos, medicamentos_descripcion, creado_en
+              medicamentos, medicamentos_descripcion, creado_en,
+              acepta_marketing
        FROM usuarios WHERE id = $1 LIMIT 1`,
       [req.user.id]
     );

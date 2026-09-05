@@ -4742,15 +4742,435 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
     transform: none;
   }
 
-  .acceso-columna-form { padding: 2rem 1.5rem; }
+  .acceso-columna-form { padding: 2rem 1.5rem 2.25rem; }
+
+  /* Reportado desde un iPhone: apilados, el formulario terminaba y la foto
+     empezaba PEGADA —medido, 0 px entre bloques—, sin nada que dijera que
+     ahi acaba una cosa y empieza otra. En dos columnas ese limite lo marca
+     el propio borde vertical; al apilarse no queda ninguno.
+
+     Una linea y un cambio de fondo bastan: separan sin anadir altura, que en
+     una pantalla donde el formulario ya ocupa casi todo es lo que importa. */
+  .acceso-columna-info {
+    border-top: 1px solid var(--border);
+    background: var(--surface-soft);
+  }
+
   /* Apaisada al apilarse: una foto 4:3 a ancho completo empuja el porqué
      fuera de la pantalla y deja de acompañar al texto. */
   .acceso-foto { aspect-ratio: 16 / 9; }
-  .acceso-info-texto { padding: 1.25rem 1.5rem 2rem; }
+  .acceso-info-texto { padding: 1.5rem 1.5rem 2rem; }
+
+  /* El velo del degradado tiene que morir en el fondo NUEVO, no en el de la
+     columna en escritorio, o se ve un escalón de color justo bajo la foto. */
+  .acceso-velo {
+    background: linear-gradient(180deg, transparent 55%, var(--surface-soft) 100%);
+  }
 }
 
 @media (max-width: 576px) {
   .acceso-envoltorio { padding: 1rem 0.75rem; }
   .acceso-rejilla { border-radius: 18px; }
-  .acceso-columna-form { padding: 1.75rem 1.15rem; }
+  /* Mas relleno ABAJO que arriba, y no por gusto: los enlaces del final
+     ("Olvide mi contrasena" / "Crear cuenta") llevan 44px de alto tactil, asi
+     que su caja termina bastante por debajo de su texto. Con relleno
+     simetrico el hueco que se VE hasta la foto eran 6px medidos, aunque el
+     declarado fuese 25. */
+  .acceso-columna-form { padding: 1.75rem 1.15rem 2.5rem; }
+}
+
+/* ============================================================
+   RECIBO IMPRESO (ReciboImpreso)
+   ============================================================
+   Un comprobante saliendo de una impresora de recibos.
+
+   LA ANIMACIÓN NO DECIDE DÓNDE ACABA EL PAPEL
+   El papel descansa en `translateY(0)` y la animación solo lo trae desde
+   arriba. Si las animaciones no corren —preferencia del sistema, o
+   sencillamente que el navegador no las ejecute— el recibo se ve completo y
+   quieto. Lo contrario, animar HACIA la posición buena, deja el comprobante
+   fuera de la vista cuando algo falla, y un comprobante invisible es peor que
+   uno sin animación.
+
+   Se anima `transform`, nunca el alto: animar el alto reflowea la página en
+   cada fotograma y en un teléfono de gama media se ve a tirones. */
+
+.recibo-marco {
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+/* La carcasa de la impresora. */
+.recibo-cabezal {
+  position: relative;
+  height: 34px;
+  border-radius: 12px 12px 4px 4px;
+  background: linear-gradient(180deg, var(--surface-soft), var(--border));
+  border: 1px solid var(--border-strong);
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* La ranura por la que sale el papel. */
+.recibo-ranura {
+  width: 72%;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--text);
+  opacity: 0.55;
+}
+
+/* Recorta el papel mientras baja: sin esto el recibo aparece de la nada en
+   vez de salir de la ranura. */
+.recibo-ventana {
+  overflow: hidden;
+}
+
+.recibo-papel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  padding: 1.5rem 1.35rem 1.25rem;
+  font-size: 0.86rem;
+  color: var(--text);
+  box-shadow: 0 14px 34px -16px rgba(58, 42, 26, 0.4);
+  /* El borde inferior dentado, como el papel cortado de una impresora
+     térmica. Es un degradado repetido y no una imagen: escala solo. */
+  border-bottom: none;
+  padding-bottom: 1.6rem;
+  -webkit-mask-image:
+    linear-gradient(#000 calc(100% - 9px), transparent 0),
+    radial-gradient(circle 6px at 8px 100%, transparent 96%, #000 100%);
+  mask-image:
+    linear-gradient(#000 calc(100% - 9px), transparent 0),
+    radial-gradient(circle 6px at 8px 100%, transparent 96%, #000 100%);
+  -webkit-mask-size: 100% 100%, 16px 100%;
+  mask-size: 100% 100%, 16px 100%;
+  -webkit-mask-repeat: no-repeat, repeat-x;
+  mask-repeat: no-repeat, repeat-x;
+  animation: recibo-sale 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes recibo-sale {
+  from { transform: translateY(-100%); }
+  /* Sin `to`: el estado de reposo YA es el bueno. */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recibo-papel { animation: none; }
+}
+
+.recibo-cabecera { text-align: center; }
+
+.recibo-marca {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.recibo-sub {
+  margin: 2px 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+/* La línea de puntos de un recibo térmico. */
+.recibo-corte {
+  height: 1px;
+  margin: 0.9rem 0;
+  background-image: linear-gradient(90deg, var(--border-strong) 50%, transparent 0);
+  background-size: 7px 1px;
+  background-repeat: repeat-x;
+}
+
+.recibo-titulo {
+  margin: 0 0 0.9rem;
+  text-align: center;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.recibo-filas { margin: 0; }
+
+.recibo-fila {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.3rem 0;
+}
+
+.recibo-fila dt {
+  color: var(--text-soft);
+  flex-shrink: 0;
+}
+
+.recibo-fila dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+  /* Un procedimiento con nombre largo tiene que partir, no desbordar el
+     papel. */
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.recibo-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 0.95rem;
+}
+
+.recibo-total strong {
+  font-family: "Playfair Display", serif;
+  font-size: 1.15rem;
+}
+
+.recibo-aviso {
+  margin: 0.4rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+.recibo-estado { margin: 0; font-size: 0.82rem; }
+
+.recibo-numero {
+  margin: 0.2rem 0 0;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: var(--text-soft);
+}
+
+.recibo-barras {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 38px;
+  margin: 0.9rem 0 0.2rem;
+}
+
+.recibo-barras span {
+  display: block;
+  height: 100%;
+  background: var(--text);
+  opacity: 0.8;
+}
+
+.recibo-wa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 1rem;
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 100px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-soft));
+  color: var(--brand-contrast);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition:
+    transform 260ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    filter 200ms ease-out;
+}
+.recibo-wa:active {
+  transform: scale(0.97);
+  transition: transform 70ms cubic-bezier(0.4, 0, 1, 1);
+}
+.recibo-wa:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.recibo-pie {
+  margin: 0.8rem 0 0;
+  text-align: center;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+
+/* El comprobante dentro de "Mis citas", plegado.
+   `<details>` y no un estado de React: el navegador ya sabe abrir y cerrar
+   esto, recuerda el estado al volver atrás, y el contenido plegado sigue
+   estando en el documento para buscarlo con Ctrl+F. */
+.recibo-detalle { margin-top: 1rem; }
+
+.recibo-detalle > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 0.25rem;
+  color: var(--brand);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  /* El triángulo por defecto se dibuja distinto en cada navegador y encima
+     hereda mal el color de la marca. */
+  list-style: none;
+}
+.recibo-detalle > summary::-webkit-details-marker { display: none; }
+
+.recibo-detalle > summary::before {
+  content: "▸";
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.recibo-detalle[open] > summary::before { transform: rotate(90deg); }
+
+.recibo-detalle > summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recibo-detalle > summary::before { transition: none; }
+}
+
+/* ============================================================
+   TARJETA DE FIDELIDAD (TarjetaFidelidad)
+   ============================================================ */
+.fidelidad {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.35rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.fidelidad-cabecera {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.fidelidad-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--brand) 14%, var(--surface));
+  color: var(--brand);
+}
+
+.fidelidad-titulo {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.fidelidad-sub {
+  margin: 4px 0 0;
+  font-size: 0.87rem;
+  line-height: 1.6;
+  color: var(--text-soft);
+}
+
+/* Los sellos. `flex-wrap` porque el número lo decide la doctora desde el
+   panel: con 12 en una pantalla estrecha tienen que bajar de línea en vez de
+   encogerse hasta desaparecer. */
+.fidelidad-sellos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 1.1rem 0 0.75rem;
+}
+
+.fidelidad-sello {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px dashed var(--border-strong);
+  /* El hueco vacío no lleva relleno: un círculo lleno y otro vacío se
+     distinguen por forma, no solo por color, así que también funciona para
+     quien no distingue el marrón del beige. */
+  background: transparent;
+  transition: background 260ms ease, border-color 260ms ease;
+}
+
+.fidelidad-sello.es-marcado {
+  border-style: solid;
+  border-color: var(--brand);
+  background: linear-gradient(135deg, var(--brand), var(--brand-soft));
+}
+
+.fidelidad-faltan {
+  margin: 0;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.fidelidad-nota {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fidelidad-sello { transition: none; }
+}
+
+/* ============================================================
+   CAMPOS DE FECHA Y HORA EN MÓVIL
+   ============================================================
+   Reportado desde un iPhone: en "pedir otro día" y en el modal de reagenda
+   del panel, el campo de fecha se salía por el borde derecho y el valor
+   quedaba cortado.
+
+   La causa no es el ancho declarado —los dos llevan `width: 100%`— sino que
+   Safari le da a `input[type=date]` un ANCHO INTRÍNSECO MÍNIMO, tomado del
+   texto que el sistema mete dentro (el formato de fecha completo con su
+   selector). Ese mínimo gana al 100 % del contenedor, y como el contenedor no
+   puede encoger por debajo del contenido de su hijo, el campo desborda.
+
+   `min-width: 0` es lo que rompe esa cadena: autoriza a la caja a bajar de su
+   contenido. `-webkit-appearance: none` quita además el adorno nativo que
+   suma ancho por su cuenta, y con `appearance` estándar detrás para los
+   navegadores que ya no necesitan el prefijo.
+
+   No se toca `font-size`: la regla de más arriba ya lo pone en 16px para
+   evitar el zoom de iOS, y bajarlo aquí lo reintroduciría. */
+@media (max-width: 768px) {
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="month"] {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* El contenedor también: una rejilla o un flex tampoco encogen por debajo
+     del contenido de sus hijos salvo que se les diga. Sin esto el arreglo de
+     arriba se queda a medias, porque el que desborda pasa a ser el padre. */
+  .reagenda-campos,
+  .reagenda-campos > * {
+    min-width: 0;
+  }
 }

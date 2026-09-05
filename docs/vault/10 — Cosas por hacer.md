@@ -543,3 +543,46 @@ Se deja escrito para no volver a abrirlo por error.
   el campo arrastrado por las rutas de citas y su cliente. **Pendiente de
   confirmar si se retira.** Si se retira, en dos pasos: primero dejar de leerlo
   y escribirlo en el código, y borrar la columna semanas después.
+
+---
+
+## 🔺 Pendiente con orden obligatorio — 2026-09-05
+
+- [ ] **Ejecutar la migración 010 (quitar el pago en línea), pero SOLO en este
+      orden.** La migración está escrita y **sin aplicar a propósito**. El
+      servidor que hay hoy en producción todavía nombra `tipo_pago_online` en
+      su SELECT y su INSERT: borrar la columna antes de desplegar el código
+      nuevo rompe agendar al instante.
+
+      1. Fusionar y desplegar el código que ya no la nombra.
+      2. Comprobar que se puede agendar una cita en producción.
+      3. Ejecutar `010_quitar_pago_online.sql`.
+
+      Si se queda sin ejecutar no pasa nada: una columna que nadie lee puede
+      esperar indefinidamente. Lo que no se puede es adelantarla.
+
+      Es el mismo error que la 008 al revés. **La regla, en las dos
+      direcciones: el paso que AÑADE va antes, el que QUITA va después.**
+
+---
+
+## 🟩 Cerrado también el 2026-09-05
+
+- [x] **El permiso de promociones, conectado al perfil.** El endpoint existía
+      desde la Fase 2 y no lo llamaba nadie.
+- [x] **El comprobante impreso**, en el último paso de agendar y plegado en
+      «Mis citas». Con el botón de WhatsApp dentro, que es lo que esquiva el
+      bloqueo de Safari.
+- [x] **Tarjeta de fidelidad** — ver [[009 — La tarjeta de fidelidad informa,
+      no aplica]]. Migración 009 aplicada en producción.
+- [x] **Retirado el andamiaje del pago en línea** del código. Comprobado
+      contra producción antes de tocar nada: 0 citas con `tipo_pago_online`,
+      0 con un `metodo_pago` distinto de 'Consultorio'.
+
+---
+
+## ⚪ Decisión pequeña que no es mía
+
+- [ ] **`app/agendar/tarjetaCita.tsx` quedó sin usar** al sustituirlo el
+      recibo. No se borró: tiene modos `lista` y `admin` sin estrenar que
+      parecen un plan. Si no lo son, es un borrado limpio de un archivo.

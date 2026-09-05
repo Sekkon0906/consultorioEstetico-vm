@@ -10,19 +10,40 @@ const { DEFINICIONES, ejecutar, escribe } = require("../ia/herramientas");
 /**
  * El modelo del copiloto.
  *
- * POR QUE SONNET Y NO OPUS
+ * OJO: LO QUE PONE AQUI ES SOLO EL VALOR DE RESPALDO
+ * `ANTHROPIC_MODEL` gana, y en los despliegues suele estar puesta. Asi que
+ * este archivo NO dice que modelo esta corriendo. Para saberlo de verdad:
+ *
+ *   node server/scripts/probar-copiloto.js
+ *
+ * que ademas imprime el modelo que respondio, no el que se pidio. (Este
+ * comentario decia "por que Sonnet y no Opus" mientras el entorno tenia
+ * puesto Haiku; describir una decision como si fuera un hecho observable es
+ * como se llega a eso.)
+ *
+ * COMO ELEGIR
  * Lo que hace este asistente es llamar a ocho herramientas sobre un esquema
  * pequeno y conocido: crear un procedimiento, poner una promocion, cambiar
  * el WhatsApp, contar las citas de un dia. Es uso de herramientas con
- * argumentos claros, no razonamiento abierto.
+ * argumentos claros, no razonamiento abierto, y ahi la diferencia entre
+ * modelos se nota mucho menos que en tareas de criterio.
  *
- * Sonnet resuelve eso igual de bien y cuesta una fraccion. En un consultorio
- * de una sola doctora, que usara esto unas cuantas veces al mes, la
- * diferencia de precio es real y la de calidad no se nota.
+ * De menos a mas, con lo que cuesta cada millon de fichas de entrada/salida:
  *
- * Se deja `ANTHROPIC_MODEL` como valvula: si algun dia el copiloto empieza
- * a equivocarse en peticiones ambiguas, se sube a Opus cambiando UNA
- * variable de entorno, sin tocar codigo ni desplegar.
+ *   claude-haiku-4-5   $1 / $5    Suficiente para peticiones directas
+ *                                 ("pon esta promocion", "cuantas citas hay
+ *                                 el martes"). Es lo mas barato que hace
+ *                                 bien este trabajo.
+ *   claude-sonnet-5    $2 / $10   El respaldo de aqui. Aguanta mejor las
+ *                                 peticiones ambiguas y las de varios pasos.
+ *   claude-opus-5      $5 / $25   Solo si lo anterior se queda corto.
+ *
+ * La senal para subir no es una corazonada: es el copiloto eligiendo mal la
+ * herramienta o inventando argumentos en peticiones que una persona entiende
+ * a la primera. La auditoria de este mismo archivo deja el rastro para
+ * comprobarlo en vez de suponerlo.
+ *
+ * Se sube cambiando UNA variable de entorno, sin tocar codigo ni desplegar.
  */
 const MODELO = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
 

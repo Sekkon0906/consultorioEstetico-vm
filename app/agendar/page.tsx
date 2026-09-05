@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import type { Procedimiento, Cita } from "@/types/domain";
 import { getProcedimientosApi } from "@/services/procedimientosApi";
@@ -13,7 +13,7 @@ import { useCarrito } from "@/context/CarritoContext";
 import AgendarCalendar from "./agendarCalendar";
 import AgendarForm, { AgendarFormData } from "./agendarForm";
 import AgendarPago, { CitaSinPagos } from "./agendarPago";
-import TarjetaCita from "./tarjetaCita";
+import ReciboImpreso from "@/components/ReciboImpreso";
 
 import { PALETTE } from "./palette";
 import { aISOLocal, aFechaLocal } from "@/lib/fechas";
@@ -36,9 +36,15 @@ function AgendarPageContent() {
   const [procedimientos, setProcedimientos] = useState<Procedimiento[]>([]);
   const [citaDraft, setCitaDraft] = useState<CitaSinPagos | null>(null);
   const [citaCreada, setCitaCreada] = useState<Cita | null>(null);
-  const [metodoPago, setMetodoPago] = useState<"Consultorio" | "Online" | null>(null);
+  /* El mensaje de WhatsApp se compone al confirmar y se envia desde el boton
+     del recibo. Se guarda aqui porque el paso que lo compone (el de pago) ya
+     no esta montado cuando el recibo aparece. */
+  const [textoWhatsApp, setTextoWhatsApp] = useState("");
+  /* `es-CO` y no `es` a secas: el formato de fecha larga en Colombia difiere
+     del de Espana, y el recibo lleva la fecha escrita entera. */
+  const intlLocale = useLocale() === "en" ? "en-US" : "es-CO";
+  const [metodoPago, setMetodoPago] = useState<"Consultorio" | null>(null);
   const [tipoPagoConsultorio, setTipoPagoConsultorio] = useState<"Efectivo" | "Tarjeta" | undefined>(undefined);
-  const [tipoPagoOnline, setTipoPagoOnline] = useState<"PayU" | "PSE" | undefined>(undefined);
 
   const [formData, setFormData] = useState<AgendarFormData>({
     nombre: "",
@@ -292,11 +298,10 @@ function AgendarPageContent() {
               setMetodoPago={setMetodoPago}
               tipoPagoConsultorio={tipoPagoConsultorio}
               setTipoPagoConsultorio={setTipoPagoConsultorio}
-              tipoPagoOnline={tipoPagoOnline}
-              setTipoPagoOnline={setTipoPagoOnline}
               citaData={citaDraft}
-              onConfirmar={(nuevaCita: Cita) => {
+              onConfirmar={(nuevaCita: Cita, texto: string) => {
                 setCitaCreada(nuevaCita);
+                setTextoWhatsApp(texto);
                 setStep(4);
                 // Lo que se acaba de agendar sale de la selección. Se cruza
                 // por NOMBRE porque es lo único que viaja en la URL desde
@@ -320,10 +325,22 @@ function AgendarPageContent() {
               transition={{ duration: 0.5 }}
               className="text-center flex flex-col items-center"
             >
-              <TarjetaCita
+              {/* El recibo sustituye a la tarjeta de confirmacion. Dice lo
+                  mismo y ademas lleva el boton de WhatsApp, que es lo que
+                  arregla el bloqueo de Safari: pulsarlo es un gesto directo,
+                  sin espera al servidor por delante. */}
+              <ReciboImpreso
                 cita={citaCreada}
-                modo="confirmacion"
-                mostrarQR={true}
+                locale={intlLocale}
+                onEnviarWhatsApp={
+                  textoWhatsApp
+                    ? () =>
+                        window.open(
+                          `https://wa.me/573155445748?text=${encodeURIComponent(textoWhatsApp)}`,
+                          "_blank"
+                        )
+                    : undefined
+                }
               />
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
                 <motion.button

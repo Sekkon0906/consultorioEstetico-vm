@@ -33,7 +33,6 @@ function mapCita(row) {
     montoRestante:       row.monto_restante,
     metodoPago:          row.metodo_pago,
     tipoPagoConsultorio: row.tipo_pago_consultorio,
-    tipoPagoOnline:      row.tipo_pago_online,
     creadaPor:           row.creada_por,
     fechaCreacion:       row.creado_en,
     motivoCancelacion:   row.motivo_cancelacion,
@@ -56,7 +55,7 @@ router.get("/", verifyToken, async (req, res) => {
     let sql = `SELECT id, user_id, nombres, apellidos, telefono, correo,
                       procedimiento, tipo_cita, nota, fecha, hora, estado,
                       pagado, monto, monto_pagado, monto_restante,
-                      metodo_pago, tipo_pago_consultorio, tipo_pago_online,
+                      metodo_pago, tipo_pago_consultorio,
                       creada_por, creado_en, motivo_cancelacion,
                       qr_url, consentimiento_firmado, firma_url, firma_fecha,
                       consentimiento_pdf
@@ -98,7 +97,6 @@ router.post("/", verifyToken, requireRole(["usuario", "admin", "ayudante", "deve
       procedimiento, nota, fecha, hora,
       metodoPago, metodo_pago,
       tipoPagoConsultorio, tipo_pago_consultorio,
-      tipoPagoOnline, tipo_pago_online,
     } = req.body;
 
     const ownerId      = userId      ?? user_id      ?? req.user.id;
@@ -106,7 +104,6 @@ router.post("/", verifyToken, requireRole(["usuario", "admin", "ayudante", "deve
     const procId       = procedimientoId ?? procedimiento_id ?? null;
     const metPago      = metodoPago  ?? metodo_pago  ?? null;
     const tipoPagoCons = tipoPagoConsultorio ?? tipo_pago_consultorio ?? null;
-    const tipoPagoOnl  = tipoPagoOnline ?? tipo_pago_online ?? null;
 
     // Verificar disponibilidad
     const { rows: ocupada } = await pool.query(
@@ -122,16 +119,16 @@ router.post("/", verifyToken, requireRole(["usuario", "admin", "ayudante", "deve
          user_id, nombres, apellidos, telefono, correo,
          procedimiento, procedimiento_id, tipo_cita,
          nota, fecha, hora, estado, pagado,
-         metodo_pago, tipo_pago_consultorio, tipo_pago_online, creada_por
-       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'pendiente',false,$12,$13,$14,'usuario')
+         metodo_pago, tipo_pago_consultorio, creada_por
+       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'pendiente',false,$12,$13,'usuario')
        RETURNING id, user_id, nombres, apellidos, telefono, correo,
                  procedimiento, tipo_cita, nota, fecha, hora, estado,
                  pagado, monto, monto_pagado, monto_restante,
-                 metodo_pago, tipo_pago_consultorio, tipo_pago_online,
+                 metodo_pago, tipo_pago_consultorio,
                  creada_por, creado_en`,
       [ownerId, nombres, apellidos || "", telefono || "", correo || "",
        procedimiento, procId, tipoCitaVal, nota || null, fecha, hora,
-       metPago, tipoPagoCons, tipoPagoOnl]
+       metPago, tipoPagoCons]
     );
 
     // Aviso a la doctora (best-effort; no bloquea la creación).
@@ -181,7 +178,7 @@ router.put("/:id", verifyToken, async (req, res) => {
     }
 
     const allowed = ["fecha", "hora", "estado", "nota", "motivo_cancelacion",
-                     "metodo_pago", "tipo_pago_consultorio", "tipo_pago_online",
+                     "metodo_pago", "tipo_pago_consultorio",
                      "pagado", "monto", "monto_pagado", "monto_restante"];
     const sets = [], values = [];
 

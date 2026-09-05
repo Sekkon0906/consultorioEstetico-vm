@@ -1,0 +1,52 @@
+-- 010 · Retirar el andamiaje del pago en línea.
+--
+-- ⚠️  ESTA MIGRACIÓN NO SE HA APLICADO. Léase el apartado "CUÁNDO" antes de
+--     ejecutarla.
+--
+-- QUÉ ERA
+-- `citas.tipo_pago_online` con un CHECK que solo admitía 'PayU' y 'PSE', y el
+-- valor 'Online' en `metodo_pago`. Preparación para una pasarela que nunca se
+-- integró. Se descartó la pasarela por decisión del consultorio.
+--
+-- POR QUÉ SE RETIRA EN VEZ DE DEJARLO
+-- Una columna que nadie escribe no es gratis: aparece en cada SELECT, en cada
+-- INSERT, y sobre todo obliga a escribir ramas para un caso que no puede
+-- ocurrir. El código tenía tres `if (metodoPago === "Online")` que ninguna
+-- cita ha cumplido ni podía cumplir. Cada una de esas ramas es un sitio donde
+-- alguien puede meter un fallo mientras arregla otra cosa.
+--
+-- Además el CHECK dejaba escritos dos nombres de proveedor —PayU y PSE— que
+-- ya no significan nada aquí, y que el día de mañana harían pensar que hubo
+-- una integración.
+--
+-- COMPROBADO ANTES DE ESCRIBIR ESTO
+-- En producción: 2 citas en total, 0 con `tipo_pago_online`, 0 con un
+-- `metodo_pago` distinto de 'Consultorio'. No se pierde ningún dato porque no
+-- hay ningún dato.
+--
+-- CUÁNDO EJECUTARLA  ← lo importante
+-- SOLO DESPUÉS de que esté desplegado el código que deja de nombrar la
+-- columna. El servidor que hay hoy en producción todavía la incluye en su
+-- SELECT y en su INSERT: si se borra la columna antes, agendar deja de
+-- funcionar al instante.
+--
+-- Es exactamente el mismo error que la migración 008, al revés. Allí el
+-- código nombró columnas que aún no existían y el registro se rompió; aquí
+-- sería borrar una columna que el código aún nombra. La regla, en las dos
+-- direcciones: el paso que AÑADE va antes, el que QUITA va después.
+--
+-- Orden correcto:
+--   1. Fusionar y desplegar el código que ya no la nombra.
+--   2. Comprobar que se puede agendar una cita en producción.
+--   3. Ejecutar esta migración.
+--
+-- Si algo sale mal entre el 1 y el 3, no pasa nada: una columna que nadie lee
+-- puede quedarse ahí indefinidamente.
+
+ALTER TABLE citas DROP CONSTRAINT IF EXISTS citas_tipo_pago_online_check;
+ALTER TABLE citas DROP COLUMN IF EXISTS tipo_pago_online;
+
+-- `metodo_pago` se queda: la usa el pago en consultorio, que sí existe. Lo que
+-- desaparece es su valor 'Online'. No lleva CHECK en la base, así que no hay
+-- restricción que actualizar; el tipo de TypeScript ya solo admite
+-- 'Consultorio'.
