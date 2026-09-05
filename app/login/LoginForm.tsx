@@ -11,9 +11,17 @@ import { PALETTE } from "./palette2";
 
 interface Props {
   setErr: (msg: string | null) => void;
+  /* Opcional. Cuando este formulario vive dentro de PantallaAcceso, crear
+     cuenta es un cambio de ESTADO —los lados se intercambian animados— y no
+     una navegacion. Sin esto, este boton se llevaria a /register recargando
+     la pantalla, que es justo lo que la pantalla compartida evita.
+
+     Se deja opcional para que el componente siga sirviendo suelto: si nadie
+     lo pasa, navega como antes. */
+  onCrearCuenta?: () => void;
 }
 
-export default function LoginForm({ setErr }: Props) {
+export default function LoginForm({ setErr, onCrearCuenta }: Props) {
   const t = useTranslations("loginPage");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -179,7 +187,7 @@ export default function LoginForm({ setErr }: Props) {
         </motion.button>
         <motion.button
           type="button"
-          onClick={() => router.push("/register")}
+          onClick={() => (onCrearCuenta ? onCrearCuenta() : router.push("/register"))}
           className="btn btn-link text-decoration-none fw-semibold p-0"
           style={{ color: PALETTE.main }}
           whileHover={{ scale: 1.08 }}

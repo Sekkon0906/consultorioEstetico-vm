@@ -6,7 +6,7 @@ import Select, { MultiValue, StylesConfig } from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { PALETTE } from "./palette";
-import type { RegisterFormData } from "./page";
+import type { RegisterFormData } from "./RegistroWizard";
 
 // ---- Tipos auxiliares ----
 type MedicalOption = { value: string; label: string };

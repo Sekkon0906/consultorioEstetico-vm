@@ -10,7 +10,7 @@ import React, {
 import Input from "./input";
 import InputPassword from "./inputPassword";
 import { PALETTE } from "./palette";
-import type { RegisterFormData } from "./page";
+import type { RegisterFormData } from "./RegistroWizard";
 
 interface Props {
   formData: RegisterFormData;
