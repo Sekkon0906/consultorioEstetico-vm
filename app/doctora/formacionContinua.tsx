@@ -311,7 +311,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                 </div>
               )}
             </div>
-            <button onClick={onClose} style={{
+            <button onClick={onClose} aria-label="Cerrar" title="Cerrar" style={{
               width: 34, height: 34, borderRadius: "50%",
               background: "var(--surface-soft)", border: "none", cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -371,7 +371,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
 
             {total > 1 && (
               <>
-                <button onClick={prev} style={{
+                <button onClick={prev} aria-label="Imagen anterior" title="Anterior" style={{
                   position: "absolute", left: 10, top: "50%",
                   transform: "translateY(-50%)",
                   width: 36, height: 36, borderRadius: "50%",
@@ -381,7 +381,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                 }}>
                   <ChevronLeft size={18} color="#4E3B2B" />
                 </button>
-                <button onClick={next} style={{
+                <button onClick={next} aria-label="Imagen siguiente" title="Siguiente" style={{
                   position: "absolute", right: 10, top: "50%",
                   transform: "translateY(-50%)",
                   width: 36, height: 36, borderRadius: "50%",

@@ -123,10 +123,10 @@ export default function Footer() {
           <p style={{ fontSize: "0.95rem", color: "#FFFFFF", marginBottom: "2rem" }}>{t("contactSub")}</p>
 
           <form onSubmit={handleSubmit} className="footer-form" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", maxWidth: 650, margin: "0 auto" }}>
-            <input name="name" value={formData.name} onChange={handleChange} placeholder={t("form.name")} required style={inputStyle}
+            <input name="name" value={formData.name} onChange={handleChange} placeholder={t("form.name")} aria-label={t("form.name")} autoComplete="name" required style={inputStyle}
               onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; }} />
-            <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder={t("form.email")} required style={inputStyle}
+            <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder={t("form.email")} aria-label={t("form.email")} autoComplete="email" required style={inputStyle}
               onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; }} />
 
@@ -159,7 +159,7 @@ export default function Footer() {
               )}
             </div>
 
-            <input name="phone" value={formData.phone} onChange={handleChange} placeholder={t("form.phone")} style={inputStyle}
+            <input name="phone" value={formData.phone} onChange={handleChange} placeholder={t("form.phone")} aria-label={t("form.phone")} autoComplete="tel" type="tel" style={inputStyle}
               onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; }} />
 
@@ -210,7 +210,7 @@ export default function Footer() {
                 })}
               </div>
             </div>
-            <textarea name="message" value={formData.message} onChange={handleChange} rows={3} placeholder={t("form.message")} required
+            <textarea name="message" value={formData.message} onChange={handleChange} rows={3} placeholder={t("form.message")} aria-label={t("form.message")} required
               style={{ ...inputStyle, gridColumn: "1 / -1", resize: "vertical" }}
               onFocus={e => { e.currentTarget.style.borderColor = "var(--brand)"; }}
               onBlur={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; }} />

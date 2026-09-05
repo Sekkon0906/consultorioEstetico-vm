@@ -19,9 +19,16 @@ export default function InputPassword({
   error?: string | false;
   palette: { main: string; text: string; surface: string; border: string };
 }) {
+  // Mismo motivo que en `input.tsx`: sin `htmlFor`/`id` la etiqueta visible
+  // no llega al lector de pantalla ni lleva el foco al pulsarla. Aqui importa
+  // el doble, porque las dos contrasenas se llaman parecido y sin etiqueta
+  // suenan identicas.
+  const id = "campo-" + label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
   return (
     <div className="mb-3 text-start">
       <label
+        htmlFor={id}
         className="form-label fw-semibold"
         style={{ color: palette.text }}
       >
@@ -29,6 +36,7 @@ export default function InputPassword({
       </label>
       <div className="pwd-input-wrapper" style={{ position: "relative" }}>
         <input
+          id={id}
           type={show ? "text" : "password"}
           value={value}
           onChange={(e) => setValue(e.target.value)}
