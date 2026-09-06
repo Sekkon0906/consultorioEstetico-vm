@@ -15,16 +15,22 @@
  * LA SEGURIDAD ES EL PUNTO DELICADO
  * Estas herramientas escriben en la base de un consultorio médico. Un servidor
  * MCP abierto en internet es una consola de administración abierta en
- * internet. Aquí se protege con un token en la cabecera `Authorization`, que
- * es el mínimo aceptable y NO es lo mismo que OAuth:
+ * internet.
  *
- *   · Un token compartido no distingue quién llama, solo si sabe el secreto.
- *   · No caduca solo. Si se filtra, hay que rotarlo a mano.
+ * DOS FORMAS DE ENTRAR, Y LA SEGUNDA ES LA BUENA
  *
- * Sirve para conectar Claude Desktop hoy. Para publicarlo como conector en
- * claude.ai hace falta OAuth, que es la segunda fase y está anotada en la
- * bóveda. Mientras tanto, si `MCP_TOKEN` no está configurado el servidor NO
- * se monta: es preferible que la funcionalidad no exista a que exista abierta.
+ *   1. OAuth 2.1 (`mcp/proveedorOauth.js`). Es lo que usa claude.ai, y lo que
+ *      permite saber QUIÉN llama, que caduque solo y que se pueda revocar sin
+ *      tocar a nadie más. Cada llamada revalida que la cuenta sigue siendo
+ *      administradora.
+ *
+ *   2. `MCP_TOKEN`, un token compartido. Se conserva solo para conectar Claude
+ *      Desktop a mano sin montar el intercambio entero. No distingue quién
+ *      llama y no caduca: si se filtra hay que rotarlo. Es un atajo de
+ *      desarrollo, no la puerta principal.
+ *
+ * Si no hay NINGUNA de las dos configuradas, el servidor no se monta. Es
+ * preferible que la funcionalidad no exista a que exista abierta.
  *
  * SIN SESIONES, A PROPÓSITO
  * El transporte se crea por petición y se descarta. Guardar sesiones obligaría
@@ -42,7 +48,11 @@ const {
 const {
   StreamableHTTPServerTransport,
 } = require("@modelcontextprotocol/sdk/server/streamableHttp.js");
+const {
+  requireBearerAuth,
+} = require("@modelcontextprotocol/sdk/server/auth/middleware/bearerAuth.js");
 const { DEFINICIONES, ejecutar, escribe } = require("../ia/herramientas");
+const { provider } = require("./proveedorOauth");
 
 const router = express.Router();
 
@@ -63,15 +73,35 @@ function tokenValido(recibido) {
   return crypto.timingSafeEqual(a, b);
 }
 
+/* Primero se intenta el token compartido, y si no cuadra se pasa la petición a
+   la validación de OAuth. El orden importa: al revés, `requireBearerAuth`
+   respondería 401 con su cabecera `WWW-Authenticate` antes de que el atajo
+   tuviera ocasión, y Claude Desktop configurado con `MCP_TOKEN` dejaría de
+   funcionar sin explicación aparente.
+
+   `requireBearerAuth` es del SDK a propósito: en el 401 mete la cabecera
+   `WWW-Authenticate` apuntando a los metadatos del recurso, que es como
+   claude.ai descubre dónde autorizar. Escribir ese 401 a mano y olvidar la
+   cabecera daría un conector que "no conecta" sin decir por qué. */
+const urlApi = (
+  process.env.API_URL || `http://localhost:${process.env.PORT || 4000}`
+).replace(/\/+$/, "");
+
+const oauthMiddleware = requireBearerAuth({
+  verifier: provider,
+  /* Sin esto el 401 sale con `WWW-Authenticate` pero SIN decir donde estan los
+     metadatos, y ese puntero es exactamente por donde claude.ai descubre a que
+     servidor de autorizacion ir. El conector fallaria con un "no se pudo
+     conectar" que no dice nada. Se comprobo que faltaba mirando la cabecera
+     cruda de la respuesta. */
+  resourceMetadataUrl: `${urlApi}/.well-known/oauth-protected-resource/mcp`,
+});
+
 router.use((req, res, next) => {
   const cabecera = req.headers.authorization || "";
   const token = cabecera.startsWith("Bearer ") ? cabecera.slice(7) : "";
-  if (!tokenValido(token)) {
-    /* 401 escueto y sin pistas: decir "token incorrecto" frente a "falta el
-       token" ya le confirma a quien sondea que la ruta existe y qué espera. */
-    return res.status(401).json({ error: "no autorizado" });
-  }
-  next();
+  if (process.env.MCP_TOKEN && tokenValido(token)) return next();
+  return oauthMiddleware(req, res, next);
 });
 
 /**

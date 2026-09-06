@@ -5174,3 +5174,150 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
     min-width: 0;
   }
 }
+
+/* ============================================================
+   AUTORIZAR UN CONECTOR (app/conectar-claude)
+   ============================================================
+   La pantalla donde la doctora da —o niega— acceso a las herramientas del
+   consultorio. Se diseña sobria a propósito: una pantalla de permisos que
+   parece publicidad se aprueba sin leerla, y aquí lo que se aprueba puede
+   cambiar precios. */
+
+.conectar-envoltorio {
+  min-height: var(--alto-pantalla, 100vh);
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.25rem;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%);
+}
+
+.conectar-tarjeta {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 2.25rem 2rem;
+  box-shadow: 0 18px 50px -22px rgba(58, 42, 26, 0.3);
+}
+
+.conectar-cargando {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+}
+.conectar-cargando svg { animation: conectar-gira 900ms linear infinite; }
+@keyframes conectar-gira { to { transform: rotate(360deg); } }
+
+.conectar-icono {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  margin: 0 auto 1.1rem;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--brand) 14%, var(--surface));
+  color: var(--brand);
+}
+.conectar-icono.es-aviso {
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  color: var(--danger);
+}
+
+.conectar-titulo {
+  margin: 0 0 0.9rem;
+  text-align: center;
+  font-family: "Playfair Display", serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.conectar-texto {
+  margin: 0 0 0.9rem;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.conectar-permisos {
+  margin: 0 0 1.1rem;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.conectar-permisos strong { color: var(--text); }
+
+.conectar-nota {
+  margin: 0 0 1.5rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+/* En columna y con "Autorizar" arriba. En fila, el botón que más se pulsa
+   acaba donde cae el pulgar, y aquí el que más se va a pulsar no debería ser
+   el fácil de pulsar sin mirar. */
+.conectar-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.conectar-aprobar,
+.conectar-rechazar {
+  min-height: 46px;
+  border-radius: 100px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition:
+    transform 260ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    filter 200ms ease-out;
+}
+.conectar-aprobar:active,
+.conectar-rechazar:active {
+  transform: scale(0.98);
+  transition: transform 70ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+.conectar-aprobar {
+  border: none;
+  background: linear-gradient(135deg, var(--brand), var(--brand-soft));
+  color: var(--brand-contrast);
+}
+.conectar-aprobar:disabled {
+  filter: grayscale(0.4);
+  cursor: default;
+}
+
+.conectar-rechazar {
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-soft);
+}
+
+.conectar-aprobar:focus-visible,
+.conectar-rechazar:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conectar-aprobar, .conectar-rechazar { transition: none; }
+  .conectar-cargando svg { animation: none; }
+}

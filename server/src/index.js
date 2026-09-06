@@ -96,11 +96,38 @@ app.use("/",               reagendasRoutes);  // /citas/:id/solicitar-reagenda y
 
    Comparte el limitador de la IA porque el perfil de uso es el mismo: pocas
    peticiones, caras si alguien las repite en bucle. */
-if (process.env.MCP_TOKEN) {
+{
+  /* `process.env.PORT` y no la constante PORT: esa se declara mas abajo en
+     este mismo archivo, y usarla aqui lanza por zona muerta temporal. */
+  const urlApi = (process.env.API_URL || `http://localhost:${process.env.PORT || 4000}`).replace(/\/+$/, "");
+  const { mcpAuthRouter } = require("@modelcontextprotocol/sdk/server/auth/router.js");
+  const { provider } = require("./mcp/proveedorOauth");
+
+  /* El OAuth va ANTES que el servidor MCP. `mcpAuthRouter` monta /authorize,
+     /token, /register y los .well-known que claude.ai consulta para descubrir
+     donde autorizar; si el servidor MCP se montara primero en la misma raiz,
+     su exigencia de token taparia esos endpoints, que por definicion se
+     consultan SIN estar autorizado todavia. */
+  /* EN LA RAIZ, no bajo /mcp. Los `.well-known` estan definidos por RFC en la
+     raiz del dominio: montarlos en /mcp/.well-known los deja donde nadie los
+     busca. Ademas el propio router se declara a si mismo en /authorize y
+     /token —se comprobo leyendo los metadatos que emite—, asi que montarlo
+     mas adentro produce unos metadatos que apuntan a rutas que no existen. */
+  app.use(mcpAuthRouter({
+    provider,
+    issuerUrl: new URL(urlApi),
+    baseUrl: new URL(urlApi),
+    resourceName: "Consultorio Dra. Vanessa Medina",
+    resourceServerUrl: new URL(`${urlApi}/mcp`),
+  }));
+
+  app.use("/mcp/consentimiento", require("./mcp/consentimiento"));
   app.use("/mcp", limiteIa, require("./mcp/servidor"));
-  console.log("[mcp] servidor montado en /mcp");
-} else {
-  console.log("[mcp] MCP_TOKEN sin configurar: el servidor MCP no se monta.");
+
+  console.log("[mcp] servidor y OAuth montados en /mcp");
+  if (!process.env.MCP_TOKEN) {
+    console.log("[mcp] sin MCP_TOKEN: solo se entra por OAuth (que es lo correcto en produccion).");
+  }
 }
 
 // ── MANEJO GLOBAL DE ERRORES ─────────────────────────────────
