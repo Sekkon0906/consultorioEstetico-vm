@@ -58,6 +58,10 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
       links: [
         { id: "configuracion",  label: "Información general" },
         { id: "copiloto",       label: "Asistente" },
+        /* Junto al Asistente y no en "Cómo va": son las dos formas de que una
+           IA toque el consultorio, y quien viene a revisar una quiere ver la
+           otra al lado. */
+        { id: "conexiones",     label: "Programas conectados" },
       ],
     },
     {

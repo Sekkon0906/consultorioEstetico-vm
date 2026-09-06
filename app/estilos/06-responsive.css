@@ -5321,3 +5321,118 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   .conectar-aprobar, .conectar-rechazar { transition: none; }
   .conectar-cargando svg { animation: none; }
 }
+
+/* ============================================================
+   PROGRAMAS CONECTADOS (panel → conexiones)
+   ============================================================ */
+.conexiones-titulo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 0.5rem;
+  font-family: "Playfair Display", serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.conexiones-intro {
+  margin: 0 0 1.5rem;
+  max-width: var(--ancho-texto);
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.conexiones-error {
+  margin: 0 0 1rem;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--surface));
+  color: var(--danger);
+  font-size: 0.86rem;
+}
+
+.conexiones-cargando {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 0.88rem;
+}
+.conexiones-cargando svg { animation: conexion-gira 900ms linear infinite; }
+
+.conexiones-vacio {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: var(--surface-soft);
+  border: 1px dashed var(--border-strong);
+  border-radius: 18px;
+}
+.conexiones-vacio p {
+  margin: 0.6rem 0 0;
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.conexiones-vacio strong { color: var(--text); }
+
+.conexion-fila {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.conexion-nombre {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.96rem;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.conexion-detalle {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+}
+
+/* En rojo y con el icono de papelera: es una acción destructiva y tiene que
+   parecerlo. Un botón neutro aquí se pulsa por error mientras se explora. */
+.conexion-cortar {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  border-radius: 100px;
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--surface));
+  background: transparent;
+  color: var(--danger);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.83rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 200ms ease;
+}
+.conexion-cortar:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface));
+}
+.conexion-cortar:disabled { opacity: 0.6; cursor: default; }
+.conexion-cortar:focus-visible {
+  outline: 2px solid var(--danger);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conexion-cortar { transition: none; }
+  .conexiones-cargando svg { animation: none; }
+}
