@@ -55,3 +55,115 @@
 :root[data-theme="dark"] .admin-form-card .small {
   color: var(--text-muted) !important;
 }
+
+/* ============================================================
+   Asistente — el bloque del conector
+
+   Va con estilo propio y no con el de una tarjeta cualquiera del panel
+   porque tiene que ganarle la mirada a la caja de la clave de API que hay
+   debajo. Si los dos pesan igual, se lee primero el formulario, que es
+   justo el orden que esta pantalla existe para invertir.
+============================================================ */
+.conectar-bloque {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--brand);
+  border-radius: 14px;
+  background: var(--surface-soft);
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.conectar-bloque-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 0.4rem;
+  color: var(--brand-texto);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.conectar-bloque-titulo {
+  margin: 0 0 0.5rem;
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.conectar-bloque-texto {
+  margin: 0 0 0.9rem;
+  color: var(--text-soft);
+  font-size: 0.87rem;
+  line-height: 1.6;
+}
+.conectar-bloque-pasos {
+  /* `list-style` explicito: un reset global deja las listas sin vinetas, y sin
+     los numeros los tres pasos se leen como tres parrafos sueltos en vez de
+     como una secuencia que hay que seguir en orden. Se vio en pantalla, no
+     en el codigo. */
+  list-style: decimal;
+  margin: 0 0 0.9rem;
+  padding-left: 1.2rem;
+  color: var(--text-soft);
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+.conectar-bloque-pasos li { margin-bottom: 0.55rem; }
+.conectar-bloque-pasos li::marker { color: var(--brand-texto); font-weight: 700; }
+
+/* La direccion en su propia linea y no dentro del parrafo: es lo unico que
+   hay que llevarse de esta pantalla. `flex-wrap` para que en movil el boton
+   caiga debajo en vez de estrujar la direccion hasta hacerla ilegible. */
+.conectar-bloque-url {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 0.45rem;
+}
+.conectar-bloque-url code {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.7rem;
+  color: var(--text);
+  font-size: 0.82rem;
+}
+.conectar-bloque-copiar {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 100px;
+  background: var(--bg-elevated);
+  color: var(--brand-texto);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--mov-rapido) var(--mov-curva);
+}
+.conectar-bloque-copiar:hover { background: var(--surface); }
+.conectar-bloque-nota {
+  margin: 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.79rem;
+  line-height: 1.6;
+}
+.conectar-bloque-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--brand-texto);
+  font-weight: 600;
+  text-decoration: underline;
+}

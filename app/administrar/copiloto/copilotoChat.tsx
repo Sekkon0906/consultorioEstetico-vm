@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, Check, X, Sparkles, AlertCircle, KeyRound, Trash2, Mic, MicOff } from "lucide-react";
 import { api } from "@/lib/api";
 import Button from "@/components/ui/Button";
+import ConectarAsistente from "./conectarAsistente";
 
 // Etiquetas legibles: la doctora no debería ver nombres de funciones.
 const ACCIONES: Record<string, string> = {
@@ -259,7 +260,8 @@ export default function CopilotoChat() {
             </h2>
             <p style={{ color: "var(--text-muted)", fontSize: "0.88rem", marginTop: 6, marginBottom: 0 }}>
               Pídele que cree o cambie procedimientos, promociones e información del consultorio.
-              Siempre te muestra qué va a hacer antes de hacerlo.
+              Siempre te muestra qué va a hacer antes de hacerlo. Puedes hacerlo desde tu propio
+              Claude o ChatGPT, o escribiendo aquí abajo.
             </p>
           </div>
 
@@ -291,11 +293,15 @@ export default function CopilotoChat() {
             >
               <div style={{ marginTop: "0.9rem", padding: "1rem", borderRadius: 14, background: "var(--surface-soft)", border: "1px solid var(--border)" }}>
                 <p style={{ margin: "0 0 0.6rem", color: "var(--text)", fontWeight: 600, fontSize: "0.85rem" }}>
-                  Clave de API del copiloto
+                  Clave de API — solo para el chat de esta pantalla
                 </p>
+                {/* Se dice que esto se paga aparte, y se dice aquí. Enterarse
+                    en la factura del mes siguiente es la peor forma. */}
                 <p style={{ margin: "0 0 0.7rem", color: "var(--text-muted)", fontSize: "0.78rem", lineHeight: 1.5 }}>
-                  La de Anthropic (Claude), la que usa el asistente para responder. Se guarda cifrada;
-                  una vez configurada, solo hace falta escribir en el chat.
+                  Hace falta <strong>únicamente</strong> si quieres escribir en el chat de aquí abajo
+                  sin salir del panel. Es una clave de Anthropic, y se cobra por uso, aparte de tu
+                  suscripción. Si conectas tu Claude o tu ChatGPT como se explica arriba, no
+                  necesitas nada de esto. Se guarda cifrada.
                 </p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <input
@@ -329,6 +335,8 @@ export default function CopilotoChat() {
           )}
         </AnimatePresence>
       </header>
+
+      <ConectarAsistente />
 
       {/* Conversación */}
       <div style={{ flex: 1, overflowY: "auto", paddingRight: 4, display: "flex", flexDirection: "column", gap: 12 }}>
