@@ -1,7 +1,8 @@
 # Lo que falta
 
-Estado a 5 de septiembre de 2026. Comprobado contra la base de producción y
-contra el código, no de memoria.
+Estado a 10 de septiembre de 2026. Comprobado contra la base de producción y
+contra el código, no de memoria. (El estado de la base es del día 5; lo demás,
+del 10.)
 
 **Casi nada de lo que queda es programar.** Lo que impide que el consultorio
 funcione hoy son cuatro variables de entorno y una prueba en un iPhone.
@@ -182,11 +183,22 @@ escribe en la base real. Conviene saberlo antes de probar formularios.
 
 ## Cola larga, sin urgencia
 
-- **~194 colores escritos a mano** en componentes. Hay una regla de lint que
-  impide añadir más; los existentes están en una lista de excepciones que se
-  va vaciando cuando se toca cada archivo.
+**Estado del lint: 33 errores** (eran 308 el 5 de septiembre).
+
+- **31 `no-explicit-any`.** Es la deuda que queda, y es real: tipos sin
+  concretar, sobre todo en manejadores de error (`catch (e: any)`). Arreglarlo
+  bien exige mirar qué devuelve cada API en cada caso, así que no se puede
+  hacer en bloque.
+- **~180 colores escritos a mano**, repartidos en 33 archivos. La regla de
+  lint impide añadir más; los existentes están en una lista de excepciones que
+  se vacía archivo a archivo. Ocho salieron el 10 de septiembre.
+  - **Dos no van a salir nunca, y está bien:** los `theme-color` de
+    `app/layout.tsx` tienen que ser literales porque el navegador los lee
+    fuera del documento, donde `var()` no resuelve.
+  - **Ojo:** la regla lee el *texto crudo* del archivo y no distingue
+    comentarios. Citar un color viejo dentro de un comentario la dispara.
 - **51 campos de formulario del panel sin etiqueta asociada.** Deliberadamente
   despriorizado: hay una sola usuaria y conoce el panel.
-- **`.tarjeta-cita-*` en el CSS quedó muerto** al borrar el componente que lo
-  usaba. No se barrió por si alguna clase se comparte.
-- **F14b:** auditoría de colores en un navegador real, con los dos temas.
+- **F14b:** auditoría de colores en un navegador real, con los dos temas. Es
+  lo único que puede confirmar que las sustituciones a tokens se ven bien en
+  oscuro; hasta ahora se comprobó que resuelven al mismo valor en claro.
