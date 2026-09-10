@@ -148,6 +148,37 @@ deliberado — el precio final depende de la valoración.
 
 ---
 
+## 🎨 Decisión de marca pendiente
+
+El texto blanco sobre el marrón de la marca da **3.17:1**, y el mínimo de
+WCAG AA para texto normal es 4.5. Afecta a **todos los botones principales**
+del sitio en tema claro: «Agendar cita», «Entrar», «Confirmar». Lo mismo pasa
+con la marca usada como color de texto (3.01:1).
+
+En tema oscuro no hay problema: ahí la marca es un champán claro y da 11:1.
+
+**No lo he cambiado porque no es una decisión técnica.** Arreglarlo exige
+oscurecer la marca, y eso cambia cómo se ve toda la web. Los números, para
+cuando lo decidas:
+
+| Opción | Resultado |
+|---|---|
+| Dejarlo como está | 3.17:1 — incumple AA para texto normal |
+| Botones con `--brand-deep` (#8B6A4B, **ya existe en la paleta**) | 4.93:1 — cumple, y es un marrón un punto más oscuro |
+| Texto oscuro en vez de blanco sobre la marca | 5.06:1 — cumple, pero cambia mucho el aspecto |
+
+La segunda es la que menos toca: usa un color que ya está en la paleta.
+
+**La marca como texto sí tiene arreglo sin decidir nada:** usar `--brand-deep`
+en su lugar da 4.68 en vez de 3.01, y no cambia ningún fondo. Está documentado
+en `01-tokens.css`; falta repasar los sitios donde se usa `--brand` para
+texto.
+
+Mientras tanto, `npm run contraste` los marca como «sabido»: se siguen viendo
+cada vez que se corre, pero no bloquean. Si aparece un cuarto, ese sí falla.
+
+---
+
 ## ⚫ Descartado
 
 - **Pasarela de pago.** Se evaluó Wompi como la más razonable; se decidió no
@@ -199,6 +230,12 @@ escribe en la base real. Conviene saberlo antes de probar formularios.
     comentarios. Citar un color viejo dentro de un comentario la dispara.
 - **51 campos de formulario del panel sin etiqueta asociada.** Deliberadamente
   despriorizado: hay una sola usuaria y conoce el panel.
-- **F14b:** auditoría de colores en un navegador real, con los dos temas. Es
-  lo único que puede confirmar que las sustituciones a tokens se ven bien en
-  oscuro; hasta ahora se comprobó que resuelven al mismo valor en claro.
+- **F14b: hecho** (`npm run contraste`). Audita las 18 parejas de tokens que
+  de verdad se usan juntas, en los dos temas, sin navegador.
+
+  **El hallazgo fue al revés de lo que se suponía: el tema oscuro pasa todo.
+  El que falla es el claro.** `--text-muted` ya se arregló. Quedan tres, y son
+  una decisión tuya, no técnica — ver abajo.
+
+  Lo que el script **no** cubre y sigue necesitando ojos: texto sobre fotos,
+  sobre degradados, y los colores escritos a mano en componentes.
