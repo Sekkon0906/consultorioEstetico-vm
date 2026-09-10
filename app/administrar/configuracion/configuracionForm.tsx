@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { RotateCcw, Check, AlertCircle, Loader2 } from "lucide-react";
+import { RotateCcw, Check, AlertCircle, Loader2, Phone, MapPin, Clock, Scale, Sparkles } from "lucide-react";
 import { api } from "@/lib/api";
 import Button from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import { MUELLE_ENTRADA } from "@/lib/movimiento";
+import VistaPrevia from "./vistaPrevia";
 
 // Estilo de input compartido con el resto del panel
 const IS: React.CSSProperties = {
@@ -36,6 +37,17 @@ const TITULOS: Record<string, string> = {
   horario:   "Horario de atención",
   legal:     "Identidad legal",
   marca:     "Marca y contenido",
+};
+
+/* Un icono por grupo. No es adorno: con cinco secciones plegadas en una
+   columna, el icono es lo que permite volver a "Ubicación" de un vistazo sin
+   releer los cinco títulos. */
+const ICONOS: Record<string, React.ComponentType<{ size?: number }>> = {
+  contacto:  Phone,
+  ubicacion: MapPin,
+  horario:   Clock,
+  legal:     Scale,
+  marca:     Sparkles,
 };
 
 const DESCRIPCIONES: Record<string, string> = {
@@ -161,6 +173,18 @@ export default function ConfiguracionForm() {
   // Valor mostrado: lo editado si existe, si no lo que vino del servidor
   const valorDe = (c: Campo) => (c.clave in editado ? editado[c.clave] : c.valor);
 
+  /* Todos los datos en un solo objeto, plano, con lo editado ya encima. Es lo
+     que necesita la vista previa: se arma con claves concretas
+     (`ubicacion_edificio`) y no le sirve la estructura por grupos. Se recalcula
+     con cada tecla, y por eso la vista previa cambia mientras escribes. */
+  const valores = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const lista of Object.values(grupos)) {
+      for (const c of lista) out[c.clave] = c.clave in editado ? editado[c.clave] : c.valor;
+    }
+    return out;
+  }, [grupos, editado]);
+
   const cambios = useMemo(() => {
     const out: Record<string, string> = {};
     for (const lista of Object.values(grupos)) {
@@ -282,7 +306,7 @@ export default function ConfiguracionForm() {
 
   return (
     <div style={{ maxWidth: 780, margin: "0 auto", paddingBottom: 100 }}>
-      <header style={{ marginBottom: "1.75rem" }}>
+      <header style={{ marginBottom: "1.25rem" }}>
         <h2 style={{ color: "var(--text)", fontWeight: 700, fontSize: "1.5rem", margin: 0 }}>
           Información general
         </h2>
@@ -292,15 +316,30 @@ export default function ConfiguracionForm() {
         </p>
       </header>
 
-      {nombresGrupo.map((g) => (
-        <section key={g} style={{ marginBottom: "2rem" }}>
-          <h3 style={{ color: "var(--text)", fontWeight: 600, fontSize: "1.05rem", margin: "0 0 2px" }}>
-            {TITULOS[g] || g}
-          </h3>
+      {/* Antes que las casillas, lo que producen. Ver el efecto arriba
+          convierte treinta campos sueltos en algo que se está construyendo. */}
+      <VistaPrevia v={valores} />
+
+      {nombresGrupo.map((g) => {
+        const Icono = ICONOS[g];
+        const campos = grupos[g];
+        const llenos = campos.filter((c) => (valorDe(c) || "").trim() !== "").length;
+        return (
+        <section key={g} className="cfg-tarjeta">
+          <div className="cfg-tarjeta-cabecera">
+            {Icono && <span className="cfg-tarjeta-icono"><Icono size={16} /></span>}
+            <h3 className="cfg-tarjeta-titulo">{TITULOS[g] || g}</h3>
+            {/* Cuántos datos tienen algo escrito. Con cinco secciones y treinta
+                campos, sin esto hay que abrirlas todas para saber cuál dejaste
+                a medias. No es una barra de progreso ni una nota: nada de esto
+                es obligatorio, y algunos campos se dejan vacíos a propósito. */}
+            <span className={"cfg-tarjeta-cuenta" + (llenos === campos.length ? " esta-completa" : "")}>
+              {llenos === campos.length ? <Check size={11} /> : null}
+              {llenos} de {campos.length}
+            </span>
+          </div>
           {DESCRIPCIONES[g] && (
-            <p style={{ color: "var(--text-muted)", fontSize: "0.78rem", margin: "0 0 0.9rem" }}>
-              {DESCRIPCIONES[g]}
-            </p>
+            <p className="cfg-tarjeta-descripcion">{DESCRIPCIONES[g]}</p>
           )}
 
           <div style={{ display: "grid", gap: "0.9rem" }}>
@@ -370,7 +409,8 @@ export default function ConfiguracionForm() {
             ))}
           </div>
         </section>
-      ))}
+        );
+      })}
 
       {/* La barra de guardar ya no existe: cada campo se guarda solo. Lo
           que queda es un aviso, y solo cuando hay algo que el usuario

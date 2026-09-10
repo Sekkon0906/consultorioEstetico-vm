@@ -167,3 +167,145 @@
   font-weight: 600;
   text-decoration: underline;
 }
+
+/* ============================================================
+   Informacion general — vista previa y tarjetas
+
+   La pantalla era treinta campos en fila. Funcionaba, pero no decia en
+   ningun momento QUE producen esos campos juntos, y una seccion a medias
+   solo se descubria bajando hasta ella.
+============================================================ */
+.cfg-previa {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(160deg, var(--surface-soft), var(--bg-elevated));
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 1.75rem;
+}
+.cfg-previa-eyebrow {
+  margin: 0 0 0.7rem;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+.cfg-previa-nombre {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.cfg-previa-especialidad {
+  margin: 2px 0 0.9rem;
+  color: var(--brand-texto);
+  font-size: 0.83rem;
+  font-weight: 600;
+}
+.cfg-previa-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+.cfg-previa-linea {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: var(--text-soft);
+  font-size: 0.83rem;
+  line-height: 1.5;
+  /* `break-word`: las direcciones de Instagram son largas y sin esto
+     ensanchan la tarjeta hasta desbordar el panel en movil. */
+  overflow-wrap: anywhere;
+}
+.cfg-previa-icono {
+  color: var(--brand-texto);
+  flex-shrink: 0;
+  display: flex;
+  margin-top: 2px;
+}
+/* Lo que falta se ve, no se calla. En el sitio un campo vacio es una linea
+   que simplemente no aparece, y desde el panel eso es indistinguible de que
+   todo este bien. */
+.cfg-previa-falta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-style: italic;
+}
+.cfg-previa-promo,
+.cfg-previa-agenda {
+  margin: 0.9rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+.cfg-previa-agenda { margin-top: 0.5rem; padding-top: 0.5rem; border-top: none; }
+
+.cfg-tarjeta {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-elevated);
+  padding: 1.1rem 1.15rem;
+  margin-bottom: 1.1rem;
+}
+.cfg-tarjeta-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 3px;
+}
+.cfg-tarjeta-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--surface-soft);
+  color: var(--brand-texto);
+  flex-shrink: 0;
+}
+.cfg-tarjeta-titulo {
+  margin: 0;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.02rem;
+}
+/* `margin-left: auto` y no una rejilla: el titulo manda el ancho y la cuenta
+   se va al borde sola, sea cual sea el largo del titulo. */
+.cfg-tarjeta-cuenta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.15rem 0.55rem;
+  border-radius: 100px;
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.cfg-tarjeta-cuenta.esta-completa {
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  color: var(--success);
+}
+.cfg-tarjeta-descripcion {
+  margin: 0 0 0.95rem;
+  padding-left: 39px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+@media (max-width: 520px) {
+  .cfg-tarjeta-descripcion { padding-left: 0; }
+}
