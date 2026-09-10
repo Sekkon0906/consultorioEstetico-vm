@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "contraste": "node scripts/auditar-contraste.mjs"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.0.1",

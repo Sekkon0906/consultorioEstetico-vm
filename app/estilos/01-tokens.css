@@ -43,12 +43,27 @@ h1, h2, h3 {
   --surface-soft:  #F5EEE6;   /* secundario / hover */
   --text:          #3A2A1A;   /* texto principal */
   --text-soft:     #6C584C;   /* texto secundario */
-  --text-muted:    #8A7565;   /* meta, captions */
+  /* Oscurecido desde #8A7565, que daba 4.15:1 sobre el fondo — por debajo del
+     4.5 que pide WCAG AA para texto normal. El cambio es imperceptible al ojo
+     y sube a 4.65. Medido con `scripts/auditar-contraste.mjs`. */
+  --text-muted:    #826D5D;   /* meta, captions */
   --border:        #E9DED2;   /* bordes y separadores */
   --border-strong: #D9C3B0;
-  --brand:         #B08968;   /* marca principal */
-  --brand-soft:    #C9AD8D;   /* marca suave */
-  --brand-deep:    #8B6A4B;   /* marca profunda (hover/accent) */
+
+  /* ── La marca, y CUÁL usar según dónde ────────────────────────────────
+     Importa, porque usar la equivocada produce texto que no se lee y nadie
+     lo nota hasta que alguien se queja.
+
+       --brand       fondos, bordes, adornos. Como TEXTO sobre fondo claro da
+                     3.01:1, insuficiente para texto normal.
+       --brand-deep  la marca cuando es TEXTO sobre fondo claro: 4.68:1.
+       --brand-soft  degradados y estados suaves. Nunca para texto.
+
+     En tema oscuro la marca es un champán claro y no tiene este problema:
+     ahí --brand como texto da 11.47:1. */
+  --brand:         #B08968;   /* marca principal — fondos, no texto */
+  --brand-soft:    #C9AD8D;   /* marca suave — degradados, nunca texto */
+  --brand-deep:    #8B6A4B;   /* la marca cuando es TEXTO sobre fondo claro */
   --brand-contrast:#FFFFFF;   /* texto sobre fondos --brand (botones) */
   --accent:        #E0B892;   /* acento cálido */
   --topbar-bg:     #E8E1D4;
