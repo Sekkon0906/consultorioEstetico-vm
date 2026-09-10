@@ -457,7 +457,7 @@
   .g3d-stage .g3d-grid-dorso-precio {
     font-size: 0.78rem;
     font-weight: 700;
-    color: var(--brand);
+    color: var(--brand-texto);
   }
 
   .g3d-stage .g3d-grid-card img {
@@ -680,7 +680,7 @@
 /* Issue 9 — /consultorio dark mode: la descripción "Every area was designed"
    usaba `text-[#2B2B2B]/80` que en dark mode quedaba ilegible. */
 :root[data-theme="dark"] .consultorio-desc-section h2 {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .consultorio-desc-text,
 :root[data-theme="dark"] .consultorio-desc-section .text-\[\#2B2B2B\]\/80 {
@@ -822,7 +822,7 @@
   .consultorio-showcase-label { font-size: 0.9rem; left: 14px; right: 56px; bottom: 12px; }
 }
 :root[data-theme="dark"] .consultorio-gallery-title {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 
 /* /consultorio — card del mapa (Tailwind bg-white + título champagne).
@@ -832,7 +832,7 @@
   border: 1px solid var(--border) !important;
 }
 :root[data-theme="dark"] .consultorio-map-title {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .consultorio-map-addr {
   color: var(--text-soft) !important;
@@ -905,7 +905,7 @@
 }
 :root[data-theme="dark"] .citas-filter-count {
   background: rgba(232, 201, 160, 0.25) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
   border-color: var(--brand) !important;
 }
 :root[data-theme="dark"] .citas-filter-btn.is-active .citas-filter-count {
@@ -1060,7 +1060,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--brand);
+  color: var(--brand-texto);
   position: sticky;
   top: 0;
   /* Fondo sólido + un poco de blur para que al hacer scroll las cards
@@ -1397,7 +1397,7 @@
   color: var(--text-soft) !important;
 }
 :root[data-theme="dark"] .agendar-form-card .text-\[\#5C4533\]:hover {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 /* Inputs, selects, textareas */
 :root[data-theme="dark"] .agendar-form-card input,
@@ -1524,7 +1524,7 @@
 :root[data-theme="dark"] .citas-page button [style*="rgba(176,137,104,0.18)"],
 :root[data-theme="dark"] .citas-page span[style*="rgba(176,137,104,0.18)"] {
   background: rgba(232, 201, 160, 0.25) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 /* Filtros inactivos (bg #F5EEE6) → texto cream */
 :root[data-theme="dark"] .citas-page button[style*="background: var(--surface-soft)"] {
@@ -1584,7 +1584,7 @@
 /* La doctora cards — heading champagne en dark, párrafo claro */
 :root[data-theme="dark"] .vm-card h4,
 :root[data-theme="dark"] .filo-section .dark-aware-card h5 {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .vm-card p,
 :root[data-theme="dark"] .filo-section .dark-aware-card p {
@@ -1726,7 +1726,7 @@
   color: var(--text-soft) !important;
 }
 :root[data-theme="dark"] .formacion-card > div:last-child > div:last-child {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 /* Año del timeline (#C9AD8D) ya es champagne, OK */
 
@@ -1760,8 +1760,8 @@
    porque React serializa sin espacio). */
 :root[data-theme="dark"] .comentario-proc-pill {
   background: rgba(232, 201, 160, 0.22) !important;
-  color: var(--brand) !important;
-  -webkit-text-fill-color: var(--brand) !important;
+  color: var(--brand-texto) !important;
+  -webkit-text-fill-color: var(--brand-texto) !important;
   border: 1px solid rgba(232, 201, 160, 0.4);
 }
 /* También en light reforzamos contraste del pill (café sobre cream claro) */
@@ -2761,7 +2761,7 @@ footer a:hover i {
 }
 
 .navbar-menu a:hover {
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 /* === SECCIONADO DEL MENÚ ===
@@ -2814,7 +2814,7 @@ footer a:hover i {
 }
 
 .menu-item.active a {
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 /* === Animación de indicador === */
@@ -3134,7 +3134,7 @@ footer a:hover i {
 }
 
 .mobile-sidebar a:hover {
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 /* === MOBILE SIDEBAR — MODO OSCURO === */
@@ -3162,7 +3162,7 @@ footer a:hover i {
 }
 :root[data-theme="dark"] .user-action-btn:hover {
   background: var(--surface-soft) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .mobile-sidebar li {
   border-bottom-color: var(--border) !important;
@@ -3172,7 +3172,7 @@ footer a:hover i {
   color: var(--text) !important;
 }
 :root[data-theme="dark"] .mobile-sidebar a:hover {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .mobile-sidebar-footer {
   border-top-color: var(--border) !important;
@@ -3368,7 +3368,7 @@ footer a:hover i {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--brand);
+  color: var(--brand-texto);
   background: rgba(176, 137, 104, 0.1);
   border: 1px solid rgba(176, 137, 104, 0.35);
   padding: 0.4rem 1rem;
@@ -3376,7 +3376,7 @@ footer a:hover i {
   margin-bottom: 1rem;
 }
 :root[data-theme="dark"] .doc-hero-kicker {
-  color: var(--brand);
+  color: var(--brand-texto);
   background: rgba(232, 201, 160, 0.1);
   border-color: rgba(232, 201, 160, 0.4);
 }
@@ -4303,7 +4303,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
 }
 .quick-fab-social:hover {
   background: var(--surface-soft);
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 .quick-fab-legal {
@@ -4317,7 +4317,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
      en 3.79:1 sobre este fondo, por debajo del mínimo AA. */
   color: var(--text-soft);
 }
-.quick-fab-legal a:hover { color: var(--brand); }
+.quick-fab-legal a:hover { color: var(--brand-texto); }
 
 /* En móvil el sidebar ya lleva tema e idioma, y el disparador taparía el
    botón de WhatsApp. El comentario del componente dice "SOLO escritorio";
@@ -4655,7 +4655,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   border-radius: 50%;
   flex-shrink: 0;
   background: color-mix(in srgb, var(--brand) 14%, var(--surface));
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 .acceso-ventajas strong {
@@ -4689,7 +4689,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   border: none;
   background: none;
   font: inherit;
-  color: var(--brand);
+  color: var(--brand-texto);
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -4998,7 +4998,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   gap: 8px;
   min-height: 44px;
   padding: 0 0.25rem;
-  color: var(--brand);
+  color: var(--brand-texto);
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
@@ -5050,7 +5050,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   border-radius: 50%;
   flex-shrink: 0;
   background: color-mix(in srgb, var(--brand) 14%, var(--surface));
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 .fidelidad-titulo {
@@ -5202,7 +5202,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   display: grid;
   place-items: center;
   background: color-mix(in srgb, var(--brand) 14%, var(--surface));
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 .conectar-icono.es-aviso {
   background: color-mix(in srgb, var(--danger) 12%, var(--surface));

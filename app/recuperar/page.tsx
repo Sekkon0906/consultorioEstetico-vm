@@ -113,7 +113,7 @@ export default function RecuperarPage() {
               <p
                 onClick={() => router.push("/login")}
                 style={{
-                  color: "var(--brand)",
+                  color: "var(--brand-texto)",
                   textDecoration: "underline",
                   marginTop: "1rem",
                   cursor: "pointer",

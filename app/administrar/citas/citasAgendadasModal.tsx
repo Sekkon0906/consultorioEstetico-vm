@@ -150,7 +150,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
           {cita.estado !== "cancelada" && cita.estado !== "atendida" && (
             <div style={{ marginBottom: "1.5rem" }}>
               <h5 style={{ fontWeight: 600, color: "var(--text)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: 6, fontSize: "1rem" }}>
-                <Calculator size={16} color="var(--brand)" /> Registro de pago
+                <Calculator size={16} color="var(--brand-texto)" /> Registro de pago
               </h5>
 
               <div style={{ display: "flex", gap: "0.8rem", marginBottom: "1rem" }}>
@@ -158,13 +158,13 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
                   <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-soft)", display: "block", marginBottom: 5 }}>Total a pagar</label>
                   <input type="number" value={monto} onChange={e => setMonto(e.target.value)} placeholder="350000"
                     style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 14, border: "1px solid var(--border)", fontSize: "1.05rem", background: "var(--surface)" }} />
-                  <span style={{ fontSize: "0.78rem", color: "var(--brand)", fontWeight: 600, display: "block", marginTop: 4, minHeight: 16 }}>{montoNum > 0 ? `$ ${montoNum.toLocaleString("es-CO")}` : ""}</span>
+                  <span style={{ fontSize: "0.78rem", color: "var(--brand-texto)", fontWeight: 600, display: "block", marginTop: 4, minHeight: 16 }}>{montoNum > 0 ? `$ ${montoNum.toLocaleString("es-CO")}` : ""}</span>
                 </div>
                 <div style={{ flex: 1 }}>
                   <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-soft)", display: "block", marginBottom: 5 }}>Pago total cliente</label>
                   <input type="number" value={pagoCliente} onChange={e => setPagoCliente(e.target.value)} placeholder="350000"
                     style={{ width: "100%", padding: "0.75rem 0.9rem", borderRadius: 14, border: "1px solid var(--border)", fontSize: "1.05rem", background: "var(--surface)" }} />
-                  <span style={{ fontSize: "0.78rem", color: "var(--brand)", fontWeight: 600, display: "block", marginTop: 4, minHeight: 16 }}>{pagoNum > 0 ? `$ ${pagoNum.toLocaleString("es-CO")}` : ""}</span>
+                  <span style={{ fontSize: "0.78rem", color: "var(--brand-texto)", fontWeight: 600, display: "block", marginTop: 4, minHeight: 16 }}>{pagoNum > 0 ? `$ ${pagoNum.toLocaleString("es-CO")}` : ""}</span>
                 </div>
               </div>
 
@@ -185,7 +185,7 @@ export default function CitasAgendadasModal({ cita, onClose, onUpdated }: Props)
                 <motion.div initial={{ height: 0 }} animate={{ opacity: 1, height: "auto" }} style={{ overflow: "hidden" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.82rem", marginBottom: 6 }}>
                     <span style={{ color: "var(--text-soft)" }}>Pagado: <strong>${pagadoTotal.toLocaleString("es-CO")}</strong></span>
-                    {restante > 0 && <span style={{ color: "var(--brand)", fontWeight: 600 }}>Restante: ${restante.toLocaleString("es-CO")}</span>}
+                    {restante > 0 && <span style={{ color: "var(--brand-texto)", fontWeight: 600 }}>Restante: ${restante.toLocaleString("es-CO")}</span>}
                     {devolucion > 0 && <span style={{ color: "var(--estado-atendida)", fontWeight: 600 }}>Devolucion: ${devolucion.toLocaleString("es-CO")}</span>}
                   </div>
                   <div style={{ height: 8, borderRadius: 4, background: "var(--border)", overflow: "hidden" }}>

@@ -58,7 +58,7 @@ function Contenido() {
         >
           {estado === "listo"
             ? <Check size={26} color="var(--estado-atendida)" strokeWidth={3} />
-            : <Mail size={24} color="var(--brand)" />}
+            : <Mail size={24} color="var(--brand-texto)" />}
         </div>
 
         <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.5rem", color: "var(--text)", margin: "0 0 0.75rem" }}>

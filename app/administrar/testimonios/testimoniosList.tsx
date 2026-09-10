@@ -139,16 +139,16 @@ export default function TestimoniosList() {
                     <div className="admin-card-body" style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                         <span style={{ fontWeight: 700, color: "var(--text)", fontSize: "1.05rem" }}>{c.nombre}</span>
-                        <span style={{ background: "var(--surface-soft)", color: "var(--brand)", padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>{c.procedimiento}</span>
-                        <span style={{ background: c.aprobado ? "rgba(150, 220, 170, 0.2)" : "rgba(242, 221, 184, 0.2)", color: c.aprobado ? "var(--estado-atendida)" : "var(--brand)", border: "1px solid " + (c.aprobado ? "var(--estado-atendida)" : "var(--brand)"), padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.74rem", fontWeight: 700 }}>{c.aprobado ? "Visible" : "Pendiente"}</span>
+                        <span style={{ background: "var(--surface-soft)", color: "var(--brand-texto)", padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>{c.procedimiento}</span>
+                        <span style={{ background: c.aprobado ? "rgba(150, 220, 170, 0.2)" : "rgba(242, 221, 184, 0.2)", color: c.aprobado ? "var(--estado-atendida)" : "var(--brand-texto)", border: "1px solid " + (c.aprobado ? "var(--estado-atendida)" : "var(--brand)"), padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.74rem", fontWeight: 700 }}>{c.aprobado ? "Visible" : "Pendiente"}</span>
                       </div>
                       <p style={{ fontSize: "0.92rem", color: "var(--text-soft)", margin: "0.35rem 0 0", fontStyle: "italic" }}>&quot;{c.texto}&quot;</p>
                       <div style={{ display: "flex", gap: 2, marginTop: 4 }}>
-                        {[1,2,3,4,5].map(function(i) { return <span key={i} style={{ color: i <= c.puntuacion ? "var(--brand)" : "#ddd", fontSize: "0.95rem" }}>★</span>; })}
+                        {[1,2,3,4,5].map(function(i) { return <span key={i} style={{ color: i <= c.puntuacion ? "var(--brand-texto)" : "#ddd", fontSize: "0.95rem" }}>★</span>; })}
                       </div>
                     </div>
                     <div className="admin-card-actions" style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                      <button onClick={function() { toggleAprobado(c.id, c.aprobado); }} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0.5rem 1rem", borderRadius: 100, background: c.aprobado ? "rgba(232, 201, 160, 0.18)" : "rgba(150, 220, 170, 0.22)", color: c.aprobado ? "var(--brand)" : "var(--estado-atendida)", border: "1px solid " + (c.aprobado ? "var(--brand)" : "var(--estado-atendida)"), fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>
+                      <button onClick={function() { toggleAprobado(c.id, c.aprobado); }} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "0.5rem 1rem", borderRadius: 100, background: c.aprobado ? "rgba(232, 201, 160, 0.18)" : "rgba(150, 220, 170, 0.22)", color: c.aprobado ? "var(--brand-texto)" : "var(--estado-atendida)", border: "1px solid " + (c.aprobado ? "var(--brand)" : "var(--estado-atendida)"), fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>
                         {c.aprobado ? <EyeOff size={14} /> : <Eye size={14} />}
                         {c.aprobado ? "Ocultar" : "Aprobar"}
                       </button>
@@ -179,7 +179,7 @@ export default function TestimoniosList() {
                 <div style={{ marginBottom: "0.8rem" }}><Lbl>Testimonio *</Lbl><textarea style={{ ...IS, resize: "vertical" as const }} value={form.texto} onChange={function(e) { setForm({ ...form, texto: e.target.value }); }} rows={3} placeholder="La experiencia fue increible..." /></div>
                 <div style={{ marginBottom: "1rem" }}><Lbl>Link de video (YouTube)</Lbl>
                   <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                    <Play size={16} color="var(--brand)" style={{ flexShrink: 0 }} />
+                    <Play size={16} color="var(--brand-texto)" style={{ flexShrink: 0 }} />
                     <input style={IS} value={form.video} onChange={function(e) { setForm({ ...form, video: e.target.value }); }} placeholder="https://youtube.com/watch?v=..." />
                   </div>
                   {form.video && form.video.includes("youtu") && <p style={{ fontSize: "0.72rem", color: "var(--success)", marginTop: 3 }}>Video detectado</p>}
@@ -187,7 +187,7 @@ export default function TestimoniosList() {
                 <div style={{ background: "var(--surface-soft)", borderRadius: 16, padding: "1rem", marginBottom: "1rem" }}><Lbl>Foto del paciente</Lbl>
                   <div style={{ display: "flex", gap: "0.8rem", alignItems: "center", flexWrap: "wrap", marginTop: 6 }}>
                     {form.thumb && <div style={{ position: "relative" }}><Image src={form.thumb} alt="" width={64} height={64} quality={70} style={{ height: 64, width: 64, borderRadius: 10, objectFit: "cover", border: "2px solid var(--brand)" }} /><button onClick={function() { setForm({ ...form, thumb: "" }); }} aria-label="Quitar la foto" title="Quitar la foto" style={{ position: "absolute", top: -5, right: -5, width: 18, height: 18, borderRadius: "50%", background: "var(--danger)", color: "var(--brand-contrast)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} /></button></div>}
-                    <label style={{ padding: "0.45rem 1rem", borderRadius: 12, border: "1px dashed var(--brand)", cursor: upl ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: upl ? 0.6 : 1 }}><Upload size={14} /> {upl ? "Subiendo..." : form.thumb ? "Cambiar" : "Subir foto"}<input type="file" accept="image/*" style={{ display: "none" }} onChange={handleThumb} disabled={upl} /></label>
+                    <label style={{ padding: "0.45rem 1rem", borderRadius: 12, border: "1px dashed var(--brand)", cursor: upl ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand-texto)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: upl ? 0.6 : 1 }}><Upload size={14} /> {upl ? "Subiendo..." : form.thumb ? "Cambiar" : "Subir foto"}<input type="file" accept="image/*" style={{ display: "none" }} onChange={handleThumb} disabled={upl} /></label>
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: "0.6rem" }}>
@@ -205,7 +205,7 @@ export default function TestimoniosList() {
                   <motion.div key={t.id} className="admin-card" initial={{ y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }} style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.1rem 1.4rem", display: "flex", alignItems: "center", gap: "1.1rem", opacity: t.activo ? 1 : 0.5 }}>
                     {t.thumb ? <Image src={t.thumb} alt="" width={72} height={72} quality={70} style={{ width: 72, height: 72, borderRadius: 14, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 72, height: 72, borderRadius: 14, background: "var(--border)", flexShrink: 0 }} />}
                     <div className="admin-card-body" style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 7 }}><TextoEditable valor={t.nombre} etiqueta="Nombre de la paciente" onGuardar={function(v) { return guardarCampoSuelto(t.id, { nombre: v }); }} estilo={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }} />{t.video && <Play size={16} color="var(--brand)" />}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 7 }}><TextoEditable valor={t.nombre} etiqueta="Nombre de la paciente" onGuardar={function(v) { return guardarCampoSuelto(t.id, { nombre: v }); }} estilo={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }} />{t.video && <Play size={16} color="var(--brand-texto)" />}</div>
                       {/* La cita se corrige aqui mismo: es texto de una paciente, asi
                           que lo que se toca es una coma o una palabra, no el
                           testimonio entero. Va en multilinea porque suele ocupar
@@ -217,7 +217,7 @@ export default function TestimoniosList() {
                     </div>
                     <div className="admin-card-actions" style={{ display: "flex", gap: 7, flexShrink: 0 }}>
                       <IBtn icon={t.activo ? <Eye size={18} color="var(--brand-deep)" /> : <EyeOff size={18} color="var(--text-muted)" />} bg="var(--surface-soft)" title={t.activo ? "Ocultar" : "Mostrar"} onClick={function() { toggle(t, "activo"); }} />
-                      <IBtn icon={<Star size={18} color="var(--brand)" fill={t.destacado ? "var(--brand)" : "none"} />} bg="var(--surface-soft)" title="Destacar" onClick={function() { toggle(t, "destacado"); }} />
+                      <IBtn icon={<Star size={18} color="var(--brand-texto)" fill={t.destacado ? "var(--brand)" : "none"} />} bg="var(--surface-soft)" title="Destacar" onClick={function() { toggle(t, "destacado"); }} />
                       <IBtn icon={<Edit3 size={18} color="var(--text)" />} bg="var(--surface-soft)" title="Editar" onClick={function() { startEdit(t); }} />
                       {delId === t.id ? (
                         <><button onClick={function() { handleDel(t.id); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--danger)", color: "white", border: "none", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>Sí</button><button onClick={function() { setDelId(null); }} style={{ padding: "0.4rem 0.8rem", borderRadius: 10, background: "var(--border)", border: "none", fontSize: "0.85rem", cursor: "pointer" }}>No</button></>

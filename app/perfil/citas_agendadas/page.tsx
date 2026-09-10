@@ -275,7 +275,7 @@ export default function CitasAgendadas() {
     cancelada: citas.filter(c => c.estado === "cancelada").length,
   }), [citas]);
 
-  if (loading) return <div style={{ display: "flex", justifyContent: "center", padding: "5rem 0" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
+  if (loading) return <div style={{ display: "flex", justifyContent: "center", padding: "5rem 0" }}><div className="spinner-border" style={{ color: "var(--brand-texto)" }} /></div>;
   if (error) return <div style={{ textAlign: "center", padding: "3rem" }}><p style={{ color: "var(--estado-cancelada)" }}>{error}</p><button onClick={() => window.location.reload()} style={{ marginTop: "1rem", padding: "0.6rem 2rem", borderRadius: 100, background: "var(--brand)", color: "var(--brand-contrast)", border: "none", fontWeight: 600, cursor: "pointer" }}>{t("retry")}</button></div>;
 
   return (
@@ -401,7 +401,7 @@ export default function CitasAgendadas() {
                           </div>
                           <div style={{ textAlign: "right", background: "linear-gradient(135deg, var(--bg-elevated), var(--surface-soft))", border: "1px solid rgba(176,137,104,0.14)", borderRadius: 14, padding: "0.6rem 1rem", minWidth: 150 }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6, fontSize: "0.9rem", fontWeight: 700, color: "var(--text)" }}>
-                              <Clock size={14} color="var(--brand)" /> {cita.hora}
+                              <Clock size={14} color="var(--brand-texto)" /> {cita.hora}
                             </div>
                             <div style={{ fontSize: "0.76rem", color: "var(--text-muted)", marginTop: 2 }}>{formatFecha(cita.fecha)}</div>
                           </div>
@@ -409,15 +409,15 @@ export default function CitasAgendadas() {
 
                         {/* Metadatos compactos (una sola línea tenue) */}
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem 1.2rem", fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "1rem" }}>
-                          <span style={{ display: "flex", alignItems: "center", gap: 5 }}><User size={13} color="var(--brand)" /> {cita.nombres} {cita.apellidos}</span>
-                          {cita.telefono && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Phone size={13} color="var(--brand)" /> {cita.telefono}</span>}
-                          {cita.correo && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Mail size={13} color="var(--brand)" /> {cita.correo}</span>}
-                          {cita.metodoPago && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><i className="fas fa-wallet" style={{ color: "var(--brand)" }} /> {cita.metodoPago} ({cita.tipoPagoConsultorio || ""})</span>}
+                          <span style={{ display: "flex", alignItems: "center", gap: 5 }}><User size={13} color="var(--brand-texto)" /> {cita.nombres} {cita.apellidos}</span>
+                          {cita.telefono && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Phone size={13} color="var(--brand-texto)" /> {cita.telefono}</span>}
+                          {cita.correo && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Mail size={13} color="var(--brand-texto)" /> {cita.correo}</span>}
+                          {cita.metodoPago && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><i className="fas fa-wallet" style={{ color: "var(--brand-texto)" }} /> {cita.metodoPago} ({cita.tipoPagoConsultorio || ""})</span>}
                         </div>
 
                         {cita.nota && (
                           <div style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: "0.83rem", color: "var(--text-soft)", padding: "0.55rem 0.8rem", background: "var(--surface-soft)", borderRadius: 10, marginBottom: "0.8rem" }}>
-                            <FileText size={14} color="var(--brand)" style={{ marginTop: 2, flexShrink: 0 }} /> {cita.nota}
+                            <FileText size={14} color="var(--brand-texto)" style={{ marginTop: 2, flexShrink: 0 }} /> {cita.nota}
                           </div>
                         )}
 

@@ -120,12 +120,12 @@ export default function ComentariosClientes() {
                     onMouseEnter={function() { setHoverStar(i); }} onMouseLeave={function() { setHoverStar(0); }}
                     onClick={function() { setPuntuacion(i); }}
                     style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}>
-                    {i <= (hoverStar || puntuacion) ? <FaStar size={26} color="var(--brand)" /> : <FaRegStar size={26} color="var(--brand)" />}
+                    {i <= (hoverStar || puntuacion) ? <FaStar size={26} color="var(--brand-texto)" /> : <FaRegStar size={26} color="var(--brand-texto)" />}
                   </button>
                 );
               })}
             </div>
-            {puntuacion > 0 && <span style={{ fontSize: "0.78rem", color: "var(--brand)" }}>{ratingLabels[puntuacion]}</span>}
+            {puntuacion > 0 && <span style={{ fontSize: "0.78rem", color: "var(--brand-texto)" }}>{ratingLabels[puntuacion]}</span>}
           </div>
 
           <button onClick={handleEnviar} disabled={enviando}
@@ -148,7 +148,7 @@ export default function ComentariosClientes() {
                 <h4 style={{ fontWeight: 600, color: "var(--text)", fontSize: "0.95rem", margin: 0 }}>{c.nombre}</h4>
                 <span className="comentario-proc-pill" style={{ background: "var(--surface-soft)", color: "var(--brand-deep)", padding: "0.2rem 0.8rem", borderRadius: 100, fontSize: "0.7rem", fontWeight: 600 }}>{c.procedimiento}</span>
                 <div style={{ display: "flex", gap: 2 }}>
-                  {[1,2,3,4,5].map(function(i) { return c.puntuacion >= i ? <FaStar key={i} size={14} color="var(--brand)" /> : <FaRegStar key={i} size={14} color="var(--brand)" />; })}
+                  {[1,2,3,4,5].map(function(i) { return c.puntuacion >= i ? <FaStar key={i} size={14} color="var(--brand-texto)" /> : <FaRegStar key={i} size={14} color="var(--brand-texto)" />; })}
                 </div>
                 <p style={{ fontSize: "0.85rem", color: "var(--text-soft)", fontStyle: "italic", lineHeight: 1.4, textAlign: "center" }}>&quot;{c.texto.length > 140 ? c.texto.slice(0, 140) + "..." : c.texto}&quot;</p>
                 <span style={{ fontSize: "0.72rem", color: "var(--text-soft)" }}>{new Date(c.creado_en).toLocaleDateString(intlLocale, { year: "numeric", month: "long", day: "numeric" })}</span>

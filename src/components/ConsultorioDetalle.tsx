@@ -179,7 +179,7 @@ export default function ConsultorioDetalle() {
                 className="cons-paso"
               >
                 <span className="cons-paso-num">{i + 1}</span>
-                <Icono size={22} color="var(--brand)" style={{ marginBottom: "0.7rem" }} />
+                <Icono size={22} color="var(--brand-texto)" style={{ marginBottom: "0.7rem" }} />
                 <h3 className="cons-paso-titulo">{paso.titulo}</h3>
                 <p className="cons-paso-texto">{paso.texto}</p>
               </motion.li>
@@ -218,7 +218,7 @@ export default function ConsultorioDetalle() {
         <div className="cons-doble">
           <div className="cons-horarios">
             <h3 className="cons-sub">
-              <Clock size={19} color="var(--brand)" /> Horarios de atención
+              <Clock size={19} color="var(--brand-texto)" /> Horarios de atención
             </h3>
             <dl className="cons-horario-lista">
               {HORARIOS.map((h) => (
@@ -236,14 +236,14 @@ export default function ConsultorioDetalle() {
 
           <div className="cons-llegar">
             <h3 className="cons-sub">
-              <MapPin size={19} color="var(--brand)" /> Cómo llegar
+              <MapPin size={19} color="var(--brand-texto)" /> Cómo llegar
             </h3>
             <ul className="cons-llegar-lista">
               {LLEGAR.map((l) => {
                 const Icono = l.icono;
                 return (
                   <li key={l.titulo}>
-                    <Icono size={17} color="var(--brand)" />
+                    <Icono size={17} color="var(--brand-texto)" />
                     <div>
                       <strong>{l.titulo}</strong>
                       <span>{l.texto}</span>
@@ -282,7 +282,7 @@ export default function ConsultorioDetalle() {
           line-height: 1;
           /* Muy tenue a propósito: ordena la lectura sin competir con el
              título del paso, que es lo que hay que leer. */
-          color: var(--brand);
+          color: var(--brand-texto);
           opacity: 0.22;
         }
         .cons-paso-titulo {

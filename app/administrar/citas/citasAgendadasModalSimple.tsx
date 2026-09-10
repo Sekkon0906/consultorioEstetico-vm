@@ -98,7 +98,7 @@ export default function CitasAgendadasModalSimple({
           >
             <ArrowLeft size={20} className="[color:var(--text-soft)]" aria-hidden="true" />
           </button>
-          <h3 className="text-xl font-semibold [color:var(--brand)] tracking-wide">
+          <h3 className="text-xl font-semibold [color:var(--brand-texto)] tracking-wide">
             Detalle de cita #{cita.id}
           </h3>
         </div>

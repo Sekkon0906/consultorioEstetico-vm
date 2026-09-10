@@ -186,7 +186,7 @@ export default function AgendarForm({
             </h3>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
               <div className="flex items-center gap-2">
-                <CalendarDays className="w-5 h-5 text-[var(--brand)]" />
+                <CalendarDays className="w-5 h-5 text-[var(--brand-texto)]" />
                 <span>
                   <b>
                     {fmtDiaHumano(fechaObj)}, {fmtFechaHumana(fechaObj)}
@@ -194,7 +194,7 @@ export default function AgendarForm({
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-[var(--brand)]" />
+                <Clock className="w-5 h-5 text-[var(--brand-texto)]" />
                 <span>
                   <b>{fmtHoraHumana(formData.hora)}</b>
                 </span>

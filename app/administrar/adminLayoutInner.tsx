@@ -125,7 +125,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
 
       {/* SIDEBAR DESKTOP */}
       <aside className="admin-sidebar hidden lg:flex lg:flex-col lg:w-64 lg:py-6 lg:px-4 lg:shadow-lg">
-        <h1 className="text-2xl font-bold mb-2 text-center tracking-wide [color:var(--brand)]">
+        <h1 className="text-2xl font-bold mb-2 text-center tracking-wide [color:var(--brand-texto)]">
           Panel Admin
         </h1>
         {user && (
@@ -153,7 +153,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
               style={{ top: TOP_OFFSET, height: `calc(100vh - ${TOP_OFFSET}px)` }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h1 className="text-xl font-bold [color:var(--brand)]">Panel Admin</h1>
+                <h1 className="text-xl font-bold [color:var(--brand-texto)]">Panel Admin</h1>
                 <button onClick={() => setSidebarOpen(false)} className="admin-close-btn p-1 rounded-md">
                   <X size={20} className="[color:var(--text)]" />
                 </button>
@@ -185,7 +185,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
             <Menu size={20} />
             <span className="text-sm font-medium">Menú</span>
           </button>
-          <h2 className="text-xl font-semibold [color:var(--brand)] ml-auto lg:ml-0">
+          <h2 className="text-xl font-semibold [color:var(--brand-texto)] ml-auto lg:ml-0">
             Administración
           </h2>
         </header>

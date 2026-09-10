@@ -337,7 +337,7 @@ export default function FirmaConsentimiento(props: Props) {
 
                 {step === "guardando" && (
                   <div style={{ textAlign: "center", padding: "2rem 0" }}>
-                    <div className="spinner-border" style={{ color: "var(--brand)" }} />
+                    <div className="spinner-border" style={{ color: "var(--brand-texto)" }} />
                     <p style={{ color: "var(--text-soft)", marginTop: "1rem" }}>{t("savingMessage")}</p>
                   </div>
                 )}

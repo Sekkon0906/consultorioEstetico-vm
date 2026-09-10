@@ -75,7 +75,7 @@
 }
 :root[data-theme="dark"] .admin-nav-link:hover {
   background: var(--surface-soft) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .admin-nav-link.is-active {
   background: linear-gradient(135deg, var(--brand), var(--brand-deep)) !important;
@@ -105,7 +105,7 @@
 
 /* Spinner / loader de Bootstrap usado en admin */
 :root[data-theme="dark"] .spinner-border {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 
 /* ============================================================
@@ -140,7 +140,7 @@
 }
 .admin-cal-day.is-today {
   background: var(--surface-soft);
-  color: var(--brand);
+  color: var(--brand-texto);
   font-weight: 700;
   border-color: var(--brand);
 }

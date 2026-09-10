@@ -92,7 +92,7 @@ export default function PreferenciaCorreos() {
               fontWeight: 700, color: "var(--text)", fontSize: "0.95rem",
             }}
           >
-            <Mail size={16} color="var(--brand)" />
+            <Mail size={16} color="var(--brand-texto)" />
             Quiero recibir promociones y novedades
 
             {estado === "guardando" && (

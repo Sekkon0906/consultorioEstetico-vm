@@ -54,16 +54,35 @@ h1, h2, h3 {
      Importa, porque usar la equivocada produce texto que no se lee y nadie
      lo nota hasta que alguien se queja.
 
-       --brand       fondos, bordes, adornos. Como TEXTO sobre fondo claro da
-                     3.01:1, insuficiente para texto normal.
-       --brand-deep  la marca cuando es TEXTO sobre fondo claro: 4.68:1.
-       --brand-soft  degradados y estados suaves. Nunca para texto.
+       --brand        fondos, bordes, adornos. Como TEXTO sobre fondo claro da
+                      3.01:1, insuficiente para texto normal.
+       --brand-texto  la marca CUANDO ES TEXTO. Úsalo siempre en `color:`.
+                      Es un punto más oscuro que --brand-deep, y no por
+                      capricho: con #8B6A4B daba 4.28 sobre --surface-soft,
+                      que es justo el fondo de las insignias y las pestañas
+                      donde más se usa. Lo destapó `npm run contraste` al
+                      añadir esa pareja.
+       --brand-deep   el extremo oscuro de los degradados de marca.
+       --brand-soft   degradados y estados suaves. Nunca para texto.
 
-     En tema oscuro la marca es un champán claro y no tiene este problema:
-     ahí --brand como texto da 11.47:1. */
+     POR QUÉ --brand-texto EXISTE SIENDO IGUAL QUE --brand-deep EN CLARO
+     Porque en OSCURO no son iguales, y ahí está todo el asunto. En oscuro
+     --brand-deep es un crema casi blanco (#F5F1EA), pensado para ser el
+     extremo claro de los degradados; pintar texto con él borraría el champán
+     que es el único acento cálido de la paleta. --brand-texto vale champán en
+     oscuro y marrón oscuro en claro, así que `color: var(--brand-texto)` sale
+     bien en los dos temas sin escribir una sola regla por tema.
+
+     Ese fue el motivo de no reutilizar --brand-deep para esto: se comprobó
+     que ya está metido en quince degradados donde el tema oscuro cuenta con
+     que sea claro.
+
+     En tema oscuro la marca es un champán claro y no tiene el problema del
+     contraste: ahí --brand como texto da 11.47:1. */
   --brand:         #B08968;   /* marca principal — fondos, no texto */
   --brand-soft:    #C9AD8D;   /* marca suave — degradados, nunca texto */
-  --brand-deep:    #8B6A4B;   /* la marca cuando es TEXTO sobre fondo claro */
+  --brand-deep:    #8B6A4B;   /* extremo oscuro de los degradados de marca */
+  --brand-texto:   #856445;   /* la marca cuando es TEXTO: 4.67 a 5.38:1 */
   --brand-contrast:#FFFFFF;   /* texto sobre fondos --brand (botones) */
   --accent:        #E0B892;   /* acento cálido */
   --topbar-bg:     #E8E1D4;
@@ -155,6 +174,11 @@ h1, h2, h3 {
   --brand:         #E8C9A0;   /* champán — único acento cálido de la paleta */
   --brand-soft:    #F2DDB8;
   --brand-deep:    #F5F1EA;
+  /* Aquí --brand-texto NO sigue a --brand-deep: es el mismo champán que
+     --brand. En oscuro la marca como texto ya da 11.47:1, así que no hay nada
+     que corregir, y usar el crema de --brand-deep dejaría la web sin acento
+     cálido. */
+  --brand-texto:   #E8C9A0;
   --brand-contrast:#1A1720;   /* en dark, --brand es claro (champán): texto oscuro */
   --accent:        #E8C9A0;
   --topbar-bg:     #0E0C11;

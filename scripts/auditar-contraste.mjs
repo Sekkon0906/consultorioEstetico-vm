@@ -47,8 +47,10 @@ const PAREJAS = [
   ["--text-muted", "--bg", "Texto atenuado sobre el fondo"],
   ["--text-muted", "--surface", "Texto atenuado sobre superficie"],
   ["--brand-contrast", "--brand", "Texto encima de la marca (botones)"],
-  ["--brand", "--bg", "La marca como texto sobre el fondo"],
-  ["--brand", "--surface", "La marca como texto sobre superficie"],
+  ["--brand-texto", "--bg", "La marca como texto sobre el fondo"],
+  ["--brand-texto", "--surface", "La marca como texto sobre superficie"],
+  ["--brand-texto", "--bg-elevated", "La marca como texto sobre tarjeta"],
+  ["--brand-texto", "--surface-soft", "La marca como texto sobre superficie suave"],
   ["--danger", "--surface", "Aviso de error sobre superficie"],
   ["--danger", "--bg-elevated", "Aviso de error sobre tarjeta"],
   ["--success", "--surface", "Aviso de acierto sobre superficie"],
@@ -65,17 +67,15 @@ const PAREJAS = [
    puede salir con 0 para no bloquear la integración continua por algo ya
    sabido. Si aparece una CUARTA, esa sí sale con 1.
 
-   Los números, para cuando toque decidir:
-     · Blanco sobre la marca da 3.17. Para llegar a 4.5 la marca tendría que
-       ser #8B6A4B —que ya existe como --brand-deep— y da 4.93.
-     · La marca como texto se arregla usando --brand-deep en su lugar: 4.68
-       en vez de 3.01. Eso no cambia ningún fondo, solo el color de algunos
-       textos. */
-const CONOCIDAS = new Set([
-  "--brand-contrast|--brand",
-  "--brand|--bg",
-  "--brand|--surface",
-]);
+   Queda UNA, no tres. Las otras dos —la marca usada como color de texto—
+   ya se arreglaron: existe --brand-texto, que vale #8B6A4B en claro y el
+   champán en oscuro, y todos los `color:` de marca lo usan. Eso no tocó
+   ningún fondo, así que no hacía falta decidir nada.
+
+   La que queda, para cuando toque decidir: blanco sobre la marca da 3.17.
+   Para llegar a 4.5 el fondo tendría que ser #8B6A4B, que da 4.93 — y eso sí
+   cambia el aspecto de todos los botones. */
+const CONOCIDAS = new Set(["--brand-contrast|--brand"]);
 
 /* 4.5:1 es el mínimo de WCAG AA para texto normal. El texto grande admite 3,
    pero estos tokens se usan sobre todo en texto normal, así que se exige el

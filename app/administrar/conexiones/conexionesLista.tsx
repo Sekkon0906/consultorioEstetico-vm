@@ -66,7 +66,7 @@ export default function ConexionesLista() {
   return (
     <section>
       <h1 className="conexiones-titulo">
-        <Plug size={20} color="var(--brand)" /> Programas conectados
+        <Plug size={20} color="var(--brand-texto)" /> Programas conectados
       </h1>
       {/* Dice exactamente lo mismo que la pantalla de autorización, y a
           propósito: si las dos describen el mismo permiso con palabras
@@ -92,7 +92,7 @@ export default function ConexionesLista() {
 
       {conexiones?.length === 0 && (
         <div className="conexiones-vacio">
-          <ShieldCheck size={26} color="var(--brand)" />
+          <ShieldCheck size={26} color="var(--brand-texto)" />
           <p><strong>No hay ningún programa conectado.</strong></p>
           <p>
             Para conectar Claude, añade este consultorio como conector desde tu

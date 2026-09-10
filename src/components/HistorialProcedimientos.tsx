@@ -107,7 +107,7 @@ export default function HistorialProcedimientos({ locale }: { locale: string }) 
   return (
     <section style={{ marginBottom: "2rem" }}>
       <h2 style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "var(--text)", margin: "0 0 0.3rem" }}>
-        <History size={18} color="var(--brand)" /> Lo que te has hecho
+        <History size={18} color="var(--brand-texto)" /> Lo que te has hecho
       </h2>
       <p style={{ color: "var(--text-soft)", fontSize: "0.86rem", margin: "0 0 1rem", maxWidth: "var(--ancho-texto)" }}>
         Solo cuenta las citas que ya se atendieron. Si tienes dudas sobre

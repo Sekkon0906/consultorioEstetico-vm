@@ -868,7 +868,7 @@ export default function ProcedimientosPage() {
           align-self: flex-start;
           font-size: 0.82rem;
           font-weight: 600;
-          color: var(--brand);
+          color: var(--brand-texto);
           text-decoration: none;
           border-bottom: 1px solid transparent;
           padding-bottom: 1px;
@@ -890,7 +890,7 @@ export default function ProcedimientosPage() {
         .proc-card-price {
           font-size: 0.85rem;
           font-weight: 700;
-          color: var(--brand);
+          color: var(--brand-texto);
         }
         .proc-card-price-unit {
           font-size: 0.7rem;
@@ -1183,7 +1183,7 @@ function FeaturedCarousel({
               {item.precio && (
                 <p
                   style={{
-                    color: "var(--brand)",
+                    color: "var(--brand-texto)",
                     fontWeight: 700,
                     fontSize: "0.95rem",
                     margin: "0.2rem 0 0",
@@ -1538,7 +1538,7 @@ function EmptyState({
           alignItems: "center",
           justifyContent: "center",
           margin: "0 auto 1rem",
-          color: "var(--brand)",
+          color: "var(--brand-texto)",
         }}
       >
         <Search size={26} />

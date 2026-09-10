@@ -244,20 +244,20 @@ export default function AgendarCalendar({ fecha, hora, onFechaSelect, onHoraSele
             {!selectedDate && (
               <motion.div initial={false} animate={{ opacity: 1 }} style={{ textAlign: "center", padding: "3rem 1rem" }}>
                 <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, var(--border), var(--surface))", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
-                  <i className="fas fa-calendar-day" style={{ color: "var(--brand)", fontSize: "1.4rem" }} />
+                  <i className="fas fa-calendar-day" style={{ color: "var(--brand-texto)", fontSize: "1.4rem" }} />
                 </div>
                 <p style={{ color: "var(--text-muted)", fontSize: "0.92rem" }}>{t("pickDayHint")}</p>
               </motion.div>
             )}
 
             {selectedDate && loadingHoras && (
-              <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border spinner-border-sm" style={{ color: "var(--brand)" }} /></div>
+              <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border spinner-border-sm" style={{ color: "var(--brand-texto)" }} /></div>
             )}
 
             {selectedDate && !loadingHoras && !hayHorasDisponibles && (
               <motion.div initial={false} animate={{ opacity: 1 }} style={{ textAlign: "center", padding: "2.5rem 1rem" }}>
                 <div style={{ width: 60, height: 60, borderRadius: "50%", background: "linear-gradient(135deg, var(--surface-soft), var(--surface))", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1rem" }}>
-                  <i className="fas fa-clock" style={{ color: "var(--brand)", fontSize: "1.3rem" }} />
+                  <i className="fas fa-clock" style={{ color: "var(--brand-texto)", fontSize: "1.3rem" }} />
                 </div>
                 <p style={{ color: "var(--text-muted)", fontSize: "0.95rem", margin: 0 }}>
                   {esHoySeleccionado ? t("noHoursToday") : t("noHoursForDay")}

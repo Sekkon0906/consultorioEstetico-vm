@@ -108,7 +108,7 @@ function CardItem({
         </p>
         <div style={{
           marginTop: "0.6rem", fontSize: "0.68rem",
-          color: "var(--brand)", fontWeight: 600,
+          color: "var(--brand-texto)", fontWeight: 600,
         }}>
           {t("viewGallery")}
         </div>
@@ -307,7 +307,7 @@ function CharlaModal({ charla, onClose }: { charla: Charla; onClose: () => void 
                   display: "flex", alignItems: "center", gap: 5,
                   marginTop: "0.4rem", fontSize: "0.73rem", color: "var(--text-soft)",
                 }}>
-                  <Calendar size={12} color="var(--brand)" /> {fechaFmt}
+                  <Calendar size={12} color="var(--brand-texto)" /> {fechaFmt}
                 </div>
               )}
             </div>
@@ -541,7 +541,7 @@ export default function FormacionContinua() {
         >
           <p style={{
             fontSize: "0.67rem", letterSpacing: "0.22em",
-            textTransform: "uppercase", color: "var(--brand)",
+            textTransform: "uppercase", color: "var(--brand-texto)",
             fontWeight: 700, marginBottom: "0.45rem",
           }}>
             {t("kicker")}

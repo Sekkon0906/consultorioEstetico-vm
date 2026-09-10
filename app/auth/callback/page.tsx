@@ -54,7 +54,7 @@ export default function AuthCallbackPage() {
         <FondoAnim />
       </div>
       <div className="text-center position-relative" style={{ zIndex: 1 }}>
-        <div className="spinner-border" style={{ color: "var(--brand)" }} role="status" />
+        <div className="spinner-border" style={{ color: "var(--brand-texto)" }} role="status" />
         <p className="mt-3" style={{ color: "var(--text-soft)", fontWeight: 600 }}>
           Iniciando sesión…
         </p>

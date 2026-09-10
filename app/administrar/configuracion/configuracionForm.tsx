@@ -131,7 +131,7 @@ function EstadoDelCampo({
   // Editado pero todavía dentro del campo: aún no ha salido, así que aún no
   // se ha intentado guardar.
   if (pendiente) {
-    return <span style={{ ...base, color: "var(--brand)", fontWeight: 500 }}>sin guardar</span>;
+    return <span style={{ ...base, color: "var(--brand-texto)", fontWeight: 500 }}>sin guardar</span>;
   }
 
   return null;

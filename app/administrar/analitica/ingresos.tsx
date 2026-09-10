@@ -64,7 +64,7 @@ export default function IngresosPage() {
     load();
   }, []);
 
-  if (loading) return <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
+  if (loading) return <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border" style={{ color: "var(--brand-texto)" }} /></div>;
 
   return (
     <div>
@@ -98,7 +98,7 @@ export default function IngresosPage() {
             <KPI icon={<XCircle size={18} />} label="Canceladas" value={stats.canceladas} color="var(--estado-cancelada)" />
             <KPI icon={<Activity size={18} />} label="Citas hoy" value={stats.citasHoy} color="var(--estado-confirmada)" />
             <KPI icon={<Users size={18} />} label="Pacientes registrados" value={stats.pacientes} color="var(--estado-global)" />
-            <KPI icon={<Calendar size={18} />} label="Total historico" value={stats.totalCitas} color="var(--brand)" />
+            <KPI icon={<Calendar size={18} />} label="Total historico" value={stats.totalCitas} color="var(--brand-texto)" />
           </div>
 
           <div style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.5rem", marginBottom: "2rem" }}>

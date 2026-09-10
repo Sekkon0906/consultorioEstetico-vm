@@ -33,7 +33,7 @@ export default function LegalDoc({ titulo, actualizado, current, children }: Pro
         </Link>{" "}
         ·{" "}
         <span style={{ color: "var(--text-soft)" }}>Legal</span>{" "}
-        · <span style={{ color: "var(--brand)", fontWeight: 600 }}>{titulo}</span>
+        · <span style={{ color: "var(--brand-texto)", fontWeight: 600 }}>{titulo}</span>
       </nav>
 
       {/* Título */}
@@ -110,7 +110,7 @@ export default function LegalDoc({ titulo, actualizado, current, children }: Pro
         .legal-body ul, .legal-body ol { margin: 0 0 1rem 1.2rem; color: var(--text-soft); font-size: 0.98rem; }
         .legal-body li { margin-bottom: 0.4rem; }
         .legal-body strong { color: var(--text); }
-        .legal-body a { color: var(--brand); text-decoration: underline; }
+        .legal-body a { color: var(--brand-texto); text-decoration: underline; }
         .legal-body code,
         .legal-placeholder {
           background: var(--surface-soft);

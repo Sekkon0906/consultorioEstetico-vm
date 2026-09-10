@@ -106,7 +106,7 @@ function PrecioEditable({
       onClick={() => setEditando(true)}
       title="Pulsa para cambiar el precio"
       className="admin-card-price"
-      style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "1px dashed transparent", borderRadius: 8, padding: "0.2rem 0.4rem", cursor: "text", fontSize: "1.1rem", color: estado === "error" ? "var(--danger)" : "var(--brand)", fontWeight: 700, whiteSpace: "nowrap", font: "inherit" }}
+      style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "1px dashed transparent", borderRadius: 8, padding: "0.2rem 0.4rem", cursor: "text", fontSize: "1.1rem", color: estado === "error" ? "var(--danger)" : "var(--brand-texto)", fontWeight: 700, whiteSpace: "nowrap", font: "inherit" }}
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.borderColor = "transparent"; }}
     >
@@ -369,7 +369,7 @@ export default function ProcedimientosList() {
                   style={{ width: 18, height: 18, accentColor: "#D4A437" }}
                 />
                 <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", display: "flex", alignItems: "center", gap: 6 }}>
-                  <Star size={14} fill="currentColor" color="var(--brand)" /> En promoción
+                  <Star size={14} fill="currentColor" color="var(--brand-texto)" /> En promoción
                 </span>
                 <small style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginLeft: "auto" }}>
                   Se muestra con descuento y badge especial.
@@ -494,7 +494,7 @@ export default function ProcedimientosList() {
                     <button aria-label="Quitar imagen" title="Quitar imagen" onClick={function() { setForm({ ...form, imagen: "" }); }} style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#C62828", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={10} /></button>
                   </div>
                 )}
-                <label style={{ padding: "0.5rem 1.2rem", borderRadius: 12, border: "1px dashed var(--brand)", cursor: uploading ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: uploading ? 0.6 : 1 }}>
+                <label style={{ padding: "0.5rem 1.2rem", borderRadius: 12, border: "1px dashed var(--brand)", cursor: uploading ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand-texto)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: uploading ? 0.6 : 1 }}>
                   <Upload size={14} /> {uploading ? "Subiendo..." : form.imagen ? "Cambiar foto" : "Subir foto"}
                   <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleMainImg} disabled={uploading} />
                 </label>
@@ -520,7 +520,7 @@ export default function ProcedimientosList() {
                       </div>
                     );
                   })}
-                  <label style={{ width: 90, height: 70, borderRadius: 10, border: "2px dashed var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", cursor: uploadingGal ? "wait" : "pointer", fontSize: "0.72rem", color: "var(--brand)", fontWeight: 600, textAlign: "center", opacity: uploadingGal ? 0.6 : 1, background: "transparent" }}>
+                  <label style={{ width: 90, height: 70, borderRadius: 10, border: "2px dashed var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", cursor: uploadingGal ? "wait" : "pointer", fontSize: "0.72rem", color: "var(--brand-texto)", fontWeight: 600, textAlign: "center", opacity: uploadingGal ? 0.6 : 1, background: "transparent" }}>
                     {uploadingGal ? "..." : "+ Foto"}
                     <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleGalAdd} disabled={uploadingGal} />
                   </label>
@@ -533,7 +533,7 @@ export default function ProcedimientosList() {
                   {gal.filter(function(g) { return g.tipo === "video"; }).map(function(g, i) {
                     return (
                       <div key={g.id || "v" + i} style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.4rem" }}>
-                        <Play size={14} color="var(--brand)" />
+                        <Play size={14} color="var(--brand-texto)" />
                         <span style={{ flex: 1, fontSize: "0.78rem", color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.url}</span>
                         <button onClick={function() { galRemove(g); }} aria-label="Quitar esta imagen de la galeria" title="Quitar de la galeria" style={{ width: 20, height: 20, borderRadius: "50%", background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} color="#C62828" /></button>
                       </div>
@@ -591,7 +591,7 @@ export default function ProcedimientosList() {
                   {/* Encabezado de categoria */}
                   <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.9rem" }}>
                     <h3 style={{ margin: 0, fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", fontWeight: 700, color: "var(--text)" }}>{cat}</h3>
-                    <span style={{ background: "var(--border)", color: "var(--brand)", padding: "0.15rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 700 }}>{items.length}</span>
+                    <span style={{ background: "var(--border)", color: "var(--brand-texto)", padding: "0.15rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 700 }}>{items.length}</span>
                     <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
@@ -614,7 +614,7 @@ export default function ProcedimientosList() {
                                 onClick={function() { void guardarCampoSuelto(p.id, { destacado: !p.destacado }); }}
                                 aria-pressed={!!p.destacado}
                                 title={p.destacado ? "Quitar de destacados" : "Marcar como destacado"}
-                                style={{ display: "inline-flex", alignItems: "center", gap: 4, background: p.destacado ? "rgba(232, 201, 160, 0.18)" : "transparent", color: p.destacado ? "var(--brand)" : "var(--text-muted)", border: p.destacado ? "1px solid transparent" : "1px solid var(--border)", padding: "0.2rem 0.6rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 600, cursor: "pointer", font: "inherit" }}
+                                style={{ display: "inline-flex", alignItems: "center", gap: 4, background: p.destacado ? "rgba(232, 201, 160, 0.18)" : "transparent", color: p.destacado ? "var(--brand-texto)" : "var(--text-muted)", border: p.destacado ? "1px solid transparent" : "1px solid var(--border)", padding: "0.2rem 0.6rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 600, cursor: "pointer", font: "inherit" }}
                               >
                                 <Star size={11} fill={p.destacado ? "currentColor" : "none"} /> Destacado
                               </motion.button>

@@ -686,7 +686,7 @@ export default function Galeria3D() {
                         {tr.desc}
                       </p>
                       {tr.precio && (
-                        <p style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--brand)" }}>
+                        <p style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--brand-texto)" }}>
                           {Number(String(tr.precio).replace(/[^\d]/g, "")).toLocaleString("es-CO")}{" "}
                           <span style={{ fontSize: "0.7rem", fontWeight: 600, color: "var(--text-muted)" }}>COP</span>
                         </p>

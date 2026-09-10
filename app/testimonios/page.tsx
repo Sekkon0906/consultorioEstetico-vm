@@ -51,7 +51,7 @@ export default function TestimoniosPage() {
     <main className="dark-aware-section testimonios-page" style={{ minHeight: "var(--alto-pantalla, 100vh)", background: "linear-gradient(180deg, var(--bg-elevated) 0%, var(--surface) 100%)" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "4rem 1.5rem 3rem" }}>
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--brand)", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("badge")}</span>
+          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--brand-texto)", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("badge")}</span>
           <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "var(--text)", marginBottom: "0.8rem" }}>{t("title")}</h1>
           <div style={{ width: 50, height: 3, background: "linear-gradient(90deg, var(--brand-soft), var(--brand))", borderRadius: 2, margin: "0 auto 0.8rem" }} />
           <p style={{ fontSize: "1.05rem", color: "var(--text-soft)", maxWidth: 600, margin: "0 auto" }}>{t("subtitle")}</p>

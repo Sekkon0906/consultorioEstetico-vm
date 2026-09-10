@@ -75,7 +75,7 @@ export default function ProcedimientoPage() {
     return () => window.removeEventListener("keydown", h);
   }, [modalIndex, galeria.length]);
 
-  if (loading) return <div style={{ minHeight: "var(--alto-pantalla, 100vh)", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
+  if (loading) return <div style={{ minHeight: "var(--alto-pantalla, 100vh)", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}><div className="spinner-border" style={{ color: "var(--brand-texto)" }} /></div>;
   if (!proc) return (
     <div style={{ minHeight: "var(--alto-pantalla, 100vh)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--bg)", color: "var(--text)", gap: "1rem" }}>
       <p style={{ fontSize: "1.5rem", fontWeight: 600 }}>{t("notFound")}</p>

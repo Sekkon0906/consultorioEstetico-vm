@@ -255,7 +255,7 @@ export default function CopilotoChat() {
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div>
             <h2 style={{ color: "var(--text)", fontWeight: 700, fontSize: "1.5rem", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
-              <Sparkles size={22} style={{ color: "var(--brand)" }} /> Asistente
+              <Sparkles size={22} style={{ color: "var(--brand-texto)" }} /> Asistente
             </h2>
             <p style={{ color: "var(--text-muted)", fontSize: "0.88rem", marginTop: 6, marginBottom: 0 }}>
               Pídele que cree o cambie procedimientos, promociones e información del consultorio.

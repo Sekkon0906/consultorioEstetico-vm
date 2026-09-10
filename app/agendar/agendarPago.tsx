@@ -150,7 +150,7 @@ export default function AgendarPago({ citaData, onConfirmar, goBack, setMetodoPa
                 transition={{ duration: 0.4 }}
               >
                 {isEfectivo ? (
-                  <i className="fas fa-money-bill-wave" style={{ color: "var(--brand)", fontSize: "0.9rem" }} />
+                  <i className="fas fa-money-bill-wave" style={{ color: "var(--brand-texto)", fontSize: "0.9rem" }} />
                 ) : (
                   <i className="fas fa-credit-card" style={{ color: "#6C8B6A", fontSize: "0.9rem" }} />
                 )}

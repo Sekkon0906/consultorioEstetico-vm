@@ -101,7 +101,7 @@ export default function SeleccionPage() {
                       {item.nombre}
                     </Link>
                     {item.precio != null && (
-                      <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "var(--brand)" }}>
+                      <span style={{ fontSize: "0.86rem", fontWeight: 700, color: "var(--brand-texto)" }}>
                         {mostrarPrecio(item.precio)}{" "}
                         <span style={{ fontSize: "0.72rem", fontWeight: 600, color: "var(--text-muted)" }}>COP</span>
                       </span>
