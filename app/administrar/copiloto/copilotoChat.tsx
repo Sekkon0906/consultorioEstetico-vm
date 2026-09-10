@@ -256,7 +256,18 @@ export default function CopilotoChat() {
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div>
             <h2 style={{ color: "var(--text)", fontWeight: 700, fontSize: "1.5rem", margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
-              <Sparkles size={22} style={{ color: "var(--brand-texto)" }} /> Asistente
+              {/* El icono solo se mueve mientras piensa. Una animacion
+                  permanente en un encabezado se convierte en algo que hay que
+                  aprender a ignorar, y entonces ya no sirve para avisar de
+                  nada. */}
+              <motion.span
+                animate={pensando ? { scale: [1, 1.15, 1], rotate: [0, 8, -8, 0] } : { scale: 1, rotate: 0 }}
+                transition={pensando ? { duration: 1.6, repeat: Infinity, ease: "easeInOut" } : { duration: 0.3 }}
+                style={{ display: "flex", color: "var(--brand-texto)" }}
+              >
+                <Sparkles size={22} />
+              </motion.span>{" "}
+              Asistente
             </h2>
             <p style={{ color: "var(--text-muted)", fontSize: "0.88rem", marginTop: 6, marginBottom: 0 }}>
               Pídele que cree o cambie procedimientos, promociones e información del consultorio.
@@ -375,10 +386,34 @@ export default function CopilotoChat() {
           </motion.div>
         ))}
 
+        {/* Mientras piensa.
+
+            ANTES ERA LA PALABRA "Pensando…" Y NADA MAS
+            Una linea de texto quieta no distingue "esta trabajando" de "se
+            colgo". Y aqui la espera es larga de verdad: el modelo tarda
+            segundos, no milisegundos, asi que el rato de duda es suficiente
+            para volver a pulsar enviar.
+
+            Tres puntos que suben por turnos lo resuelven sin decir nada: el
+            movimiento ES el mensaje. Se quedan en la misma burbuja gris que
+            usan las respuestas, en el mismo sitio donde va a aparecer la que
+            viene, para que la respuesta sustituya a la espera en vez de
+            empujarla.
+
+            El retraso escalonado (0, 150, 300 ms) es lo unico que hace que se
+            lea como una onda y no como tres puntos parpadeando a la vez. */}
         {pensando && (
-          <div style={{ alignSelf: "flex-start", color: "var(--text-muted)", fontSize: "0.85rem", fontStyle: "italic" }}>
-            Pensando…
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ alignSelf: "flex-start" }}
+          >
+            <div className="copiloto-pensando">
+              <span className="copiloto-punto" />
+              <span className="copiloto-punto" />
+              <span className="copiloto-punto" />
+            </div>
+          </motion.div>
         )}
 
         {/* Propuesta pendiente de confirmación */}

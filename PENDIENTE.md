@@ -98,7 +98,12 @@ autorizar con la cuenta de la doctora. Solo un administrador puede autorizar.
 ### 5. El copiloto del panel (opcional, y cuesta dinero)
 
 Está completo y le falta solo la clave. **Es un lujo, no una necesidad** — el
-aviso de las citas lo resuelve el correo, que es gratis.
+aviso de las citas lo resuelve el correo, que es gratis, y para manejar el
+consultorio con IA está el conector del punto 4, que usa la suscripción que la
+doctora ya paga en vez de cobrarse por uso.
+
+La pantalla del Asistente ya lo dice en ese orden: primero cómo conectar su
+propio Claude o ChatGPT, y la clave debajo, marcada como lo que es.
 
 Si se quiere:
 
@@ -150,16 +155,19 @@ deliberado — el precio final depende de la valoración.
 
 ## 🎨 Decisión de marca pendiente
 
-El texto blanco sobre el marrón de la marca da **3.17:1**, y el mínimo de
-WCAG AA para texto normal es 4.5. Afecta a **todos los botones principales**
-del sitio en tema claro: «Agendar cita», «Entrar», «Confirmar». Lo mismo pasa
-con la marca usada como color de texto (3.01:1).
+Queda **una sola**, no tres. Las otras dos —la marca usada como color de
+texto— ya se arreglaron sin decidir nada: existe `--brand-texto`, que vale
+`#856445` en claro y el champán de siempre en oscuro, y todos los `color:` de
+marca lo usan. **No cambió ningún fondo.**
+
+La que queda: **el texto blanco sobre el marrón de la marca da 3.17:1**, y el
+mínimo de WCAG AA para texto normal es 4.5. Afecta a **todos los botones
+principales** en tema claro: «Agendar cita», «Entrar», «Confirmar».
 
 En tema oscuro no hay problema: ahí la marca es un champán claro y da 11:1.
 
 **No lo he cambiado porque no es una decisión técnica.** Arreglarlo exige
-oscurecer la marca, y eso cambia cómo se ve toda la web. Los números, para
-cuando lo decidas:
+oscurecer el fondo de los botones, y eso cambia cómo se ve toda la web:
 
 | Opción | Resultado |
 |---|---|
@@ -169,13 +177,39 @@ cuando lo decidas:
 
 La segunda es la que menos toca: usa un color que ya está en la paleta.
 
-**La marca como texto sí tiene arreglo sin decidir nada:** usar `--brand-deep`
-en su lugar da 4.68 en vez de 3.01, y no cambia ningún fondo. Está documentado
-en `01-tokens.css`; falta repasar los sitios donde se usa `--brand` para
-texto.
+`npm run contraste` la marca como «sabido»: se sigue viendo cada vez que se
+corre, pero no bloquea. **Si aparece una segunda, esa sí falla.**
 
-Mientras tanto, `npm run contraste` los marca como «sabido»: se siguen viendo
-cada vez que se corre, pero no bloquean. Si aparece un cuarto, ese sí falla.
+> **Lo que enseñó esta tanda:** el plan escrito aquí era usar `--brand-deep`
+> para el texto. No valía. En tema oscuro `--brand-deep` es un crema casi
+> blanco, porque es el extremo claro de quince degradados; pintar texto con él
+> habría borrado el champán, que es el único acento cálido de la paleta.
+> Por eso `--brand-texto` es un token nuevo y no un alias.
+>
+> Y el valor tampoco era el previsto. Empezó en `#8B6A4B`; al añadir la pareja
+> contra `--surface-soft` el auditor lo tumbó con 4.28 — y ése es justo el
+> fondo de las insignias y las pestañas, donde más se usa la marca como texto.
+
+---
+
+## 🟢 Pedido y sin terminar
+
+### 9. El consultorio en 3D
+
+Hoy la página del consultorio enseña las fotos como galería plana: una imagen
+grande y miniaturas debajo. La portada sí tiene rueda 3D, así que la página
+que debería impresionar es la que se ve más sosa de las dos.
+
+**No se puede reutilizar `Galeria3D` tal cual.** Son 1.329 líneas, no recibe
+ninguna propiedad y lee los procedimientos por su cuenta. Adaptarla es un
+refactor grande, no un cambio de datos. Lo razonable es un componente propio
+y pequeño para las fotos del consultorio.
+
+### 10. Animación del asistente virtual
+
+El Asistente no da ninguna señal de estar vivo: mientras piensa solo sale la
+palabra «Pensando…» en cursiva. Falta que se note que está trabajando, y que
+al aparecer se presente.
 
 ---
 
@@ -230,12 +264,12 @@ escribe en la base real. Conviene saberlo antes de probar formularios.
     comentarios. Citar un color viejo dentro de un comentario la dispara.
 - **51 campos de formulario del panel sin etiqueta asociada.** Deliberadamente
   despriorizado: hay una sola usuaria y conoce el panel.
-- **F14b: hecho** (`npm run contraste`). Audita las 18 parejas de tokens que
-  de verdad se usan juntas, en los dos temas, sin navegador.
+- **F14b: hecho** (`npm run contraste`). Audita 20 parejas de tokens que de
+  verdad se usan juntas, en los dos temas, sin navegador.
 
   **El hallazgo fue al revés de lo que se suponía: el tema oscuro pasa todo.
-  El que falla es el claro.** `--text-muted` ya se arregló. Quedan tres, y son
-  una decisión tuya, no técnica — ver abajo.
+  El que falla es el claro.** `--text-muted` y la marca-como-texto ya se
+  arreglaron. Queda **una** sola, y es una decisión tuya, no técnica.
 
   Lo que el script **no** cubre y sigue necesitando ojos: texto sobre fotos,
   sobre degradados, y los colores escritos a mano en componentes.

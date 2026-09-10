@@ -309,3 +309,45 @@
 @media (max-width: 520px) {
   .cfg-tarjeta-descripcion { padding-left: 0; }
 }
+
+/* Los tres puntos de "esta pensando".
+
+   `animation-delay` negativo y no positivo: con el positivo, la primera vuelta
+   arranca con los tres puntos abajo y quietos, y justo el primer instante
+   —cuando el usuario esta mirando si paso algo— es el que no dice nada. En
+   negativo, la animacion empieza ya empezada. */
+.copiloto-pensando {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+}
+.copiloto-punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brand-texto);
+  animation: copiloto-onda 1.2s ease-in-out infinite;
+}
+.copiloto-punto:nth-child(1) { animation-delay: -1.2s; }
+.copiloto-punto:nth-child(2) { animation-delay: -1.05s; }
+.copiloto-punto:nth-child(3) { animation-delay: -0.9s; }
+
+@keyframes copiloto-onda {
+  0%, 60%, 100% { transform: translateY(0);     opacity: 0.35; }
+  30%           { transform: translateY(-5px);  opacity: 1; }
+}
+
+/* Quien pidio menos movimiento no se queda sin saber que esta pasando: los
+   puntos dejan de saltar pero siguen latiendo en opacidad, que es un cambio
+   mucho mas suave y sigue distinguiendo "trabajando" de "colgado". */
+@media (prefers-reduced-motion: reduce) {
+  .copiloto-punto { animation: copiloto-latido 1.6s ease-in-out infinite; }
+  @keyframes copiloto-latido {
+    0%, 100% { opacity: 0.3; }
+    50%      { opacity: 0.9; }
+  }
+}

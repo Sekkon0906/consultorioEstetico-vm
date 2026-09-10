@@ -3,6 +3,7 @@
 import { IMG } from "@/lib/imagenes";
 import ConsultorioDetalle from "@/components/ConsultorioDetalle";
 import Image from "next/image";
+import ConsultorioCoverflow from "@/components/ConsultorioCoverflow";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
@@ -164,57 +165,24 @@ export default function ConsultorioPage() {
               bloque aparte, arriba, sin relación con lo que estabas mirando.
               Ahora la descripción acompaña a la foto y cambia con ella. */}
           <div className="consultorio-showcase-fila">
-          <div className="consultorio-showcase-main">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeIndex}
-                initial={{ scale: 1.03 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="consultorio-showcase-imgwrap"
-                onClick={() => setSelectedIndex(activeIndex)}
-              >
-                <Image
-                  src={galleryImages[activeIndex].src}
-                  alt={galleryImages[activeIndex].label}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 1024px"
-                  quality={85}
-                  style={{ objectFit: "cover" }}
-                />
-                <div className="consultorio-showcase-overlay" />
-                <span className="consultorio-showcase-label">
-                  {galleryImages[activeIndex].label}
-                </span>
-                <span className="consultorio-showcase-zoom" aria-hidden="true">
-                  <i className="fas fa-expand" />
-                </span>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Flechas */}
-            <button
-              type="button"
-              onClick={showcasePrev}
-              aria-label={t("gallery.close")}
-              className="consultorio-showcase-arrow left"
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              onClick={showcaseNext}
-              aria-label={t("gallery.viewSpace")}
-              className="consultorio-showcase-arrow right"
-            >
-              ›
-            </button>
-
-            {/* Contador */}
-            <span className="consultorio-showcase-counter">
-              {activeIndex + 1} / {galleryImages.length}
-            </span>
+          {/* La foto grande y la tira de miniaturas eran dos formas planas de
+              enseñar lo mismo. Ahora es una sola vista en profundidad: la del
+              centro es la grande, las de los lados se pulsan para traerlas, y
+              pulsar la del centro amplía. Se gana la sensación de recorrer un
+              sitio, que es de lo que va esta página, y se quita una fila
+              entera de la pantalla. */}
+          {/* Sin envolver en `.consultorio-showcase-main`, que es lo que
+              contenia la foto plana. Esa clase trae `aspect-ratio: 16/9`,
+              un fondo y, sobre todo, `overflow: hidden` — que recorta justo
+              las tarjetas de los lados, que es lo unico que hace que esto se
+              vea en 3D. Ademas su fondo se veia como una caja palida detras. */}
+          <div className="consultorio-showcase-3d">
+            <ConsultorioCoverflow
+              fotos={galleryImages}
+              activo={activeIndex}
+              onSeleccionar={setActiveIndex}
+              onAbrir={setSelectedIndex}
+            />
           </div>
 
           {/* Panel de descripción, sincronizado con la foto activa */}
@@ -241,27 +209,6 @@ export default function ConsultorioPage() {
           </div>
           </div>
 
-          {/* Tira de miniaturas */}
-          <div className="consultorio-thumbs">
-            {galleryImages.map((img, i) => (
-              <button
-                key={img.src}
-                type="button"
-                onClick={() => setActiveIndex(i)}
-                aria-label={img.label}
-                className={`consultorio-thumb ${i === activeIndex ? "is-active" : ""}`}
-              >
-                <Image
-                  src={img.src}
-                  alt={img.label}
-                  fill
-                  sizes="120px"
-                  quality={55}
-                  style={{ objectFit: "cover" }}
-                />
-              </button>
-            ))}
-          </div>
         </motion.div>
       </section>
 
