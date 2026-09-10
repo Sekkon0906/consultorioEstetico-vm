@@ -90,7 +90,10 @@ const payload = {
 
       {toast && (
         <div
-          style={{ background: "#E8F5E9", color: "#145A32", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.85rem", textAlign: "center" }}
+          /* Derivado de --estado-atendida, que es el verde que ya usa el
+             resto del panel para "salio bien". Los dos fijos que habia solo
+             funcionan sobre fondo claro. */
+          style={{ background: "color-mix(in srgb, var(--estado-atendida) 14%, var(--surface))", color: "var(--estado-atendida)", padding: "0.5rem 1rem", borderRadius: 12, marginBottom: "0.8rem", fontSize: "0.85rem", textAlign: "center" }}
         >
           {toast}
         </div>

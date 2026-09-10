@@ -166,67 +166,67 @@ export default function ProcedimientosList() {
 
   const loadGal = async function(pid: string | number) {
     try {
-      var items = await getGaleriaProcedimientoApi(pid);
+      const items = await getGaleriaProcedimientoApi(pid);
       setGal(items.map((g) => ({ id: g.id, url: g.url, titulo: g.titulo || "", orden: g.orden, tipo: g.tipo })));
     } catch { setGal([]); }
   };
 
-  var uploadFile = function(file: File): Promise<string> {
+  const uploadFile = function(file: File): Promise<string> {
     return subirImagenApi(file, "procedimientos");
   };
 
-  var handleMainImg = async function(e: React.ChangeEvent<HTMLInputElement>) {
-    var f = e.target.files?.[0];
+  const handleMainImg = async function(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
     if (!f) return;
     setUploading(true);
     setErr(null);
     try {
-      var url = await uploadFile(f);
+      const url = await uploadFile(f);
       setForm(function(p) { return { ...p, imagen: url }; });
       showToast("Imagen subida");
     } catch (er: any) { setErr("Error: " + er.message); }
     finally { setUploading(false); e.target.value = ""; }
   };
 
-  var handleGalAdd = async function(e: React.ChangeEvent<HTMLInputElement>) {
-    var f = e.target.files?.[0];
+  const handleGalAdd = async function(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
     if (!f || !actual) return;
     setUploadingGal(true);
     setErr(null);
     try {
-      var url = await uploadFile(f);
-      var item = await addGaleriaItemApi(actual.id, { tipo: "imagen", url: url });
+      const url = await uploadFile(f);
+      const item = await addGaleriaItemApi(actual.id, { tipo: "imagen", url: url });
       setGal(function(prev) { return [...prev, { id: item.id, url: url, titulo: "", orden: item.orden, tipo: "imagen" }]; });
       showToast("Imagen agregada a galeria");
     } catch (er: any) { setErr("Error: " + er.message); }
     finally { setUploadingGal(false); e.target.value = ""; }
   };
 
-  var galRemove = async function(item: GalItem) {
+  const galRemove = async function(item: GalItem) {
     if (typeof item.id === "number") await deleteGaleriaItemApi(item.id);
     setGal(function(prev) { return prev.filter(function(g) { return g.id !== item.id; }); });
   };
 
-  var galMove = async function(i: number, dir: -1 | 1) {
-    var j = i + dir;
+  const galMove = async function(i: number, dir: -1 | 1) {
+    const j = i + dir;
     if (j < 0 || j >= gal.length || !actual) return;
-    var updated = [...gal];
-    var temp = updated[i]; updated[i] = updated[j]; updated[j] = temp;
+    const updated = [...gal];
+    const temp = updated[i]; updated[i] = updated[j]; updated[j] = temp;
     updated.forEach(function(g, idx) { g.orden = idx; });
     setGal(updated);
-    var orden = updated
+    const orden = updated
       .filter(function(g) { return typeof g.id === "number"; })
       .map(function(g) { return { id: g.id as number, orden: g.orden }; });
     await reordenarGaleriaApi(actual.id, orden);
   };
 
-  var handleSave = async function() {
+  const handleSave = async function() {
     if (!form.nombre.trim()) { setErr("Nombre obligatorio"); return; }
     setSaving(true);
     setErr(null);
     try {
       // El backend (normalizeBody) acepta camelCase.
-      var payload = {
+      const payload = {
         nombre: form.nombre,
         desc: form.desc,
         descCompleta: form.descCompleta,
@@ -256,16 +256,20 @@ export default function ProcedimientosList() {
     finally { setSaving(false); }
   };
 
-  var handleDel = async function(id: string | number) {
+  const handleDel = async function(id: string | number) {
     try {
       await deleteProcedimientoApi(id);
       setDelId(null); load();
     } catch (e: any) { setErr(e.message); }
   };
 
-  var reset = function() { setForm(emptyForm); setModo("lista"); setActual(null); setGal([]); };
+  /* `const` y no `var`: se referencia mas arriba, pero SIEMPRE desde dentro
+     de una funcion diferida —un manejador o un efecto— que corre despues
+     de que el cuerpo del componente haya terminado. ESLint no lo arregla
+     solo porque no puede probar esa diferencia. */
+  const reset = function() { setForm(emptyForm); setModo("lista"); setActual(null); setGal([]); };
 
-  var startEdit = function(p: Procedimiento) {
+  const startEdit = function(p: Procedimiento) {
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     setActual(p);
     setForm({
@@ -290,7 +294,7 @@ export default function ProcedimientosList() {
     loadGal(p.id);
   };
 
-  var IS = { width: "100%", padding: "0.75rem 1rem", borderRadius: 14, border: "1px solid var(--border)", fontSize: "0.98rem", background: "var(--surface)" } as React.CSSProperties;
+  const IS = { width: "100%", padding: "0.75rem 1rem", borderRadius: 14, border: "1px solid var(--border)", fontSize: "0.98rem", background: "var(--surface)" } as React.CSSProperties;
 
   return (
     <div>
@@ -538,11 +542,11 @@ export default function ProcedimientosList() {
                   <div style={{ display: "flex", gap: "0.5rem" }}>
                     <input id="videoLinkInput" style={{ ...IS, flex: 1, fontSize: "0.82rem" }} placeholder="https://youtube.com/watch?v=... o https://instagram.com/reel/..." />
                     <button onClick={async function() {
-                      var input = document.getElementById("videoLinkInput") as HTMLInputElement;
-                      var url = input?.value?.trim();
+                      const input = document.getElementById("videoLinkInput") as HTMLInputElement;
+                      const url = input?.value?.trim();
                       if (!url || !actual) return;
                       try {
-                        var it = await addGaleriaItemApi(actual.id, { tipo: "video", url: url });
+                        const it = await addGaleriaItemApi(actual.id, { tipo: "video", url: url });
                         setGal(function(prev) { return [...prev, { id: it.id, url: url, titulo: "", orden: it.orden, tipo: "video" }]; });
                         input.value = "";
                         showToast("Video agregado");

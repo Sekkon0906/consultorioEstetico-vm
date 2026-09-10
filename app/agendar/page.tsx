@@ -249,7 +249,9 @@ function AgendarPageContent() {
                   style={{
                     background: PALETTE.surface,
                     color: "var(--danger)",
-                    border: "1px solid #e4bfbf",
+                    /* Derivado de --danger: el rosa fijo que había solo
+                       funciona sobre fondo claro. */
+                    border: "1px solid color-mix(in srgb, var(--danger) 35%, var(--surface))",
                   }}
                 >
                   <span className="flex-1">{aviso}</span>
@@ -360,9 +362,13 @@ function AgendarPageContent() {
                   whileTap={{ scale: 0.97 }}
                   transition={MUELLE_TACTO}
                   onClick={() => router.push("/perfil/citas_agendadas")}
-                  /* Iba con `bg-white` y `text-[#7A5534]` fijos: en modo
-                     oscuro quedaba un botón blanco pegado en una pantalla
-                     oscura. Sale de los tokens, como el resto. */
+                  /* Iba con un blanco y un marrón fijos: en modo oscuro
+                     quedaba un botón blanco pegado en una pantalla oscura.
+                     Sale de los tokens, como el resto.
+
+                     (El valor viejo no se cita: la regla de lint que prohíbe
+                     colores fijos lee el texto crudo del archivo y no
+                     distingue un comentario de una declaración.) */
                   className="px-6 py-3 rounded-full font-semibold transition"
                   style={{
                     border: "1px solid var(--brand)",

@@ -68,10 +68,18 @@ export default function ConexionesLista() {
       <h1 className="conexiones-titulo">
         <Plug size={20} color="var(--brand)" /> Programas conectados
       </h1>
+      {/* Dice exactamente lo mismo que la pantalla de autorización, y a
+          propósito: si las dos describen el mismo permiso con palabras
+          distintas, la doctora no sabe cuál creer, y la que recuerde será la
+          que menos le preocupe. Ambas están comprobadas contra
+          `ia/herramientas.js`. */}
       <p className="conexiones-intro">
         Aplicaciones a las que le diste permiso para manejar tu consultorio.
         Pueden ver y cambiar procedimientos, precios, promociones y la
-        información del sitio, y consultar cuántas citas tienes.
+        información del sitio, y consultar cuántas citas tienes y las de un
+        día concreto —nombre, hora y procedimiento—.{" "}
+        <strong>Nunca ven el teléfono ni el correo</strong> de tus pacientes,
+        ni sus historias clínicas.
       </p>
 
       {error && <p className="conexiones-error">{error}</p>}

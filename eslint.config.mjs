@@ -73,6 +73,25 @@ const eslintConfig = [
     ],
   },
 
+  /* El servidor es CommonJS y usa `require` porque debe: es un Node/Express
+     que arranca con `node src/index.js`, no un bundle.
+
+     Sin esta excepción, `next/typescript` le aplicaba reglas de módulos ES y
+     marcaba CADA `require` como error: 154 de los 308 errores del proyecto
+     eran eso. Un lint que grita 154 veces por algo correcto es un lint que
+     nadie mira, y ahí se entierra la señal de las reglas que sí importan
+     —empezando por el cerrojo de colores de aquí abajo—.
+
+     Se apagan solo estas dos y solo en `server/`: el resto de reglas siguen
+     activas ahí. */
+  {
+    files: ["server/**/*.js"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-var-requires": "off",
+    },
+  },
+
   // La regla, activa en todo el código de interfaz.
   {
     files: ["app/**/*.tsx", "src/**/*.tsx"],
@@ -90,26 +109,20 @@ const eslintConfig = [
       "app/administrar/charlas/charlasList.tsx",
       "app/administrar/citas/citasAgendadas.tsx",
       "app/administrar/citas/citasAgendadasCard.tsx",
-      "app/administrar/citas/citasAgendadasEditor.tsx",
       "app/administrar/citas/citasAgendadasModalSimple.tsx",
       "app/administrar/procedimientos/modalGaleriaItem.tsx",
-      "app/administrar/procedimientos/procedimientosForm.tsx",
       "app/administrar/procedimientos/procedimientosList.tsx",
       "app/administrar/testimonios/testimoniosForm.tsx",
       "app/administrar/testimonios/testimoniosList.tsx",
       "app/agendar/agendarPago.tsx",
-      "app/agendar/page.tsx",
       "app/consultorio/page.tsx",
       "app/doctora/filosofia.tsx",
       "app/doctora/formacionContinua.tsx",
-      "app/doctora/page.tsx",
       "app/doctora/visionMision.tsx",
       "app/global-error.tsx",
       "app/layout.tsx",
-      "app/legal/layout.tsx",
       "app/loading.tsx",
       "app/login/LoginForm.tsx",
-      "app/login/page.tsx",
       "app/page.tsx",
       "app/perfil/editar_info/datosPersonalesForm.tsx",
       "app/perfil/editar_info/perfilCard.tsx",
@@ -121,8 +134,6 @@ const eslintConfig = [
       "app/procedimientos/*/page.tsx",
       "app/procedimientos/page.tsx",
       "app/recuperar/page.tsx",
-      "app/register/page.tsx",
-      "app/register/step1DatosPersonales.tsx",
       "app/register/step2DatosMedicos.tsx",
       "app/register/step3exito.tsx",
       "src/components/CookieBanner.tsx",

@@ -23,18 +23,18 @@ export default function ComentariosClientes() {
   const t = useTranslations("comentarios");
   const locale = useLocale();
   const intlLocale = locale === "en" ? "en-US" : "es-CO";
-  var { user } = useAuth();
-  var [comentarios, setComentarios] = useState<Comentario[]>([]);
-  var [citasAtendidas, setCitasAtendidas] = useState<string[]>([]);
-  var [yaComento, setYaComento] = useState(false);
-  var [loading, setLoading] = useState(true);
-  var [showForm, setShowForm] = useState(false);
-  var [enviando, setEnviando] = useState(false);
-  var [mensaje, setMensaje] = useState<string | null>(null);
-  var [procSeleccionado, setProcSeleccionado] = useState("");
-  var [texto, setTexto] = useState("");
-  var [puntuacion, setPuntuacion] = useState(0);
-  var [hoverStar, setHoverStar] = useState(0);
+  const { user } = useAuth();
+  const [comentarios, setComentarios] = useState<Comentario[]>([]);
+  const [citasAtendidas, setCitasAtendidas] = useState<string[]>([]);
+  const [yaComento, setYaComento] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [mensaje, setMensaje] = useState<string | null>(null);
+  const [procSeleccionado, setProcSeleccionado] = useState("");
+  const [texto, setTexto] = useState("");
+  const [puntuacion, setPuntuacion] = useState(0);
+  const [hoverStar, setHoverStar] = useState(0);
 
   useEffect(function() {
     getComentariosApi()
@@ -53,10 +53,10 @@ export default function ComentariosClientes() {
       .catch(function(e) { console.error("Error comprobando elegibilidad:", e); });
   }, [user]);
 
-  var nombreCompleto = user ? ((user.nombres || "") + " " + (user.apellidos || "")).trim() : "";
-  var puedeOpinar = citasAtendidas.length > 0 && !yaComento;
+  const nombreCompleto = user ? ((user.nombres || "") + " " + (user.apellidos || "")).trim() : "";
+  const puedeOpinar = citasAtendidas.length > 0 && !yaComento;
 
-  var handleEnviar = async function() {
+  const handleEnviar = async function() {
     if (!procSeleccionado || !texto.trim() || puntuacion === 0) { setMensaje(t("messages.completeFields")); return; }
     setEnviando(true); setMensaje(null);
     try {

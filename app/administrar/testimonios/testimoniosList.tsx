@@ -20,51 +20,55 @@ import { subirImagenApi } from "@/services/uploadsApi";
 import type { Testimonio } from "@/types/domain";
 import { Plus, Edit3, Trash2, X, Eye, EyeOff, Star, Upload, Play } from "lucide-react";
 
-var emptyForm = { nombre: "", texto: "", video: "", thumb: "" };
+const emptyForm = { nombre: "", texto: "", video: "", thumb: "" };
 
 export default function TestimoniosList() {
-  var [list, setList] = useState<Testimonio[]>([]);
-  var [modo, setModo] = useState<"lista" | "form">("lista");
-  var [actual, setActual] = useState<Testimonio | null>(null);
-  var [form, setForm] = useState(emptyForm);
-  var [saving, setSaving] = useState(false);
-  var [upl, setUpl] = useState(false);
-  var [err, setErr] = useState<string | null>(null);
-  var [delId, setDelId] = useState<string | null>(null);
-  var [toast, setToast] = useState<string | null>(null);
-  var [tab, setTab] = useState<"testimonios" | "comentarios">("testimonios");
-  var [comentarios, setCom] = useState<any[]>([]);
+  const [list, setList] = useState<Testimonio[]>([]);
+  const [modo, setModo] = useState<"lista" | "form">("lista");
+  const [actual, setActual] = useState<Testimonio | null>(null);
+  const [form, setForm] = useState(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [upl, setUpl] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [delId, setDelId] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [tab, setTab] = useState<"testimonios" | "comentarios">("testimonios");
+  const [comentarios, setCom] = useState<any[]>([]);
 
-  var showToast = function(msg: string) { setToast(msg); setTimeout(function() { setToast(null); }, 3000); };
-  var load = useCallback(function() { getTestimoniosApi({ fresh: true }).then(setList).catch(function(e) { setErr(e.message); }); }, []);
+  const showToast = function(msg: string) { setToast(msg); setTimeout(function() { setToast(null); }, 3000); };
+  const load = useCallback(function() { getTestimoniosApi({ fresh: true }).then(setList).catch(function(e) { setErr(e.message); }); }, []);
   useEffect(function() { load(); loadCom(); }, [load]);
 
-  var loadCom = function() {
+  /* `const` y no `var`: se referencia mas arriba, pero SIEMPRE desde dentro
+     de una funcion diferida —un manejador o un efecto— que corre despues
+     de que el cuerpo del componente haya terminado. ESLint no lo arregla
+     solo porque no puede probar esa diferencia. */
+  const loadCom = function() {
     getComentariosAdminApi().then(setCom).catch(function(e) { console.error(e); });
   };
 
-  var toggleAprobado = async function(id: number, aprobado: boolean) {
+  const toggleAprobado = async function(id: number, aprobado: boolean) {
     await aprobarComentarioApi(id, !aprobado);
     loadCom();
   };
-  var deleteCom = async function(id: number) {
+  const deleteCom = async function(id: number) {
     await eliminarComentarioApi(id);
     loadCom();
   };
 
-  var uploadFile = function(file: File): Promise<string> {
+  const uploadFile = function(file: File): Promise<string> {
     return subirImagenApi(file, "testimonios");
   };
 
-  var handleThumb = async function(e: React.ChangeEvent<HTMLInputElement>) {
-    var f = e.target.files?.[0]; if (!f) return;
+  const handleThumb = async function(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0]; if (!f) return;
     setUpl(true); setErr(null);
-    try { var url = await uploadFile(f); setForm(function(p) { return { ...p, thumb: url }; }); showToast("Foto subida"); }
+    try { const url = await uploadFile(f); setForm(function(p) { return { ...p, thumb: url }; }); showToast("Foto subida"); }
     catch (er: any) { setErr("Error: " + er.message); }
     finally { setUpl(false); e.target.value = ""; }
   };
 
-  var handleSave = async function() {
+  const handleSave = async function() {
     if (!form.nombre.trim() || !form.texto.trim()) { setErr("Nombre y texto obligatorios"); return; }
     setSaving(true); setErr(null);
     try {
@@ -82,7 +86,7 @@ export default function TestimoniosList() {
   /* Guarda UN campo desde la lista. El PUT de testimonios ya era parcial
      —construye el SET con lo que llega—, asi que aqui no hizo falta tocar
      el servidor: era el de charlas el que reescribia todo. */
-  var guardarCampoSuelto = async function(id: string, campos: Partial<Testimonio>) {
+  const guardarCampoSuelto = async function(id: string, campos: Partial<Testimonio>) {
     await updateTestimonioApi(id, campos);
     setList(function(prev: Testimonio[]) {
       return prev.map(function(x: Testimonio) {
@@ -91,21 +95,21 @@ export default function TestimoniosList() {
     });
   };
 
-  var toggle = async function(t: Testimonio, campo: "activo" | "destacado") {
+  const toggle = async function(t: Testimonio, campo: "activo" | "destacado") {
     await updateTestimonioApi(t.id, { [campo]: !t[campo] });
     load();
   };
 
-  var handleDel = async function(id: string) {
+  const handleDel = async function(id: string) {
     await deleteTestimonioApi(id);
     setDelId(null); load();
   };
 
-  var reset = function() { setForm(emptyForm); setModo("lista"); setActual(null); };
-  var startEdit = function(t: Testimonio) { setActual(t); setForm({ nombre: t.nombre, texto: t.texto, video: t.video || "", thumb: t.thumb || "" }); setModo("form"); };
+  const reset = function() { setForm(emptyForm); setModo("lista"); setActual(null); };
+  const startEdit = function(t: Testimonio) { setActual(t); setForm({ nombre: t.nombre, texto: t.texto, video: t.video || "", thumb: t.thumb || "" }); setModo("form"); };
 
-  var IS = { width: "100%", padding: "0.75rem 1rem", borderRadius: 14, border: "1px solid var(--border)", fontSize: "0.98rem", background: "var(--surface)" } as React.CSSProperties;
-  var pendientes = comentarios.filter(function(c) { return !c.aprobado; }).length;
+  const IS = { width: "100%", padding: "0.75rem 1rem", borderRadius: 14, border: "1px solid var(--border)", fontSize: "0.98rem", background: "var(--surface)" } as React.CSSProperties;
+  const pendientes = comentarios.filter(function(c) { return !c.aprobado; }).length;
 
   return (
     <div>

@@ -170,9 +170,14 @@ export default function Step1DatosPersonales({
         type="submit"
         className="btn w-100 fw-semibold py-2 mt-2"
         style={{
-          backgroundColor: valid ? PALETTE.main : "#c9b7a8",
+          /* El gris de "no puedes pulsar todavia" sale del borde fuerte del
+             tema; el beige fijo que habia se confundia con el fondo en
+             oscuro y el boton parecia ausente en vez de deshabilitado. */
+          backgroundColor: valid ? PALETTE.main : "var(--border-strong)",
           border: "none",
-          color: "white",
+          /* El token de contraste, no un blanco fijo: es el color que la
+             paleta define para ir encima de la marca. */
+          color: "var(--brand-contrast)",
           borderRadius: "50px",
           cursor: valid ? "pointer" : "not-allowed",
           opacity: valid ? 1 : 0.8,

@@ -134,17 +134,30 @@ function Contenido() {
               <li><strong>Ver y modificar</strong> tus procedimientos y sus precios.</li>
               <li><strong>Activar y desactivar</strong> promociones.</li>
               <li><strong>Cambiar</strong> la información del consultorio: dirección, teléfonos, horarios.</li>
-              <li><strong>Consultar</strong> cuántas citas hay y las de un día concreto.</li>
+              <li><strong>Consultar</strong> cuántas citas hay, y de un día concreto: nombre, hora y procedimiento.</li>
             </ul>
 
             {/* Lo que NO puede hacer es tan importante como lo que sí. Sin esta
                 línea, "acceso a las citas" se lee como acceso a las historias
                 clínicas, y la decisión se toma con miedo o con demasiada
-                confianza según a quién le toque imaginarlo. */}
+                confianza según a quién le toque imaginarlo.
+
+                La lista de arriba y esta nota se COMPROBARON contra
+                `ia/herramientas.js`, no se escribieron de memoria:
+                `citas_del_dia` devuelve nombres, apellidos, hora,
+                procedimiento y estado, y `resumen_de_citas` solo agregados.
+                Ninguna herramienta lee la tabla de usuarios.
+
+                La primera versión decía "datos de contacto fuera de la agenda
+                del día", que daba a entender que DENTRO de la agenda sí los
+                ve. No los ve nunca. En una pantalla de permisos, decir de
+                menos también es decir mal. */}
             <p className="conectar-nota">
-              No puede ver historias clínicas, consentimientos firmados ni datos
-              de contacto de tus pacientes fuera de la agenda del día. Puedes
-              retirar el acceso cuando quieras desde el panel.
+              <strong>Nunca ve el teléfono ni el correo</strong> de tus
+              pacientes, ni sus historias clínicas, ni los consentimientos
+              firmados. De la agenda solo lee el nombre, la hora y el
+              procedimiento. Puedes retirar el acceso cuando quieras desde el
+              panel.
             </p>
 
             <div className="conectar-botones">

@@ -49,7 +49,7 @@ export default function CitasAgendadas() {
     setLoadingCitas(true);
     if (buzonGeneral) {
       getCitasAPI().then((data) => {
-        let f = filtroEstado !== "todos" ? data.filter((c) => c.estado === filtroEstado) : data;
+        const f = filtroEstado !== "todos" ? data.filter((c) => c.estado === filtroEstado) : data;
         f.sort((a, b) => ascendente ? a.fecha.localeCompare(b.fecha) || a.hora.localeCompare(b.hora) : b.fecha.localeCompare(a.fecha) || b.hora.localeCompare(a.hora));
         setCitas(f);
       }).catch(console.error).finally(() => setLoadingCitas(false));
