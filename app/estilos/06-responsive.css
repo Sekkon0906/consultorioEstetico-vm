@@ -1784,90 +1784,109 @@
   box-shadow: 0 14px 40px rgba(58, 42, 26, 0.18), 0 0 0 1px rgba(0,0,0,0.04);
   color: var(--text);
 }
-.profile-menu-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-soft);
-  transition: background var(--mov-rapido) ease, color var(--mov-rapido) ease;
-}
-.profile-menu-close:hover {
-  background: var(--surface-soft);
-  color: var(--text);
-}
+/* Las reglas de abajo se reescribieron enteras.
+
+   QUE HABIA PASADO
+   El menu se rediseno —de tres botones de colores distintos a una lista de
+   opciones del mismo peso— y ese cambio solo llego al JSX. El CSS se quedo
+   describiendo el menu anterior: definia `.profile-menu-close` y
+   `.profile-menu-btn` con sus tres variantes, que ya no usa nadie, y no
+   definia ninguna de las clases nuevas.
+
+   El resultado en pantalla era que "Editar perfil" y "Cerrar sesion" salian
+   pegados en la misma linea, porque `.profile-menu-item` no existia y los
+   botones caian al estilo por defecto del navegador.
+
+   Es el mismo fallo que el del boton flotante: clases citadas y nunca
+   escritas. No da error en ninguna parte —ni compilando, ni en la consola—
+   asi que solo se ve mirando la pantalla. */
+
 .profile-menu-avatar {
   border: 2px solid var(--brand);
   box-shadow: 0 4px 12px rgba(176,137,104,0.2);
 }
+
+/* La identidad: avatar pequeno a la izquierda, nombre y correo al lado.
+   `min-width: 0` en el hijo es lo que permite que el correo se recorte en vez
+   de ensanchar el menu; sin eso un correo largo lo desborda. */
+.profile-menu-id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.15rem 0.35rem 0.7rem;
+  border-bottom: 1px solid var(--border);
+}
 .profile-menu-name {
   font-weight: 700;
   color: var(--text);
-  font-size: 1.05rem;
-  margin-top: 0.2rem;
+  font-size: 0.95rem;
+  line-height: 1.25;
 }
 .profile-menu-email {
-  font-size: 0.84rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.profile-menu-btn {
+
+.profile-menu-lista {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.35rem;
+}
+
+/* Todas las opciones pesan lo mismo: es una lista de navegacion, no tres
+   llamadas a la accion compitiendo.
+
+   El alto minimo de 44px no es decorativo: es el objetivo tactil minimo. Con
+   el padding solo, en movil quedaban en 36px y fallaba tanto acertarlas como
+   la pauta de accesibilidad. */
+.profile-menu-item {
+  display: block;
   width: 100%;
-  border: none;
-  border-radius: 12px;
-  padding: 0.6rem 1rem;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: transform var(--mov-rapido) ease, box-shadow var(--mov-rapido) ease, filter var(--mov-rapido) ease;
-}
-.profile-menu-btn:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-}
-.profile-menu-btn-soft {
-  background: var(--surface-soft);
-  color: var(--text);
-}
-.profile-menu-btn-primary {
-  background: linear-gradient(135deg, var(--brand-deep), var(--brand));
-  color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(176,137,104,0.25);
-}
-.profile-menu-btn-danger {
+  min-height: 44px;
+  text-align: left;
   background: transparent;
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--mov-rapido) var(--mov-curva),
+              color var(--mov-rapido) var(--mov-curva);
+}
+.profile-menu-item:hover,
+.profile-menu-item:focus-visible {
+  background: var(--surface-soft);
+  color: var(--brand-texto);
+}
+.profile-menu-item:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}
+
+/* Cerrar sesion va separada por una linea: es la unica que no lleva a ninguna
+   parte. No se pinta de rojo —no es destructiva, se vuelve a entrar— pero al
+   pasar por encima si se tine, que es cuando importa no confundirla. */
+.profile-menu-item-salir {
+  margin-top: 0.3rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 10px 10px;
+  color: var(--text-soft);
+}
+.profile-menu-item-salir:hover,
+.profile-menu-item-salir:focus-visible {
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
   color: var(--danger);
-  border: 1px solid var(--danger);
 }
-.profile-menu-btn-danger:hover {
-  background: rgba(176, 46, 46, 0.08);
-}
-
-/* Light mode: brand-deep es un café oscuro real */
-:root[data-theme="light"] .profile-menu-btn-primary {
-  background: linear-gradient(135deg, var(--brand-deep), #C9AD8D);
-  color: #FFFFFF;
-}
-
-/* Dark mode: avatar dropdown botón primario invierte para legibilidad */
-:root[data-theme="dark"] .profile-menu-btn-primary {
-  background: linear-gradient(135deg, var(--brand), var(--brand-soft)) !important;
-  color: var(--bg) !important;
-}
-:root[data-theme="dark"] .profile-menu-btn-danger {
-  color: #FFB8B8 !important;
-  border-color: rgba(244, 168, 168, 0.4) !important;
-}
-:root[data-theme="dark"] .profile-menu-btn-danger:hover {
-  background: rgba(244, 168, 168, 0.12) !important;
+:root[data-theme="dark"] .profile-menu-item-salir:hover,
+:root[data-theme="dark"] .profile-menu-item-salir:focus-visible {
+  color: #FFB8B8;
 }
 
 /* ============================================================

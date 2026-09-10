@@ -35,6 +35,32 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
   }, [isDesktop]);
 
   /**
+   * Al cambiar de sección, volver arriba.
+   *
+   * EL FALLO QUE ARREGLA
+   * Todos los enlaces del menú llevan `scroll={false}`, y con razón: sin él,
+   * Next da un salto seco al pulsar cualquier enlace del panel. Pero eso deja
+   * el scroll donde estaba, y las secciones no miden lo mismo. Estando abajo
+   * del todo en "Citas agendadas" —que es larga— y pulsando "Asistente" —que
+   * es corta—, la pantalla se queda a la altura de antes: el panel entero
+   * queda por encima del borde superior y lo que se ve es el pie de la web.
+   * Parece que el clic no hizo nada, o que la sección está vacía.
+   *
+   * NO SE HACE SIEMPRE
+   * Si ya estás arriba no se toca el scroll. Mover la página cuando no hacía
+   * falta es un tirón gratis, y se nota más que el problema que arregla.
+   *
+   * `behavior` sigue a la preferencia del sistema en vez de imponer el
+   * deslizamiento: para quien pidió menos movimiento, un desplazamiento
+   * animado de página completa es justo de lo que quería librarse.
+   */
+  useEffect(() => {
+    if (typeof window === "undefined" || window.scrollY <= TOP_OFFSET) return;
+    const quietud = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: quietud ? "auto" : "smooth" });
+  }, [section]);
+
+  /**
    * El menú, en grupos.
    *
    * Antes eran nueve enlaces seguidos, todos con el mismo peso, en un orden
