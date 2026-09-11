@@ -790,28 +790,39 @@ export default function Galeria3D() {
         </div>
       )}
 
-      {/* Dots — debajo de la rueda (no encima), mismo eje horizontal.
-          bottom subido de 13% a 19%: al bajar la rueda (fix anterior)
-          quedaba muy pegado al CTA de abajo (8 puntos de separación). */}
+      {/* El indicador y el boton, EN LA MISMA COLUMNA.
+
+          POR QUE SE JUNTARON
+          Eran dos bloques absolutos independientes con el mismo anclaje
+          horizontal (`right: 30%` + `translateX(50%)`) y dos `bottom` en
+          porcentaje separados por dos puntos: 7% y 5%. En una seccion alta
+          esos dos puntos son unos 14px, y el boton mide 44 de alto — asi que
+          se montaba encima de la barra de puntos y salia atravesandola.
+
+          Ese `bottom` llevaba retocado varias veces (el comentario que habia
+          aqui decia "subido de 13% a 19%" cuando el valor era 7%). Ese es el
+          sintoma: dos numeros magicos que hay que volver a cuadrar cada vez
+          que cambia algo, y que se descuadran solos al cambiar el alto de la
+          ventana.
+
+          Ahora es UNA columna con un hueco de verdad entre los dos. El orden
+          y la separacion dejan de depender de que dos porcentajes no se
+          crucen. */}
       {selected === null && tratamientos.length > 0 && (
         <div
-          className="g3d-dots-wrap"
+          className="g3d-pie-wrap"
           style={{
             position: "absolute",
-            /* Del 14 % al 7 %. Con las tarjetas girando, el dorso ocupa
-               todo el alto de la tarjeta y el indicador quedaba pegado
-               justo debajo, leyéndose casi como parte de ella. Bajarlo lo
-               deja centrado en el hueco que hay hasta el botón de abajo. */
-            bottom: "7%",
-            /* Centrada sobre LA RUEDA, no sobre la seccion. Medido: el eje de
+            bottom: "5%",
+            /* Centrado sobre LA RUEDA, no sobre la seccion. Medido: el eje de
                las tarjetas cae en 1130 y el de la seccion en 720, porque la
-               foto de la doctora ocupa la mitad izquierda. Una barra centrada
-               en la seccion queda a 410px de lo que controla y se lee como un
-               elemento suelto debajo de la foto. */
+               foto de la doctora ocupa la mitad izquierda. */
             right: "30%",
             transform: "translateX(50%)",
             display: "flex",
-            justifyContent: "center",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1.1rem",
             zIndex: 5,
           }}
         >
@@ -882,23 +893,7 @@ export default function Galeria3D() {
               ›
             </button>
           </div>
-        </div>
-      )}
 
-      {/* CTA "Ver todos los procedimientos" — anclado al mismo eje
-          vertical del título y la rueda, al fondo de la sección y
-          despegado de los dots. Sin flecha para una píldora más limpia. */}
-      {selected === null && (
-        <div
-          className="g3d-cta-wrap"
-          style={{
-            position: "absolute",
-            bottom: "5%",
-            right: "30%",
-            transform: "translateX(50%)",
-            zIndex: 5,
-          }}
-        >
           <Link
             href="/procedimientos"
             className="g3d-cta-pill"
@@ -1190,8 +1185,7 @@ export default function Galeria3D() {
              por la perspectiva 3D se ven ligeramente desplazadas). */
           .g3d-title-wrap     { right: 22% !important; max-width: min(500px, 46%) !important; }
           .g3d-wheel-anchor   { right: 22% !important; transform: translate(50%, -50%) !important; }
-          .g3d-dots-wrap      { right: 22% !important; }
-          .g3d-cta-wrap       { right: 22% !important; }
+          .g3d-pie-wrap       { right: 22% !important; }
           /* El 70 % es para tablet, NO para el teléfono.
              Este bloque es max-width: 1200px, así que también atrapaba al
              móvil: en 375px el modal salía de 242 —el 65 % de la pantalla—
@@ -1208,8 +1202,7 @@ export default function Galeria3D() {
         @media (max-width: 980px) {
           .g3d-title-wrap     { right: 15% !important; max-width: min(460px, 52%) !important; }
           .g3d-wheel-anchor   { right: 15% !important; transform: translate(50%, -50%) !important; }
-          .g3d-dots-wrap      { right: 15% !important; }
-          .g3d-cta-wrap       { right: 15% !important; }
+          .g3d-pie-wrap       { right: 15% !important; }
         }
         @media (max-width: 820px) {
           /* Layout en columna: título arriba, rueda (escalada) al centro,
@@ -1255,28 +1248,20 @@ export default function Galeria3D() {
             align-items: center !important;
             justify-content: center !important;
           }
-          .g3d-dots-wrap      {
+          /* En columna, el pie deja de estar anclado y pasa a fluir debajo
+             de la rueda. Antes eran dos reglas casi iguales con anchos
+             distintos (78% y 82%) y un padding-right suelto, que es lo que
+             hacia que el indicador y el boton no quedaran alineados entre
+             ellos. Ahora comparten caja, asi que van alineados por
+             construccion. */
+          .g3d-pie-wrap       {
             position: relative !important;
             right: auto !important;
             bottom: auto !important;
             transform: none !important;
-            margin: 0 auto 0 0 !important;
-            display: flex !important;
-            justify-content: flex-end !important;
-            width: 78% !important;
-            margin-left: auto !important;
-          }
-          /* CTA alineado a la derecha, bajo la rueda, coherente con el texto. */
-          .g3d-cta-wrap       {
-            position: relative !important;
-            right: auto !important;
-            bottom: auto !important;
-            transform: none !important;
-            margin: 1.5rem 0 0 auto !important;
-            display: flex !important;
-            justify-content: flex-end !important;
             width: 82% !important;
-            padding-right: 4% !important;
+            margin: 1.2rem 0 0 auto !important;
+            align-items: flex-end !important;
           }
         }
         @media (max-width: 480px) {
@@ -1309,7 +1294,7 @@ export default function Galeria3D() {
           .g3d-title-wrap h1, .g3d-title-wrap h2 { font-size: clamp(1.5rem, 2.4vw, 2.1rem) !important; }
           .g3d-title-wrap p { font-size: 0.92rem !important; }
           .g3d-wheel-anchor { top: 60% !important; transform: translate(50%, -50%) scale(0.86) !important; }
-          .g3d-dots-wrap    { bottom: 16% !important; }
+          .g3d-pie-wrap     { bottom: 7% !important; gap: 0.8rem !important; }
         }
         @media (min-width: 821px) and (max-height: 780px) {
           .g3d-stage        { min-height: 460px !important; }
@@ -1317,7 +1302,7 @@ export default function Galeria3D() {
           .g3d-title-wrap h1, .g3d-title-wrap h2 { font-size: clamp(1.3rem, 2.1vw, 1.75rem) !important; }
           .g3d-title-wrap p { font-size: 0.85rem !important; line-height: 1.4 !important; }
           .g3d-wheel-anchor { top: 59% !important; transform: translate(50%, -50%) scale(0.72) !important; }
-          .g3d-dots-wrap    { bottom: 14% !important; }
+          .g3d-pie-wrap     { bottom: 5% !important; gap: 0.6rem !important; }
         }
         @media (min-width: 821px) and (max-height: 660px) {
           .g3d-title-wrap p { display: none !important; }

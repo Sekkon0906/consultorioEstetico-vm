@@ -330,8 +330,12 @@
      título en móvil ahora es centrado, no hace falta ninguna corrección. */
   /* En móvil se OCULTA la rueda 3D y sus dots; manda el carrusel Stories. */
   .g3d-stage .g3d-wheel-anchor { display: none !important; }
-  .g3d-stage .g3d-dots-wrap    { display: none !important; }
-  .g3d-stage .g3d-cta-wrap {
+  /* Se oculta el INDICADOR, no el contenedor. El indicador y el boton
+     comparten caja desde que se junto el pie de la rueda; ocultar el
+     contenedor se llevaria por delante el boton "Ver todos", que en movil es
+     la unica forma de llegar al listado. */
+  .g3d-stage .g3d-pie-wrap .g3d-dots { display: none !important; }
+  .g3d-stage .g3d-pie-wrap {
     position: relative !important;
     top: auto !important;
     left: auto !important;
@@ -342,7 +346,9 @@
     margin: 1.4rem 0 0 0 !important;
     padding: 0 !important;
     display: flex !important;
+    align-items: center !important;
     justify-content: center !important;
+    gap: 0 !important;
   }
   .g3d-stage { overflow: hidden !important; }
 
