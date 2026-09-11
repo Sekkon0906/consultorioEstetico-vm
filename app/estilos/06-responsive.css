@@ -5442,3 +5442,80 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   .conexion-cortar { transition: none; }
   .conexiones-cargando svg { animation: none; }
 }
+
+/* ============================================================
+   Avisos del sitio
+
+   Van entre la portada y el resto, a ancho de contenido y no de pantalla
+   completa: una banda de borde a borde se lee como parte del armazon de la
+   web —como una barra de cookies— y eso es justo lo que se aprende a
+   ignorar. Un aviso tiene que parecer contenido.
+============================================================ */
+.avisos-sitio {
+  max-width: 960px;
+  margin: 1.5rem auto 0;
+  padding: 0 1rem;
+  display: grid;
+  gap: 0.7rem;
+}
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.aviso-icono {
+  display: flex;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--text-muted);
+}
+.aviso-texto { flex: 1; min-width: 0; }
+.aviso-titulo {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.aviso-cuerpo {
+  margin: 3px 0 0;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+/* 44px de area sensible con el icono a 15: el mismo criterio tactil del
+   resto del sitio. El margen negativo evita que agrande la tarjeta. */
+.aviso-cerrar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: -10px -10px -10px 0;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--mov-rapido) var(--mov-curva),
+              color var(--mov-rapido) var(--mov-curva);
+}
+.aviso-cerrar:hover { background: var(--surface-soft); color: var(--text); }
+.aviso-cerrar:focus-visible { outline: 2px solid var(--brand); outline-offset: -8px; }
+
+/* El tipo se nota en el borde y el icono, NO en el fondo. Tres fondos de
+   color distintos apilados se leen como una alerta de sistema; el borde
+   basta para jerarquizar sin gritar. */
+.aviso.es-importante {
+  border-left-color: var(--danger);
+}
+.aviso.es-importante .aviso-icono { color: var(--danger); }
+.aviso.es-promocion {
+  border-left-color: var(--brand);
+}
+.aviso.es-promocion .aviso-icono { color: var(--brand-texto); }

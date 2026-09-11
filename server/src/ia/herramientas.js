@@ -150,6 +150,72 @@ const DEFINICIONES = [
       additionalProperties: false,
     },
   },
+  /* Los avisos son la unica herramienta con la que la doctora puede decir algo
+     que no estaba previsto. Las demas cambian cosas que ya existen —un precio,
+     una promocion, un horario—; esta crea contenido nuevo.
+
+     Por eso la descripcion insiste en la fecha de fin: es el campo que el
+     modelo mas facilmente omite y el que decide si la web se queda anunciando
+     un cierre de diciembre en marzo. */
+  {
+    name: "publicar_aviso",
+    description:
+      "Publica un aviso en la web: cierres por vacaciones, cambios de sede, novedades, " +
+      "lo que la doctora quiera comunicar y no sea un procedimiento ni una promocion de precio. " +
+      "Aparece en la portada. SIEMPRE pregunta hasta que fecha debe verse si la doctora no lo dice: " +
+      "un aviso sin fecha de fin se queda puesto para siempre y acaba diciendo algo que ya no es cierto.",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: {
+        titulo: { type: "string", description: "Una linea. Es lo que se lee primero." },
+        cuerpo: { type: "string", description: "El detalle. Dos o tres frases como mucho." },
+        tipo: {
+          type: "string",
+          description:
+            "informativo para novedades; importante para lo que afecta a una cita ya agendada " +
+            "(cierres, cambios de sede); promocion para ofertas.",
+          enum: ["informativo", "importante", "promocion"],
+        },
+        desde: { type: "string", description: "AAAA-MM-DD. Omite para publicarlo ya." },
+        hasta: { type: "string", description: "AAAA-MM-DD. El dia que deja de verse." },
+      },
+      required: ["titulo", "cuerpo", "tipo"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "listar_avisos",
+    description:
+      "Los avisos publicados, con su estado y sus fechas. Usala antes de retirar uno " +
+      "para saber su identificador, y para revisar si queda alguno viejo puesto.",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: {
+        solo_vigentes: {
+          type: "boolean",
+          description: "true para ver solo los que se estan viendo hoy. Omite para verlos todos.",
+        },
+      },
+      required: [],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "retirar_aviso",
+    description:
+      "Quita un aviso de la web. No lo borra: queda apagado y se puede consultar despues.",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: {
+        id: { type: "integer", description: "El identificador que devuelve listar_avisos." },
+      },
+      required: ["id"],
+      additionalProperties: false,
+    },
+  },
   {
     name: "resumen_de_citas",
     description:
@@ -190,6 +256,8 @@ const ESCRIBEN = new Set([
   "actualizar_procedimiento",
   "configurar_promocion",
   "actualizar_configuracion",
+  "publicar_aviso",
+  "retirar_aviso",
 ]);
 
 const escribe = (nombre) => ESCRIBEN.has(nombre);
@@ -212,6 +280,18 @@ function validar(nombre, args) {
   if (nombre === "crear_procedimiento" && (args.duracion_min < 5 || args.duracion_min > 480)) {
     return "La duración debe estar entre 5 y 480 minutos.";
   }
+  if (nombre === "publicar_aviso") {
+    if (!args.titulo || !args.titulo.trim()) return "El aviso necesita un titulo.";
+    /* 120 caracteres es lo que cabe en una linea en un movil sin partirse en
+       tres. Mas largo deja de ser un titulo y pasa a ser el cuerpo. */
+    if (args.titulo.length > 120) return "El titulo es demasiado largo: resumelo en una linea.";
+    if ((args.cuerpo || "").length > 600) return "El cuerpo es demasiado largo para un aviso.";
+    if (args.desde && !RE_FECHA.test(args.desde)) return "La fecha de inicio debe tener formato AAAA-MM-DD.";
+    if (args.hasta && !RE_FECHA.test(args.hasta)) return "La fecha de fin debe tener formato AAAA-MM-DD.";
+    if (args.desde && args.hasta && args.desde > args.hasta) {
+      return "La fecha de inicio no puede ser posterior a la de fin.";
+    }
+  }
   if (nombre === "actualizar_configuracion") {
     if (!Array.isArray(args.cambios) || !args.cambios.length) return "No se indicó ningún cambio.";
     if (args.cambios.length > 30) return "Demasiados cambios en una sola operación.";
@@ -221,6 +301,52 @@ function validar(nombre, args) {
 
 // ── Ejecutores ───────────────────────────────────────────────────────────────
 const EJECUTORES = {
+  async publicar_aviso(args) {
+    const { rows } = await pool.query(
+      `INSERT INTO avisos_sitio (titulo, cuerpo, tipo, desde, hasta, creado_por)
+       VALUES ($1, $2, $3, $4, $5, 'conector')
+       RETURNING id, titulo, tipo, desde, hasta`,
+      [args.titulo.trim(), (args.cuerpo || "").trim(), args.tipo, args.desde || null, args.hasta || null]
+    );
+    const a = rows[0];
+    return {
+      ...a,
+      /* Se devuelve dicho en palabras y no solo el registro. Quien lo lee es
+         un modelo que va a resumirselo a la doctora, y "hasta: null" se
+         traduce con demasiada facilidad por "ya esta" en vez de por "esto no
+         se apaga solo". */
+      aviso: a.hasta
+        ? `Publicado. Se vera hasta el ${a.hasta}.`
+        : "Publicado SIN fecha de fin: se vera indefinidamente hasta que se retire a mano.",
+    };
+  },
+
+  async listar_avisos(args) {
+    const { rows } = args.solo_vigentes
+      ? await pool.query(
+          `SELECT id, titulo, cuerpo, tipo, activo, desde, hasta, creado_en
+             FROM avisos_sitio
+            WHERE activo
+              AND (desde IS NULL OR desde <= CURRENT_DATE)
+              AND (hasta IS NULL OR hasta >= CURRENT_DATE)
+            ORDER BY orden, creado_en DESC`
+        )
+      : await pool.query(
+          `SELECT id, titulo, cuerpo, tipo, activo, desde, hasta, creado_en
+             FROM avisos_sitio ORDER BY activo DESC, creado_en DESC LIMIT 50`
+        );
+    return rows;
+  },
+
+  async retirar_aviso(args) {
+    const { rows } = await pool.query(
+      `UPDATE avisos_sitio SET activo = FALSE WHERE id = $1 RETURNING id, titulo`,
+      [args.id]
+    );
+    if (!rows.length) return { error: "No existe un aviso con ese identificador." };
+    return { ...rows[0], aviso: "Retirado. Ya no se ve en la web." };
+  },
+
   async listar_procedimientos(args) {
     const { rows } = args.categoria
       ? await pool.query(

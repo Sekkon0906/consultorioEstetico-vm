@@ -134,6 +134,12 @@ function Contenido() {
               <li><strong>Ver y modificar</strong> tus procedimientos y sus precios.</li>
               <li><strong>Activar y desactivar</strong> promociones.</li>
               <li><strong>Cambiar</strong> la información del consultorio: dirección, teléfonos, horarios.</li>
+              {/* Se añade cuando se añadió la herramienta, no después. Esta es
+                  la unica capacidad del conector que CREA algo visible para
+                  cualquiera que entre en la web, y no solo modifica un dato que
+                  ya estaba. Callarla aqui seria describir un permiso menor del
+                  que se concede. */}
+              <li><strong>Publicar avisos</strong> en la portada —cierres, novedades— que verá cualquiera que entre.</li>
               <li><strong>Consultar</strong> cuántas citas hay, y de un día concreto: nombre, hora y procedimiento.</li>
             </ul>
 

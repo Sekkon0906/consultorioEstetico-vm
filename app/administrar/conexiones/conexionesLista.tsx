@@ -76,8 +76,9 @@ export default function ConexionesLista() {
       <p className="conexiones-intro">
         Aplicaciones a las que le diste permiso para manejar tu consultorio.
         Pueden ver y cambiar procedimientos, precios, promociones y la
-        información del sitio, y consultar cuántas citas tienes y las de un
-        día concreto —nombre, hora y procedimiento—.{" "}
+        información del sitio, <strong>publicar avisos en la portada</strong>,
+        y consultar cuántas citas tienes y las de un día concreto —nombre,
+        hora y procedimiento—.{" "}
         <strong>Nunca ven el teléfono ni el correo</strong> de tus pacientes,
         ni sus historias clínicas.
       </p>

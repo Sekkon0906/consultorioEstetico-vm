@@ -89,6 +89,10 @@ APP_URL=<url del sitio>
 API_URL=<url de la API>
 ```
 
+**La migración 012 (avisos) ya está aplicada a producción.** Es una tabla
+nueva, así que el paso que añade fue primero, como manda la regla. Sin ella,
+la ruta de avisos devuelve lista vacía y la portada carga igual.
+
 `MCP_TOKEN` **deja de ser obligatorio**: se conserva solo como atajo para
 Claude Desktop. En producción lo correcto es entrar por OAuth.
 
@@ -194,22 +198,17 @@ corre, pero no bloquea. **Si aparece una segunda, esa sí falla.**
 
 ## 🟢 Pedido y sin terminar
 
-### 9. El consultorio en 3D
+### 9. Panel para los avisos (opcional)
 
-Hoy la página del consultorio enseña las fotos como galería plana: una imagen
-grande y miniaturas debajo. La portada sí tiene rueda 3D, así que la página
-que debería impresionar es la que se ve más sosa de las dos.
+Los avisos ya se publican y se retiran desde el conector, y se ven en la
+portada. Lo que no hay es una pantalla en **Administrar** para verlos sin
+pasar por Claude. No bloquea nada: `listar_avisos` y `retirar_aviso` cubren
+el caso, y los endpoints del panel (`GET /avisos/todos`, `DELETE /avisos/:id`)
+ya están hechos — falta solo la interfaz.
 
-**No se puede reutilizar `Galeria3D` tal cual.** Son 1.329 líneas, no recibe
-ninguna propiedad y lee los procedimientos por su cuenta. Adaptarla es un
-refactor grande, no un cambio de datos. Lo razonable es un componente propio
-y pequeño para las fotos del consultorio.
+### ~~10. El consultorio en 3D~~ — hecho
 
-### 10. Animación del asistente virtual
-
-El Asistente no da ninguna señal de estar vivo: mientras piensa solo sale la
-palabra «Pensando…» en cursiva. Falta que se note que está trabajando, y que
-al aparecer se presente.
+### ~~11. Animación del asistente virtual~~ — hecho
 
 ---
 
