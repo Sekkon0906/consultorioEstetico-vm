@@ -20,6 +20,7 @@ const charlasRoutes      = require("./routes/charlas");
 const analyticsRoutes    = require("./routes/analytics");
 const reportesRoutes     = require("./routes/reportes");
 const reagendasRoutes    = require("./routes/reagendas");
+const avisosRoutes          = require("./routes/avisos");
 const galeriaConfianzaRoutes = require("./routes/galeriaConfianza");
 const configuracionRoutes = require("./routes/configuracion");
 const copilotoRoutes     = require("./routes/copiloto");
@@ -82,8 +83,54 @@ app.use("/analytics",      analyticsRoutes);
 app.use("/reportes",       reportesRoutes);
 app.use("/configuracion",  configuracionRoutes);
 app.use("/galeria-confianza", galeriaConfianzaRoutes);
+app.use("/avisos",         avisosRoutes);
 app.use("/copiloto",       limiteIa, copilotoRoutes);
 app.use("/",               reagendasRoutes);  // /citas/:id/solicitar-reagenda y /reagendas
+
+/* ── Servidor MCP ──────────────────────────────────────────────
+   Deja que la doctora maneje el consultorio desde SU Claude, con su
+   suscripcion, en vez de que el sitio pague inferencia por fichas.
+
+   SOLO SE MONTA SI HAY TOKEN. Estas herramientas escriben en la base de un
+   consultorio medico: un MCP abierto en internet es una consola de
+   administracion abierta en internet. Sin `MCP_TOKEN` la ruta no existe, que
+   es lo unico seguro que se puede hacer por defecto.
+
+   Comparte el limitador de la IA porque el perfil de uso es el mismo: pocas
+   peticiones, caras si alguien las repite en bucle. */
+{
+  /* `process.env.PORT` y no la constante PORT: esa se declara mas abajo en
+     este mismo archivo, y usarla aqui lanza por zona muerta temporal. */
+  const urlApi = (process.env.API_URL || `http://localhost:${process.env.PORT || 4000}`).replace(/\/+$/, "");
+  const { mcpAuthRouter } = require("@modelcontextprotocol/sdk/server/auth/router.js");
+  const { provider } = require("./mcp/proveedorOauth");
+
+  /* El OAuth va ANTES que el servidor MCP. `mcpAuthRouter` monta /authorize,
+     /token, /register y los .well-known que claude.ai consulta para descubrir
+     donde autorizar; si el servidor MCP se montara primero en la misma raiz,
+     su exigencia de token taparia esos endpoints, que por definicion se
+     consultan SIN estar autorizado todavia. */
+  /* EN LA RAIZ, no bajo /mcp. Los `.well-known` estan definidos por RFC en la
+     raiz del dominio: montarlos en /mcp/.well-known los deja donde nadie los
+     busca. Ademas el propio router se declara a si mismo en /authorize y
+     /token —se comprobo leyendo los metadatos que emite—, asi que montarlo
+     mas adentro produce unos metadatos que apuntan a rutas que no existen. */
+  app.use(mcpAuthRouter({
+    provider,
+    issuerUrl: new URL(urlApi),
+    baseUrl: new URL(urlApi),
+    resourceName: "Consultorio Dra. Vanessa Medina",
+    resourceServerUrl: new URL(`${urlApi}/mcp`),
+  }));
+
+  app.use("/mcp/consentimiento", require("./mcp/consentimiento"));
+  app.use("/mcp", limiteIa, require("./mcp/servidor"));
+
+  console.log("[mcp] servidor y OAuth montados en /mcp");
+  if (!process.env.MCP_TOKEN) {
+    console.log("[mcp] sin MCP_TOKEN: solo se entra por OAuth (que es lo correcto en produccion).");
+  }
+}
 
 // ── MANEJO GLOBAL DE ERRORES ─────────────────────────────────
 app.use((err, _req, res, _next) => {

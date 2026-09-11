@@ -11,6 +11,8 @@ import dynamic from "next/dynamic";
 
 // Galería 3D y Video se cargan solo en cliente y bajo demanda — su bundle
 // (framer-motion + three.js indirecto + assets) no debe bloquear el LCP del hero.
+import AvisosSitio from "@/components/AvisosSitio";
+
 const Galeria3D = dynamic(() => import("@/components/Galeria3D"), {
   ssr: false,
   loading: () => (
@@ -159,6 +161,15 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Avisos de la doctora — justo debajo de la portada.
+
+          Aqui y no mas abajo porque lo que se publica en este bloque suele
+          afectar a una decision que la paciente esta a punto de tomar: si el
+          consultorio cierra esa semana, enterarse despues de elegir hora es
+          enterarse tarde. El componente no pinta nada cuando no hay avisos,
+          asi que el resto del año no ocupa sitio. */}
+      <AvisosSitio />
 
       {/* VIDEO CENTRAL */}
       {memoizedVideo}

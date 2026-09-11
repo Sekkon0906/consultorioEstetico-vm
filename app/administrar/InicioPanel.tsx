@@ -222,7 +222,7 @@ export default function InicioPanel({ nombre }: { nombre?: string }) {
                         alignItems: "center",
                         background: "var(--bg-elevated)",
                         border: `1px solid ${esUrgente ? "color-mix(in srgb, var(--danger) 40%, transparent)" : "var(--border)"}`,
-                        borderLeft: `3px solid ${esUrgente ? "var(--danger)" : "var(--brand)"}`,
+                        borderLeft: `3px solid ${esUrgente ? "var(--danger)" : "var(--brand-texto)"}`,
                         borderRadius: 16,
                         padding: "1.05rem 1.2rem",
                         textDecoration: "none",
@@ -237,7 +237,7 @@ export default function InicioPanel({ nombre }: { nombre?: string }) {
                             : "var(--surface-soft)",
                         }}
                       >
-                        <Icono size={19} color={esUrgente ? "var(--danger)" : "var(--brand)"} />
+                        <Icono size={19} color={esUrgente ? "var(--danger)" : "var(--brand-texto)"} />
                       </span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ color: "var(--text)", fontWeight: 700, fontSize: "0.98rem", margin: 0 }}>

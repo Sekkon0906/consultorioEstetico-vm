@@ -138,7 +138,7 @@ export default function CookieBanner() {
               {t("message")}{" "}
               <Link
                 href="/legal/cookies"
-                style={{ color: "var(--brand)", textDecoration: "underline" }}
+                style={{ color: "var(--brand-texto)", textDecoration: "underline" }}
               >
                 {t("moreInfo")}
               </Link>

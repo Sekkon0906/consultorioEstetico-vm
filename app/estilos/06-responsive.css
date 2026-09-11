@@ -23,10 +23,6 @@
 }
 
 /* Tarjeta cita (TarjetaCita) — grid 2 cols a 1 col en móvil */
-@media (max-width: 700px) {
-  .tarjeta-cita-grid { grid-template-columns: 1fr !important; }
-}
-
 /* Galería 3D — el modal de detalle en móvil.
 
    Antes: `width: 92%` más `right/top/transform` heredados de cuando el
@@ -334,8 +330,12 @@
      título en móvil ahora es centrado, no hace falta ninguna corrección. */
   /* En móvil se OCULTA la rueda 3D y sus dots; manda el carrusel Stories. */
   .g3d-stage .g3d-wheel-anchor { display: none !important; }
-  .g3d-stage .g3d-dots-wrap    { display: none !important; }
-  .g3d-stage .g3d-cta-wrap {
+  /* Se oculta el INDICADOR, no el contenedor. El indicador y el boton
+     comparten caja desde que se junto el pie de la rueda; ocultar el
+     contenedor se llevaria por delante el boton "Ver todos", que en movil es
+     la unica forma de llegar al listado. */
+  .g3d-stage .g3d-pie-wrap .g3d-dots { display: none !important; }
+  .g3d-stage .g3d-pie-wrap {
     position: relative !important;
     top: auto !important;
     left: auto !important;
@@ -346,7 +346,9 @@
     margin: 1.4rem 0 0 0 !important;
     padding: 0 !important;
     display: flex !important;
+    align-items: center !important;
     justify-content: center !important;
+    gap: 0 !important;
   }
   .g3d-stage { overflow: hidden !important; }
 
@@ -461,7 +463,7 @@
   .g3d-stage .g3d-grid-dorso-precio {
     font-size: 0.78rem;
     font-weight: 700;
-    color: var(--brand);
+    color: var(--brand-texto);
   }
 
   .g3d-stage .g3d-grid-card img {
@@ -668,14 +670,6 @@
     padding: 0.9rem !important;
   }
 
-  /* Tarjeta cita en confirmación: padding reducido */
-  .tarjeta-cita-row {
-    padding: 0.45rem 0.65rem !important;
-  }
-  .tarjeta-cita-row p {
-    font-size: 0.82rem !important;
-  }
-
   /* 14. Densidad social-media-style en grids genéricos */
   .home-loc-card {
     height: 200px !important;
@@ -692,7 +686,7 @@
 /* Issue 9 — /consultorio dark mode: la descripción "Every area was designed"
    usaba `text-[#2B2B2B]/80` que en dark mode quedaba ilegible. */
 :root[data-theme="dark"] .consultorio-desc-section h2 {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .consultorio-desc-text,
 :root[data-theme="dark"] .consultorio-desc-section .text-\[\#2B2B2B\]\/80 {
@@ -834,7 +828,7 @@
   .consultorio-showcase-label { font-size: 0.9rem; left: 14px; right: 56px; bottom: 12px; }
 }
 :root[data-theme="dark"] .consultorio-gallery-title {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 
 /* /consultorio — card del mapa (Tailwind bg-white + título champagne).
@@ -844,7 +838,7 @@
   border: 1px solid var(--border) !important;
 }
 :root[data-theme="dark"] .consultorio-map-title {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .consultorio-map-addr {
   color: var(--text-soft) !important;
@@ -874,13 +868,6 @@
    when you arrive at the clinic". En dark mode el bg cream era
    poco contraste con el resto de la card oscura.
 ============================================================ */
-:root[data-theme="dark"] .tarjeta-cita-footer-msg {
-  background: linear-gradient(135deg, rgba(232, 201, 160, 0.08), rgba(232, 201, 160, 0.04)) !important;
-  border-color: var(--brand) !important;
-}
-:root[data-theme="dark"] .tarjeta-cita-footer-msg p {
-  color: var(--text-soft) !important;
-}
 
 /* ============================================================
    Citas agendadas — filter buttons con count visible
@@ -924,7 +911,7 @@
 }
 :root[data-theme="dark"] .citas-filter-count {
   background: rgba(232, 201, 160, 0.25) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
   border-color: var(--brand) !important;
 }
 :root[data-theme="dark"] .citas-filter-btn.is-active .citas-filter-count {
@@ -1079,7 +1066,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--brand);
+  color: var(--brand-texto);
   position: sticky;
   top: 0;
   /* Fondo sólido + un poco de blur para que al hacer scroll las cards
@@ -1416,7 +1403,7 @@
   color: var(--text-soft) !important;
 }
 :root[data-theme="dark"] .agendar-form-card .text-\[\#5C4533\]:hover {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 /* Inputs, selects, textareas */
 :root[data-theme="dark"] .agendar-form-card input,
@@ -1543,7 +1530,7 @@
 :root[data-theme="dark"] .citas-page button [style*="rgba(176,137,104,0.18)"],
 :root[data-theme="dark"] .citas-page span[style*="rgba(176,137,104,0.18)"] {
   background: rgba(232, 201, 160, 0.25) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 /* Filtros inactivos (bg #F5EEE6) → texto cream */
 :root[data-theme="dark"] .citas-page button[style*="background: var(--surface-soft)"] {
@@ -1603,7 +1590,7 @@
 /* La doctora cards — heading champagne en dark, párrafo claro */
 :root[data-theme="dark"] .vm-card h4,
 :root[data-theme="dark"] .filo-section .dark-aware-card h5 {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .vm-card p,
 :root[data-theme="dark"] .filo-section .dark-aware-card p {
@@ -1745,7 +1732,7 @@
   color: var(--text-soft) !important;
 }
 :root[data-theme="dark"] .formacion-card > div:last-child > div:last-child {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 /* Año del timeline (#C9AD8D) ya es champagne, OK */
 
@@ -1779,8 +1766,8 @@
    porque React serializa sin espacio). */
 :root[data-theme="dark"] .comentario-proc-pill {
   background: rgba(232, 201, 160, 0.22) !important;
-  color: var(--brand) !important;
-  -webkit-text-fill-color: var(--brand) !important;
+  color: var(--brand-texto) !important;
+  -webkit-text-fill-color: var(--brand-texto) !important;
   border: 1px solid rgba(232, 201, 160, 0.4);
 }
 /* También en light reforzamos contraste del pill (café sobre cream claro) */
@@ -1803,90 +1790,109 @@
   box-shadow: 0 14px 40px rgba(58, 42, 26, 0.18), 0 0 0 1px rgba(0,0,0,0.04);
   color: var(--text);
 }
-.profile-menu-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-soft);
-  transition: background var(--mov-rapido) ease, color var(--mov-rapido) ease;
-}
-.profile-menu-close:hover {
-  background: var(--surface-soft);
-  color: var(--text);
-}
+/* Las reglas de abajo se reescribieron enteras.
+
+   QUE HABIA PASADO
+   El menu se rediseno —de tres botones de colores distintos a una lista de
+   opciones del mismo peso— y ese cambio solo llego al JSX. El CSS se quedo
+   describiendo el menu anterior: definia `.profile-menu-close` y
+   `.profile-menu-btn` con sus tres variantes, que ya no usa nadie, y no
+   definia ninguna de las clases nuevas.
+
+   El resultado en pantalla era que "Editar perfil" y "Cerrar sesion" salian
+   pegados en la misma linea, porque `.profile-menu-item` no existia y los
+   botones caian al estilo por defecto del navegador.
+
+   Es el mismo fallo que el del boton flotante: clases citadas y nunca
+   escritas. No da error en ninguna parte —ni compilando, ni en la consola—
+   asi que solo se ve mirando la pantalla. */
+
 .profile-menu-avatar {
   border: 2px solid var(--brand);
   box-shadow: 0 4px 12px rgba(176,137,104,0.2);
 }
+
+/* La identidad: avatar pequeno a la izquierda, nombre y correo al lado.
+   `min-width: 0` en el hijo es lo que permite que el correo se recorte en vez
+   de ensanchar el menu; sin eso un correo largo lo desborda. */
+.profile-menu-id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.15rem 0.35rem 0.7rem;
+  border-bottom: 1px solid var(--border);
+}
 .profile-menu-name {
   font-weight: 700;
   color: var(--text);
-  font-size: 1.05rem;
-  margin-top: 0.2rem;
+  font-size: 0.95rem;
+  line-height: 1.25;
 }
 .profile-menu-email {
-  font-size: 0.84rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.profile-menu-btn {
+
+.profile-menu-lista {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.35rem;
+}
+
+/* Todas las opciones pesan lo mismo: es una lista de navegacion, no tres
+   llamadas a la accion compitiendo.
+
+   El alto minimo de 44px no es decorativo: es el objetivo tactil minimo. Con
+   el padding solo, en movil quedaban en 36px y fallaba tanto acertarlas como
+   la pauta de accesibilidad. */
+.profile-menu-item {
+  display: block;
   width: 100%;
-  border: none;
-  border-radius: 12px;
-  padding: 0.6rem 1rem;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: transform var(--mov-rapido) ease, box-shadow var(--mov-rapido) ease, filter var(--mov-rapido) ease;
-}
-.profile-menu-btn:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-}
-.profile-menu-btn-soft {
-  background: var(--surface-soft);
-  color: var(--text);
-}
-.profile-menu-btn-primary {
-  background: linear-gradient(135deg, var(--brand-deep), var(--brand));
-  color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(176,137,104,0.25);
-}
-.profile-menu-btn-danger {
+  min-height: 44px;
+  text-align: left;
   background: transparent;
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--mov-rapido) var(--mov-curva),
+              color var(--mov-rapido) var(--mov-curva);
+}
+.profile-menu-item:hover,
+.profile-menu-item:focus-visible {
+  background: var(--surface-soft);
+  color: var(--brand-texto);
+}
+.profile-menu-item:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}
+
+/* Cerrar sesion va separada por una linea: es la unica que no lleva a ninguna
+   parte. No se pinta de rojo —no es destructiva, se vuelve a entrar— pero al
+   pasar por encima si se tine, que es cuando importa no confundirla. */
+.profile-menu-item-salir {
+  margin-top: 0.3rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 10px 10px;
+  color: var(--text-soft);
+}
+.profile-menu-item-salir:hover,
+.profile-menu-item-salir:focus-visible {
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
   color: var(--danger);
-  border: 1px solid var(--danger);
 }
-.profile-menu-btn-danger:hover {
-  background: rgba(176, 46, 46, 0.08);
-}
-
-/* Light mode: brand-deep es un café oscuro real */
-:root[data-theme="light"] .profile-menu-btn-primary {
-  background: linear-gradient(135deg, var(--brand-deep), #C9AD8D);
-  color: #FFFFFF;
-}
-
-/* Dark mode: avatar dropdown botón primario invierte para legibilidad */
-:root[data-theme="dark"] .profile-menu-btn-primary {
-  background: linear-gradient(135deg, var(--brand), var(--brand-soft)) !important;
-  color: var(--bg) !important;
-}
-:root[data-theme="dark"] .profile-menu-btn-danger {
-  color: #FFB8B8 !important;
-  border-color: rgba(244, 168, 168, 0.4) !important;
-}
-:root[data-theme="dark"] .profile-menu-btn-danger:hover {
-  background: rgba(244, 168, 168, 0.12) !important;
+:root[data-theme="dark"] .profile-menu-item-salir:hover,
+:root[data-theme="dark"] .profile-menu-item-salir:focus-visible {
+  color: #FFB8B8;
 }
 
 /* ============================================================
@@ -2780,7 +2786,7 @@ footer a:hover i {
 }
 
 .navbar-menu a:hover {
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 /* === SECCIONADO DEL MENÚ ===
@@ -2833,7 +2839,7 @@ footer a:hover i {
 }
 
 .menu-item.active a {
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 /* === Animación de indicador === */
@@ -3153,7 +3159,7 @@ footer a:hover i {
 }
 
 .mobile-sidebar a:hover {
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 /* === MOBILE SIDEBAR — MODO OSCURO === */
@@ -3181,7 +3187,7 @@ footer a:hover i {
 }
 :root[data-theme="dark"] .user-action-btn:hover {
   background: var(--surface-soft) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .mobile-sidebar li {
   border-bottom-color: var(--border) !important;
@@ -3191,7 +3197,7 @@ footer a:hover i {
   color: var(--text) !important;
 }
 :root[data-theme="dark"] .mobile-sidebar a:hover {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .mobile-sidebar-footer {
   border-top-color: var(--border) !important;
@@ -3387,7 +3393,7 @@ footer a:hover i {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--brand);
+  color: var(--brand-texto);
   background: rgba(176, 137, 104, 0.1);
   border: 1px solid rgba(176, 137, 104, 0.35);
   padding: 0.4rem 1rem;
@@ -3395,7 +3401,7 @@ footer a:hover i {
   margin-bottom: 1rem;
 }
 :root[data-theme="dark"] .doc-hero-kicker {
-  color: var(--brand);
+  color: var(--brand-texto);
   background: rgba(232, 201, 160, 0.1);
   border-color: rgba(232, 201, 160, 0.4);
 }
@@ -4322,7 +4328,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
 }
 .quick-fab-social:hover {
   background: var(--surface-soft);
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 .quick-fab-legal {
@@ -4336,7 +4342,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
      en 3.79:1 sobre este fondo, por debajo del mínimo AA. */
   color: var(--text-soft);
 }
-.quick-fab-legal a:hover { color: var(--brand); }
+.quick-fab-legal a:hover { color: var(--brand-texto); }
 
 /* En móvil el sidebar ya lleva tema e idioma, y el disparador taparía el
    botón de WhatsApp. El comentario del componente dice "SOLO escritorio";
@@ -4674,7 +4680,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   border-radius: 50%;
   flex-shrink: 0;
   background: color-mix(in srgb, var(--brand) 14%, var(--surface));
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 .acceso-ventajas strong {
@@ -4708,7 +4714,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   border: none;
   background: none;
   font: inherit;
-  color: var(--brand);
+  color: var(--brand-texto);
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -5017,7 +5023,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   gap: 8px;
   min-height: 44px;
   padding: 0 0.25rem;
-  color: var(--brand);
+  color: var(--brand-texto);
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
@@ -5069,7 +5075,7 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
   border-radius: 50%;
   flex-shrink: 0;
   background: color-mix(in srgb, var(--brand) 14%, var(--surface));
-  color: var(--brand);
+  color: var(--brand-texto);
 }
 
 .fidelidad-titulo {
@@ -5174,3 +5180,342 @@ a/* QUÉ SE CAMBIÓ Y POR QUÉ, la segunda vuelta.
     min-width: 0;
   }
 }
+
+/* ============================================================
+   AUTORIZAR UN CONECTOR (app/conectar-claude)
+   ============================================================
+   La pantalla donde la doctora da —o niega— acceso a las herramientas del
+   consultorio. Se diseña sobria a propósito: una pantalla de permisos que
+   parece publicidad se aprueba sin leerla, y aquí lo que se aprueba puede
+   cambiar precios. */
+
+.conectar-envoltorio {
+  min-height: var(--alto-pantalla, 100vh);
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.25rem;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--surface-soft) 100%);
+}
+
+.conectar-tarjeta {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 2.25rem 2rem;
+  box-shadow: 0 18px 50px -22px rgba(58, 42, 26, 0.3);
+}
+
+.conectar-cargando {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+}
+.conectar-cargando svg { animation: conectar-gira 900ms linear infinite; }
+@keyframes conectar-gira { to { transform: rotate(360deg); } }
+
+.conectar-icono {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  margin: 0 auto 1.1rem;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--brand) 14%, var(--surface));
+  color: var(--brand-texto);
+}
+.conectar-icono.es-aviso {
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  color: var(--danger);
+}
+
+.conectar-titulo {
+  margin: 0 0 0.9rem;
+  text-align: center;
+  font-family: "Playfair Display", serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.conectar-texto {
+  margin: 0 0 0.9rem;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.conectar-permisos {
+  margin: 0 0 1.1rem;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.conectar-permisos strong { color: var(--text); }
+
+.conectar-nota {
+  margin: 0 0 1.5rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+/* En columna y con "Autorizar" arriba. En fila, el botón que más se pulsa
+   acaba donde cae el pulgar, y aquí el que más se va a pulsar no debería ser
+   el fácil de pulsar sin mirar. */
+.conectar-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.conectar-aprobar,
+.conectar-rechazar {
+  min-height: 46px;
+  border-radius: 100px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition:
+    transform 260ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    filter 200ms ease-out;
+}
+.conectar-aprobar:active,
+.conectar-rechazar:active {
+  transform: scale(0.98);
+  transition: transform 70ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+.conectar-aprobar {
+  border: none;
+  background: linear-gradient(135deg, var(--brand), var(--brand-soft));
+  color: var(--brand-contrast);
+}
+.conectar-aprobar:disabled {
+  filter: grayscale(0.4);
+  cursor: default;
+}
+
+.conectar-rechazar {
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-soft);
+}
+
+.conectar-aprobar:focus-visible,
+.conectar-rechazar:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conectar-aprobar, .conectar-rechazar { transition: none; }
+  .conectar-cargando svg { animation: none; }
+}
+
+/* ============================================================
+   PROGRAMAS CONECTADOS (panel → conexiones)
+   ============================================================ */
+.conexiones-titulo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 0.5rem;
+  font-family: "Playfair Display", serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.conexiones-intro {
+  margin: 0 0 1.5rem;
+  max-width: var(--ancho-texto);
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.conexiones-error {
+  margin: 0 0 1rem;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--surface));
+  color: var(--danger);
+  font-size: 0.86rem;
+}
+
+.conexiones-cargando {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 0.88rem;
+}
+.conexiones-cargando svg { animation: conexion-gira 900ms linear infinite; }
+
+.conexiones-vacio {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: var(--surface-soft);
+  border: 1px dashed var(--border-strong);
+  border-radius: 18px;
+}
+.conexiones-vacio p {
+  margin: 0.6rem 0 0;
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.conexiones-vacio strong { color: var(--text); }
+
+.conexion-fila {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.conexion-nombre {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.96rem;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.conexion-detalle {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+}
+
+/* En rojo y con el icono de papelera: es una acción destructiva y tiene que
+   parecerlo. Un botón neutro aquí se pulsa por error mientras se explora. */
+.conexion-cortar {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  border-radius: 100px;
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--surface));
+  background: transparent;
+  color: var(--danger);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.83rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 200ms ease;
+}
+.conexion-cortar:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface));
+}
+.conexion-cortar:disabled { opacity: 0.6; cursor: default; }
+.conexion-cortar:focus-visible {
+  outline: 2px solid var(--danger);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conexion-cortar { transition: none; }
+  .conexiones-cargando svg { animation: none; }
+}
+
+/* ============================================================
+   Avisos del sitio
+
+   Van entre la portada y el resto, a ancho de contenido y no de pantalla
+   completa: una banda de borde a borde se lee como parte del armazon de la
+   web —como una barra de cookies— y eso es justo lo que se aprende a
+   ignorar. Un aviso tiene que parecer contenido.
+============================================================ */
+.avisos-sitio {
+  max-width: 960px;
+  margin: 1.5rem auto 0;
+  padding: 0 1rem;
+  display: grid;
+  gap: 0.7rem;
+}
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.aviso-icono {
+  display: flex;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--text-muted);
+}
+.aviso-texto { flex: 1; min-width: 0; }
+.aviso-titulo {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.aviso-cuerpo {
+  margin: 3px 0 0;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+/* 44px de area sensible con el icono a 15: el mismo criterio tactil del
+   resto del sitio. El margen negativo evita que agrande la tarjeta. */
+.aviso-cerrar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: -10px -10px -10px 0;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--mov-rapido) var(--mov-curva),
+              color var(--mov-rapido) var(--mov-curva);
+}
+.aviso-cerrar:hover { background: var(--surface-soft); color: var(--text); }
+.aviso-cerrar:focus-visible { outline: 2px solid var(--brand); outline-offset: -8px; }
+
+/* El tipo se nota en el borde y el icono, NO en el fondo. Tres fondos de
+   color distintos apilados se leen como una alerta de sistema; el borde
+   basta para jerarquizar sin gritar. */
+.aviso.es-importante {
+  border-left-color: var(--danger);
+}
+.aviso.es-importante .aviso-icono { color: var(--danger); }
+.aviso.es-promocion {
+  border-left-color: var(--brand);
+}
+.aviso.es-promocion .aviso-icono { color: var(--brand-texto); }

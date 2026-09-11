@@ -106,7 +106,7 @@ function PrecioEditable({
       onClick={() => setEditando(true)}
       title="Pulsa para cambiar el precio"
       className="admin-card-price"
-      style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "1px dashed transparent", borderRadius: 8, padding: "0.2rem 0.4rem", cursor: "text", fontSize: "1.1rem", color: estado === "error" ? "var(--danger)" : "var(--brand)", fontWeight: 700, whiteSpace: "nowrap", font: "inherit" }}
+      style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: "1px dashed transparent", borderRadius: 8, padding: "0.2rem 0.4rem", cursor: "text", fontSize: "1.1rem", color: estado === "error" ? "var(--danger)" : "var(--brand-texto)", fontWeight: 700, whiteSpace: "nowrap", font: "inherit" }}
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-strong)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.borderColor = "transparent"; }}
     >
@@ -166,67 +166,67 @@ export default function ProcedimientosList() {
 
   const loadGal = async function(pid: string | number) {
     try {
-      var items = await getGaleriaProcedimientoApi(pid);
+      const items = await getGaleriaProcedimientoApi(pid);
       setGal(items.map((g) => ({ id: g.id, url: g.url, titulo: g.titulo || "", orden: g.orden, tipo: g.tipo })));
     } catch { setGal([]); }
   };
 
-  var uploadFile = function(file: File): Promise<string> {
+  const uploadFile = function(file: File): Promise<string> {
     return subirImagenApi(file, "procedimientos");
   };
 
-  var handleMainImg = async function(e: React.ChangeEvent<HTMLInputElement>) {
-    var f = e.target.files?.[0];
+  const handleMainImg = async function(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
     if (!f) return;
     setUploading(true);
     setErr(null);
     try {
-      var url = await uploadFile(f);
+      const url = await uploadFile(f);
       setForm(function(p) { return { ...p, imagen: url }; });
       showToast("Imagen subida");
     } catch (er: any) { setErr("Error: " + er.message); }
     finally { setUploading(false); e.target.value = ""; }
   };
 
-  var handleGalAdd = async function(e: React.ChangeEvent<HTMLInputElement>) {
-    var f = e.target.files?.[0];
+  const handleGalAdd = async function(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
     if (!f || !actual) return;
     setUploadingGal(true);
     setErr(null);
     try {
-      var url = await uploadFile(f);
-      var item = await addGaleriaItemApi(actual.id, { tipo: "imagen", url: url });
+      const url = await uploadFile(f);
+      const item = await addGaleriaItemApi(actual.id, { tipo: "imagen", url: url });
       setGal(function(prev) { return [...prev, { id: item.id, url: url, titulo: "", orden: item.orden, tipo: "imagen" }]; });
       showToast("Imagen agregada a galeria");
     } catch (er: any) { setErr("Error: " + er.message); }
     finally { setUploadingGal(false); e.target.value = ""; }
   };
 
-  var galRemove = async function(item: GalItem) {
+  const galRemove = async function(item: GalItem) {
     if (typeof item.id === "number") await deleteGaleriaItemApi(item.id);
     setGal(function(prev) { return prev.filter(function(g) { return g.id !== item.id; }); });
   };
 
-  var galMove = async function(i: number, dir: -1 | 1) {
-    var j = i + dir;
+  const galMove = async function(i: number, dir: -1 | 1) {
+    const j = i + dir;
     if (j < 0 || j >= gal.length || !actual) return;
-    var updated = [...gal];
-    var temp = updated[i]; updated[i] = updated[j]; updated[j] = temp;
+    const updated = [...gal];
+    const temp = updated[i]; updated[i] = updated[j]; updated[j] = temp;
     updated.forEach(function(g, idx) { g.orden = idx; });
     setGal(updated);
-    var orden = updated
+    const orden = updated
       .filter(function(g) { return typeof g.id === "number"; })
       .map(function(g) { return { id: g.id as number, orden: g.orden }; });
     await reordenarGaleriaApi(actual.id, orden);
   };
 
-  var handleSave = async function() {
+  const handleSave = async function() {
     if (!form.nombre.trim()) { setErr("Nombre obligatorio"); return; }
     setSaving(true);
     setErr(null);
     try {
       // El backend (normalizeBody) acepta camelCase.
-      var payload = {
+      const payload = {
         nombre: form.nombre,
         desc: form.desc,
         descCompleta: form.descCompleta,
@@ -256,16 +256,20 @@ export default function ProcedimientosList() {
     finally { setSaving(false); }
   };
 
-  var handleDel = async function(id: string | number) {
+  const handleDel = async function(id: string | number) {
     try {
       await deleteProcedimientoApi(id);
       setDelId(null); load();
     } catch (e: any) { setErr(e.message); }
   };
 
-  var reset = function() { setForm(emptyForm); setModo("lista"); setActual(null); setGal([]); };
+  /* `const` y no `var`: se referencia mas arriba, pero SIEMPRE desde dentro
+     de una funcion diferida —un manejador o un efecto— que corre despues
+     de que el cuerpo del componente haya terminado. ESLint no lo arregla
+     solo porque no puede probar esa diferencia. */
+  const reset = function() { setForm(emptyForm); setModo("lista"); setActual(null); setGal([]); };
 
-  var startEdit = function(p: Procedimiento) {
+  const startEdit = function(p: Procedimiento) {
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     setActual(p);
     setForm({
@@ -290,7 +294,7 @@ export default function ProcedimientosList() {
     loadGal(p.id);
   };
 
-  var IS = { width: "100%", padding: "0.75rem 1rem", borderRadius: 14, border: "1px solid var(--border)", fontSize: "0.98rem", background: "var(--surface)" } as React.CSSProperties;
+  const IS = { width: "100%", padding: "0.75rem 1rem", borderRadius: 14, border: "1px solid var(--border)", fontSize: "0.98rem", background: "var(--surface)" } as React.CSSProperties;
 
   return (
     <div>
@@ -365,7 +369,7 @@ export default function ProcedimientosList() {
                   style={{ width: 18, height: 18, accentColor: "#D4A437" }}
                 />
                 <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", display: "flex", alignItems: "center", gap: 6 }}>
-                  <Star size={14} fill="currentColor" color="var(--brand)" /> En promoción
+                  <Star size={14} fill="currentColor" color="var(--brand-texto)" /> En promoción
                 </span>
                 <small style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginLeft: "auto" }}>
                   Se muestra con descuento y badge especial.
@@ -490,7 +494,7 @@ export default function ProcedimientosList() {
                     <button aria-label="Quitar imagen" title="Quitar imagen" onClick={function() { setForm({ ...form, imagen: "" }); }} style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#C62828", color: "white", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={10} /></button>
                   </div>
                 )}
-                <label style={{ padding: "0.5rem 1.2rem", borderRadius: 12, border: "1px dashed var(--brand)", cursor: uploading ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: uploading ? 0.6 : 1 }}>
+                <label style={{ padding: "0.5rem 1.2rem", borderRadius: 12, border: "1px dashed var(--brand)", cursor: uploading ? "wait" : "pointer", fontSize: "0.82rem", color: "var(--brand-texto)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6, opacity: uploading ? 0.6 : 1 }}>
                   <Upload size={14} /> {uploading ? "Subiendo..." : form.imagen ? "Cambiar foto" : "Subir foto"}
                   <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleMainImg} disabled={uploading} />
                 </label>
@@ -516,7 +520,7 @@ export default function ProcedimientosList() {
                       </div>
                     );
                   })}
-                  <label style={{ width: 90, height: 70, borderRadius: 10, border: "2px dashed var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", cursor: uploadingGal ? "wait" : "pointer", fontSize: "0.72rem", color: "var(--brand)", fontWeight: 600, textAlign: "center", opacity: uploadingGal ? 0.6 : 1, background: "transparent" }}>
+                  <label style={{ width: 90, height: 70, borderRadius: 10, border: "2px dashed var(--brand)", display: "flex", alignItems: "center", justifyContent: "center", cursor: uploadingGal ? "wait" : "pointer", fontSize: "0.72rem", color: "var(--brand-texto)", fontWeight: 600, textAlign: "center", opacity: uploadingGal ? 0.6 : 1, background: "transparent" }}>
                     {uploadingGal ? "..." : "+ Foto"}
                     <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleGalAdd} disabled={uploadingGal} />
                   </label>
@@ -529,7 +533,7 @@ export default function ProcedimientosList() {
                   {gal.filter(function(g) { return g.tipo === "video"; }).map(function(g, i) {
                     return (
                       <div key={g.id || "v" + i} style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.4rem" }}>
-                        <Play size={14} color="var(--brand)" />
+                        <Play size={14} color="var(--brand-texto)" />
                         <span style={{ flex: 1, fontSize: "0.78rem", color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.url}</span>
                         <button onClick={function() { galRemove(g); }} aria-label="Quitar esta imagen de la galeria" title="Quitar de la galeria" style={{ width: 20, height: 20, borderRadius: "50%", background: "color-mix(in srgb, var(--danger) 12%, var(--surface))", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><X size={9} color="#C62828" /></button>
                       </div>
@@ -538,11 +542,11 @@ export default function ProcedimientosList() {
                   <div style={{ display: "flex", gap: "0.5rem" }}>
                     <input id="videoLinkInput" style={{ ...IS, flex: 1, fontSize: "0.82rem" }} placeholder="https://youtube.com/watch?v=... o https://instagram.com/reel/..." />
                     <button onClick={async function() {
-                      var input = document.getElementById("videoLinkInput") as HTMLInputElement;
-                      var url = input?.value?.trim();
+                      const input = document.getElementById("videoLinkInput") as HTMLInputElement;
+                      const url = input?.value?.trim();
                       if (!url || !actual) return;
                       try {
-                        var it = await addGaleriaItemApi(actual.id, { tipo: "video", url: url });
+                        const it = await addGaleriaItemApi(actual.id, { tipo: "video", url: url });
                         setGal(function(prev) { return [...prev, { id: it.id, url: url, titulo: "", orden: it.orden, tipo: "video" }]; });
                         input.value = "";
                         showToast("Video agregado");
@@ -587,7 +591,7 @@ export default function ProcedimientosList() {
                   {/* Encabezado de categoria */}
                   <div style={{ display: "flex", alignItems: "center", gap: "0.7rem", marginBottom: "0.9rem" }}>
                     <h3 style={{ margin: 0, fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", fontWeight: 700, color: "var(--text)" }}>{cat}</h3>
-                    <span style={{ background: "var(--border)", color: "var(--brand)", padding: "0.15rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 700 }}>{items.length}</span>
+                    <span style={{ background: "var(--border)", color: "var(--brand-texto)", padding: "0.15rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 700 }}>{items.length}</span>
                     <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
@@ -610,7 +614,7 @@ export default function ProcedimientosList() {
                                 onClick={function() { void guardarCampoSuelto(p.id, { destacado: !p.destacado }); }}
                                 aria-pressed={!!p.destacado}
                                 title={p.destacado ? "Quitar de destacados" : "Marcar como destacado"}
-                                style={{ display: "inline-flex", alignItems: "center", gap: 4, background: p.destacado ? "rgba(232, 201, 160, 0.18)" : "transparent", color: p.destacado ? "var(--brand)" : "var(--text-muted)", border: p.destacado ? "1px solid transparent" : "1px solid var(--border)", padding: "0.2rem 0.6rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 600, cursor: "pointer", font: "inherit" }}
+                                style={{ display: "inline-flex", alignItems: "center", gap: 4, background: p.destacado ? "rgba(232, 201, 160, 0.18)" : "transparent", color: p.destacado ? "var(--brand-texto)" : "var(--text-muted)", border: p.destacado ? "1px solid transparent" : "1px solid var(--border)", padding: "0.2rem 0.6rem", borderRadius: 100, fontSize: "0.72rem", fontWeight: 600, cursor: "pointer", font: "inherit" }}
                               >
                                 <Star size={11} fill={p.destacado ? "currentColor" : "none"} /> Destacado
                               </motion.button>

@@ -24,7 +24,10 @@ export default function LegalLayout({ children }: { children: ReactNode }) {
           overflow: "hidden",
         }}
       >
-        <div style={{ height: 4, background: "linear-gradient(90deg, #B08968, #C9AD8D)" }} />
+        {/* Los dos valores eran exactamente --brand y --brand-soft del tema claro,
+            asi que en oscuro esta franja seguia siendo marron sobre fondo
+            oscuro en vez de champan. */}
+        <div style={{ height: 4, background: "linear-gradient(90deg, var(--brand), var(--brand-soft))" }} />
         <div style={{ padding: "2.5rem clamp(1.25rem, 4vw, 3rem) 3rem" }}>
           {children}
         </div>

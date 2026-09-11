@@ -114,14 +114,14 @@
 :root[data-theme="dark"] .featured-kicker-pill,
 :root[data-theme="dark"] .featured-card [style*="color: #8B5A12"],
 :root[data-theme="dark"] .featured-card [style*="color:#8B5A12"] {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
   background: linear-gradient(135deg, rgba(232, 201, 160, 0.22), rgba(242, 221, 184, 0.18)) !important;
   border-color: var(--brand) !important;
-  -webkit-text-fill-color: var(--brand) !important;
+  -webkit-text-fill-color: var(--brand-texto) !important;
   box-shadow: 0 2px 12px rgba(232, 201, 160, 0.22) !important;
 }
 :root[data-theme="dark"] .featured-kicker-pill svg {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 
 /* Precio en cards de procedimientos — siempre blanco para visibilidad */
@@ -138,7 +138,7 @@
 /* Precio en featured carousel */
 :root[data-theme="dark"] .featured-card [style*="color: #B08968"],
 :root[data-theme="dark"] .featured-card [style*="color:#B08968"] {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 /* Botón "Learn more" / btn-ghost-app dentro del featured card */
 :root[data-theme="dark"] .featured-card .btn-ghost-app {

@@ -35,6 +35,32 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
   }, [isDesktop]);
 
   /**
+   * Al cambiar de sección, volver arriba.
+   *
+   * EL FALLO QUE ARREGLA
+   * Todos los enlaces del menú llevan `scroll={false}`, y con razón: sin él,
+   * Next da un salto seco al pulsar cualquier enlace del panel. Pero eso deja
+   * el scroll donde estaba, y las secciones no miden lo mismo. Estando abajo
+   * del todo en "Citas agendadas" —que es larga— y pulsando "Asistente" —que
+   * es corta—, la pantalla se queda a la altura de antes: el panel entero
+   * queda por encima del borde superior y lo que se ve es el pie de la web.
+   * Parece que el clic no hizo nada, o que la sección está vacía.
+   *
+   * NO SE HACE SIEMPRE
+   * Si ya estás arriba no se toca el scroll. Mover la página cuando no hacía
+   * falta es un tirón gratis, y se nota más que el problema que arregla.
+   *
+   * `behavior` sigue a la preferencia del sistema en vez de imponer el
+   * deslizamiento: para quien pidió menos movimiento, un desplazamiento
+   * animado de página completa es justo de lo que quería librarse.
+   */
+  useEffect(() => {
+    if (typeof window === "undefined" || window.scrollY <= TOP_OFFSET) return;
+    const quietud = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: quietud ? "auto" : "smooth" });
+  }, [section]);
+
+  /**
    * El menú, en grupos.
    *
    * Antes eran nueve enlaces seguidos, todos con el mismo peso, en un orden
@@ -58,6 +84,10 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
       links: [
         { id: "configuracion",  label: "Información general" },
         { id: "copiloto",       label: "Asistente" },
+        /* Junto al Asistente y no en "Cómo va": son las dos formas de que una
+           IA toque el consultorio, y quien viene a revisar una quiere ver la
+           otra al lado. */
+        { id: "conexiones",     label: "Programas conectados" },
       ],
     },
     {
@@ -121,7 +151,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
 
       {/* SIDEBAR DESKTOP */}
       <aside className="admin-sidebar hidden lg:flex lg:flex-col lg:w-64 lg:py-6 lg:px-4 lg:shadow-lg">
-        <h1 className="text-2xl font-bold mb-2 text-center tracking-wide [color:var(--brand)]">
+        <h1 className="text-2xl font-bold mb-2 text-center tracking-wide [color:var(--brand-texto)]">
           Panel Admin
         </h1>
         {user && (
@@ -149,7 +179,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
               style={{ top: TOP_OFFSET, height: `calc(100vh - ${TOP_OFFSET}px)` }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h1 className="text-xl font-bold [color:var(--brand)]">Panel Admin</h1>
+                <h1 className="text-xl font-bold [color:var(--brand-texto)]">Panel Admin</h1>
                 <button onClick={() => setSidebarOpen(false)} className="admin-close-btn p-1 rounded-md">
                   <X size={20} className="[color:var(--text)]" />
                 </button>
@@ -181,7 +211,7 @@ export default function AdminLayoutInner({ children }: AdminLayoutInnerProps) {
             <Menu size={20} />
             <span className="text-sm font-medium">Menú</span>
           </button>
-          <h2 className="text-xl font-semibold [color:var(--brand)] ml-auto lg:ml-0">
+          <h2 className="text-xl font-semibold [color:var(--brand-texto)] ml-auto lg:ml-0">
             Administración
           </h2>
         </header>

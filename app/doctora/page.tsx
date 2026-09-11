@@ -10,8 +10,11 @@ const Filosofia = dynamic(() => import("./filosofia"));
 const FormacionContinua = dynamic(() => import("./formacionContinua"), {
   ssr: false,
   loading: () => (
-    <section style={{ minHeight: "30vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#FBF8F4" }}>
-      <div style={{ color: "#8B7060", fontSize: "0.85rem" }}>Cargando formación…</div>
+    /* Tokens y no valores fijos: este esqueleto se ve mientras carga el
+       bloque de abajo, y en tema oscuro un fondo crema con letra marrón
+       aparecía como un recuadro claro clavado en mitad de la página. */
+    <section style={{ minHeight: "30vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--surface)" }}>
+      <div style={{ color: "var(--text-soft)", fontSize: "0.85rem" }}>Cargando formación…</div>
     </section>
   ),
 });

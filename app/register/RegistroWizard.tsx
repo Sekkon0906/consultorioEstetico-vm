@@ -278,7 +278,7 @@ export default function RegistroWizard() {
           align-items: center;
           justify-content: center;
           font-weight: 700;
-          color: var(--brand);
+          color: var(--brand-texto);
           transition: all var(--mov-normal) ease;
         }
         .circle.filled {

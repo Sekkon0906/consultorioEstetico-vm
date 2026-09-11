@@ -49,7 +49,7 @@ export default function CitasAgendadas() {
     setLoadingCitas(true);
     if (buzonGeneral) {
       getCitasAPI().then((data) => {
-        let f = filtroEstado !== "todos" ? data.filter((c) => c.estado === filtroEstado) : data;
+        const f = filtroEstado !== "todos" ? data.filter((c) => c.estado === filtroEstado) : data;
         f.sort((a, b) => ascendente ? a.fecha.localeCompare(b.fecha) || a.hora.localeCompare(b.hora) : b.fecha.localeCompare(a.fecha) || b.hora.localeCompare(a.hora));
         setCitas(f);
       }).catch(console.error).finally(() => setLoadingCitas(false));
@@ -142,9 +142,9 @@ export default function CitasAgendadas() {
           </motion.button>
 
           <div className="flex justify-between items-center mb-4 w-full">
-            <button type="button" onClick={() => { if (mes === 0) { setMes(11); setAnio((a) => a - 1); } else setMes((m) => m - 1); }} className="[color:var(--brand)] hover:[color:var(--brand-soft)] text-lg font-semibold">{"<"}</button>
-            <span className="[color:var(--brand)] font-bold capitalize tracking-wide text-lg">{MESES[mes]} {anio}</span>
-            <button type="button" onClick={() => { if (mes === 11) { setMes(0); setAnio((a) => a + 1); } else setMes((m) => m + 1); }} className="[color:var(--brand)] hover:[color:var(--brand-soft)] text-lg font-semibold">{">"}</button>
+            <button type="button" onClick={() => { if (mes === 0) { setMes(11); setAnio((a) => a - 1); } else setMes((m) => m - 1); }} className="[color:var(--brand-texto)] hover:[color:var(--brand-soft)] text-lg font-semibold">{"<"}</button>
+            <span className="[color:var(--brand-texto)] font-bold capitalize tracking-wide text-lg">{MESES[mes]} {anio}</span>
+            <button type="button" onClick={() => { if (mes === 11) { setMes(0); setAnio((a) => a + 1); } else setMes((m) => m + 1); }} className="[color:var(--brand-texto)] hover:[color:var(--brand-soft)] text-lg font-semibold">{">"}</button>
           </div>
 
           <div className="grid grid-cols-7 w-full mb-2">
@@ -176,12 +176,12 @@ export default function CitasAgendadas() {
           ) : (
             <>
               <div className="flex flex-wrap justify-between items-center mb-4 gap-3">
-                <h3 className="text-lg font-semibold [color:var(--brand)]">{buzonGeneral ? "Todas las citas" : `Citas del ${selectedDate}`}</h3>
+                <h3 className="text-lg font-semibold [color:var(--brand-texto)]">{buzonGeneral ? "Todas las citas" : `Citas del ${selectedDate}`}</h3>
                 <div className="flex flex-wrap gap-2 items-center">
                   <select value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)} style={IS}>
                     <option value="todos">Todos</option><option value="pendiente">Pendientes</option><option value="confirmada">Confirmadas</option><option value="atendida">Atendidas</option><option value="cancelada">Canceladas</option>
                   </select>
-                  <button type="button" onClick={() => setAscendente((p) => !p)} className="flex items-center gap-1 text-sm [color:var(--text-soft)] hover:[color:var(--brand)]">
+                  <button type="button" onClick={() => setAscendente((p) => !p)} className="flex items-center gap-1 text-sm [color:var(--text-soft)] hover:[color:var(--brand-texto)]">
                     {ascendente ? <><ChevronUp size={16} /> Asc</> : <><ChevronDown size={16} /> Desc</>}
                   </button>
                 </div>
@@ -319,7 +319,7 @@ function InfoBlock({ cita }: { cita: Cita }) {
   return (
     <div style={{ background: "var(--surface)", borderRadius: 14, padding: "1rem", display: "flex", flexDirection: "column", gap: "0.35rem", fontSize: "0.85rem", color: "var(--text)", border: "1px solid var(--border)" }}>
       <div style={{ fontWeight: 700, fontSize: "0.95rem" }}>{cita.nombres} {cita.apellidos}</div>
-      <div style={{ color: "var(--brand)", fontWeight: 600 }}>{cita.procedimiento}</div>
+      <div style={{ color: "var(--brand-texto)", fontWeight: 600 }}>{cita.procedimiento}</div>
       <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", color: "var(--text-soft)" }}>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Phone size={12} /> {cita.telefono}</span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Mail size={12} /> {cita.correo}</span>

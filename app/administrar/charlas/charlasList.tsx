@@ -336,7 +336,7 @@ export default function CharlasList() {
                   {uploadingImg && (
                     <div
                       className="spinner-border spinner-border-sm"
-                      style={{ color: "var(--brand)" }}
+                      style={{ color: "var(--brand-texto)" }}
                       role="status"
                     />
                   )}
@@ -480,7 +480,7 @@ export default function CharlasList() {
                     estilo={{ fontWeight: 700, color: "var(--text)", fontSize: "1.08rem" }}
                   />
                   {c.fecha && (
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--border)", color: "var(--brand)", padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--border)", color: "var(--brand-texto)", padding: "0.2rem 0.7rem", borderRadius: 100, fontSize: "0.78rem", fontWeight: 600 }}>
                       <Calendar size={13} /> {c.fecha}
                     </span>
                   )}

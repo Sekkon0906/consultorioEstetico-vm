@@ -145,7 +145,7 @@ export default function Footer() {
                      cuando hay valor, --text-soft cuando es el marcador. */
                   color: formData.procedure ? "var(--text)" : "var(--text-soft)" }}>
                 {formData.procedure || t("form.procedure")}
-                <i className={`fas fa-chevron-${showProcs ? "up" : "down"}`} style={{ fontSize: "0.7rem", color: "var(--brand)" }} />
+                <i className={`fas fa-chevron-${showProcs ? "up" : "down"}`} style={{ fontSize: "0.7rem", color: "var(--brand-texto)" }} />
               </button>
               {showProcs && (
                 <div style={{ position: "absolute", top: "100%", left: 0, right: 0, /* Un escalon POR ENCIMA del footer en los dos temas. Iba en

@@ -23,6 +23,7 @@ const GaleriaConfianza    = dynamic(() => import("./galeria/galeriaConfianzaList
 const Ingresos            = dynamic(() => import("./analitica/ingresos"), { loading: () => CARGANDO });
 const ConfiguracionForm   = dynamic(() => import("./configuracion/configuracionForm"), { loading: () => CARGANDO });
 const CopilotoChat        = dynamic(() => import("./copiloto/copilotoChat"), { loading: () => CARGANDO });
+const ConexionesLista     = dynamic(() => import("./conexiones/conexionesLista"), { loading: () => CARGANDO });
 
 export default function AdministrarPageInner() {
   const params = useSearchParams();
@@ -59,6 +60,7 @@ export default function AdministrarPageInner() {
         {selected === "ingresos" && <Ingresos />}
         {selected === "configuracion" && <ConfiguracionForm />}
         {selected === "copiloto" && <CopilotoChat />}
+        {selected === "conexiones" && <ConexionesLista />}
       </motion.div>
     </AnimatePresence>
   );

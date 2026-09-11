@@ -155,7 +155,7 @@
    sobre fondo oscuro y queda ilegible. Forzamos contraste. */
 :root[data-theme="dark"] .hero-fs-kicker {
   background: rgba(232, 201, 160, 0.18) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
   border-color: rgba(232, 201, 160, 0.5) !important;
 }
 
@@ -229,7 +229,7 @@
 }
 :root[data-theme="dark"] .btn-ghost-app:hover {
   background: rgba(232, 201, 160, 0.15) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 
 /* === Botón secundario de doctora (Conocer más sobre la doctora) === */
@@ -240,7 +240,7 @@
 }
 :root[data-theme="dark"] .btn-doctora-secondary:hover {
   background: rgba(232, 201, 160, 0.22) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 
 /* === VideoAnim section (Por qué confiarme...) ===
@@ -381,7 +381,7 @@ body.g3d-detail-abierto {
 :root[data-theme="dark"] .g3d-detail button[style*="rgba(176,137,104,0.08)"] {
   background: rgba(232, 201, 160, 0.2) !important;
   border-color: var(--brand) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .g3d-detail button[style*="rgba(176,137,104,0.08)"]:hover {
   background: rgba(232, 201, 160, 0.32) !important;

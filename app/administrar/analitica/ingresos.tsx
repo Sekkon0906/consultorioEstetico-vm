@@ -11,19 +11,19 @@ import {
 } from "@/services/analiticaApi";
 import { CheckCircle, XCircle, Clock, Calendar, Users, Activity } from "lucide-react";
 
-var MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+const MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 
 export default function IngresosPage() {
-  var [stats, setStats] = useState<any>(null);
-  var [topProcs, setTopProcs] = useState<any[]>([]);
-  var [citasMes, setCitasMes] = useState<any[]>([]);
-  var [loading, setLoading] = useState(true);
-  var [fallo, setFallo] = useState<string | null>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [topProcs, setTopProcs] = useState<any[]>([]);
+  const [citasMes, setCitasMes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fallo, setFallo] = useState<string | null>(null);
 
   useEffect(function() {
     async function load() {
       try {
-        var [resumen, porMes, ranking] = await Promise.all([
+        const [resumen, porMes, ranking] = await Promise.all([
           getResumenApi(),
           getCitasPorMesApi(6),
           getRankingProcedimientosApi(),
@@ -64,7 +64,7 @@ export default function IngresosPage() {
     load();
   }, []);
 
-  if (loading) return <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border" style={{ color: "var(--brand)" }} /></div>;
+  if (loading) return <div style={{ textAlign: "center", padding: "3rem 0" }}><div className="spinner-border" style={{ color: "var(--brand-texto)" }} /></div>;
 
   return (
     <div>
@@ -98,7 +98,7 @@ export default function IngresosPage() {
             <KPI icon={<XCircle size={18} />} label="Canceladas" value={stats.canceladas} color="var(--estado-cancelada)" />
             <KPI icon={<Activity size={18} />} label="Citas hoy" value={stats.citasHoy} color="var(--estado-confirmada)" />
             <KPI icon={<Users size={18} />} label="Pacientes registrados" value={stats.pacientes} color="var(--estado-global)" />
-            <KPI icon={<Calendar size={18} />} label="Total historico" value={stats.totalCitas} color="var(--brand)" />
+            <KPI icon={<Calendar size={18} />} label="Total historico" value={stats.totalCitas} color="var(--brand-texto)" />
           </div>
 
           <div style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.5rem", marginBottom: "2rem" }}>
@@ -121,7 +121,7 @@ export default function IngresosPage() {
           <div style={{ background: "var(--surface)", borderRadius: 18, border: "1px solid var(--border)", padding: "1.5rem" }}>
             <h4 style={{ fontWeight: 600, color: "var(--text)", marginBottom: "1rem" }}>Top procedimientos</h4>
             {topProcs.map(function(p, i) {
-              var pct = stats.totalCitas > 0 ? Math.round((p.total / stats.totalCitas) * 100) : 0;
+              const pct = stats.totalCitas > 0 ? Math.round((p.total / stats.totalCitas) * 100) : 0;
               return (
                 <motion.div key={p.nombre} initial={{ x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                   style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "0.5rem 0.8rem", borderRadius: 12, background: i % 2 === 0 ? "var(--surface-soft)" : "transparent", marginBottom: "0.3rem" }}>

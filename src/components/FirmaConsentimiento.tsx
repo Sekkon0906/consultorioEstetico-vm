@@ -24,10 +24,10 @@ function generarPDFConsentimiento(
   nombre: string, apellidos: string, telefono: string, correo: string,
   procedimiento: string, fecha: string, hora: string, firmaDataUrl: string
 ): jsPDF {
-  var doc = new jsPDF("p", "mm", "letter");
-  var W = doc.internal.pageSize.getWidth();
-  var M = 20; // margin
-  var y = 20;
+  const doc = new jsPDF("p", "mm", "letter");
+  const W = doc.internal.pageSize.getWidth();
+  const M = 20; // margin
+  let y = 20;
 
   function addHeader() {
     doc.setFontSize(10);
@@ -46,8 +46,8 @@ function generarPDFConsentimiento(
   function addWrappedText(text: string, fontSize: number, bold: boolean, maxW?: number) {
     doc.setFontSize(fontSize);
     doc.setFont("helvetica", bold ? "bold" : "normal");
-    var lines = doc.splitTextToSize(text, maxW || (W - M * 2));
-    for (var i = 0; i < lines.length; i++) {
+    const lines = doc.splitTextToSize(text, maxW || (W - M * 2));
+    for (let i = 0; i < lines.length; i++) {
       if (y > 260) { doc.addPage(); y = 20; }
       doc.text(lines[i], M, y);
       y += fontSize * 0.45;
@@ -74,7 +74,7 @@ function generarPDFConsentimiento(
   // Patient data table
   doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
-  var tableY = y;
+  const tableY = y;
   doc.rect(M, tableY, W - M * 2, 24);
   doc.line(M, tableY + 6, W - M, tableY + 6);
   doc.line(M, tableY + 12, W - M, tableY + 12);
@@ -188,7 +188,7 @@ function generarPDFConsentimiento(
   function addFooter(d: jsPDF, w: number) {
     d.setFontSize(7);
     d.setFont("helvetica", "normal");
-    var fy = 270;
+    let fy = 270;
     d.text("Medicina Estetica y Antienvejecimiento Ibague-Tolima", w / 2, fy, { align: "center" }); fy += 3;
     d.text("Carrera 5ta #11-24. Edificio Torre Empresarial. Torre consultorios 502", w / 2, fy, { align: "center" }); fy += 3;
     d.text("Telefonos 3155445748 - 3152230544", w / 2, fy, { align: "center" }); fy += 3;
@@ -198,17 +198,17 @@ function generarPDFConsentimiento(
 
 export default function FirmaConsentimiento(props: Props) {
   const t = useTranslations("firma");
-  var [showModal, setShowModal] = useState(false);
-  var [step, setStep] = useState<"intro" | "firma" | "guardando" | "listo">("intro");
-  var canvasRef = useRef<HTMLCanvasElement>(null);
-  var [isDrawing, setIsDrawing] = useState(false);
-  var [hasFirma, setHasFirma] = useState(false);
-  var [firmaError, setFirmaError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [step, setStep] = useState<"intro" | "firma" | "guardando" | "listo">("intro");
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [hasFirma, setHasFirma] = useState(false);
+  const [firmaError, setFirmaError] = useState<string | null>(null);
 
   useEffect(function() {
     if (step !== "firma") return;
-    var c = canvasRef.current; if (!c) return;
-    var ctx = c.getContext("2d"); if (!ctx) return;
+    const c = canvasRef.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
     c.width = c.offsetWidth * 2; c.height = c.offsetHeight * 2;
     ctx.scale(2, 2); ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.lineJoin = "round"; /* Tinta FIJA, no un token del tema. Este canvas se guarda como
        imagen y acaba dentro del PDF del consentimiento: con un color de
@@ -218,40 +218,40 @@ export default function FirmaConsentimiento(props: Props) {
     ctx.strokeStyle = "#2A1C12";
   }, [step]);
 
-  var getPos = function(e: React.MouseEvent | React.TouchEvent) {
-    var c = canvasRef.current; if (!c) return { x: 0, y: 0 };
-    var rect = c.getBoundingClientRect();
+  const getPos = function(e: React.MouseEvent | React.TouchEvent) {
+    const c = canvasRef.current; if (!c) return { x: 0, y: 0 };
+    const rect = c.getBoundingClientRect();
     if ("touches" in e) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
     return { x: (e as React.MouseEvent).clientX - rect.left, y: (e as React.MouseEvent).clientY - rect.top };
   };
 
-  var startDraw = function(e: React.MouseEvent | React.TouchEvent) {
-    e.preventDefault(); var ctx = canvasRef.current?.getContext("2d"); if (!ctx) return;
-    setIsDrawing(true); var p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
+  const startDraw = function(e: React.MouseEvent | React.TouchEvent) {
+    e.preventDefault(); const ctx = canvasRef.current?.getContext("2d"); if (!ctx) return;
+    setIsDrawing(true); const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
   };
-  var draw = function(e: React.MouseEvent | React.TouchEvent) {
-    e.preventDefault(); if (!isDrawing) return; var ctx = canvasRef.current?.getContext("2d"); if (!ctx) return;
-    var p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); setHasFirma(true);
+  const draw = function(e: React.MouseEvent | React.TouchEvent) {
+    e.preventDefault(); if (!isDrawing) return; const ctx = canvasRef.current?.getContext("2d"); if (!ctx) return;
+    const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); setHasFirma(true);
   };
-  var endDraw = function() { setIsDrawing(false); };
-  var limpiar = function() { var c = canvasRef.current; if (!c) return; c.getContext("2d")?.clearRect(0, 0, c.width, c.height); setHasFirma(false); };
+  const endDraw = function() { setIsDrawing(false); };
+  const limpiar = function() { const c = canvasRef.current; if (!c) return; c.getContext("2d")?.clearRect(0, 0, c.width, c.height); setHasFirma(false); };
 
-  var guardarFirma = async function() {
-    var c = canvasRef.current; if (!c || !hasFirma) return;
+  const guardarFirma = async function() {
+    const c = canvasRef.current; if (!c || !hasFirma) return;
     setFirmaError(null);
     setStep("guardando");
     try {
-      var firmaDataUrl = c.toDataURL("image/png");
-      var blob = await (await fetch(firmaDataUrl)).blob();
+      const firmaDataUrl = c.toDataURL("image/png");
+      const blob = await (await fetch(firmaDataUrl)).blob();
 
       // El PDF se arma aquí; el servidor solo lo guarda y marca la cita.
-      var pdf = generarPDFConsentimiento(
+      const pdf = generarPDFConsentimiento(
         props.pacienteNombre, props.pacienteApellidos || "", props.pacienteTelefono || "",
         props.pacienteCorreo || "", props.procedimiento, props.fecha, props.hora || "", firmaDataUrl
       );
-      var pdfBlob = pdf.output("blob");
+      const pdfBlob = pdf.output("blob");
 
-      var fd = new FormData();
+      const fd = new FormData();
       fd.append("firma", blob, "firma.png");
       fd.append("pdf", pdfBlob, "consentimiento.pdf");
 
@@ -262,12 +262,12 @@ export default function FirmaConsentimiento(props: Props) {
     } catch (err: any) { console.error(err); setFirmaError(t("saveError") + " " + (err?.message || "")); setStep("firma"); }
   };
 
-  var cerrar = function() { setShowModal(false); setTimeout(function() { setStep("intro"); }, 300); };
+  const cerrar = function() { setShowModal(false); setTimeout(function() { setStep("intro"); }, 300); };
 
   // Lock scroll del body cuando el modal está abierto, y desbloquea al cerrar.
   useEffect(function() {
     if (showModal) {
-      var prev = document.body.style.overflow;
+      const prev = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return function() { document.body.style.overflow = prev; };
     }
@@ -276,14 +276,14 @@ export default function FirmaConsentimiento(props: Props) {
   // Cerrar con ESC
   useEffect(function() {
     if (!showModal) return;
-    var onKey = function(e: KeyboardEvent) { if (e.key === "Escape") cerrar(); };
+    const onKey = function(e: KeyboardEvent) { if (e.key === "Escape") cerrar(); };
     window.addEventListener("keydown", onKey);
     return function() { window.removeEventListener("keydown", onKey); };
   }, [showModal]);
 
   // El modal se renderiza vía portal a document.body, así escapa
   // de cualquier wrapper con overflow/transform que limite position:fixed.
-  var modalContent = (
+  const modalContent = (
     <AnimatePresence>
       {showModal && (
         <motion.div initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -337,7 +337,7 @@ export default function FirmaConsentimiento(props: Props) {
 
                 {step === "guardando" && (
                   <div style={{ textAlign: "center", padding: "2rem 0" }}>
-                    <div className="spinner-border" style={{ color: "var(--brand)" }} />
+                    <div className="spinner-border" style={{ color: "var(--brand-texto)" }} />
                     <p style={{ color: "var(--text-soft)", marginTop: "1rem" }}>{t("savingMessage")}</p>
                   </div>
                 )}

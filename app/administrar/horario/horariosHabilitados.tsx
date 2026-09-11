@@ -195,7 +195,7 @@ export default function HorariosHabilitados() {
                 </h5>
 
                 {loadingDia ? (
-                  <div style={{ textAlign: "center", padding: "2rem 0" }}><div className="spinner-border spinner-border-sm" style={{ color: "var(--brand)" }} /></div>
+                  <div style={{ textAlign: "center", padding: "2rem 0" }}><div className="spinner-border spinner-border-sm" style={{ color: "var(--brand-texto)" }} /></div>
                 ) : (
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
                     {HORAS_BASE.map(hora => {

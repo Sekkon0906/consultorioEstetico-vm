@@ -111,7 +111,7 @@ export default function GaleriaConfianzaList() {
   if (cargando) {
     return (
       <div style={{ display: "flex", justifyContent: "center", padding: "3rem 0" }}>
-        <div className="spinner-border" style={{ color: "var(--brand)" }} />
+        <div className="spinner-border" style={{ color: "var(--brand-texto)" }} />
       </div>
     );
   }

@@ -330,7 +330,7 @@ export default function Navbar() {
                          Medido, "Administrar" mas el avatar suman ~178px, y
                          con ellos la barra ya no cabe donde si cabia sin. */
                       className={`text-decoration-none navbar-link ${esCta ? "navbar-cta" : ""} ${isActive ? "navbar-link-active" : ""} ${item.grupo === "privado" ? "navbar-link-privado" : ""}`}
-                      style={!esCta ? { color: isActive ? "var(--brand)" : "var(--text)" } : undefined}
+                      style={!esCta ? { color: isActive ? "var(--brand-texto)" : "var(--text)" } : undefined}
                     >
                       {item.label}
                     </Link>

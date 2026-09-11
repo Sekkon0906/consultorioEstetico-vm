@@ -27,7 +27,7 @@ export default function NotFound() {
             fontFamily: "'Playfair Display', serif",
             fontSize: "4.5rem",
             lineHeight: 1,
-            color: "var(--brand)",
+            color: "var(--brand-texto)",
             marginBottom: "0.5rem",
           }}
         >

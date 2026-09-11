@@ -63,19 +63,19 @@ export default function CitasAgendadasCard({
       </div>
 
       {/* Procedure */}
-      <p style={{ fontSize: "0.88rem", color: "var(--brand)", fontWeight: 600, margin: "0 0 0.5rem" }}>
+      <p style={{ fontSize: "0.88rem", color: "var(--brand-texto)", fontWeight: 600, margin: "0 0 0.5rem" }}>
         {cita.procedimiento}
       </p>
 
       {/* Info rows */}
       <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.8rem", color: "var(--text-soft)", marginBottom: "0.8rem" }}>
         <div style={{ display: "flex", gap: "1.2rem", flexWrap: "wrap" }}>
-          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Phone size={12} color="var(--brand)" /> {cita.telefono}</span>
-          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Mail size={12} color="var(--brand)" /> {cita.correo}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Phone size={12} color="var(--brand-texto)" /> {cita.telefono}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Mail size={12} color="var(--brand-texto)" /> {cita.correo}</span>
         </div>
         <div style={{ display: "flex", gap: "1.2rem", flexWrap: "wrap" }}>
-          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} color="var(--brand)" /> {cita.fecha}</span>
-          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={12} color="var(--brand)" /> {cita.hora}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} color="var(--brand-texto)" /> {cita.fecha}</span>
+          <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={12} color="var(--brand-texto)" /> {cita.hora}</span>
         </div>
       </div>
 

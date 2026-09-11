@@ -99,7 +99,7 @@ export default function PanelSeleccion({
             }}
           >
             <header style={{ display: "flex", alignItems: "center", gap: "0.8rem", padding: "1.2rem 1.3rem", borderBottom: "1px solid var(--border)" }}>
-              <ClipboardList size={20} color="var(--brand)" />
+              <ClipboardList size={20} color="var(--brand-texto)" />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.15rem", fontWeight: 700, color: "var(--text)", margin: 0 }}>
                   Mi selección
@@ -172,7 +172,7 @@ export default function PanelSeleccion({
                           <Link
                             href={`/agendar?proc=${encodeURIComponent(item.nombre)}`}
                             onClick={onCerrar}
-                            style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 4, fontSize: "0.78rem", fontWeight: 700, color: "var(--brand)", textDecoration: "none" }}
+                            style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 4, fontSize: "0.78rem", fontWeight: 700, color: "var(--brand-texto)", textDecoration: "none" }}
                           >
                             <CalendarCheck size={13} /> Agendar
                           </Link>

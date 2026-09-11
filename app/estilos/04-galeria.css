@@ -75,7 +75,7 @@
 }
 :root[data-theme="dark"] .admin-nav-link:hover {
   background: var(--surface-soft) !important;
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 :root[data-theme="dark"] .admin-nav-link.is-active {
   background: linear-gradient(135deg, var(--brand), var(--brand-deep)) !important;
@@ -105,7 +105,7 @@
 
 /* Spinner / loader de Bootstrap usado en admin */
 :root[data-theme="dark"] .spinner-border {
-  color: var(--brand) !important;
+  color: var(--brand-texto) !important;
 }
 
 /* ============================================================
@@ -140,7 +140,7 @@
 }
 .admin-cal-day.is-today {
   background: var(--surface-soft);
-  color: var(--brand);
+  color: var(--brand-texto);
   font-weight: 700;
   border-color: var(--brand);
 }
@@ -150,4 +150,163 @@
 }
 :root[data-theme="light"] .admin-cal-day.is-today {
   background: var(--surface-soft);
+}
+
+/* ============================================================
+   El consultorio en 3D
+
+   La perspectiva vive en el CONTENEDOR, no en las tarjetas: si cada tarjeta
+   llevara su propio `perspective`, cada una tendria su propio punto de fuga y
+   la fila se leeria como cinco fotos torcidas por separado en vez de como una
+   sola escena vista desde un sitio.
+============================================================ */
+.consultorio-showcase-3d,
+.cons3d {
+  width: 100%;
+}
+/* Nada de `overflow: hidden` aqui: las tarjetas de los lados sobresalen a
+   proposito y recortarlas deshace el efecto entero. */
+.consultorio-showcase-3d { overflow: visible; }
+.cons3d-escena {
+  position: relative;
+  height: clamp(240px, 42vw, 420px);
+  perspective: 1200px;
+  /* NO lleva `transform-style: preserve-3d`, y es deliberado.
+
+     Con el, las cinco tarjetas comparten un mismo espacio tridimensional: el
+     `z-index` deja de contar, manda la Z real, y los planos se cruzan entre
+     ellos. El resultado era que las de los lados no llegaban a pintarse
+     —`elementFromPoint` devolvia la escena justo donde su rectangulo decia
+     que estaban— y en pantalla quedaban rectangulos vacios del color de
+     fondo. Las medidas no lo delataban: la imagen estaba cargada, con tamaño
+     y con opacidad 1.
+
+     Sin el, cada tarjeta se dibuja como un plano girado y se apilan por
+     `z-index`, que es predecible. La `perspective` del padre sigue dando la
+     profundidad: es la que hace que `translateZ` acerque y aleje. */
+  display: grid;
+  place-items: center;
+  /* El gesto de arrastrar es horizontal; sin esto el navegador se queda con
+     el toque para hacer scroll y la galeria no responde en movil. */
+  touch-action: pan-y;
+  cursor: grab;
+  outline: none;
+}
+.cons3d-escena:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 6px;
+  border-radius: 18px;
+}
+.cons3d-escena:active { cursor: grabbing; }
+
+.cons3d-tarjeta {
+  position: absolute;
+  width: clamp(200px, 58%, 460px);
+  height: 100%;
+  border: none;
+  padding: 0;
+  border-radius: 16px;
+  /* SIN `overflow: hidden` aqui: este es el elemento que gira en 3D, y
+     recortar un plano girado deja la imagen sin pintar en Chromium. El
+     recorte lo hace la capa de dentro, `.cons3d-foto`. */
+  background: var(--surface-soft);
+  box-shadow: 0 18px 44px rgba(58, 42, 26, 0.28);
+  cursor: pointer;
+  /* `will-change` avisa al navegador de que esto se va a mover: sin el, el
+     primer paso de cada transicion se ve a tirones mientras promociona la
+     capa. Se limita a las dos propiedades que cambian de verdad. */
+  will-change: transform, opacity;
+  transition: transform var(--mov-lento) var(--mov-curva),
+              opacity var(--mov-lento) var(--mov-curva);
+}
+.cons3d-tarjeta.es-centro {
+  box-shadow: 0 26px 60px rgba(58, 42, 26, 0.38);
+}
+
+/* Un velo sobre las que NO estan en el centro. Hace el trabajo que antes
+   hacia la opacidad —separar el fondo del frente— pero oscureciendo en vez de
+   desteñir, que es lo que respeta una foto clara. Va como capa encima y no
+   como filtro para que no toque el pie de foto. */
+.cons3d-tarjeta:not(.es-centro)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 22, 14, 0.18);
+  pointer-events: none;
+}
+
+/* El pie va DENTRO de la foto y sobre un velo oscuro, no debajo: si fuera
+   debajo, tendria que caber la etiqueta mas larga siempre, y al cambiar de
+   foto la altura de la fila saltaria. */
+.cons3d-foto {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.cons3d-pie {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2.2rem 0.9rem 0.75rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.72), transparent);
+  color: #FFFFFF;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-align: left;
+  /* Blanco sobre foto no se puede medir con el auditor de tokens: la sombra
+     es lo que garantiza que se lea tambien sobre una foto clara. */
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+
+.cons3d-puntos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  margin-top: 0.9rem;
+}
+/* El punto pintado mide 8px y el area pulsable 44, que es el minimo tactil que
+   sigue el resto del sitio. El borde transparente con `background-clip` es lo
+   que separa las dos medidas: agranda la zona sensible sin agrandar lo que se
+   ve.
+
+   El margen NEGATIVO es la otra mitad. Sin el, cinco cuadrados de 44px dejan
+   los puntos separados 44px y la fila se lee como cinco cosas sueltas en vez
+   de como un indicador. Con el, las zonas sensibles se solapan un poco —lo
+   que no importa: pulsar entre dos puntos elige el mas cercano— y los puntos
+   pintados quedan juntos.
+
+   La medida se comprobo en un viewport de 375px: caben los cinco sin
+   desbordar. */
+.cons3d-punto {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 50%;
+  background-color: var(--border-strong);
+  cursor: pointer;
+  box-sizing: content-box;
+  border: 18px solid transparent;
+  /* El margen negativo es SOLO horizontal. Con el vertical tambien, las zonas
+     sensibles se salian del contenedor por arriba y por abajo: la fila media
+     26px de alto en vez de 44 y los puntos se montaban encima del texto de
+     debajo. Se vio en una captura en movil, no midiendo. */
+  margin: 0 -11px;
+  background-clip: padding-box;
+  transition: background var(--mov-rapido) var(--mov-curva);
+}
+/* `background-color` y NO la abreviada `background`: la abreviada reinicia
+   `background-clip` a su valor inicial, y sin el recorte el color llena los
+   44px del borde transparente. El punto activo se veia como un circulo marron
+   enorme al lado de cuatro puntitos. Lo delato una captura. */
+.cons3d-punto.es-activo { background-color: var(--brand); }
+.cons3d-punto:focus-visible { outline: 2px solid var(--brand); outline-offset: 0; }
+
+/* Quien pidio menos movimiento sigue viendo la profundidad —que es
+   informacion, no adorno— pero sin el viaje entre una foto y otra. */
+@media (prefers-reduced-motion: reduce) {
+  .cons3d-tarjeta { transition: opacity var(--mov-rapido) linear; }
 }

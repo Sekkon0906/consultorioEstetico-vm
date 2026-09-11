@@ -35,7 +35,7 @@ export default function Filosofia() {
                 className="dark-aware-card p-4 rounded-4 shadow-sm h-100"
                 style={{ background: "#fff", border: "1px solid var(--border)" }}
               >
-                <div style={{ fontSize: "2rem", color: "var(--brand)" }}>
+                <div style={{ fontSize: "2rem", color: "var(--brand-texto)" }}>
                   <i className={`fas ${icons[i]}`} />
                 </div>
                 <h5

@@ -59,7 +59,7 @@ export default function CitasAgendadasEditor({
     >
       <h2
         className="fw-bold text-center mb-4"
-        style={{ color: "#7A5534" }}
+        style={{ color: "var(--text)" }}
       >
         Reagendar / Editar Cita
       </h2>
@@ -192,7 +192,10 @@ export default function CitasAgendadasEditor({
           className="btn rounded-pill fw-semibold flex-1"
           style={{
             backgroundColor: "var(--brand)",
-            color: "#fff",
+            /* El color que la paleta define para ir ENCIMA de la marca. En
+               tema oscuro la marca es un champan claro sobre el que un blanco
+               fijo no se lee. */
+            color: "var(--brand-contrast)",
             border: "none",
           }}
         >

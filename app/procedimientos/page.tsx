@@ -868,7 +868,7 @@ export default function ProcedimientosPage() {
           align-self: flex-start;
           font-size: 0.82rem;
           font-weight: 600;
-          color: var(--brand);
+          color: var(--brand-texto);
           text-decoration: none;
           border-bottom: 1px solid transparent;
           padding-bottom: 1px;
@@ -890,7 +890,7 @@ export default function ProcedimientosPage() {
         .proc-card-price {
           font-size: 0.85rem;
           font-weight: 700;
-          color: var(--brand);
+          color: var(--brand-texto);
         }
         .proc-card-price-unit {
           font-size: 0.7rem;
@@ -1183,7 +1183,7 @@ function FeaturedCarousel({
               {item.precio && (
                 <p
                   style={{
-                    color: "var(--brand)",
+                    color: "var(--brand-texto)",
                     fontWeight: 700,
                     fontSize: "0.95rem",
                     margin: "0.2rem 0 0",
@@ -1310,6 +1310,21 @@ function FeaturedCarousel({
         .featured-dots {
           display: flex;
           justify-content: center;
+          /* fit-content + margen automatico: sin esto la pastilla se estira
+             de lado a lado.
+
+             Un div con display:flex sigue siendo de nivel bloque, asi que
+             ocupa todo el ancho del padre; justify-content:center centra
+             los puntos DENTRO de esa caja, pero la caja —con su fondo, su
+             borde y su sombra— seguia midiendo lo que midiera la seccion. En
+             pantalla eso era una barra de 1.400px con ocho puntos diminutos
+             en medio, que no se lee como un indicador sino como un separador
+             roto.
+
+             Centrar el contenido y ceñir la caja son dos cosas distintas, y
+             hacia falta hacer las dos. */
+          width: fit-content;
+          margin-inline: auto;
           margin-top: 1rem;
           gap: 8px;
           padding: 0.4rem 0.7rem;
@@ -1538,7 +1553,7 @@ function EmptyState({
           alignItems: "center",
           justifyContent: "center",
           margin: "0 auto 1rem",
-          color: "var(--brand)",
+          color: "var(--brand-texto)",
         }}
       >
         <Search size={26} />

@@ -55,3 +55,299 @@
 :root[data-theme="dark"] .admin-form-card .small {
   color: var(--text-muted) !important;
 }
+
+/* ============================================================
+   Asistente — el bloque del conector
+
+   Va con estilo propio y no con el de una tarjeta cualquiera del panel
+   porque tiene que ganarle la mirada a la caja de la clave de API que hay
+   debajo. Si los dos pesan igual, se lee primero el formulario, que es
+   justo el orden que esta pantalla existe para invertir.
+============================================================ */
+.conectar-bloque {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--brand);
+  border-radius: 14px;
+  background: var(--surface-soft);
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.conectar-bloque-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 0.4rem;
+  color: var(--brand-texto);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.conectar-bloque-titulo {
+  margin: 0 0 0.5rem;
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.conectar-bloque-texto {
+  margin: 0 0 0.9rem;
+  color: var(--text-soft);
+  font-size: 0.87rem;
+  line-height: 1.6;
+}
+.conectar-bloque-pasos {
+  /* `list-style` explicito: un reset global deja las listas sin vinetas, y sin
+     los numeros los tres pasos se leen como tres parrafos sueltos en vez de
+     como una secuencia que hay que seguir en orden. Se vio en pantalla, no
+     en el codigo. */
+  list-style: decimal;
+  margin: 0 0 0.9rem;
+  padding-left: 1.2rem;
+  color: var(--text-soft);
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+.conectar-bloque-pasos li { margin-bottom: 0.55rem; }
+.conectar-bloque-pasos li::marker { color: var(--brand-texto); font-weight: 700; }
+
+/* La direccion en su propia linea y no dentro del parrafo: es lo unico que
+   hay que llevarse de esta pantalla. `flex-wrap` para que en movil el boton
+   caiga debajo en vez de estrujar la direccion hasta hacerla ilegible. */
+.conectar-bloque-url {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 0.45rem;
+}
+.conectar-bloque-url code {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.7rem;
+  color: var(--text);
+  font-size: 0.82rem;
+}
+.conectar-bloque-copiar {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 100px;
+  background: var(--bg-elevated);
+  color: var(--brand-texto);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--mov-rapido) var(--mov-curva);
+}
+.conectar-bloque-copiar:hover { background: var(--surface); }
+.conectar-bloque-nota {
+  margin: 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.79rem;
+  line-height: 1.6;
+}
+.conectar-bloque-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--brand-texto);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ============================================================
+   Informacion general — vista previa y tarjetas
+
+   La pantalla era treinta campos en fila. Funcionaba, pero no decia en
+   ningun momento QUE producen esos campos juntos, y una seccion a medias
+   solo se descubria bajando hasta ella.
+============================================================ */
+.cfg-previa {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(160deg, var(--surface-soft), var(--bg-elevated));
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 1.75rem;
+}
+.cfg-previa-eyebrow {
+  margin: 0 0 0.7rem;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+.cfg-previa-nombre {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.cfg-previa-especialidad {
+  margin: 2px 0 0.9rem;
+  color: var(--brand-texto);
+  font-size: 0.83rem;
+  font-weight: 600;
+}
+.cfg-previa-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+.cfg-previa-linea {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: var(--text-soft);
+  font-size: 0.83rem;
+  line-height: 1.5;
+  /* `break-word`: las direcciones de Instagram son largas y sin esto
+     ensanchan la tarjeta hasta desbordar el panel en movil. */
+  overflow-wrap: anywhere;
+}
+.cfg-previa-icono {
+  color: var(--brand-texto);
+  flex-shrink: 0;
+  display: flex;
+  margin-top: 2px;
+}
+/* Lo que falta se ve, no se calla. En el sitio un campo vacio es una linea
+   que simplemente no aparece, y desde el panel eso es indistinguible de que
+   todo este bien. */
+.cfg-previa-falta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-style: italic;
+}
+.cfg-previa-promo,
+.cfg-previa-agenda {
+  margin: 0.9rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+.cfg-previa-agenda { margin-top: 0.5rem; padding-top: 0.5rem; border-top: none; }
+
+.cfg-tarjeta {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-elevated);
+  padding: 1.1rem 1.15rem;
+  margin-bottom: 1.1rem;
+}
+.cfg-tarjeta-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 3px;
+}
+.cfg-tarjeta-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--surface-soft);
+  color: var(--brand-texto);
+  flex-shrink: 0;
+}
+.cfg-tarjeta-titulo {
+  margin: 0;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 1.02rem;
+}
+/* `margin-left: auto` y no una rejilla: el titulo manda el ancho y la cuenta
+   se va al borde sola, sea cual sea el largo del titulo. */
+.cfg-tarjeta-cuenta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.15rem 0.55rem;
+  border-radius: 100px;
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.cfg-tarjeta-cuenta.esta-completa {
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  color: var(--success);
+}
+.cfg-tarjeta-descripcion {
+  margin: 0 0 0.95rem;
+  padding-left: 39px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+@media (max-width: 520px) {
+  .cfg-tarjeta-descripcion { padding-left: 0; }
+}
+
+/* Los tres puntos de "esta pensando".
+
+   `animation-delay` negativo y no positivo: con el positivo, la primera vuelta
+   arranca con los tres puntos abajo y quietos, y justo el primer instante
+   —cuando el usuario esta mirando si paso algo— es el que no dice nada. En
+   negativo, la animacion empieza ya empezada. */
+.copiloto-pensando {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+}
+.copiloto-punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brand-texto);
+  animation: copiloto-onda 1.2s ease-in-out infinite;
+}
+.copiloto-punto:nth-child(1) { animation-delay: -1.2s; }
+.copiloto-punto:nth-child(2) { animation-delay: -1.05s; }
+.copiloto-punto:nth-child(3) { animation-delay: -0.9s; }
+
+@keyframes copiloto-onda {
+  0%, 60%, 100% { transform: translateY(0);     opacity: 0.35; }
+  30%           { transform: translateY(-5px);  opacity: 1; }
+}
+
+/* Quien pidio menos movimiento no se queda sin saber que esta pasando: los
+   puntos dejan de saltar pero siguen latiendo en opacidad, que es un cambio
+   mucho mas suave y sigue distinguiendo "trabajando" de "colgado". */
+@media (prefers-reduced-motion: reduce) {
+  .copiloto-punto { animation: copiloto-latido 1.6s ease-in-out infinite; }
+  @keyframes copiloto-latido {
+    0%, 100% { opacity: 0.3; }
+    50%      { opacity: 0.9; }
+  }
+}

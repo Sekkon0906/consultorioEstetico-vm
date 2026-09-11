@@ -44,7 +44,7 @@ export default function HistorialReportes() {
   if (loading) {
     return (
       <div className="text-center py-4">
-        <div className="spinner-border spinner-border-sm" style={{ color: "var(--brand)" }} role="status" />
+        <div className="spinner-border spinner-border-sm" style={{ color: "var(--brand-texto)" }} role="status" />
       </div>
     );
   }

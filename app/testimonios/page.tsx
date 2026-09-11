@@ -15,7 +15,7 @@ import { getTestimoniosApi } from "@/services/testimoniosApi";
 
 function getYouTubeId(url: string): string {
   if (!url) return "";
-  var match = url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([^&?/]+)/);
+  const match = url.match(/(?:v=|youtu\.be\/|embed\/|shorts\/|live\/)([^&?/]+)/);
   return match ? match[1] : "";
 }
 
@@ -26,7 +26,7 @@ function esArchivoVideo(url: string | null | undefined): boolean {
 function toEmbedUrl(url: string): string {
   if (!url) return "";
   if (url.includes("embed/")) return url;
-  var id = getYouTubeId(url);
+  const id = getYouTubeId(url);
   if (id) return "https://www.youtube.com/embed/" + id;
   return url;
 }
@@ -38,20 +38,20 @@ function tieneVideoValido(video: string | null | undefined): boolean {
 
 export default function TestimoniosPage() {
   const t = useTranslations("testimonios");
-  var [testimonios, setTestimonios] = useState<Testimonio[]>([]);
-  var [videoActivo, setVideoActivo] = useState<string | null>(null);
+  const [testimonios, setTestimonios] = useState<Testimonio[]>([]);
+  const [videoActivo, setVideoActivo] = useState<string | null>(null);
 
   useEffect(function() {
     getTestimoniosApi().then(setTestimonios).catch(console.error);
   }, []);
 
-  var activos = testimonios.filter(function(t) { return t.activo; }).sort(function(a, b) { return new Date(b.creadoEn).getTime() - new Date(a.creadoEn).getTime(); });
+  const activos = testimonios.filter(function(t) { return t.activo; }).sort(function(a, b) { return new Date(b.creadoEn).getTime() - new Date(a.creadoEn).getTime(); });
 
   return (
     <main className="dark-aware-section testimonios-page" style={{ minHeight: "var(--alto-pantalla, 100vh)", background: "linear-gradient(180deg, var(--bg-elevated) 0%, var(--surface) 100%)" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "4rem 1.5rem 3rem" }}>
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--brand)", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("badge")}</span>
+          <span style={{ display: "inline-block", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--brand-texto)", background: "rgba(176,137,104,0.07)", border: "1px solid rgba(176,137,104,0.18)", borderRadius: 100, padding: "0.4rem 1.3rem", marginBottom: "1rem" }}>{t("badge")}</span>
           <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", fontWeight: 700, color: "var(--text)", marginBottom: "0.8rem" }}>{t("title")}</h1>
           <div style={{ width: 50, height: 3, background: "linear-gradient(90deg, var(--brand-soft), var(--brand))", borderRadius: 2, margin: "0 auto 0.8rem" }} />
           <p style={{ fontSize: "1.05rem", color: "var(--text-soft)", maxWidth: 600, margin: "0 auto" }}>{t("subtitle")}</p>
@@ -62,8 +62,8 @@ export default function TestimoniosPage() {
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "1.5rem", maxWidth: 1240, margin: "0 auto" }}>
             {activos.map(function(testimonio, i) {
-              var videoValido = tieneVideoValido(testimonio.video);
-              var ytId = getYouTubeId(testimonio.video || "");
+              const videoValido = tieneVideoValido(testimonio.video);
+              const ytId = getYouTubeId(testimonio.video || "");
               return (
                 <div key={testimonio.id} className="dark-aware-card" style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 18, overflow: "hidden", boxShadow: "0 4px 14px rgba(78,59,43,0.06)", transition: "transform 0.3s", animation: "fadeInUp 0.6s ease " + (i * 0.08) + "s both" }}
                   onMouseEnter={function(e) { e.currentTarget.style.transform = "translateY(-4px)"; }}
